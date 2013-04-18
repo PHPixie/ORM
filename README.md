@@ -1,4 +1,4 @@
 PHPixie-ORM
 ===========
 
-ORM
+ORM Library for PHPixie

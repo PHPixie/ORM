@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "phpixie/db": "*"
+        "phpixie/db": "2.*@dev"
     },
     "autoload": {
         "psr-0": {"PHPixie": "classes/"}
@@ -22,4 +22,5 @@
         "branch-alias": {
             "dev-master": "2.x-dev"
         }
+    }
 }

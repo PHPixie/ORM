@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "phpixie/db": "*"
+        "phpixie/db": "2.0.*@dev"
     },
     "autoload": {
         "psr-0": {"PHPixie": "classes/"}

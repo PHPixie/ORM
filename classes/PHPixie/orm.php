@@ -2,6 +2,15 @@
 
 namespace PHPixie;
 
+/**
+ * ORM Module for PHPixie
+ *
+ * This module allows you to instantly turn your tables 
+ * into Models and specify their relations in a simple way.
+ *
+ * @see \PHPixie\DB\Query
+ * @package    DB
+ */
 class ORM {
 	
 	/**

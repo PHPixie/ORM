@@ -209,15 +209,14 @@ class Model
 		
 		return $this;
 	}
-
+	
 	/**
-	 * Finds all rows that meet set criteria.
+	 * Prepares the relationships specified using with().
 	 *
-	 * @return \PHPixie\ORM\Result Returns ORM Result that you can use in a 'foreach' loop.
+	 * @return array Relationship definitions used by \PHPixie\ORM\Result
 	 * @throw  \Exception If the relationship specified using with() does not exist or is not of the belongs_to or has_one type
 	 */
-	public function find_all()
-	{
+	public function prepare_relations() {
 		$paths = array();
 		if (!empty($this->_with))
 		{
@@ -282,7 +281,19 @@ class Model
 
 			call_user_func_array(array($this->query, 'fields'), $fields);
 		}
-
+		
+		return $paths;
+		
+	}
+	
+	/**
+	 * Finds all rows that meet set criteria.
+	 *
+	 * @return \PHPixie\ORM\Result Returns ORM Result that you can use in a 'foreach' loop.
+	 */
+	public function find_all()
+	{
+		$paths = $this->prepare_relations();
 		return $this->pixie->orm->result($this->model_name, $this->query->execute(), $paths);
 	}
 

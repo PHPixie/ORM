@@ -24,19 +24,19 @@ class Result implements \Iterator
 	 * Name of the model that the rows belong to
 	 * @var string
 	 */
-	private $_model;
+	protected $_model;
 
 	/**
 	 * Database result
 	 * @var Result_Database
 	 */
-	private $_dbresult;
+	protected $_dbresult;
 
 	/**
 	 * Rules for preloaded relationships
 	 * @var array
 	 */
-	private $_with = array();
+	protected $_with = array();
 
 	/**
 	 * Initialized an Result_ORM with which model to use and which result to

@@ -66,6 +66,7 @@ class ORM {
 		return new \PHPixie\ORM\Result($this->pixie, $model, $dbresult, $with);
 	}
 	
+<<<<<<< HEAD:classes/PHPixie/orm.php
 	/**
 	 * Initializes an ORM Model Extension.
 	 *
@@ -77,4 +78,6 @@ class ORM {
 		return new $class($this->pixie, $model);
 	}
 	
+=======
+>>>>>>> cf9c907091c978945889e766f299f4eda5fd90d9:classes/PHPixie/ORM.php
 }

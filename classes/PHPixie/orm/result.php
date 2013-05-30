@@ -24,19 +24,19 @@ class Result implements \Iterator
 	 * Name of the model that the rows belong to
 	 * @var string
 	 */
-	private $_model;
+	protected $_model;
 
 	/**
 	 * Database result
 	 * @var Result_Database
 	 */
-	private $_dbresult;
+	protected $_dbresult;
 
 	/**
 	 * Rules for preloaded relationships
 	 * @var array
 	 */
-	private $_with = array();
+	protected $_with = array();
 
 	/**
 	 * Initialized an Result_ORM with which model to use and which result to
@@ -72,27 +72,27 @@ class Result implements \Iterator
 	{
 		$this->_dbresult->rewind();
 	}
-
+	
 	/**
-	 * Gets an ORM Model of the current row
+	 * Builds a model instance based on row data.
 	 *
-	 * @return \PHPixie\ORM\Model Model of the current row of the result set
+	 * @param array $data Item data
+	 * @return \PHPixie\ORM\Model Model instance initialized with item data
 	 */
-	public function current()
-	{
+	public function build_model($data) {
+		
 		$model = $this->pixie->orm->get($this->_model);
 
-		if (!$this->_dbresult->valid())
+		if (empty($data))
 		{
 			return $model;
 		}
 
 		if (empty($this->_with))
 		{
-			return $model->values((array) $this->_dbresult->current(), true);
+			return $model->values($data, true);
 		}
 
-		$data = (array) $this->_dbresult->current();
 
 		$model_data = array();
 		foreach ($model->columns() as $column)
@@ -124,7 +124,22 @@ class Result implements \Iterator
 			}
 		}
 
-		return $model;
+		return $model;	
+		
+	}
+	
+	/**
+	 * Gets an ORM Model of the current row
+	 *
+	 * @return \PHPixie\ORM\Model Model of the current row of the result set
+	 */
+	public function current()
+	{
+		$data = $this->_dbresult->valid()
+			?((array) $this->_dbresult->current())
+			:null;
+			
+		return $this->build_model($data);
 	}
 
 	/**

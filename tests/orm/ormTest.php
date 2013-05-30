@@ -1,5 +1,5 @@
 <?php
-
+require_once(__DIR__.'/../files/extension.php');
 require_once(__DIR__.'/../files/tree_orm.php');
 require_once(__DIR__.'/../files/fairy_orm.php');
 

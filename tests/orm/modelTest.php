@@ -1,5 +1,5 @@
 <?php
-
+require_once(__DIR__.'/../files/extension.php');
 require_once(__DIR__.'/../files/tree_orm.php');
 require_once(__DIR__.'/../files/fairy_orm.php');
 
@@ -342,7 +342,12 @@ class ORM_Model_Test extends PHPUnit_Framework_TestCase
 		$fairy->values(array('id' => 1, 'name' => 'Trixie'));
 		$this->assertEquals('Trixie', $fairy->name);
 	}
-
+	
+	public function testExtension() {
+		$fairy = $this->fairies->find();
+		$fairy->extension->id = 1;
+		$this->assertEquals(1,$fairy->extension->id);
+	}
 	/**
 	 * @covers $this->pixie->orm->get
 	 * @todo   Implement testFactory().

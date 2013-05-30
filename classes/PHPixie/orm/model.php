@@ -114,7 +114,19 @@ class Model
 	 * @var array
 	 */
 	protected $_with = array();
-
+	
+	/**
+	 * Extension definitions
+	 * @var array
+	 */
+	protected $extensions = array();
+	
+	/**
+	 * Extension instances
+	 * @var array
+	 */
+	protected $extension_instances = array();
+	
 	/**
 	 * Cached column names for tables
 	 * @var array
@@ -132,6 +144,7 @@ class Model
 	 * and will use the 'default' connection. This behaviour is easy to be
 	 * changed by overriding $table, $id and $db properties.
 	 *
+	 * @param \PHPixie\Pixie $pixie Pixie dependency container
 	 * @return void
 	 * @see $table
 	 * @see $id
@@ -209,15 +222,14 @@ class Model
 		
 		return $this;
 	}
-
+	
 	/**
-	 * Finds all rows that meet set criteria.
+	 * Prepares the relationships specified using with().
 	 *
-	 * @return \PHPixie\ORM\Result Returns ORM Result that you can use in a 'foreach' loop.
+	 * @return array Relationship definitions used by \PHPixie\ORM\Result
 	 * @throw  \Exception If the relationship specified using with() does not exist or is not of the belongs_to or has_one type
 	 */
-	public function find_all()
-	{
+	public function prepare_relations() {
 		$paths = array();
 		if (!empty($this->_with))
 		{
@@ -282,7 +294,19 @@ class Model
 
 			call_user_func_array(array($this->query, 'fields'), $fields);
 		}
-
+		
+		return $paths;
+		
+	}
+	
+	/**
+	 * Finds all rows that meet set criteria.
+	 *
+	 * @return \PHPixie\ORM\Result Returns ORM Result that you can use in a 'foreach' loop.
+	 */
+	public function find_all()
+	{
+		$paths = $this->prepare_relations();
 		return $this->pixie->orm->result($this->model_name, $this->query->execute(), $paths);
 	}
 
@@ -378,7 +402,7 @@ class Model
 	}
 	
 	/**
-	 * Magic method that allows accessing row columns as properties and also facilitates
+	 * Magic method that allows accessing row columns and extensions as properties and also facilitates
 	 * access to relationships and custom properties defined in get() method.
 	 * If a relationship is being accessed, it will return an ORM model of the related table
 	 * and automatically alter its query so that all your previously set conditions will remain
@@ -390,18 +414,28 @@ class Model
 	public function __get($column)
 	{
 		if (array_key_exists($column, $this->_row))
-		{
 			return $this->_row[$column];
-		}
+			
 		if (array_key_exists($column, $this->cached))
-		{
 			return $this->cached[$column];
-		}
+			
 		if (($val = $this->get($column)) !== null)
 		{
 			$this->cached[$column] = $val;
 			return $val;
 		}
+		
+		if (array_key_exists($column, $this->extension_instances))
+		{
+			return $this->extension_instances[$column];
+		}
+		
+		if (array_key_exists($column, $this->extensions))
+		{	
+			return $this->extension_instances[$column] = 
+				$this->pixie->orm->extension($this->extensions[$column], $this);
+		}
+		
 		$relations = array_merge($this->has_one, $this->has_many, $this->belongs_to);
 		if ($target = $this->pixie->arr($relations, $column, false))
 		{

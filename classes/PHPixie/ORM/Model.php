@@ -160,7 +160,7 @@ class Model
 		
 		if ($this->table == null)
 		{
-			$this->table = substr($this->model_name, strrpos($this->model_name, "\\"));
+			$this->table = str_replace("\\", '_', $this->model_name);
 			$this->table = $this->plural($this->table);
 		}
 		$this->query->table($this->table);
@@ -184,14 +184,14 @@ class Model
 				$normalized[$key]['type'] = $rels;
 				if (!isset($rel['key']))
 				{
-					$normalized[$key]['key'] = $rels != 'belongs_to' ? ($this->model_name.'_id') : $rel['model'].'_id';
+					$normalized[$key]['key'] = $this->model_key( $rels != 'belongs_to' ? $this->model_name : $rel['model']);
 				}
 
 				if ($rels == 'has_many' && isset($rel['through']))
 				{
 					if (!isset($rel['foreign_key']))
 					{
-						$normalized[$key]['foreign_key'] = $rel['model'].'_id';
+						$normalized[$key]['foreign_key'] = $this->model_key($rel['model']);
 					}
 				}
 
@@ -200,7 +200,18 @@ class Model
 			$this->$rels = $normalized;
 		}
 	}
-
+	
+	/**
+	 * Get model foreign key from model name
+	 *
+	 * @param string $model_name      Name of the model
+	 *
+	 * @return string  Foreign key for specified model name.
+	 */
+	public function model_key($model_name) {
+		return str_replace("\\", '_', $model_name).'_id';
+	}
+	
 	/**
 	 * Magic method for call Query_Database methods
 	 *

@@ -168,20 +168,21 @@ class Nested extends \PHPixie\ORM\Extension{
 	 * Move current node to a new position in the tree.
 	 * 
 	 * @param \PHPixie\ORM\Model $parent Parent to append the node to.
+	 * @param bool $append_to_beginning  Prepend node to the beginning of children list.
 	 * @param bool $children_only Whether to move children of the node instead of the whole node.
 	 *                            Defaults to false.
 	 * @return void
 	 */
-	protected function move_to($parent, $children_only = false) {
+	protected function move_to($parent, $append_to_beginning = false, $children_only = false) {
 		$width = $this->width();
 		if ($children_only) {
 			$width = $width - 2;
 		}
 		if ($parent != null) {
-			$lpos = $parent->rpos;
+			$lpos = $append_to_beginning?$parent->lpos+1:$parent->rpos;
 			$depth = $parent->depth + 1;
 		}else{
-			$lpos = $this->max_rpos_query()->execute()->current()->rpos + 1;
+			$lpos = ($append_to_beginning?0:$this->max_rpos_query()->execute()->current()->rpos) + 1;
 			$depth = 0;
 		}
 		$rpos = $lpos + $width - 1;
@@ -226,11 +227,12 @@ class Nested extends \PHPixie\ORM\Extension{
 	 * Execute save() on the model afterwards.
 	 * 
 	 * @param \PHPixie\ORM\Model $parent Parent to append the node to.
-	 
+	 * @param bool $append_to_beginning  Prepend node to the beginning of children list.
+	 *
 	 * @return \PHPixie\ORM\Model Current Model
 	 */
-	public function prepare_append($parent = null){
-		$this->move_to($parent);
+	public function prepare_append($parent = null, $append_to_beginning = false){
+		$this->move_to($parent, $append_to_beginning);
 		return $this->model;
 	}
 	
@@ -238,15 +240,16 @@ class Nested extends \PHPixie\ORM\Extension{
 	 * Move children of the current node to the new parent.
 	 * 
 	 * @param \PHPixie\ORM\Model $parent Parent to move child nodes to.
-	 
+	 * @param bool $append_to_beginning  Prepend node to the beginning of children list.
+	 *
 	 * @return \PHPixie\ORM\Model Current Model
 	 * @throw \Exception If associated model is not loaded
 	 */
-	public function move_children($parent = null) {
+	public function move_children($parent = null, $append_to_beginning = false) {
 		if (!$this->model->loaded())
 			throw new \Exception("The model is not loaded, hence has no children.");
 		if($this->width()>2)
-			$this->move_to($parent, true);
+			$this->move_to($parent, $append_to_beginning, true);
 		return $this->model;
 	}
 	

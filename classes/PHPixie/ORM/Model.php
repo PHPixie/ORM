@@ -247,46 +247,41 @@ class Model
 			$fields = array();
 			$this_alias = $this->query->last_alias();
 			foreach ($this->columns() as $column)
-			{
 				$fields[] = array("{$this_alias}.{$column}", "{$this_alias}__{$column}");
-			}
-			foreach ($this->_with as $target)
-			{
+			
+			foreach ($this->_with as $target) {
+			
 				$model = $this;
 				$model_alias = $this_alias;
 				$rels = explode('.', $target);
-				foreach ($rels as $key => $rel_name)
-				{
+				
+				foreach ($rels as $key => $rel_name) {
+				
 					$path = implode('.', array_slice($rels, 0, $key + 1));
-					if (isset($paths[$path]))
-					{
+					if (isset($paths[$path])) {
 						$model = $paths[$path]['model'];
 						$model_alias = $paths[$path]['alias'];
 						continue;
 					}
-					$alias = $this->query->add_alias();
+					
+					$alias = str_replace('.', '_', $path);
 					$model_rels = array_merge($model->has_one, $model->has_many, $model->belongs_to);
 					$rel = $this->pixie->arr($model_rels, $rel_name, false);
 
 					if (!$rel)
-					{
 						throw new \Exception("Model '{$model->model_name}' doesn't have a '{$rel_name}' relation defined");
-					}
+						
 					if ($rel['type'] == 'has_many')
-					{
 						throw new \Exception("Relationship '{$rel_name}' is of has_many type and cannot be preloaded view with()");
-					}
+						
 					$rel_model = $this->pixie->orm->get($rel['model']);
 
-					if ($rel['type'] == 'belongs_to')
-					{
+					if ($rel['type'] == 'belongs_to') {
 						$this->query->join(array($rel_model->table, $alias), array(
 							$model_alias.'.'.$rel['key'],
 							$alias.'.'.$rel_model->id_field,
 							), 'left');
-					}
-					else
-					{
+					}else{
 						$this->query->join(array($rel_model->table, $alias), array(
 							$model_alias.'.'.$model->id_field,
 							$alias.'.'.$rel['key'],
@@ -294,9 +289,8 @@ class Model
 					}
 
 					foreach ($rel_model->columns() as $column)
-					{
 						$fields[] = array("{$alias}.{$column}", "{$alias}__{$column}");
-					}
+						
 					$model = $rel_model;
 					$model_alias = $alias;
 					$paths[$path] = array('alias' => $alias, 'model' => $model);

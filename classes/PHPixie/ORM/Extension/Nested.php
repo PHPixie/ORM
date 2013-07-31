@@ -178,7 +178,7 @@ class Nested extends \PHPixie\ORM\Extension{
 		if ($children_only) {
 			$width = $width - 2;
 		}
-		if ($parent != null) {
+		if ($parent != null && $parent->loaded()) {
 			$lpos = $append_to_beginning?$parent->lpos+1:$parent->rpos;
 			$depth = $parent->depth + 1;
 		}else{
@@ -226,7 +226,7 @@ class Nested extends \PHPixie\ORM\Extension{
 	 * Prepare the tree for the node move. 
 	 * Execute save() on the model afterwards.
 	 * 
-	 * @param \PHPixie\ORM\Model $parent Parent to append the node to.
+	 * @param \PHPixie\ORM\Model $parent Parent to append the node to. If it's an empty model it will be ignored.
 	 * @param bool $append_to_beginning  Prepend node to the beginning of children list.
 	 *
 	 * @return \PHPixie\ORM\Model Current Model

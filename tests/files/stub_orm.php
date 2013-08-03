@@ -6,6 +6,7 @@ namespace Model{
 		public $row;
 		public $loaded;
 		public $cached = array();
+		public $model_name = 'Stub_Orm';
 
 		public function values($row, $loaded)
 		{

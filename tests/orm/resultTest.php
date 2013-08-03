@@ -141,6 +141,32 @@ class ORM_Result_Test extends PHPUnit_Framework_TestCase
 			(object) array('id' => 1, 'name' => 'Trixie', 'id1' => 11, 'name1' => 'Trixie1', 'id2' => 12, 'name2' => 'Trixie2'),
 			(object) array('id' => 1, 'name' => 'Tinkerbell', 'id1' => 11, 'name1' => 'Tinkerbell1', 'id2' => 12, 'name2' => 'Tinkerbell2')
 		);
+
+		$this->object = new \PHPixie\ORM\Result($this->pixie, 'Stub_Orm', $this->stub, array(
+			'tester' => array('model' => new \Model\Stub_Orm),
+			'tester.another' => array('model' => new \Model\Stub_Orm)
+		));
+		
+		$arr = $this->object->as_array();
+		foreach (array('Trixie', 'Tinkerbell') as $key => $name)
+		{
+			$this->assertArrayHasKey($key, $arr);
+			$this->assertEquals($name, $arr[$key]->row['name']);
+			$this->assertArrayHasKey('tester', $arr[$key]->cached);
+
+			$this->assertEquals($name.'1', $arr[$key]->cached['tester']->row['name']);
+			$this->assertArrayHasKey('another', $arr[$key]->cached['tester']->cached);
+			$this->assertEquals($name.'2', $arr[$key]->cached['tester']->cached['another']->row['name']);
+			$this->object->next();
+		}
+	}
+
+	public function test_withArrayData()
+	{
+		$this->stub->data = array(
+			(object) array('id' => 1, 'name' => 'Trixie', 'id1' => 11, 'name1' => 'Trixie1', 'id2' => 12, 'name2' => 'Trixie2'),
+			(object) array('id' => 1, 'name' => 'Tinkerbell', 'id1' => 11, 'name1' => 'Tinkerbell1', 'id2' => 12, 'name2' => 'Tinkerbell2')
+		);
 		$this->object = new \PHPixie\ORM\Result($this->pixie,'Stub_Orm', $this->stub, array(
 			'tester' => array('model' => $this->pixie->orm->get('Stub_Orm')),
 			'tester.another' => array('model' => $this->pixie->orm->get('Stub_Orm'))

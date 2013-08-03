@@ -108,14 +108,15 @@ class Result implements \Iterator
 			{
 				$rel_data[$column] = array_shift($data);
 			}
-			$rel['model']->values($rel_data, true);
+			$rel_model = $this->pixie->orm->get($rel['model']->model_name);
+			$rel_model->values($rel_data, true);
 
 			$owner = $model;
 			foreach ($rel['path'] as $key => $child)
 			{
 				if ($key == $rel['path_count'] - 1)
 				{
-					$owner->cached[$child] = $rel['model'];
+					$owner->cached[$child] = $rel_model;
 				}
 				else
 				{

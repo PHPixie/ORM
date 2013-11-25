@@ -680,7 +680,7 @@ class Model
 	{
 		if (!$this->loaded())
 			foreach ($this->columns() as $column)
-				$this->$column = $this->pixie->arr($defaults, $column, null);
+				$this->$column = isset($defaults[$column]) ? $defaults[$column] : null;
 		return $this;
 	}
 

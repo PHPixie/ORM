@@ -45,7 +45,7 @@ class ORM_Model_Test extends PHPUnit_Framework_TestCase
                  ->method('find_file')
                  ->will($this->returnValue($this->conf_file));
 		$this->pixie->db = new \PHPixie\DB($this->pixie);
-		$this->pixie-> orm = new \PHPixie\ORM($this->pixie);
+		$this->pixie->orm = new \PHPixie\ORM($this->pixie);
 				 
 		$this->pixie->config->set('db.orm.connection', 'sqlite:'.$this->db_file);
 		$this->pixie->config->set('db.orm.driver', 'pdo');
@@ -260,6 +260,33 @@ class ORM_Model_Test extends PHPUnit_Framework_TestCase
 		$this->assertEquals('id', $cols[0]);
 		$this->assertEquals('name', $cols[1]);
 		$this->assertEquals('tree_id', $cols[2]);
+	}
+
+	/**
+	 * @covers ORM::init_columns
+	 * @todo   Implement testInit_columns()
+	 */
+	public function testInit_columns()
+	{
+		// fairy: id,name,tree_id
+		$fairy = $this->pixie->orm->get('fairy', 0)->init_columns();
+		$this->assertEquals(null, $fairy->id);
+		$this->assertEquals(null, $fairy->name);
+		$this->assertEquals(null, $fairy->tree_id);
+
+		$fairy = $this->pixie->orm->get('fairy', 0)->init_columns( array('name' => 'Pixie', 'tree_id' => 0) );
+		$this->assertEquals(null, $fairy->id);
+		$this->assertEquals('Pixie', $fairy->name);
+		$this->assertEquals(0, $fairy->tree_id);
+
+		$except = false;
+		try{
+			$fairy->non_existing;
+		}catch(\Exception $e){
+			$except = true;
+		}
+
+		$this->assertEquals(true, $except);
 	}
 
 	/**

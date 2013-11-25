@@ -670,6 +670,23 @@ class Model
 		return $cache[$this->table];
 	}
 
+	/*
+	* Init properties for model if not loaded and fill it with default values
+	*
+	* @param array $defaults An associative array with default values for columns
+	* @return \PHPixie\ORM\Model Returns itself
+	*/
+	public function init_columns($defaults = array())
+	{
+	if (!$this->loaded())
+		foreach ($this->columns() as $column)
+			if (isset($defaults[$column]))
+				$this->$column = $defaults[$column];
+			else
+				$this->$column = null;
+	return $this;
+	}
+
 	/**
 	 * Gets the items id field value
 	 *

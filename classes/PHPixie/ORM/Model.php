@@ -678,13 +678,10 @@ class Model
 	*/
 	public function init_columns($defaults = array())
 	{
-	if (!$this->loaded())
-		foreach ($this->columns() as $column)
-			if (isset($defaults[$column]))
-				$this->$column = $defaults[$column];
-			else
-				$this->$column = null;
-	return $this;
+		if (!$this->loaded())
+			foreach ($this->columns() as $column)
+				$this->$column = $this->pixie->arr($defaults, $column, null);
+		return $this;
 	}
 
 	/**

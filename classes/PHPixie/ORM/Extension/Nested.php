@@ -187,7 +187,7 @@ class Nested extends \PHPixie\ORM\Extension{
 		}
 		$rpos = $lpos + $width - 1;
 		
-		if ($this->model->loaded() && $width>2)
+		if ($this->model->loaded())
 			$this->reverse_children_pos_query()->execute();
 			
 		$this->pad_rpos_query($lpos, $width)->execute();

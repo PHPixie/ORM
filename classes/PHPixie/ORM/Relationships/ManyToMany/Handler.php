@@ -46,4 +46,25 @@ class Handler{
 	public function process_left_relationship($config, $query, $group, $relationship, $plan) {
 		$this->process_side_relationship('left', 'right', $config, $query, $group, $relationship, $plan);
 	}
+	
+	protected function add_to_side($side, $config, $model, $items) {
+		$model_name = $config["{$side}_model"];
+		
+		
+		
+		$keys = array($config["linker_{$side}_key"], $config["linker_{$opposing_side}_key"]);
+		$data = array();
+		foreach($ids as $id)
+			$data[] = array($model->id(), $id);
+		
+		
+		$this->db->query('insert', $config['linker_connection'])
+																->table($config['linker_table'])
+																->batch_data($keys, $data)
+																->execute();
+	}
+	
+	public function add_to_left($model, $property ,$items) {
+		$this->add_to_side('left', $config, $query, $group, $relationship, $plan);
+	}
 }

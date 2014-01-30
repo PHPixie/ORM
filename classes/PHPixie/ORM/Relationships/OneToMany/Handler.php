@@ -27,25 +27,6 @@ class Handler{
 		return $query;
 	}
 	
-	protected function get_item_ids_subquery($params, $conditions, $alias) {
-		$query = $this->db->query('select')
-						->fields(array($config['owner_id_field']))
-						->from($config['owner_table'], $alias);
-						
-		$this->mapper->add_conditions($query, $conditions);
-		return $query;
-	}
-	
-	protected function process_items_relationship($config, $query, $group, $relationship, $plan) {
-		$subquery = $this->get_owner_ids_subquery($params, $group->conditions(), $alias);
-		$this->id_strategy->add_condition($query, $group->logic, $group->negated(), $config['owner_id_field'], $subquery);
-	}
-	
-	protected function process_owner_relationship($config, $query, $current_alias, $conditions, $relationship, $plan) {
-		$subquery = $this->get_item_ids_subquery($params, $group->conditions(), $alias);
-		$this->id_strategy->add_condition($$query, $group->logic, $group->negated(), $config['owner_id_field'], $subquery);
-	}
-	
 	public function process_relationship($query, $model_name, $relationship, $plan) {
 		
 	}

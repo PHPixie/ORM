@@ -22,7 +22,7 @@ class Owner extends \PHPixie\ORM\Relationships\OneToMany\Handler\Side {
 	}
 	
 
-	public function add_owner_conditions($owner_handler, $config, $query, $group, $plan) {
+	public function add_owner_conditions($config, $query, $group, $plan) {
 		$subquery = $this->ids_query($config, $group->conditions());
 		$this->subquery_strategy($config)->add_condition($query, $group->logic, $group->negated(), $config['item_key'], $subquery);
 	}

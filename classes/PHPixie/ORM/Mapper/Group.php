@@ -44,8 +44,8 @@ class Group {
 	}
 	
 	protected function map_relationship_group($group, $model_name, $query, $plan) {
-		$this->get_handler($model_name, $relationship->relationship)
-				->map_relationship_group($model_name, $group, $query, $plan);
+		$this->get_handler($model_name, $group->relationship)
+				->map_relationship_group($group, $model_name, $query, $plan);
 	}
 	
 	protected function map_relationship_condition($relationship, $model_name, $query, $plan) {

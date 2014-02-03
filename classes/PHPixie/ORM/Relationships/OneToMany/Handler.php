@@ -18,13 +18,13 @@ class Handler{
 									->related($config['owner_items_property'], $item_condition);
 	}
 	
-	public function map_relationship_group($model_name, $group, $query, $plan) {
+	public function map_relationship_group($group, $model_name, $query, $plan) {
 		$config = $this->get_config($model_name, $group->relationship);
 		$side = $this->get_side($config, $model_name, $group);
 		$this->get_side($side, $config)->map_condition_group($config, $query, $relationship, $plan);
 	}
 	
-	public function map_model_condition($model_name, $model, $query, $plan) {
+	public function map_model_relationship($relationship, $model_name, $query, $plan) {
 		$config = $this->get_config($model_name, $relationship->relationship);
 		$side = $this->get_side($config, $model_name, $relationship);
 		$this->get_side($side, $config)->map_model_condition($config, $query, $relationship, $plan);

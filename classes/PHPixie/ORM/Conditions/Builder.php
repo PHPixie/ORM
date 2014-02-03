@@ -6,7 +6,7 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 	
 	protected $orm;
 	
-	public function __construct($orm, $default_operator = '='){
+	public function __construct($orm, $default_operator = '=') {
 		$this->orm = $orm;
 		$this->default_operator = $default_operator;
 		$this->current_group = $orm->condition_group();
@@ -33,9 +33,9 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 		if($relationship === null) {
 			parent::add_operator_condition($logic, $negate, $field, $operator, $values);
 		}else {
-			$group = $this->relationship_group($relationship);
-			$group->add($condition);
-			$this->current_group->add($group, $logic);
+			$this->start_relationship_group($logic, $relationship);
+			$this->current_group->add($condition);
+			$this->end_group();
 		}
 	}
 	
@@ -44,12 +44,21 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 	}
 	
 	public function start_relationship_group($logic, $relationship) {
-		$group = $this->relationship_group($relationship);
-		$this->push_group($logic, $group);
+		$current = $this->current_group;
+		
+		foreach(explode('.', $relationship) as $key => $rel) {
+			$group = $this->relationship_group($rel);
+			$this->add_group_to_group($key === 0 ? $logic:'and', $group, $current);
+			$current = $group;
+		}
+		
+		$this->group_stack[]=$group;
+		$this->current_group = $group;
 		return $this;
 	}
 	
 	public function add_relationship_group($logic, $negate, $args) {
+		echo(6); die;
 		if ($negate)
 			$logic = $logic.'_not';
 			

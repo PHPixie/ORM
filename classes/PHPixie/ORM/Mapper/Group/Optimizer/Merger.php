@@ -11,40 +11,6 @@ class Merger {
 		$this->orm = $orm;
 	}
 	
-	public function common_relationship($left, $right) {
-		if ($left === null || $right === null)
-			return null;
-			
-		$l_len = strlen($left);
-		$r_len = strlen($right);
-		$min_len = min($l_len, $r_len);
-		
-		$common = null;
-		$current = '';
-		
-		for ($i = 0; $i < $min_len; $i++) {
-			$char = $left[$i];
-			if ($char === $right[$i]) {
-			
-				if ($char === '.')
-					$common = $current;
-					
-				$current.= $char;
-			}else {
-				return $common;
-			}
-		}
-		
-		if ($l_len === $r_len)
-			return $current;
-		
-		$longer = $l_len > $r_len? $left:$right;
-		if ($longer[$min_len] === '.')
-			return $current;
-			
-		return $common;
-	}
-	
 	public function find_merge_target($condition_list, $new_condition, $logic_precedance) {
 		if (!($new_condition instanceof Group\Relationship))
 			return null;
@@ -64,9 +30,8 @@ class Merger {
 				continue;
 						
 			if ($cond instanceof Group\Relationship) {
-				$common = $this->common_relationship($cond->relationship, $new_condition->relationship);
-					if ($common !== null)
-						return $i;
+				if ($cond->relationship === $new_condition->relationship)
+					return $i;
 				
 			}elseif($unrelated_subgroup === null && $cond instanceof Group){
 				$unrelated_subgroup = $i;
@@ -96,27 +61,6 @@ class Merger {
 		foreach($right->conditions() as $key => $rcond)
 			$left->add($rcond, $key === 0 ? $right->logic : $rcond->logic);
 		return true;
-	}
-	
-	public function shift_relationship($cond, $prefix) {
-		if ($prefix === null)
-			return $cond;
-			
-		$len = strlen($prefix);
-		if ($cond->relationship === $prefix) {
-			$group = $this->orm->condition_group();
-			$group->set_conditions($cond->conditions());
-			$group->logic = $cond->logic;
-			if ($cond->negated())
-				$group->negate();
-			$cond = $group;
-			
-		}elseif(substr($cond->relationship, 0, $len) === $prefix) {
-			$cond->relationship = substr($cond->relationship, $len + 1);
-		}else
-			throw new \PHPixie\ORM\Exception\Mapper("Relation {$prefix} doesn't start with $prefix");
-		
-		return $cond;
 	}
 	
 }

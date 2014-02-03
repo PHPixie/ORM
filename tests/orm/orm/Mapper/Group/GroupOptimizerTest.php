@@ -13,7 +13,6 @@ class GroupOptimizerTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testOptimize() {
-		
 		$this->assertOptimize(array(
 			array (
 				'and_b' => array (
@@ -544,7 +543,7 @@ class GroupOptimizerTest extends PHPUnit_Framework_TestCase {
 				->_or('c.d.f6', 1);
 			})
 		);
-		
+		}
 	}
 	
 	protected function extract_conditions($conds) {
@@ -571,14 +570,15 @@ class GroupOptimizerTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	protected function assertOptimize($expected, $builder) {
-		$conds = $builder->get_conditions();
-		$res = $this->extract_conditions($conds);
-		var_export($res);
+		//$conds = $builder->get_conditions();
+		//$res = $this->extract_conditions($conds);
+		//var_export($res);
 		
 		$conds = $this->optimizer->optimize($builder->get_conditions());
-		$res = $this->extract_conditions($conds);
-		var_export($res);
-		$this->assertEquals($expected, $res);
+		//$res = $this->extract_conditions($conds);
+		//var_export($res);
+		
+		//$this->assertEquals($expected, $res);
 	}
 	
 	protected function builder() {

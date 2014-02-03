@@ -53,23 +53,20 @@ class Optimizer extends \PHPixie\DB\Conditions\Logic\Parser{
 		}
 		
 		$cond = $left[$target];
-		$common_relationship = null;
+		
+		$same_relationship = false;
+		
 		if ($cond instanceof Group\Relationship && $right instanceof Group\Relationship)
-			$common_relationship = $this->merger->common_relationship($cond->relationship, $right->relationship);
+			$same_relationship = $cond->relationship === $right->relationship;
 		
 		
 		$optimize_merge = true;
 		
-		$is_suitable = $cond instanceof Group && $common_relationship === null;
-		$is_suitable = $is_suitable || ($cond instanceof Group\Relationship && $common_relationship === $cond->relationship);
+		$is_suitable = $cond instanceof Group && !$same_relationship;
+		$is_suitable = $is_suitable || ($cond instanceof Group\Relationship && $same_relationship);
 		
 		if (!$is_suitable) {
-			if ($common_relationship === null) {
-				$group = $this->orm->condition_group();
-			}else {
-				$group = $this->orm->relationship_group($common_relationship);
-				$this->merger->shift_relationship($cond, $common_relationship);
-			}
+			$group = $this->orm->condition_group();
 			
 			$group->logic = $cond->logic;
 			$group->add($cond,  'and');
@@ -86,9 +83,7 @@ class Optimizer extends \PHPixie\DB\Conditions\Logic\Parser{
 		
 		
 		if (!($right instanceof Group) || !$this->merger->merge_groups($cond, $right, $this->logic_precedance)) {
-			if($right instanceof Group\Relationship)
-				$right = $this->merger->shift_relationship($right, $common_relationship);
-			$cond->add($right, $right->logic);
+		
 		}
 		
 		

@@ -9,21 +9,8 @@ class Ids extends \PHPixie\ORM\Query\Plan\Planner\Cross\Strategy {
 		$this->set_collection($query, $config['pivot']);
 		
 		$insert_step = $this->steps->cross_insert($query, array($left_key, $right_key));
-		$insert_step->add_left_ids($left_collection->field($left_id_field) , true);
-		$insert_step->add_right_ids($right_collection->field($right_id_field) , true);
-		
-		$collections = array(
-			'left' => $left_collection,
-			'right' => $right_collection,
-		);
-		
-		foreach($collections as $side => $collection)
-			foreach($collection->queries() as $query) {
-				$subplan = $query->map();
-				$subquery = $subplan->pop_result_query();
-				$plan->prepend_plan($subplan);
-				$insert_step->add_query($side, $subquery);
-			}
+		$this->add_collection($left_collection, 'left', $left_repository->id_field(), $insert_step);
+		$this->add_collection($right_collection, 'right', $right_repository->id_field(), $insert_step);
 		
 		$plan->push($insert_step);
 		return $plan;
@@ -33,28 +20,15 @@ class Ids extends \PHPixie\ORM\Query\Plan\Planner\Cross\Strategy {
 		$query = $this->db->query('insert', $config['pivot_connection']);
 		$this->set_collection($query, $config['pivot']);
 		
-		$insert_step = $this->steps->cross_delete($query, array($left_key, $right_key));
-		$insert_step->add_left_ids($left_collection->field($left_id_field) , true);
-		$insert_step->add_right_ids($right_collection->field($right_id_field) , true);
+		$delete_step = $this->steps->cross_delete($query, array($left_key, $right_key));
+		$this->add_collection($left_collection, 'left', $left_repository->id_field(), $delete_step);
+		$this->add_collection($right_collection, 'right', $right_repository->id_field(), $delete_step);
 		
-		$collections = array(
-			'left' => $left_collection,
-			'right' => $right_collection,
-		);
-		
-		foreach($collections as $side => $collection)
-			foreach($collection->queries() as $query) {
-				$subplan = $query->map();
-				$subquery = $subplan->pop_result_query();
-				$plan->prepend_plan($subplan);
-				$insert_step->add_query($side, $subquery);
-			}
-		
-		$plan->push($insert_step);
+		$plan->push($delete_step);
 		return $plan;
 	}
 	
-	protected function add_collection($collection, $side, $id_field, $insetstep) {
+	protected function add_collection($collection, $side, $id_field, $cross_step) {
 		$step->add_ids($side, $collection->field($id_field), true);
 		foreach($collection->queries() as $query) {
 			$subplan = $query->map();

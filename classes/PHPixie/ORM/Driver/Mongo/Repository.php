@@ -1,22 +1,22 @@
 <?php
 
-namespace PHPixie\ORM\Driver\PDO;
+namespace PHPixie\ORM\Driver\Mongo;
 
 class Repository extends \PHPixie\ORM\Repository {
 	
-	protected $table;
+	protected $collection;
 	protected $id_field;
 	
 	public function __construct($db, $model_name, $plural_name, $config) {
 		parent::__construct($model_name, $plural_name, $config);
-		$this->table = $config->get('table', $plural_name)
-		$this->id_field  = $config->get('id_field', 'id');
+		$this->collection = $config->get('collection', $plural_name);
+		$this->id_field  = $config->get('id_field', '_id');
 	}
 	
 	public function db_query($type) {
 		return $this->connection()
 					->query($type)
-					->table($this->table);
+					->collection($this->collection);
 	}
 	
 	public function id_field() {

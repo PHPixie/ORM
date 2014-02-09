@@ -17,7 +17,7 @@ abstract class Cross {
 		'right' => array(),
 	);
 	
-	public function __construct($query, $keys) {
+	public function __construct($query, $left_key, $right_key) {
 		$this->query = $query;
 		$this->keys = array(
 			'left' => $keys[0],

@@ -6,8 +6,13 @@ class Planners {
 	
 	protected $steps;
 	
-	public function __construct($steps) {
-		$this->steps = $steps;
+	protected function steps() {
+		if ($this->steps === null)
+			$this->steps = $this->build_steps();
+	}
+	
+	protected function build_steps() {
+		return new \PHPixie\ORM\Planners\Steps();
 	}
 	
 	public function embed() {
@@ -32,7 +37,7 @@ class Planners {
 	
 	protected function build_planner($name) {
 		$class = '\PHPixie\ORM\Planners\Planner\\'.ucfirst($name);
-		return new $class($this->steps);
+		return new $class($this->steps());
 	}
 	
 }

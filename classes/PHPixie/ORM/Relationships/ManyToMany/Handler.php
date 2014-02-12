@@ -61,4 +61,6 @@ class Handler{
 		$collection->add($items);
 		$this->process_add($config, $side, $opposing_side, $model, $collection);
 	}
+	
+	
 }

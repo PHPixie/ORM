@@ -46,7 +46,7 @@ class Registry {
 		return $this->handlers[$type];
 	}
 	
-	public function property($model, $property_name) {
+	public function property_handler($model, $property_name) {
 		$type = $this->propety_map[$model->model_name()][$property_name];
 		return $this->handler($type);
 	}

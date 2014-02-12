@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM\Query\Plan;
+namespace \PHPixie\ORM\Planners;
 
 abstract class Planner {
 	

@@ -4,19 +4,21 @@ namespace PHPixie\ORM\Mapper;
 
 class Preload {
 	
-	public function preloaders($model_name, $relationships, $plan) {
+	public function preloaders($loader, $relationships, $plan) {
 		foreach($relationships as $relationship) {
-			$path = explode('.', $relationship);
-			foreach($path as $rel) {
-				$handler->preloader($plan);
-			}
+			$this->preload_path($loader, $relationship);
 		}
 	}
 	
-	protected function reltionship_map($relationships) {
-		$map = array();
-		foreach($relationships as $relationship) {
-			
+	protected function preload_path($loader, $relationship) {
+		$current_loader = $loader;
+		foreach(explode('.', $relationship) as $property) {
+			$preloader = $current_loader->preloader($property);
+			if ($preloader === null) {
+				$preloader = $this->preloader();
+				$current_loader->add_preloader($property, $preloader);
+			}
+			$current_model = $preloader;
 		}
 	}
 	

@@ -55,12 +55,16 @@ class Handler{
 	}
 	
 	public function add($model, $property, $side, $items) {
-		$confoig = $this->get_config($model->model_name(), $property);
+		$config = $this->get_config($model->model_name(), $property);
 		$opposing_side = $this->opposing_side($side);
 		$collection = $this->orm->collection($config["{$side}_model"]);
 		$collection->add($items);
 		$this->process_add($config, $side, $opposing_side, $model, $collection);
 	}
 	
+	public function preload($loader, $property, $plan){
+		$config = $this->get_config($loader->model_name(), $property);
+		$loader->
+	}
 	
 }

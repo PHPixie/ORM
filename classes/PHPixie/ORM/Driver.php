@@ -3,6 +3,13 @@
 namespace PHPixie\ORM;
 
 abstract class Driver{
-
-	public abstract function save($data);
+	
+	protected $orm;
+	
+	public function __construct($orm) {
+		$this->orm = $orm;
+	}
+	
+	public abstract function repository($model_name, $model_config);
+	
 }

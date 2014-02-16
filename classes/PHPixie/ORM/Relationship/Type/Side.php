@@ -24,4 +24,5 @@ abstract class Side {
 	
 	public abstract function model_name();
 	public abstract function property_name();
+	public abstract function relationship_type();
 }

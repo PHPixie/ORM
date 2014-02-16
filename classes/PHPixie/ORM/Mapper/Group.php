@@ -15,7 +15,7 @@ class Group {
 		
 	}
 	
-	protected function add_conditions($query, $conditions, $plan) {
+	protected function map_conditions($db_query, $conditions, $model_name, $plan) {
 		$builder = $query->get_builder('where');
 		
 		foreach($conditions as $cond) {

@@ -17,7 +17,7 @@ class Map {
 		}
 	}
 	
-	public function add($side) {
+	public function add_side($side) {
 		$model_name = $side->model_name();
 		$property_name = $side->property_name();
 		
@@ -30,7 +30,7 @@ class Map {
 		$this->property_map[$model][$property] = $side;
 	}
 	
-	public function get($model_name, $property_name) {
+	public function get_side($model_name, $property_name) {
 		return $this->property_map[$model_name][$property_name];
 	}
 	

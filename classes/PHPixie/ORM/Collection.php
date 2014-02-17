@@ -21,7 +21,8 @@ class Collection {
 			$this->add_item($item);
 	}
 	
-	protected function add_item($item) {
+	protected function add_item($item, $recurse_array =  true) {
+		
 		if ($item instanceof \PHPixie\ORM\Model) {
 			if ($item->model_name() !== $this->required_model)
 				throw new \PHPixie\ORM\Exception\Mapper("Instance of the '{$item->model_name()}' model passed, but '{$this->required_model}' was expected.");

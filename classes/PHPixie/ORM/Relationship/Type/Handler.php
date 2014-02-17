@@ -1,17 +1,20 @@
 <?php
 
-namespace PHPixe\ORM\Relationships;
+namespace PHPixie\ORM\Relationship\Type;
 
 class Handler{
 	
+	protected $orm;
 	protected $relationship;
 	
-	public function __construct($relationship) {
+	public function __construct($orm, $relationship) {
+		$this->orm = $orm;
 		$this->relationship = $relationship;
 	}
 	
-	public function get_config($model, $property) {
-		return $this->relationship->config($model, $property);
+	protected function build_related_query($model_name, $property, $related) {
+		return $this->orm->query($model_name)
+								->related($property, $related_model);
 	}
 	
 }

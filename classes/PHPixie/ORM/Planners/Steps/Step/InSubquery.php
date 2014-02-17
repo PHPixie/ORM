@@ -8,7 +8,7 @@ class InSubquery{
 	protected $placeholder;
 	protected $field;
 	
-	public function __construct($query, $placeholder, $field) {
+	public function __construct($query, $placeholder, $field, $logic, $negated) {
 		if (count($query->get_fields()) !== 1)
 			throw new \PHPixie\ORM\Exception\Mapper("A field subquery must return only a single column.");
 		
@@ -23,7 +23,6 @@ class InSubquery{
 				->execute()
 				->get_column();
 		
-		$this->placeholder
-						->where($field, 'in', $ids);
+		$this->placeholder->condition($this->logic, $this->negated, $this->field, 'in', $ids);
 	}
 }

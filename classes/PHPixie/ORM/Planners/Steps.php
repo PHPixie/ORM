@@ -14,8 +14,8 @@ class Steps {
 		return new Step\Query\Result($query);
 	}
 	
-	public function in_subquery($query, $placeholder, $field) {
-		return new Step\InSubquery($query, $placeholder, $field);
+	public function in_subquery($query, $placeholder, $logic, $negated, $field) {
+		return new Step\InSubquery($query, $placeholder, $logic, $negated, $field);
 	}
 	
 	public function cross_insert($query, $left_key, $right_key) {

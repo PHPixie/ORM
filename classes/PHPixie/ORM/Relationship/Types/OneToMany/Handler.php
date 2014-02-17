@@ -2,21 +2,37 @@
 
 namespace PHPixe\ORM\Relationships\OneToMany;
 
-class Handler{
+class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 	
+	public function query($side, $related) {
+		$config = $side->config();
+		if($side->type() == 'items')
+			return $this->build_query($config->item_model, $related->owner_property, $related);
+		
+		return $this->build_query($config->owner_model, $related->items_property, $related);
+	}
+	
+	public function link_plan($config, $owner, $items) {
+		$plan = $this->orm->plan();
+		$item_collection = $this->orm->collection($config->item_model);
+		$item_collection->add($items);
+		$items_repository = $this->registry_repository->get($config->item_model);
+		$item_id_field = $items_repository->id_field();
+		$update_query = $items_repository
+							->db_query('update')
+							->data(array(
+								$config->item_key => $owner->id
+							));
+		$this->planners->in_condition($update_query, $item_id_field, $collection, $item_id_field, $plan);
+		return $plan;
+	}
+	
+	public function unlink_plan($config, $items, $required_owner = null) {
+	
+	}
+	
+	/*
 	protected $side_handlers = array();
-	
-	public function item_query($owner_side, $owner_query) {
-		$config = $owner_side->config();
-		$this->orm->repository($config->item_model)->query()
-														->related($config->item_property, $owner_query);
-	}
-	
-	public function owner_query($item_side, $item_query) {
-		$config = $item_side->config();
-		$this->orm->repository($config->owner_model)->query()
-														->related($config->owner_property, $item_query);
-	}
 	
 	public function map_condition_group($group, $model_name, $query, $plan) {
 		$side = $this->relationship_map->get($model_name, $group->relationship);
@@ -43,4 +59,5 @@ class Handler{
 		
 		return $this->side_handlers[$side][$driver_name];
 	}
+	*/
 }

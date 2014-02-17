@@ -17,7 +17,7 @@ class OneToMany extends PHPixie\ORM\Relationship\Type {
 	}
 	
 	protected function sides($config) {
-		return array('owner', 'item');
+		return array('owner', 'items');
 	}
 	
 }

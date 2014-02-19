@@ -6,14 +6,12 @@ class Result impelements \Iterator{
 	
 	protected $repository;
 	protected $data_iterator;
-	protected $preloaders;
-
 	protected $current;
+	protected $preloaders = array();
 	
-	public function __construct($repository, $data_iterator, $preloaders) {
+	public function __construct($repository, $data_iterator) {
 		$this->repository = $repository;
 		$this->data_iterator = $data_iterator;
-		$this->preloaders = $preloaders;
 	}
 	
 	public function current() {
@@ -46,4 +44,6 @@ class Result impelements \Iterator{
 		foreach($this->preloaders as $preloader) 
 			$preloader->preload_for($model);
 	}
+	
+	public function
 }

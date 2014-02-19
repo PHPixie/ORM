@@ -43,77 +43,71 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 		return $this->orm->relationship_group($relationship);
 	}
 	
-	public function start_relationship_group($logic, $relationship) {
-		$current = $this->current_group;
-		
+	public function start_relationship_group($logic, $negate, $relationship) {
 		foreach(explode('.', $relationship) as $key => $rel) {
 			$group = $this->relationship_group($rel);
-			$this->add_group_to_group($key === 0 ? $logic:'and', $group, $current);
+			if ($key > 0) {
+				$root = $group;
+				$this->add_subgroup('and', $group, $current);
+			}
 			$current = $group;
 		}
 		
-		$this->group_stack[]=$group;
-		$this->current_group = $group;
+		$this->push_group($logic, $negate, $root);
 		return $this;
 	}
 	
-	public function add_relationship_group($logic, $negate, $args) {
-		echo(6); die;
-		if ($negate)
-			$logic = $logic.'_not';
-			
-		$count = count($args);
+	public function add_relationship_condition($logic, $negate, $relationship, $condition) {
+		$parent_relationship = null;
+		if(($pos = strrpos($field, '.')) !== false) {
+			$parent_relationship = substr($relationship, 0, $pos);
+			$relationship = substr($relationship, $pos+1);
+		}
 		
-		if($count === 2) {
-			$relationship = $args[0];
-			$callback = $args[1];
-		}else
-			throw new \PHPixie\ORM\Exception\Builder("Unexpected number of arguments passed");
+		$condition = $this->build_relationship_condition($negate, $field, $operator, $values);
 		
-		$this->start_relationship_group($logic, $relationship);
-		call_user_func($callback, $this);
-		$this->end_group();
+		if($relationship === null) {
+			parent::add_operator_condition($logic, $negate, $field, $operator, $values);
+		}else {
+			$this->start_relationship_group($logic, $relationship);
+			$this->current_group->add($condition);
+			$this->end_group();
+		}
+	}
+	
+	public function add_relationship($logic, $negate, $relationship, $condition) {
+		if(is_callable($condition)){
+			$this->start_relationship_group($logic, $negate, $relationship);
+			call_user_func($condition, $this);
+			$this->end_group();
+		}else {
+			$this->add_relationship_condition($logic, $negate, $relationship, $condition);
+		}
 		return $this;
 	}
 	
-	public function add_relationship_condition($logic, $negate, $args) {
-		$count = count($args);
-		if ($count === 1)
-			if (is_callable($callback = $args[0])) {
-				if ($negate)
-					$logic = $logic.'_not';
-				$this->start_relationship_group($logic);
-				$callback($this);
-				$this->end_group();
-				return $this;
-			}else 
-				throw new \PHPixie\DB\Exception("If only one argument is provided it must be a callable");
-		
-		throw new \PHPixie\DB\Exception("Not enough arguments provided");
+	public function related($relationship, $condition) {
+		return $this->add_relationship('and', false, $relationship, $condition);
 	}
 	
-	public function related() {
-		return $this->add_relationship_group('and', false, func_get_args());
+	public function or_related($relationship, $condition) {
+		return $this->add_relationship('or', false, $relationship, $condition);
 	}
 	
-	public function or_related() {
-		return $this->add_relationship_group('or', false, func_get_args());
+	public function xor_related($relationship, $condition) {
+		return $this->add_relationship('xor', false, $relationship, $condition);
 	}
 	
-	public function xor_related() {
-		return $this->add_relationship_group('xor', false, func_get_args());
+	public function and_related_not($relationship, $condition) {
+		return $this->add_relationship('and', true, $relationship, $condition);
 	}
 	
-	public function and_related_not() {
-		return $this->add_relationship_group('and', true, func_get_args());
+	public function or_related_not($relationship, $condition) {
+		return $this->add_relationship('or', true, $relationship, $condition);
 	}
 	
-	public function or_related_not() {
-		return $this->add_relationship_group('or', true, func_get_args());
-	}
-	
-	public function xor_related_not() {
-		return $this->add_relationship_group('xor', true, func_get_args());
+	public function xor_related_not($relationship, $condition) {
+		return $this->add_relationship('xor', true, $relationship, $condition);
 	}
 	
 	public function where() {

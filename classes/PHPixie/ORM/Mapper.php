@@ -17,5 +17,6 @@ class Mapper {
 		$repository = $this->repository_registry->get($model_name);
 		$db_query = $repository->$query();
 		$this->group_mapper->map_conditions($db_query, $query->conditions(), $model_name, $plan);
+		$db
 	}
 }

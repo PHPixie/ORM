@@ -23,15 +23,26 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 	}
 	
 	public function add_operator_condition($logic, $negate, $field, $operator, $values) {
-		$relationship = null;
-		if(($pos = strrpos($field, '.')) !== false) {
-			$relationship = substr($field, 0, $pos);
-			$field = substr($field, $pos+1);
-		}
+		list($relationship, $field) = $this->get_relationship_path($field);
+		
 		$condition = $this->build_operator_condition($negate, $field, $operator, $values);
 		
 		if($relationship === null) {
 			parent::add_operator_condition($logic, $negate, $field, $operator, $values);
+		}else {
+			$this->start_relationship_group($logic, $relationship);
+			$this->current_group->add($condition);
+			$this->end_group();
+		}
+	}
+	
+	public function add_relationship_condition($logic, $negate, $relationship, $value) {
+		list($parent_relationship, $relationship) = $this->get_relationship_path($relationship);
+		
+		$condition = $this->build_relationship_condition($negate, $relationship, $value);
+		
+		if($parent_relationship === null) {
+			$this->current_group->add($condition);
 		}else {
 			$this->start_relationship_group($logic, $relationship);
 			$this->current_group->add($condition);
@@ -57,23 +68,17 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 		return $this;
 	}
 	
-	public function add_relationship_condition($logic, $negate, $relationship, $condition) {
-		$parent_relationship = null;
+	protected function get_relationship_path($field) {
+		$relationship = null;
 		if(($pos = strrpos($field, '.')) !== false) {
-			$parent_relationship = substr($relationship, 0, $pos);
-			$relationship = substr($relationship, $pos+1);
+			$relationship = substr($field, 0, $pos);
+			$field = substr($field, $pos+1);
 		}
 		
-		$condition = $this->build_relationship_condition($negate, $field, $operator, $values);
-		
-		if($relationship === null) {
-			parent::add_operator_condition($logic, $negate, $field, $operator, $values);
-		}else {
-			$this->start_relationship_group($logic, $relationship);
-			$this->current_group->add($condition);
-			$this->end_group();
-		}
+		return array($relationship, $field);
 	}
+	
+
 	
 	public function add_relationship($logic, $negate, $relationship, $condition) {
 		if(is_callable($condition)){

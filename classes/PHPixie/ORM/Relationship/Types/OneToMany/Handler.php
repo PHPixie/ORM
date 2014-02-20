@@ -13,50 +13,28 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 	}
 	
 	public function link_plan($config, $owner, $items) {
-		$plan = $this->orm->plan();
-		$item_collection = $this->orm->collection($config->item_model);
-		$item_collection->add($items);
 		$items_repository = $this->registry_repository->get($config->item_model);
-		$item_id_field = $items_repository->id_field();
-		$update_query = $items_repository
-							->db_query('update')
-							->data(array(
-								$config->item_key => $owner->id
-							));
-		$this->planners->in_condition($update_query, $item_id_field, $collection, $item_id_field, $plan);
-		$plan->push($this->steps->query($update_query));
-		return $plan;
+		$query = $items_repository->query()->in($items);
+		return $this->get_update_plan($config, $query, $owner->id_field());
 	}
 	
 	public function unlink_item_plan($config, $item) {
-		$plan = $this->orm->plan();
 		$items_repository = $this->registry_repository->get($config->item_model);
-		$item_id_field = $items_repository->id_field();
-		
-		$update_query = $items_repository
-							->db_query('update')
-							->data(array(
-								$config->item_key => null
-							));
-		$update_query->where($item_id_field, $item->id());
-		$plan->push($this->steps->query($update_query));
-		return $plan;
+		$query = $items_repository->query()->in($item);
+		return $this->get_update_plan($config, $query, null);
 	}
 	
-	public function unlink_owner_plan($config, $items, $required_owner = null) {
-		$plan = $this->orm->plan();
-		$item_collection = $this->orm->collection($config->item_model);
-		$item_collection->add($items);
+	public function unlink_owner_plan($config, $owner) {
 		$items_repository = $this->registry_repository->get($config->item_model);
-		$item_id_field = $items_repository->id_field();
-		$update_query = $items_repository
-							->db_query('update')
-							->data(array(
-								$config->item_key => null
-							));
-		$this->planners->in_condition($update_query, $item_id_field, $collection, $item_id_field, $plan);
-		$plan->push($this->steps->query($update_query));
-		return $plan;
+		$query = $items_repository->query()
+										->related($config->item_property, $owner);
+		return $this->get_update_plan($config, $query, null);
+	}
+	
+	protected function get_update_plan($config, $query, $owner_id) {
+		return $query->update_plan(array(
+									$config->item_key => $owner_id
+								));
 	}
 	
 	/*

@@ -21,8 +21,10 @@ class In extends \PHPixie\ORM\Query\Plan\Planner{
 		foreach($collection->added_queries() as $query) {
 			$subplan = $query->plan_find();
 			$plan->append_plan($subplan->required_plan());
-			foreach($subplan->result_plan() as $result_step){
-				$strategy->add_subquery_condition($builder, $field, $result_step->query(), $collection_field, $plan);
+			foreach($subplan->result_plan() as $result_step) {
+				$subquery = $result_step->query()
+												->fields($collection_field);
+				$strategy->add_subquery_condition($builder, $field, $subquery(), $collection_field, $plan);
 			}
 		}
 		

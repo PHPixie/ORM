@@ -9,39 +9,41 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 	public function __construct($orm, $default_operator = '=') {
 		$this->orm = $orm;
 		$this->default_operator = $default_operator;
-		$this->current_group = $orm->condition_group();
-		$this->group_stack[] = $this->current_group;
-		
+		$this->push_group($this->db->condition_group());
 	}
 	
-	public function operator($field, $operator, $values) {
+	protected function operator($field, $operator, $values) {
 		return $this->orm->operator($field, $operator, $values);
 	}
 	
-	public function condition_group() {
+	protected function condition_group() {
 		return $this->orm->condition_group();
 	}
 	
 	public function add_operator_condition($logic, $negate, $field, $operator, $values) {
-		list($relationship, $field) = $this->get_relationship_path($field);
+		if (($pos = strpos($field, '>')) !== false || ($pos = strpos($field, '.', -1)) !== false) {
+			$relationship = substr($field, 0, $pos);
+			$field = substr($field, $pos + 1);
+		}else
+			$relationship = null;
 		
 		$condition = $this->build_operator_condition($negate, $field, $operator, $values);
-		
-		if($relationship === null) {
-			parent::add_operator_condition($logic, $negate, $field, $operator, $values);
-		}else {
-			$this->start_relationship_group($logic, $relationship);
-			$this->current_group->add($condition);
-			$this->end_group();
-		}
+		$this->add_condition_to_relationship($logic, $condition, $relationship);
 	}
 	
 	public function add_relationship_condition($logic, $negate, $relationship, $value) {
-		list($parent_relationship, $relationship) = $this->get_relationship_path($relationship);
-		
-		$condition = $this->build_relationship_condition($negate, $relationship, $value);
-		
-		if($parent_relationship === null) {
+		if (($pos = strpos($field, '.', -1)) !== false) {
+			$parent_relationship = substr($field, 0, $pos);
+			$field = substr($field, $pos + 1);
+		}else
+			$parent_relationship = null;
+			
+		$condition = $this->build_relationship_condition($negate, $parent_relationship, $value);
+		$this->add_condition_to_relationship($logic, $condition, $parent_relationship);
+	}
+	
+	protected function add_condition_to_relationship($logic, $condition, $relationship) {
+		if($relationship === null) {
 			$this->current_group->add($condition);
 		}else {
 			$this->start_relationship_group($logic, $relationship);
@@ -50,7 +52,7 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 		}
 	}
 	
-	public function relationship_group($relationship) {
+	protected function relationship_group($relationship) {
 		return $this->orm->relationship_group($relationship);
 	}
 	
@@ -68,18 +70,6 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 		return $this;
 	}
 	
-	protected function get_relationship_path($field) {
-		$relationship = null;
-		if(($pos = strrpos($field, '.')) !== false) {
-			$relationship = substr($field, 0, $pos);
-			$field = substr($field, $pos+1);
-		}
-		
-		return array($relationship, $field);
-	}
-	
-
-	
 	public function add_relationship($logic, $negate, $relationship, $condition) {
 		if(is_callable($condition)){
 			$this->start_relationship_group($logic, $negate, $relationship);
@@ -89,6 +79,11 @@ class Builder extends \PHPixie\DB\Conditions\Builder {
 			$this->add_relationship_condition($logic, $negate, $relationship, $condition);
 		}
 		return $this;
+	}
+	
+	protected function build_placeholder() {
+		//NEEDS TEST
+		return $this->orm->condition_placeholder();
 	}
 	
 	public function related($relationship, $condition) {

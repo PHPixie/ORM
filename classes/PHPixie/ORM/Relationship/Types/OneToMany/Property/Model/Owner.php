@@ -14,7 +14,7 @@ class Owner extends \PHPixie\ORM\Relationship\Types\OneToMany\Property\Model {
 	}
 	
 	public function unlink() {
-		$plan = $this->handler->unlink_plan($this->side->config(), $this->model);
+		$plan = $this->handler->unlink_item_plan($this->side->config(), $this->model);
 		$plan->execute();
 	}
 	

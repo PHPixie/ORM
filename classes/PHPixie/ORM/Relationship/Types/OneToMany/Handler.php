@@ -24,11 +24,39 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 								$config->item_key => $owner->id
 							));
 		$this->planners->in_condition($update_query, $item_id_field, $collection, $item_id_field, $plan);
+		$plan->push($this->steps->query($update_query));
 		return $plan;
 	}
 	
-	public function unlink_plan($config, $items, $required_owner = null) {
+	public function unlink_item_plan($config, $item) {
+		$plan = $this->orm->plan();
+		$items_repository = $this->registry_repository->get($config->item_model);
+		$item_id_field = $items_repository->id_field();
+		
+		$update_query = $items_repository
+							->db_query('update')
+							->data(array(
+								$config->item_key => null
+							));
+		$update_query->where($item_id_field, $item->id());
+		$plan->push($this->steps->query($update_query));
+		return $plan;
+	}
 	
+	public function unlink_owner_plan($config, $items, $required_owner = null) {
+		$plan = $this->orm->plan();
+		$item_collection = $this->orm->collection($config->item_model);
+		$item_collection->add($items);
+		$items_repository = $this->registry_repository->get($config->item_model);
+		$item_id_field = $items_repository->id_field();
+		$update_query = $items_repository
+							->db_query('update')
+							->data(array(
+								$config->item_key => null
+							));
+		$this->planners->in_condition($update_query, $item_id_field, $collection, $item_id_field, $plan);
+		$plan->push($this->steps->query($update_query));
+		return $plan;
 	}
 	
 	/*

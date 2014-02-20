@@ -3,6 +3,7 @@
 namespace PHPixie\ORM\Conditions\Condition;
 
 class Relationship extends \PHPixie\ORM\Conditions\Condition {
+	
 	public $property_name;
 	public $value;
 	

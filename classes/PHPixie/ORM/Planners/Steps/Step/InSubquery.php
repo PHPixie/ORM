@@ -23,6 +23,6 @@ class InSubquery{
 				->execute()
 				->get_column();
 		
-		$this->placeholder->condition($this->logic, $this->negated, $this->field, 'in', $ids);
+		$this->placeholder->add_operator_condition($this->logic, $this->negated, $this->field, 'in', array($ids));
 	}
 }

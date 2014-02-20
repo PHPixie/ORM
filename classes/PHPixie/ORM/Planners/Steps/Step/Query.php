@@ -13,4 +13,8 @@ class Query extends \PHPixie\ORM\Query\Plan\Step {
 	public function execute() {
 		$this->query->execute();
 	}
+	
+	public function query() {
+		return $this->query();
+	}
 }

@@ -72,18 +72,6 @@ class ORM {
 		return new \PHPixie\ORM\Relationship\Registry($this, $model_config);
 	}
 	
-	public function operator($field, $operator, $values) {
-		return new \PHPixie\ORM\Conditions\Condition\Operator($field, $operator, $values);
-	}
-	
-	public function condition_group() {
-		return new \PHPixie\ORM\Conditions\Condition\Group;
-	}
-	
-	public function relationship_group($relationship) {
-		return new \PHPixie\ORM\Conditions\Condition\Group\Relationship($relationship);
-	}
-	
 	public function property_builder() {
 		if ($this->property_builder === null)
 			$this->property_builder = $this->build_property_builder();
@@ -122,5 +110,15 @@ class ORM {
 	
 	public function build_mapper() {
 		return \PHPixie\ORM\Mapper($this, $this->group_mapper());
+	}
+	
+	public function conditions() {
+		if ($this->conditions === null)
+			$this->conditions = $this->build_conditions();
+		return $this->conditions;
+	}
+	
+	protected function get_conditions() {
+		return new \PHPixie\DB\Conditions();
 	}
 }

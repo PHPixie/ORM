@@ -15,5 +15,7 @@ abstract class Model {
 		return $this->query;
 	}
 	
-	abstract protected function load();
+	public function __invoke() {
+		return $this->query();
+	}
 }

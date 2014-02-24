@@ -27,6 +27,9 @@ class Planners {
 		return $this->planner_instance('in');
 	}
 	
+	public function build_update_field($value_source, $value_field) {
+		return new \PHPixie\ORM\Planners\Planner\Update\Field($value_source, $value_field);
+	}
 	
 	public function planner_instance($name) {
 		if (!isset($this->instances[$name]))

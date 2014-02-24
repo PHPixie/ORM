@@ -21,7 +21,13 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 
 		$plan = $this->orm->plan();
 		$query = $items_repository->query()->in($items);
-		$this->planners->update()->subquery($query, $config->item_key, $owner_collection, $owner_repository->id_field(), $plan);
+		$update_planner = $this->planners->update();
+		$owner_field = $update_planner->field($owner, $owner_repository->id_field());
+		$update_planner->plan(
+								$query, 
+								array($config->item_key => $owner_field), 
+								$plan
+							);
 		return $plan;
 	}
 	
@@ -50,7 +56,7 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 		$owner_repository = $this->registry_repository->get($config->owner_model);
 		$conditions = $group->conditions();
 
-		if($link->type() == 'item') {
+		if($link->type() === 'item') {
 			$subquery_repository = $item_repository;
 			$query_field = $owner_repository->id_field();
 			$subquery_field = $config->item_key;
@@ -71,6 +77,25 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 										$group->logic,
 										$group->negated()
 									);
+	}
+	
+	public function preload($link, $result_step, $result_plan, $preload_nested) {
+		$config = $link->config();
+		if($link->type() === 'item') {
+			$subquery_repository = $item_repository;
+			$query_field = $owner_repository->id_field();
+			$subquery_field = $config->item_key;
+		}else{
+			$subquery_repository = $owner_repository;
+			$query_field = $config->item_key;
+			$subquery_field = $owner_repository->id_field();
+		}
+		
+		$query = $preload_repository->db_query();
+		$placeholder = $query->get_where_builder()->placeholder();
+		$preload_step = $this->steps->preload_step($query, $placeholder,);
+		$result_plan->preload_plan()->push($preload_step);
+		
 	}
 	
 	

@@ -40,7 +40,18 @@ class Group {
 		$handler->map_relationship($side, $query, $group, $plan);
 	}
 
-	protected function map_collection()
+	protected function map_collection($collection_condition, $db_query, $model_name, $plan) {
+		$id_field = $this->repository_registry($model_name)->id_field();
+		$this->planners->in->collection(
+											$db_query,
+											$id_field,
+											$collection_condition->collection(),
+											$id_field,
+											$plan,
+											$collection_condition->logic,
+											$collection_condition->negated()
+										);
+	}
 	
 
 	

@@ -4,47 +4,49 @@ namespace \PHPixie\ORM\Query\Plan\Planner;
 
 class In extends \PHPixie\ORM\Query\Plan\Planner{
 	
-	public function collection($db_query, $query_field, $collection, $collection_field, $plan, $logic, $negated) {
+	public function collection($logic, $negated, $query, $query_field, $collection, $collection_field, $plan) {
+		$query->start_where_group($logic, $negated);
 		$collection_connection = $this
-									->repository_registry($collection->model_name())
-									->connection();
-		
-		$strategy = $this->select_strategy($db_query->connection(), $collection_connection);
-		
-		$builder = $db_query->get_builder('where');
-		$builder->start_group($logic, $negated);
-		
+							->repository_registry($collection->model_name())
+							->connection();
+		$method = $this->select_strategy($db_query->connection(), $collection_connection);
 		$ids = $collection->get_field($collection_field);
 		if (!empty($ids))
-			$builder->_or($field, 'in', $ids);
+			$query->or_where($field, 'in', $ids);
 		
 		foreach($collection->added_queries() as $query) {
 			$subplan = $query->plan_find();
 			$plan->append_plan($subplan->required_plan());
-			foreach($subplan->result_plan() as $result_step) {
-				$subquery = $result_step->query()
-												->fields($collection_field);
-				$strategy->add_subquery_condition($builder, $field, $subquery, $collection_field, $plan);
-			}
+			$subquery = $subplan->result_step()->query();
+			$strategy->$method('or', false, $query, $query_field, $subquery, $collection_field, $plan);
 		}
 		
-		$builder->end_group($logic, $negated);
+		$query->end_where_group();
 	}
 	
-	public function subquery($db_query, $query_field, $subquery, $subquery_field, $plan, $logic, $negated) {
-		$strategy = $this->select_strategy($db_query->connection(), $subqery->connection());
-		$strategy->add_subquery_condition($builder, $field, $subquery, $collection_field, $plan);
-
-	}
-
-	protected function select_strategy($query_connection, $collection_connection) {
-		if ($query_connection instanceof PHPixie\DB\Driver\PDO\Connection && $query_connection === $collection_connection)
-			return $this->strategy('condition');
-		
-		return $this->strategy('multiquery');
+	public function subquery($logic, $negated, $query, $query_field, $subquery, $subquery_field, $plan) {
+		$method = $this->method($db_query->connection(), $subqery->connection());
+		$strategy->$method($logic, $negate, $query, $query_field, $subquery, $subquery_field, $plan);
 	}
 	
-	protected function build_strategy($name) {
-		return $this->planner->in_strategy($name);
+	protected function subquery_method($logic, $negate, $query, $query_field, $subquery, $subquery_field, $plan) {
+		$subquery->fields(array($subquery_field));
+		$query->get_where_builder()->add_operator_condition($logic, $negate, $query_field, 'in', $subquery);
 	}
+	
+	protected function multiquery_method($logic, $negate, $query, $query_field, $subquery, $subquery_field, $plan) {
+		$subquery->fields(array($subquery_field));
+		$result_step = $this->steps->result($subquery);
+		$plan->push($result_step);
+		$placeholder = $query->get_where_builder()->add_placeholder($logic, $negate);
+		$in_step = $this->steps->in($placeholder, $query_field, $result_step, $subquery_field);
+		$plan->push($in_step);
+	}
+	
+	protected function method($query_connection, $subquery_connection) {
+		if ($query_connection instanceof PHPixie\DB\Driver\PDO\Connection && $query_connection === $subquery_connection)
+			return 'subquery_method';
+		return 'multiquery_method';
+	}
+	
 }

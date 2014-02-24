@@ -79,23 +79,23 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 									);
 	}
 	
-	public function preload($link, $result_step, $result_plan, $preload_nested) {
+	public function preload($link, $result_step, $result_plan) {
 		$config = $link->config();
 		if($link->type() === 'item') {
-			$subquery_repository = $item_repository;
-			$query_field = $owner_repository->id_field();
-			$subquery_field = $config->item_key;
-		}else{
-			$subquery_repository = $owner_repository;
+			$query_repository = $item_repository;
 			$query_field = $config->item_key;
-			$subquery_field = $owner_repository->id_field();
+			$result_field = $owner_repository->id_field();
+		}else{
+			$query_repository = $owner_repository;
+			$query_field = $owner_repository->id_field();
+			$result_field = $config->item_key;
 		}
 		
 		$query = $preload_repository->db_query();
-		$placeholder = $query->get_where_builder()->placeholder();
-		$preload_step = $this->steps->preload_step($query, $placeholder,);
+		$placeholder = $query->get_where_builder()->add_placeholder();
+		$preload_step = $this->steps->in($placeholder, $query_field, $result_step, $result_field);
 		$result_plan->preload_plan()->push($preload_step);
-		
+		return $preload_step;
 	}
 	
 	

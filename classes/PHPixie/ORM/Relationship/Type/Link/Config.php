@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Side;
+namespace PHPixie\ORM\Relationship\Link;
 
 abstract class Config {
 	

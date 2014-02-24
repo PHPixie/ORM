@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Types\OneToMany;
 
-class Side extends PHPixie\ORM\Relationship\Side {
+class Link extends PHPixie\ORM\Relationship\Link {
 	
 	public function model_name() {
 		if($this->type === 'owner'){
@@ -14,5 +14,9 @@ class Side extends PHPixie\ORM\Relationship\Side {
 	
 	public function property_name() {
 		return $this->config->get($this->type.'_property');
+	}
+
+	public function relationship() {
+		return 'oneToMany'
 	}
 }

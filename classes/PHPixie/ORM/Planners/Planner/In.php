@@ -4,7 +4,7 @@ namespace \PHPixie\ORM\Query\Plan\Planner;
 
 class In extends \PHPixie\ORM\Query\Plan\Planner{
 	
-	public function add_subquery_condition($db_query, $query_field, $collection, $collection_field, $plan, $logic, $negated) {
+	public function collection($db_query, $query_field, $collection, $collection_field, $plan, $logic, $negated) {
 		$collection_connection = $this
 									->repository_registry($collection->model_name())
 									->connection();
@@ -24,13 +24,19 @@ class In extends \PHPixie\ORM\Query\Plan\Planner{
 			foreach($subplan->result_plan() as $result_step) {
 				$subquery = $result_step->query()
 												->fields($collection_field);
-				$strategy->add_subquery_condition($builder, $field, $subquery(), $collection_field, $plan);
+				$strategy->add_subquery_condition($builder, $field, $subquery, $collection_field, $plan);
 			}
 		}
 		
 		$builder->end_group($logic, $negated);
 	}
 	
+	public function subquery($db_query, $query_field, $subquery, $subquery_field, $plan, $logic, $negated) {
+		$strategy = $this->select_strategy($db_query->connection(), $subqery->connection());
+		$strategy->add_subquery_condition($builder, $field, $subquery, $collection_field, $plan);
+
+	}
+
 	protected function select_strategy($query_connection, $collection_connection) {
 		if ($query_connection instanceof PHPixie\DB\Driver\PDO\Connection && $query_connection === $collection_connection)
 			return $this->strategy('condition');

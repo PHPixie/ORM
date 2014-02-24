@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationship;
 
-abstract class Side {
+abstract class Link {
 	
 	protected $relationship;
 	protected $config;
@@ -24,5 +24,5 @@ abstract class Side {
 	
 	public abstract function model_name();
 	public abstract function property_name();
-	public abstract function relationship_type();
+	public abstract function relationship();
 }

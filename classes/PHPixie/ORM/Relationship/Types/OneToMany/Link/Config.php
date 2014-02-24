@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\OneToMany\Side;
+namespace PHPixie\ORM\Relationships\Types\OneToMany\Link;
 
 class Config extends PHPixie\ORM\Relationship\Side\Config {
 	

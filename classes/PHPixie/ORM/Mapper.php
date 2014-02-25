@@ -35,16 +35,37 @@ class Mapper {
 	}
 
 	public function map_find($query, $preload) {
-		$result_plan = $this->orm->result_plan();
 		$model_name = $query->model_name();
+		$result_plan = $this->orm->result_plan($model_name);
 		$repository = $this->repository_registry->get($model_name);
 
 		$db_query = $repository->query('select');
 		$this->group_mapper->map_conditions($db_query, $query->conditions(), $model_name, $result_plan->required_plan());
 		$result_step = $this->steps->result_step($db_query);
 		$plan->set_result_step($result_step);
+		
 		foreach($preload as $relationship)
-		$current_result_step = $result_step;
+			$this->add_preloaders($relationship, $model, $plan->loader(), $plan->preload_plan());
+		
 		return $plan;
+	}
+	
+	protected function add_preloaders($relationship, $model, $loader, $plan) {
+		$path = explode('.', $relationship);
+		foreach($path as $rel) {
+			$preloader = $loader->get_preloader($relationship);
+			if($preloader === null) {
+				$preloader = $this->build_preloader($model, $relationship, $loader->result_step(), $plan);
+				$loader->set_preloader($relationship, $loader);
+			}
+			$model = $preloader->model_name();
+			$loader = $preloader;
+		}
+	}
+	
+	protected function build_preloader($model, $relationship, $result_step, $plan) {
+		$link = $this->relationship_registry->get_link($current_model, $relationship);
+		$handler = $this->orm->handler($link->relationship_type());
+		return $handler->preloader($link, $result_step, $preload_plan);
 	}
 }

@@ -10,8 +10,12 @@ class Steps {
 		return new Step\Query($query);
 	}
 	
-	public function result_query($query) {
-		return new Step\Query\Result($query);
+	public function result($query) {
+		return new Step\Query\Result\Single($query);
+	}
+	
+	public function reusable_result($query) {
+		return new Step\Query\Result\Reusable($query);
 	}
 	
 	public function in_subquery($query, $placeholder, $logic, $negated, $field) {

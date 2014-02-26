@@ -41,7 +41,7 @@ class Mapper {
 
 		$db_query = $repository->query('select');
 		$this->group_mapper->map_conditions($db_query, $query->conditions(), $model_name, $result_plan->required_plan());
-		$result_step = $this->steps->result_step($db_query);
+		$result_step = $this->steps->reusable_result($db_query);
 		$plan->set_result_step($result_step);
 		
 		foreach($preload as $relationship)

@@ -26,15 +26,4 @@ class Mapper {
 		);
 	}
 	
-	protected function relationship_properties($config) {
-		return array(
-			$params['owner_model'] => array(
-				$params['owner_items_property']
-			),
-			
-			$params['item_model'] => array(
-				$params['item_owner_property']
-			),
-		);
-	}
 }

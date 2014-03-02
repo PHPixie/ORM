@@ -5,50 +5,37 @@ namespace PHPixie\ORM\Relationships\OneToMany;
 class Mapper {
 	
 	protected function normalize_config($config) {
-		$left_model = $config->get('left');
-		$right_model = $config->get('right');
-		
-		$left_repo = $this->registry->get($left_model);
-		$right_repo = $this->registry->get($right_model);
-		
-		$normalized = array(
-			'left_model' => $left_model,
-			'right_model' => $right_model,
-		);
+		$normalized = array();
 		
 		$sides = array(
 			'left' => array('opposing' => 'right'),
 			'right' => array('opposing' => 'left'),
 		);
 		
-		$forms = array(
-			$
-		)
 		foreach($sides as $side => $params) {
-			$opposing_repo = $this->registry->get($normalized["{$side}_model"]);
-			$normalized["{$side}_property"] = $config->get("{$side}_property", $opposing_repo->plural_name());
-			$opposing_singular = $config->get("{$opposing}_pivot_key", $this->inflector->singular($normalized["{$side}_property"]);
-			$normalized["{$opposing}_pivot_key"] = .'_id');
+			$opposing = $params['opposing'];
+			
+			$model = $config->get($opposing);
+			$normalized["{$side}_model"] = $model;
+			
+			if (($plural = $config->get("{$opposing}_property", null)) === null)
+				$plural = $this->repository_registry($model)->plural_name();
+			$sides[$side]['plural'] = $plural;
+			$normalized["{$opposing}_property"] = $plural;
+			
+			if (($pivot_key = $config->get("{$side}_pivot_key", null)) === null)
+				$pivot_key = $this->inflector->singular($plural).'_id';
+			$normalized["{$side}_pivot_key"] = $pivot_key;
 		}
 		
-			
-			'pivot' => $config->get('pivot', $left_repo->plural_name().'_'.$right_repo->plural_name()),
-			'pivot_connect5ion' => $config->get('pivot_connect5ion', $left_repo->connection_name());
-			
-			'left_property' => $config->get('left_property', $right_repo->plural_name()
-			'item_property' => $owner_model
-		);
-	}
-	
-	protected function relationship_properties($config) {
-		return array(
-			$params['owner_repo']->model_name() => array(
-				$params['owner_items_property']
-			),
-			
-			$params['item_repo']->model_name() => array(
-				$params['item_property']
-			),
-		);
+		if (($pivot = $config->get('pivot', null)) === null)
+			$pivot = $sides['left']['plural'].'_'.$sides['right']['plural'];
+		$normalized['pivot'] = $pivot;
+		
+		if (($pivot_connection = $config->get('pivot_connection', null)) === null)
+			$pivot_connection = $this->repository_registry($normalized["left_model"])->connection_name();
+		$normalized['pivot_connection'] = $pivot_connection;
+		
+		return $normalized;
 	}
 }

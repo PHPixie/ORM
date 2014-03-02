@@ -8,15 +8,15 @@ class OneToMany extends PHPixie\ORM\Relationship\Type {
 		return new OneToMany\Side\Config($config);
 	}
 	
-	public function side($type, $config) {
-		return new OneToMany\Side($this, $type, $config);
+	public function link($type, $config) {
+		return new OneToMany\Link($this, $type, $config);
 	}
 	
 	public function build_handler() {
 		return new OneToMany\Handler();
 	}
 	
-	protected function sides($config) {
+	protected function links($config) {
 		return array('owner', 'items');
 	}
 	

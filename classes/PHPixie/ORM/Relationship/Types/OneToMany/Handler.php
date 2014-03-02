@@ -79,7 +79,7 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 									);
 	}
 	
-	public function preload($link, $result_step, $result_plan) {
+	public function preload($link, $loader, $result_step, $result_plan) {
 		$config = $link->config();
 		if($link->type() === 'item') {
 			$query_repository = $item_repository;

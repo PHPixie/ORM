@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\OneToMany\Preloader;
 
-class Items extends \PHPixie\ORM\Model\Preloader\Multiple{
+class Owner extends \PHPixie\ORM\Model\Preloader\Single{
 	
 	protected function process_items() {
 		$this->items = array();
@@ -19,8 +19,9 @@ class Items extends \PHPixie\ORM\Model\Preloader\Multiple{
 		}
 	}
 	
-	protected function get_item_ids($owner) {
-		return $this->ids_map[$owner->id()];
+	protected function get_item($item) {
+		$key = $this->link->config()->item_key;
+		return $this->ids_map[$item];
 	}
 	
 }

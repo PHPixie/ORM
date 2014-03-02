@@ -36,4 +36,9 @@ abstract class Model {
 	}
 	
 	abstract protected function load();
+	
+	public function set_value($value) {
+		$this->value = $value;
+		$this->loaded = true;
+	}
 }

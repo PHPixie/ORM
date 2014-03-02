@@ -59,13 +59,17 @@ class Mapper {
 				$loader->set_preloader($relationship, $loader);
 			}
 			$model = $preloader->model_name();
-			$loader = $preloader;
+			$loader = $preloader->get_loader();
 		}
 	}
 	
 	protected function build_preloader($model, $relationship, $result_step, $plan) {
-		$link = $this->relationship_registry->get_link($current_model, $relationship);
+		$registry = $this->repository_registry->get($model);
+		$loader = $this->orm->loader($registry);
+		
+		$link = $this->relationship_registry->get_link($model, $relationship);
 		$handler = $this->orm->handler($link->relationship_type());
-		return $handler->preloader($link, $result_step, $preload_plan);
+		
+		return $handler->preloader($link, $loader, $result_step, $preload_plan);
 	}
 }

@@ -1,61 +1,53 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\ManyToMany;
+namespace PHPixie\ORM\Relationships\OneToMany;
 
 class Mapper {
 	
 	protected function normalize_config($config) {
-		$left_model = $config->get('left.model');
-		$right_model = $config->get('right.model');
+		$left_model = $config->get('left');
+		$right_model = $config->get('right');
 		
 		$left_repo = $this->registry->get($left_model);
 		$right_repo = $this->registry->get($right_model);
 		
-		
-		$config = array(
+		$normalized = array(
 			'left_model' => $left_model,
 			'right_model' => $right_model,
-			
-			'left_model_connection' => $owner_model->connection_name(),
-			'right_model_connection' => $item_model->connection_name(),
-			
-			'left_id_field' => $left_repo->id_field(),
-			'right_id_field' => $right_repo->id_field(),
-			
-			'linker' => $config->get('linker', $left_plural.'_'.$right_plural),
 		);
 		
-		foreach(array('left', 'right') as $side) {
-			
-			if ($property = $config->get("{$side}.property", null)) {
-				
-				$config["{$side}_property"] = $property;
-				$default_key = $this->inflector->singular($property).'_id';
-				
-			}else {
-				
-				$opposing_side = $side === 'left' ? 'right' : 'left';
-				$opposing_model = $config["{$opposing_side}_model"];
-				
-				$config["{$side}_property"] = $this->inflector->plural($opposing_model);
-				$default_key = $opposing_model.'_id';
-				
-			}
-			
-			$config["linker_{$side}_key"] = $config->get("{$side}.linker_key", $default_key);
+		$sides = array(
+			'left' => array('opposing' => 'right'),
+			'right' => array('opposing' => 'left'),
+		);
+		
+		$forms = array(
+			$
+		)
+		foreach($sides as $side => $params) {
+			$opposing_repo = $this->registry->get($normalized["{$side}_model"]);
+			$normalized["{$side}_property"] = $config->get("{$side}_property", $opposing_repo->plural_name());
+			$opposing_singular = $config->get("{$opposing}_pivot_key", $this->inflector->singular($normalized["{$side}_property"]);
+			$normalized["{$opposing}_pivot_key"] = .'_id');
 		}
 		
-		return $config;
+			
+			'pivot' => $config->get('pivot', $left_repo->plural_name().'_'.$right_repo->plural_name()),
+			'pivot_connect5ion' => $config->get('pivot_connect5ion', $left_repo->connection_name());
+			
+			'left_property' => $config->get('left_property', $right_repo->plural_name()
+			'item_property' => $owner_model
+		);
 	}
 	
 	protected function relationship_properties($config) {
 		return array(
-			$params['left_model'] => array(
-				$params['left_property']
+			$params['owner_repo']->model_name() => array(
+				$params['owner_items_property']
 			),
 			
-			$params['right_model'] => array(
-				$params['right_property']
+			$params['item_repo']->model_name() => array(
+				$params['item_property']
 			),
 		);
 	}

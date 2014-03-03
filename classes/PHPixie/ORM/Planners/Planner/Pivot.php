@@ -2,23 +2,43 @@
 
 namespace \PHPixie\ORM\Query\Plan\Planner;
 
-class Cross extends \PHPixie\ORM\Query\Plan\Planner{
+class Pivot extends \PHPixie\ORM\Query\Plan\Planner{
 	
-	public function link($left_repository, $right_repository, $pivot_connection, $left_collection, $right_collection) {
-		$strategy = $this->select_strategy($left_repository, $right_repository, $pivot_connection);
-		$strategy->link($left_repository, $right_repository, $pivot_connection, $left_collection, $right_collection);
+	public function link($pivot, $first_side, $second_side, $plan) {
+		$link_method = $this->link_method($pivot, $first_side, $second_side);
+		$this->$link_method($pivot, $first_side, $second_side, $plan);
 	}
 	
-	protected function select_strategy($query_repository, $subquery_repository) {
-		if ($query_repository->connection() instanceof PHPixie\DB\Driver\PDO\Connection 
-			&& $query_repository->connection_name() === $subquery_repository->connection_name()) {
-			return $this->strategy('condition');
+	protected function link_method($pivot, $first_side, $second_side) {
+		$p_conn = $pivot->connection();
+		$f_conn = $first_side-> repository->connection();
+		$s_conn = $second_side-> repository->connection();
+		
+		if ($p_conn === $f_conn && $f_conn === $s_conn && $p_conn instanceof PHPixie\DB\Driver\PDO\Connection)
+			return 'link_subquery';
+		return 'link_multiquery';
+	}
+	
+	protected function link_subquery() {
+		$in_planner = $this->planners->in();
+		
+		$queries = array();
+		foreach(array($first_side, $second_side) as $side) {
+			$repository = $side->repository();
+			$id_field = $repository()->id_field();
+			$query = $repository->db_query()->fields(array($id_field));
+			$in_planner->collection('or', false, $query, $id_field, $collection, $id_field, $plan);
+			$queries[] = $query;
 		}
 		
-		return $this->strategy('multiquery');
+		
 	}
 	
-	protected function build_strategy($name) {
-		return $this->planner->cross_strategy($name);
+	public function pivot($connection, $pivot) {
+		return new Pivot\Pivot($connection, $pivot);
+	}
+	
+	public function side($collection, $id_field, $pivot_key) {
+		return new Pivot\Side($collection, $id_field, $pivot_key);
 	}
 }

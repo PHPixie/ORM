@@ -10,23 +10,31 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 		return $this->build_query($config->{"{$side}_model"}, $config->{"{$side}_property"}, $related);
 	}
 	
-	public function link_plan($link, $side_items, $opposing_tems) {
-		$side = $link->side();
-		$opposing_side = $this->opposing_side($side);
-		$side_model = $config->get("{$side}_model");
-		$opposing_model = $config->get("{$opposing_side}_model");
-
+	public function link_plan($link, $items, $opposing_items) {
+		$side = $link->type();
+		$config = $link->config();
+		$pivot_planner = $this->planners->pivot();
 		
-		$side_repository = $this->registry_repository->get($side_model);
-		$opposing_repository = $this->registry_repository->get($opposing_model);
-
-		$side_collection = $this->orm->collection($side_model);
-		$side_collection->add($owner);
+		$sides = array();
+		foreach(array('left', 'right') as $collection_side) {
+			$model = $config->get("{$side}_model");
+			
+			$collection = $this->orm->collection($model);
+			$collection->add($side === $collection_side ? $items : $opposing_items);
+			
+			$repository = $this->repository_registry->get($model);
+			$pivot_key = $config->get("{$side}_pivot_key");
+			$sides[$collection_side] = $pivot_planner->side($collection, $repository, $pivot_key);
+		}
 		
-		$side_collection = $this->orm->collection($side_model);
-		$side_collection->add($owner);
-
+		
 		$plan = $this->orm->plan();
+		
+		$pivot_connection = $this->db->get($config->pivot_connection);
+		$pivot = $pivot_planner->pivot($pivot_connection, $config->pivot);
+		
+		$pivot_planner->link($pivot, $sides['left'], $sides['right'], $plan);
+		
 		$query = $items_repository->query()->in($items);
 		$update_planner = $this->planners->update();
 		$owner_field = $update_planner->field($owner, $owner_repository->id_field());

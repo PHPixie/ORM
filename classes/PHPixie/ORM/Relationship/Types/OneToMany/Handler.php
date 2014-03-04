@@ -81,6 +81,8 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 	
 	public function preload($link, $loader, $result_step, $result_plan) {
 		$config = $link->config();
+		$preload_plan = $result_plan->preload_plan();
+		
 		if($link->type() === 'item') {
 			$query_repository = $item_repository;
 			$query_field = $config->item_key;
@@ -92,9 +94,12 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 		}
 		
 		$query = $preload_repository->db_query();
+		
 		$placeholder = $query->get_where_builder()->add_placeholder();
-		$preload_step = $this->steps->in($placeholder, $query_field, $result_step, $result_field);
-		$result_plan->preload_plan()->push($preload_step);
+		$in_step = $this->steps->in($placeholder, $query_field, $result_step, $result_field);
+		$preload_plan->push($in_step);
+		
+		$preload_step = $this->steps->result($query);
 		return $preload_step;
 	}
 	

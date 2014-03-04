@@ -10,117 +10,146 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler {
 		return $this->build_query($config->{"{$side}_model"}, $config->{"{$side}_property"}, $related);
 	}
 	
-	public function link_plan($link, $items, $opposing_items) {
+	
+	public function link($link, $items, $opposing_items) {
+		return $this->modify_link('link', $link, $items, $opposing_items);
+	}
+	
+	public function unlink($link, $items, $opposing_items) {
+		return $this->modify_link('unlink', $link, $items, $opposing_items);
+	}
+	
+	public function unlink_all($link, $items) {
 		$side = $link->type();
 		$config = $link->config();
-		$pivot_planner = $this->planners->pivot();
 		
-		$sides = array();
-		foreach(array('left', 'right') as $collection_side) {
-			$model = $config->get("{$side}_model");
-			
-			$collection = $this->orm->collection($model);
-			$collection->add($side === $collection_side ? $items : $opposing_items);
-			
-			$repository = $this->repository_registry->get($model);
-			$pivot_key = $config->get("{$side}_pivot_key");
-			$sides[$collection_side] = $pivot_planner->side($collection, $repository, $pivot_key);
-		}
-		
+		$first_side = $this->get_planner_side($config, $side, $items);
+		$pivot = $this->get_planner_pivot($config);
 		
 		$plan = $this->orm->plan();
-		
-		$pivot_connection = $this->db->get($config->pivot_connection);
-		$pivot = $pivot_planner->pivot($pivot_connection, $config->pivot);
-		
-		$pivot_planner->link($pivot, $sides['left'], $sides['right'], $plan);
-		
-		$query = $items_repository->query()->in($items);
-		$update_planner = $this->planners->update();
-		$owner_field = $update_planner->field($owner, $owner_repository->id_field());
-		$update_planner->plan(
-								$query, 
-								array($config->item_key => $owner_field), 
-								$plan
-							);
+		$this->planners->pivot()->unlink($pivot, $first_side, $plan);
 		return $plan;
 	}
 	
-	public function unlink_item_plan($config, $items) {
-		$items_repository = $this->registry_repository->get($config->item_model);
-		$query = $items_repository->query()->in($item);
-		return $this->get_update_plan($config, $query, null);
-	}
-	
-	public function unlink_owner_plan($config, $owner) {
-		$items_repository = $this->registry_repository->get($config->item_model);
-		$query = $items_repository->query()
-										->related($config->item_property, $owner);
-		return $this->get_update_plan($config, $query, null);
-	}
-	
-	protected function get_update_plan($config, $query, $owner_id) {
-		return $query->update_plan(array(
-									$config->item_key => $owner_id
-								));
-	}
-
-	public function map_relationship($link, $group, $query, $plan) {
+	protected function modify_link($method, $link, $items, $opposing_items) {
+		$side = $link->type();
 		$config = $link->config();
-		$item_repository = $this->registry_repository->get($config->item_model);
-		$owner_repository = $this->registry_repository->get($config->owner_model);
-		$conditions = $group->conditions();
-
-		if($link->type() === 'item') {
-			$subquery_repository = $item_repository;
-			$query_field = $owner_repository->id_field();
-			$subquery_field = $config->item_key;
-		}else{
-			$subquery_repository = $owner_repository;
-			$query_field = $config->item_key;
-			$subquery_field = $owner_repository->id_field();
+		
+		$first_side = $this->get_planner_side($config, $side, $items);
+		$second_side = $this->get_planner_side($config, $this->opposing_side($side), $opposing_items);
+		$pivot = $this->get_planner_pivot($config);
+		
+		$plan = $this->orm->plan();
+		$pivot_planner = $this->planners->pivot();
+		
+		if($method === 'link') {
+			$pivot_planner->link($pivot, $first_side, $second_side, $plan);
+		}else {
+			$pivot_planner->unlink($pivot, $first_side, $plan, $second_side);
 		}
-
-		$subquery = $subquery_repository->query();
-		$this->group_mapper->map_conditions($subquery, $conditions, $subquery_repository->model_name(), $plan);
-		$this->planners->in_subquery(
-										$query,
-										$query_field,
-										$subquery,
-										$subquery_field,
-										$plan,
-										$group->logic,
-										$group->negated()
-									);
+		
+		return $plan;
+	}
+	
+	protected function opposing_side($side) {
+		if ($side === 'left')
+			return 'right';
+		
+		if ($side === 'right')
+			return 'left';
+			
+		throw new \PHPixie\ORM\Exception\Mapper("Side must be either 'left' or 'right', '{$side}' was passed.")
+	}
+	
+	protected function get_planner_side($config, $side, $items) {
+		$model = $config->get("{$side}_model");
+		$collection = $this->orm->collection($model);
+		$collection->add($items);
+		$repository = $this->repository_registry->get($model);
+		$pivot_key = $config->get("{$side}_pivot_key");
+		return $this->planners->pivot()->side($collection, $repository, $pivot_key);
+	}
+	
+	protected get_planner_pivot($config) {
+		$pivot_connection = $this->db->get($config->pivot_connection);
+		return $this->planners->pivot()->pivot($pivot_connection, $config->pivot)
+	}
+	
+	protected function get_sides($config) {
+		$sides = array();
+		foreach(array('left', 'right') as $side) {
+			$model = $config->get("{$side}_model");
+			$repo = $this->registry_repository->get($model);
+			$id_field = $repo->id_field();
+			$pivot_key = $config->get("{$side}_pivot_key");
+			
+			$sides[$side] = array(
+				'model' => $model,
+				'repo' => $repo,
+				'id_field' => $id_field,
+				'pivot_key' => $pivot_key
+			);
+		}
+		return $sides;
+	}
+	
+	public function map_relationship($link, $group, $query, $plan) {
+		$side = $link->type();
+		$config = $link->config();
+		$opposing = $this->opposing_side($side);
+		$sides = $this->get_sides($config);
+		$pivot_connection = $this->db->get($config->pivot_connection);
+		$in_planner = $this->planners->in();
+		
+		$opposing_query = $sides[$opposing]['repo']->db_query()->fields(array($sides[$opposing]['id_field']));
+		$pivot_query = $pivot_connection->query('select')->collection($config->pivot);
+		
+		$this->group_mapper->map_conditions($opposing_query, $group->conditions(), $sides[$opposing]['model'], $plan);
+		
+		$in_planner->query(
+							$pivot_query,
+							$sides[$opposing]['pivot_key'],
+							$opposing_query,
+							$sides[$opposing]['id_field'],
+							$plan
+						);
+						
+		$in_planner->query(
+							$query,
+							$sides[$side]['id_field'],
+							$pivot_query,
+							$sides[$side]['pivot_key'],
+							$plan,
+							$group->logic(),
+							$group->negated()
+						);
 	}
 	
 	public function preload($link, $loader, $result_step, $result_plan) {
+		$side = $link->type();
 		$config = $link->config();
-		if($link->type() === 'item') {
-			$query_repository = $item_repository;
-			$query_field = $config->item_key;
-			$result_field = $owner_repository->id_field();
-		}else{
-			$query_repository = $owner_repository;
-			$query_field = $owner_repository->id_field();
-			$result_field = $config->item_key;
-		}
-		
-		$query = $preload_repository->db_query();
+		$opposing = $this->opposing_side($side);
+		$sides = $this->get_sides($config);
+		$pivot_connection = $this->db->get($config->pivot_connection);
+		$in_planner = $this->planners->in();
+		$preload_plan = $result_plan->preload_plan();
+
+		$pivot_query = $pivot_connection->query('select')->collection($config->pivot);
 		$placeholder = $query->get_where_builder()->add_placeholder();
-		$preload_step = $this->steps->in($placeholder, $query_field, $result_step, $result_field);
-		$result_plan->preload_plan()->push($preload_step);
-		return $preload_step;
-	}
-	
-	protected opposing_side($side) {
-		if($side === 'left'){
-			return 'right';
+		$pivot_step = $this->steps->in($placeholder, $sides[$opposing]['pivot_key'], $result_step, $sides[$opposing]['id_field']);
+		$preload_plan->push($pivot_step);
 		
-		}elseif($side === 'right') {
-			return 'left';
-			
-		}else
-			throw new \Exception();
+		$query = $sides[$side]['repo']->db_query();
+		$in_planner->query(
+					$query,
+					$sides[$side]['id_field'],
+					$pivot_query,
+					$sides[$side]['pivot_key'],
+					$plan
+				);
+		
+		$preload_step = $this->steps->result($query);
+		$preload_plan->push($preload_step);
+		return $preload_step;
 	}
 }

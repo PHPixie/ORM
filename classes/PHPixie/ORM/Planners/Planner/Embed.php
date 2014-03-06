@@ -2,32 +2,34 @@
 
 namespace \PHPixie\ORM\Query\Plan\Planner;
 
-class Embed {
+class Embed
+{
+    public function pushTo($owner, $relationship, $itemCollection, $itemRepository, $plan)
+    {
+        $pushStep = $this->steps->push($this->updateQuery($owner, $owerRepository), $itemRepository->path());
+        $pullStep = $this->steps->pull($this->updateQuery($owner, $owerRepository), $itemRepository->path(), $itemRepository->idField());
 
-	public function push_to($owner, $relationship, $item_collection, $item_repository, $plan) {
-		$push_step = $this->steps->push($this->update_query($owner, $ower_repository), $item_repository->path());
-		$pull_step = $this->steps->pull($this->update_query($owner, $ower_repository), $item_repository->path(), $item_repository->id_field());
-		
-		foreach($item_collection->added_models() as $item) {
-			$push_step->add_item($item->full_data());
-			$pull_step->add_id($item->id());
-		}
-		
-		foreach($item_collection->added_quesries() as $query) {
-			$result_plan = $query->map();
-			$result_step->peek();
-			$push_step->add_result_step($result_step);
-			$pull_step->add_result_step($result_step);
-			$plan->prepend_plan($result_plan);
-		}
-		
-		$plan->push($pull_step);
-		$plan->push($push_step);
-	}
-	
-	protected function update_query($owner, $owner_repository) {
-		return $owner_repository
-						->query('update')
-						->where($onwer_repository->id_field(), $owner->id());
-	}
+        foreach ($itemCollection->addedModels() as $item) {
+            $pushStep->addItem($item->fullData());
+            $pullStep->addId($item->id());
+        }
+
+        foreach ($itemCollection->addedQuesries() as $query) {
+            $resultPlan = $query->map();
+            $resultStep->peek();
+            $pushStep->addResultStep($resultStep);
+            $pullStep->addResultStep($resultStep);
+            $plan->prependPlan($resultPlan);
+        }
+
+        $plan->push($pullStep);
+        $plan->push($pushStep);
+    }
+
+    protected function updateQuery($owner, $ownerRepository)
+    {
+        return $ownerRepository
+                        ->query('update')
+                        ->where($onwerRepository->idField(), $owner->id());
+    }
 }

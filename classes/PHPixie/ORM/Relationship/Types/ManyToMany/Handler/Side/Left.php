@@ -2,12 +2,13 @@
 
 namespace \PHPixie\ORM\Relationships\ManyToMany\Handler\Side;
 
-class Right {
-	
-	protected $side = 'left';
-	
-	public function add_left_side_conditions($group, $right_handler, $pivot_handler, $config, $query, $plan) {
-		$this->add_opposing_side_conditions($group, 'right', $left_handler, $pivot_handler, $config, $query, $plan);
-	}
-	
+class Left
+{
+    protected $side = 'left';
+
+    public function addLeftSideConditions($group, $rightHandler, $pivotHandler, $config, $query, $plan)
+    {
+        $this->addOpposingSideConditions($group, 'right', $leftHandler, $pivotHandler, $config, $query, $plan);
+    }
+
 }

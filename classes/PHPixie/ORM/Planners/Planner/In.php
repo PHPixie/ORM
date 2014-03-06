@@ -2,51 +2,56 @@
 
 namespace \PHPixie\ORM\Query\Plan\Planner;
 
-class In extends \PHPixie\ORM\Query\Plan\Planner{
-	
-	public function collection($logic, $negated, $query, $query_field, $collection, $collection_field, $plan) {
-		$query->start_where_group($logic, $negated);
-		$collection_connection = $this
-							->repository_registry($collection->model_name())
-							->connection();
-		$method = $this->select_strategy($db_query->connection(), $collection_connection);
-		$ids = $collection->get_field($collection_field);
-		if (!empty($ids))
-			$query->or_where($field, 'in', $ids);
-		
-		foreach($collection->added_queries() as $query) {
-			$subplan = $query->plan_find();
-			$plan->append_plan($subplan->required_plan());
-			$subquery = $subplan->result_step()->query();
-			$strategy->$method('or', false, $query, $query_field, $subquery, $collection_field, $plan);
-		}
-		
-		$query->end_where_group();
-	}
-	
-	public function subquery($logic, $negated, $query, $query_field, $subquery, $subquery_field, $plan) {
-		$method = $this->method($db_query->connection(), $subqery->connection());
-		$strategy->$method($logic, $negate, $query, $query_field, $subquery, $subquery_field, $plan);
-	}
-	
-	protected function subquery_method($logic, $negate, $query, $query_field, $subquery, $subquery_field, $plan) {
-		$subquery->fields(array($subquery_field));
-		$query->get_where_builder()->add_operator_condition($logic, $negate, $query_field, 'in', $subquery);
-	}
-	
-	protected function multiquery_method($logic, $negate, $query, $query_field, $subquery, $subquery_field, $plan) {
-		$subquery->fields(array($subquery_field));
-		$result_step = $this->steps->result($subquery);
-		$plan->push($result_step);
-		$placeholder = $query->get_where_builder()->add_placeholder($logic, $negate);
-		$in_step = $this->steps->in($placeholder, $query_field, $result_step, $subquery_field);
-		$plan->push($in_step);
-	}
-	
-	protected function method($query_connection, $subquery_connection) {
-		if ($query_connection instanceof PHPixie\DB\Driver\PDO\Connection && $query_connection === $subquery_connection)
-			return 'subquery_method';
-		return 'multiquery_method';
-	}
-	
+class In extends \PHPixie\ORM\Query\Plan\Planner
+{
+    public function collection($logic, $negated, $query, $queryField, $collection, $collectionField, $plan)
+    {
+        $query->startWhereGroup($logic, $negated);
+        $collectionConnection = $this
+                            ->repositoryRegistry($collection->modelName())
+                            ->connection();
+        $method = $this->selectStrategy($dbQuery->connection(), $collectionConnection);
+        $ids = $collection->getField($collectionField);
+        if (!empty($ids))
+            $query->orWhere($field, 'in', $ids);
+
+        foreach ($collection->addedQueries() as $query) {
+            $subplan = $query->planFind();
+            $plan->appendPlan($subplan->requiredPlan());
+            $subquery = $subplan->resultStep()->query();
+            $strategy->$method('or', false, $query, $queryField, $subquery, $collectionField, $plan);
+        }
+
+        $query->endWhereGroup();
+    }
+
+    public function subquery($logic, $negated, $query, $queryField, $subquery, $subqueryField, $plan)
+    {
+        $method = $this->method($dbQuery->connection(), $subqery->connection());
+        $strategy->$method($logic, $negate, $query, $queryField, $subquery, $subqueryField, $plan);
+    }
+
+    protected function subqueryMethod($logic, $negate, $query, $queryField, $subquery, $subqueryField, $plan)
+    {
+        $subquery->fields(array($subqueryField));
+        $query->getWhereBuilder()->addOperatorCondition($logic, $negate, $queryField, 'in', $subquery);
+    }
+
+    protected function multiqueryMethod($logic, $negate, $query, $queryField, $subquery, $subqueryField, $plan)
+    {
+        $subquery->fields(array($subqueryField));
+        $resultStep = $this->steps->result($subquery);
+        $plan->push($resultStep);
+        $placeholder = $query->getWhereBuilder()->addPlaceholder($logic, $negate);
+        $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $subqueryField);
+        $plan->push($inStep);
+    }
+
+    protected function method($queryConnection, $subqueryConnection)
+    {
+        if ($queryConnection instanceof PHPixie\DB\Driver\PDO\Connection && $queryConnection === $subqueryConnection)
+            return 'subquery_method';
+        return 'multiquery_method';
+    }
+
 }

@@ -2,6 +2,6 @@
 
 namespace PHPixie\ORM\Driver\PDO;
 
-class Result{
-
+class Result
+{
 }

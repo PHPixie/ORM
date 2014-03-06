@@ -2,21 +2,27 @@
 
 namespace PHPixie\ORM\Properties;
 
-class Builder {
-	protected $orm;
-	protected $relationship_map;
-	
-	public function __construct($orm, $relatonship_map) {
-		$this->relationship_map = $relationship_map;
-	}
-	
-	public function model_property($model, $property_name) {
-		$side = $this->relationship_map->get_side($model->model_name(), $property_name);
-		return $this->orm->model_property($side, $model);
-	}
-	
-	public function query_property($model, $name) {
-		$side = $this->relationship_map->get_side($model->model_name(), $property_name);
-		return $this->orm->query_property($side, $model);
-	}
+class Builder
+{
+    protected $orm;
+    protected $relationshipMap;
+
+    public function __construct($orm, $relatonshipMap)
+    {
+        $this->relationshipMap = $relationshipMap;
+    }
+
+    public function modelProperty($model, $propertyName)
+    {
+        $side = $this->relationshipMap->getSide($model->modelName(), $propertyName);
+
+        return $this->orm->modelProperty($side, $model);
+    }
+
+    public function queryProperty($model, $name)
+    {
+        $side = $this->relationshipMap->getSide($model->modelName(), $propertyName);
+
+        return $this->orm->queryProperty($side, $model);
+    }
 }

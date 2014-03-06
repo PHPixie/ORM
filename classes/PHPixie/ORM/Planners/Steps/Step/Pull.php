@@ -1,45 +1,48 @@
 <?php
 
-class Push {
+class Push
+{
+    protected $updateQuery;
+    protected $ids = array();
+    protected $path;
+    protected $resultSteps = array();
+    protected $idField;
 
-	protected $update_query;
-	protected $ids = array();
-	protected $path;
-	protected $result_steps = array();
-	protected $id_field;
-	
-	public function __construct($update_query, $path, $id_field) {
-		$this->update_query = $update_query;
-		$this->path = $path;
-		$this->id_field = $id_field;
-	}
-	
-	public function add_result_step($step) {
-		$this->result_steps[] = $step;
-	}
-	
-	public function add_id($id) {
-		$this->ids[] = $id;
-	}
-	
-	
-	public function execute() {
-		$ids = $this->ids;
-		
-		foreach($this->result_steps as $step)
-			foreach($step->result() as $item)
-				$ids[] = $item->{$this->id_field};
-		
-		$this->update_query
-						->data(array(
-							'$pull' => array(
-								$this->path => array(
-									$this->id_field => array(
-										'in' => $ids
-									)
-								)
-							)
-						))
-						->execute();
-	}
+    public function __construct($updateQuery, $path, $idField)
+    {
+        $this->updateQuery = $updateQuery;
+        $this->path = $path;
+        $this->idField = $idField;
+    }
+
+    public function addResultStep($step)
+    {
+        $this->resultSteps[] = $step;
+    }
+
+    public function addId($id)
+    {
+        $this->ids[] = $id;
+    }
+
+    public function execute()
+    {
+        $ids = $this->ids;
+
+        foreach($this->resultSteps as $step)
+            foreach($step->result() as $item)
+                $ids[] = $item->{$this->idField};
+
+        $this->updateQuery
+                        ->data(array(
+                            '$pull' => array(
+                                $this->path => array(
+                                    $this->idField => array(
+                                        'in' => $ids
+                                    )
+                                )
+                            )
+                        ))
+                        ->execute();
+    }
 }

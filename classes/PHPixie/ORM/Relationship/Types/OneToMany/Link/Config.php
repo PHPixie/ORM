@@ -2,22 +2,23 @@
 
 namespace PHPixie\ORM\Relationships\Types\OneToMany\Link;
 
-class Config extends PHPixie\ORM\Relationship\Side\Config {
-	
-	public $owner_model;
-	public $item_model;
-	public $item_key;
-	public $owner_property;
-	public $item_property;
-	
-	protected function process_config($config, $inflector) {
-		$this->owner_model = $config->get('owner.model');
-		$this->item_model = $config->get('items.model');
-		$this->item_key = $config->get('items.owner_key', $this->owner_model.'_id');
-		
-		if (($this->owner_property = $config->get('owner.items_property', null)) === null)
-			$this->owner_property = $inflector->plural($items_model);
-		
-		$this->item_property = $config->get('owner.owner_property', $owner_model);
-	}
+class Config extends PHPixie\ORM\Relationship\Side\Config
+{
+    public $ownerModel;
+    public $itemModel;
+    public $itemKey;
+    public $ownerProperty;
+    public $itemProperty;
+
+    protected function processConfig($config, $inflector)
+    {
+        $this->ownerModel = $config->get('owner.model');
+        $this->itemModel = $config->get('items.model');
+        $this->itemKey = $config->get('items.owner_key', $this->ownerModel.'_id');
+
+        if (($this->ownerProperty = $config->get('owner.items_property', null)) === null)
+            $this->ownerProperty = $inflector->plural($itemsModel);
+
+        $this->itemProperty = $config->get('owner.owner_property', $ownerModel);
+    }
 }

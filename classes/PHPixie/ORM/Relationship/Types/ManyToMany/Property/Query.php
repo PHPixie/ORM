@@ -2,8 +2,8 @@
 
 namespace PHPixie\ORM\Relationship\Types\ManyToMany\Property;
 
-class Query extends \PHPixie\ORM\Properties\Property\Query {
-	
-	protected $handler;
-	
+class Query extends \PHPixie\ORM\Properties\Property\Query
+{
+    protected $handler;
+
 }

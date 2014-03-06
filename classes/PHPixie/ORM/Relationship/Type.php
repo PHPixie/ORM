@@ -2,21 +2,23 @@
 
 namespace PHPixie\ORM\Relationship;
 
-abstract class Type {
+abstract class Type
+{
+    public function getLinks($config)
+    {
+        $config = $this->config($config);
+        $sides = array();
+        foreach($this->linkTypes($config) as $link)
+            $links[] = $this->link($link, $config);
 
-	public function get_links($config) {
-		$config = $this->config($config);
-		$sides = array();
-		foreach($this->link_types($config) as $link)
-			$links[] = $this->link($link, $config);
-		return $links;
-	}
-	
-	public abstract function config($config);
-	public abstract function side($type, $config);
-	public abstract function model_property($side, $model);
-	public abstract function query_property($side, $model);
-	
-	protected abstract function side_types($config);
-	
+        return $links;
+    }
+
+    abstract public function config($config);
+    abstract public function side($type, $config);
+    abstract public function modelProperty($side, $model);
+    abstract public function queryProperty($side, $model);
+
+    abstract protected function sideTypes($config);
+
 }

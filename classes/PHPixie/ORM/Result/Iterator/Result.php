@@ -2,25 +2,27 @@
 
 namespace PHPixie\ORM\Result\Iterator;
 
-class Result extends \PHPixie\ORM\Result\Iterator{
-	
-	protected $preloaders;
-	protected $current;
-	
-	public function __construct($preloaders) {
-		$this->preloaders = $preloaders;
-	}
-	
-	public function current() {
-		if ($this->current_model === null)
-			$this->current_model();
-		
-		return $this->current_model;
-	}
+class Result extends \PHPixie\ORM\Result\Iterator
+{
+    protected $preloaders;
+    protected $current;
 
-	public abstract function key();
-	public abstract function valid();
-	public abstract function next();
-	public abstract function rewind();
-	protected abstract function current_model();
+    public function __construct($preloaders)
+    {
+        $this->preloaders = $preloaders;
+    }
+
+    public function current()
+    {
+        if ($this->currentModel === null)
+            $this->currentModel();
+
+        return $this->currentModel;
+    }
+
+    abstract public function key();
+    abstract public function valid();
+    abstract public function next();
+    abstract public function rewind();
+    abstract protected function currentModel();
 }

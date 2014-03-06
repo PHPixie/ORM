@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\ManyToMany\Handler;
 
-class IdSubquery extends PHPixie\ORM\Relationships\ManyToMany\Handler {
-	
-	protected $subquery_strategy = null;
+class IdSubquery extends PHPixie\ORM\Relationships\ManyToMany\Handler
+{
+    protected $subqueryStrategy = null;
 }

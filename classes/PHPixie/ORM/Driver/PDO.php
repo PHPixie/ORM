@@ -2,10 +2,11 @@
 
 namespace PHPixie\ORM\Driver;
 
-class PDO extends \PHPixie\PDO\Driver{
+class PDO extends \PHPixie\PDO\Driver
+{
+    public function repository($modelName, $modelConfig)
+    {
+        return new PDO\Repository($this->orm, $modelName, $modelConfig);
+    }
 
-	public function repository($model_name, $model_config) {
-		return new PDO\Repository($this->orm, $model_name, $model_config);
-	}
-	
 }

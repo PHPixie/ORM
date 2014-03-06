@@ -2,34 +2,41 @@
 
 namespace \PHPixie\ORM\Query\Plan;
 
-class Result extends \PHPixie\ORM\Query\Plan {
-	
-	protected $orm;
-	
-	protected $required_plan;
-	protected $result_plan;
-	protected $preload_plan;
-	
-	public function __construct($orm) {
-		$this->orm = $orm;
-	}
-	
-	public function required_plan() {
-		if ($this->required_plan === null)
-			$this->required_plan = $this->orm->plan();
-		return $this->required_plan;
-	}
-	
-	public function result_plan() {
-		if ($this->result_plan === null)
-			$this->result_plan = $this->orm->plan();
-		return $this->result_plan;
-	}
-	
-	public function preload_plan() {
-		if ($this->preload_plan === null)
-			$this->preload_plan = $this->orm->plan();
-		return $this->preload_plan;
-	}
-	
+class Result extends \PHPixie\ORM\Query\Plan
+{
+    protected $orm;
+
+    protected $requiredPlan;
+    protected $resultPlan;
+    protected $preloadPlan;
+
+    public function __construct($orm)
+    {
+        $this->orm = $orm;
+    }
+
+    public function requiredPlan()
+    {
+        if ($this->requiredPlan === null)
+            $this->requiredPlan = $this->orm->plan();
+
+        return $this->requiredPlan;
+    }
+
+    public function resultPlan()
+    {
+        if ($this->resultPlan === null)
+            $this->resultPlan = $this->orm->plan();
+
+        return $this->resultPlan;
+    }
+
+    public function preloadPlan()
+    {
+        if ($this->preloadPlan === null)
+            $this->preloadPlan = $this->orm->plan();
+
+        return $this->preloadPlan;
+    }
+
 }

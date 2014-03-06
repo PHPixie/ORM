@@ -2,74 +2,83 @@
 
 namespace PHPixie\ORM;
 
-class Mapper {
-	protected $orm;
-	protected $group_mapper;
-	
-	public function __construct($orm, $group_mapper, $repository_registry) {
-		$this->orm = $orm;
-		$this->group_mapper = $group_mapper;
-	}
-	
-	public function map_delete($query) {
-		$plan = $this->orm->plan();
-		$model_name = $query->model_name();
-		$repository = $this->repository_registry->get($model_name);
+class Mapper
+{
+    protected $orm;
+    protected $groupMapper;
 
-		$db_query = $repository->query('delete');
-		$this->group_mapper->map_conditions($db_query, $query->conditions(), $model_name, $plan);
-		$plan->push($this->steps->query($db_query))
-		return $plan;
-	}
+    public function __construct($orm, $groupMapper, $repositoryRegistry)
+    {
+        $this->orm = $orm;
+        $this->groupMapper = $groupMapper;
+    }
 
-	public function map_update($query, $data) {
-		$plan = $this->orm->plan();
-		$model_name = $query->model_name();
-		$repository = $this->repository_registry->get($model_name);
+    public function mapDelete($query)
+    {
+        $plan = $this->orm->plan();
+        $modelName = $query->modelName();
+        $repository = $this->repositoryRegistry->get($modelName);
 
-		$db_query = $repository->query('update');
-		$db->query->data($data);
-		$this->group_mapper->map_conditions($db_query, $query->conditions(), $model_name, $plan);
-		$plan->push($this->steps->query($db_query));
-		return $plan;
-	}
+        $dbQuery = $repository->query('delete');
+        $this->groupMapper->mapConditions($dbQuery, $query->conditions(), $modelName, $plan);
+        $plan->push($this->steps->query($dbQuery))
 
-	public function map_find($query, $preload) {
-		$model_name = $query->model_name();
-		$result_plan = $this->orm->result_plan($model_name);
-		$repository = $this->repository_registry->get($model_name);
+        return $plan;
+    }
 
-		$db_query = $repository->query('select');
-		$this->group_mapper->map_conditions($db_query, $query->conditions(), $model_name, $result_plan->required_plan());
-		$result_step = $this->steps->reusable_result($db_query);
-		$plan->set_result_step($result_step);
-		
-		foreach($preload as $relationship)
-			$this->add_preloaders($relationship, $model, $plan->loader(), $plan->preload_plan());
-		
-		return $plan;
-	}
-	
-	protected function add_preloaders($relationship, $model, $loader, $plan) {
-		$path = explode('.', $relationship);
-		foreach($path as $rel) {
-			$preloader = $loader->get_preloader($relationship);
-			if($preloader === null) {
-				$preloader = $this->build_preloader($model, $relationship, $loader->result_step(), $plan);
-				$loader->set_preloader($relationship, $loader);
-			}
-			$model = $preloader->model_name();
-			$loader = $preloader->get_loader();
-		}
-	}
-	
-	protected function build_preloader($model, $relationship, $result_step, $plan) {
-		$registry = $this->repository_registry->get($model);
-		$loader = $this->orm->loader($registry);
-		
-		$link = $this->relationship_registry->get_link($model, $relationship);
-		$handler = $this->orm->handler($link->relationship_type());
-		
-		return $handler->preloader($link, $loader, $result_step, $preload_plan);
-	}
+    public function mapUpdate($query, $data)
+    {
+        $plan = $this->orm->plan();
+        $modelName = $query->modelName();
+        $repository = $this->repositoryRegistry->get($modelName);
+
+        $dbQuery = $repository->query('update');
+        $db->query->data($data);
+        $this->groupMapper->mapConditions($dbQuery, $query->conditions(), $modelName, $plan);
+        $plan->push($this->steps->query($dbQuery));
+
+        return $plan;
+    }
+
+    public function mapFind($query, $preload)
+    {
+        $modelName = $query->modelName();
+        $resultPlan = $this->orm->resultPlan($modelName);
+        $repository = $this->repositoryRegistry->get($modelName);
+
+        $dbQuery = $repository->query('select');
+        $this->groupMapper->mapConditions($dbQuery, $query->conditions(), $modelName, $resultPlan->requiredPlan());
+        $resultStep = $this->steps->reusableResult($dbQuery);
+        $plan->setResultStep($resultStep);
+
+        foreach($preload as $relationship)
+            $this->addPreloaders($relationship, $model, $plan->loader(), $plan->preloadPlan());
+
+        return $plan;
+    }
+
+    protected function addPreloaders($relationship, $model, $loader, $plan)
+    {
+        $path = explode('.', $relationship);
+        foreach ($path as $rel) {
+            $preloader = $loader->getPreloader($relationship);
+            if ($preloader === null) {
+                $preloader = $this->buildPreloader($model, $relationship, $loader->resultStep(), $plan);
+                $loader->setPreloader($relationship, $loader);
+            }
+            $model = $preloader->modelName();
+            $loader = $preloader->getLoader();
+        }
+    }
+
+    protected function buildPreloader($model, $relationship, $resultStep, $plan)
+    {
+        $registry = $this->repositoryRegistry->get($model);
+        $loader = $this->orm->loader($registry);
+
+        $link = $this->relationshipRegistry->getLink($model, $relationship);
+        $handler = $this->orm->handler($link->relationshipType());
+
+        return $handler->preloader($link, $loader, $resultStep, $preloadPlan);
+    }
 }

@@ -2,22 +2,24 @@
 
 namespace PHPixie\ORM\Query\Plan\Step;
 
-class In{
-	
-	protected $placeholder;
-	protected $placeholder_field;
-	protected $result_step;
-	protected $result_field;
-	
-	public function __construct($placeholder, $placeholder_field, $result_step, $result_field) {
-		$this->placeholder = $placeholder;
-		$this->placeholder_field = $placeholder_field;
-		$this->result_step = $result_step;
-		$this->result_field = $result_field;
-	}
-	
-	public function execute() {
-		$values = $this->result_step->result()->get_column($result_field);
-		$placeholder->where($this->placeholder_field, 'in', $values);
-	}
+class In
+{
+    protected $placeholder;
+    protected $placeholderField;
+    protected $resultStep;
+    protected $resultField;
+
+    public function __construct($placeholder, $placeholderField, $resultStep, $resultField)
+    {
+        $this->placeholder = $placeholder;
+        $this->placeholderField = $placeholderField;
+        $this->resultStep = $resultStep;
+        $this->resultField = $resultField;
+    }
+
+    public function execute()
+    {
+        $values = $this->resultStep->result()->getColumn($resultField);
+        $placeholder->where($this->placeholderField, 'in', $values);
+    }
 }

@@ -2,14 +2,15 @@
 
 namespace \PHPixie\ORM\Query\Plan\Planner\Pivot;
 
-class Pivot {
+class Pivot
+{
+    protected $pivotConnection;
+    protected $pivot;
 
-	protected $pivot_connection;
-	protected $pivot;
-	
-	public function __construct($pivot_connection, $pivot) {
-		$this->pivot_connection = $pivot_connection;
-		$this->pivot = $pivot;
-	}
-	
+    public function __construct($pivotConnection, $pivot)
+    {
+        $this->pivotConnection = $pivotConnection;
+        $this->pivot = $pivot;
+    }
+
 }

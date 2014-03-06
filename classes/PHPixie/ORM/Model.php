@@ -35,7 +35,7 @@ class Model
 	 * @var \PHPixie\DB\Connection
 	 */
 	public $conn;
-	
+
 	/**
 	 * Specifies which table the model will use, can be overridden
 	 * @var string
@@ -114,19 +114,19 @@ class Model
 	 * @var array
 	 */
 	protected $_with = array();
-	
+
 	/**
 	 * Extension definitions
 	 * @var array
 	 */
 	protected $extensions = array();
-	
+
 	/**
 	 * Extension instances
 	 * @var array
 	 */
 	protected $extension_instances = array();
-	
+
 	/**
 	 * Cached column names for tables
 	 * @var array
@@ -157,7 +157,7 @@ class Model
 		$this->query = $this->conn->query('select');
 		$this->model_name = strtolower(get_class($this));
 		$this->model_name = str_ireplace($this->pixie->app_namespace."Model\\", '', $this->model_name);
-		
+
 		if ($this->table == null)
 		{
 			$this->table = str_replace("\\", '_', $this->model_name);
@@ -200,7 +200,7 @@ class Model
 			$this->$rels = $normalized;
 		}
 	}
-	
+
 	/**
 	 * Get model foreign key from model name
 	 *
@@ -211,7 +211,7 @@ class Model
 	public function model_key($model_name) {
 		return str_replace("\\", '_', $model_name).'_id';
 	}
-	
+
 	/**
 	 * Magic method for call Query_Database methods
 	 *
@@ -230,10 +230,10 @@ class Model
 		$res = call_user_func_array(array($this->query, $method), $arguments);
 		if (empty($arguments))
 			return $res;
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * Prepares the relationships specified using with().
 	 *
@@ -248,32 +248,32 @@ class Model
 			$this_alias = $this->query->last_alias();
 			foreach ($this->columns() as $column)
 				$fields[] = array("{$this_alias}.{$column}", "{$this_alias}__{$column}");
-			
+
 			foreach ($this->_with as $target) {
-			
+
 				$model = $this;
 				$model_alias = $this_alias;
 				$rels = explode('.', $target);
-				
+
 				foreach ($rels as $key => $rel_name) {
-				
+
 					$path = implode('.', array_slice($rels, 0, $key + 1));
 					if (isset($paths[$path])) {
 						$model = $paths[$path]['model'];
 						$model_alias = $paths[$path]['alias'];
 						continue;
 					}
-					
+
 					$alias = str_replace('.', '_', $path);
 					$model_rels = array_merge($model->has_one, $model->has_many, $model->belongs_to);
 					$rel = $this->pixie->arr($model_rels, $rel_name, false);
 
 					if (!$rel)
 						throw new \Exception("Model '{$model->model_name}' doesn't have a '{$rel_name}' relation defined");
-						
+
 					if ($rel['type'] == 'has_many')
 						throw new \Exception("Relationship '{$rel_name}' is of has_many type and cannot be preloaded view with()");
-						
+
 					$rel_model = $this->pixie->orm->get($rel['model']);
 
 					if ($rel['type'] == 'belongs_to') {
@@ -290,7 +290,7 @@ class Model
 
 					foreach ($rel_model->columns() as $column)
 						$fields[] = array("{$alias}.{$column}", "{$alias}__{$column}");
-						
+
 					$model = $rel_model;
 					$model_alias = $alias;
 					$paths[$path] = array('alias' => $alias, 'model' => $model);
@@ -299,11 +299,11 @@ class Model
 
 			call_user_func_array(array($this->query, 'fields'), $fields);
 		}
-		
+
 		return $paths;
-		
+
 	}
-	
+
 	/**
 	 * Finds all rows that meet set criteria.
 	 *
@@ -403,9 +403,9 @@ class Model
 		$relations = array_merge($this->has_one, $this->has_many, $this->belongs_to);
 		if ($target = $this->pixie->arr($relations, $property, false))
 			return true;
-		return false;		
+		return false;
 	}
-	
+
 	/**
 	 * Magic method that allows accessing row columns and extensions as properties and also facilitates
 	 * access to relationships and custom properties defined in get() method.
@@ -420,27 +420,27 @@ class Model
 	{
 		if (array_key_exists($column, $this->_row))
 			return $this->_row[$column];
-			
+
 		if (array_key_exists($column, $this->cached))
 			return $this->cached[$column];
-			
+
 		if (($val = $this->get($column)) !== null)
 		{
 			$this->cached[$column] = $val;
 			return $val;
 		}
-		
+
 		if (array_key_exists($column, $this->extension_instances))
 		{
 			return $this->extension_instances[$column];
 		}
-		
+
 		if (array_key_exists($column, $this->extensions))
-		{	
-			return $this->extension_instances[$column] = 
+		{
+			return $this->extension_instances[$column] =
 				$this->pixie->orm->extension($this->extensions[$column], $this);
 		}
-		
+
 		$relations = array_merge($this->has_one, $this->has_many, $this->belongs_to);
 		if ($target = $this->pixie->arr($relations, $column, false))
 		{
@@ -664,7 +664,7 @@ class Model
 	public function columns()
 	{
 		$cache = &$this->pixie->orm->column_cache;
-		
+
 		if (!isset($cache[$this->table]))
 			$cache[$this->table] = $this->conn->list_columns($this->table);
 		return $cache[$this->table];
@@ -689,14 +689,14 @@ class Model
 	 *
 	 * @return mixed   Item id
 	 */
-	public function id() 
+	public function id()
 	{
 		if ($this->loaded())
 			return $this->_row[$this->id_field];
-			
+
 		return null;
 	}
-	
+
 	/**
 	 * Defines which relationships should be preloaded. You can only preload
 	 * belongs_to and has_one relationships. You can use the dot notation to
@@ -765,9 +765,11 @@ class Model
 				->table($this->table);
 		}
 		$query->data($this->_row);
-		$query->execute();
-
-		if ($this->loaded())
+		$row = (array)$query->execute()->current();
+		if ($row && isset($row[$this->id_field])) {
+			$this->_row[$this->id_field] = $row[$this->id_field];
+		}
+		if ($this->loaded() || (isset($this->_row[$this->id_field])&&$this->_row[$this->id_field]))
 		{
 			$id = $this->_row[$this->id_field];
 		}
@@ -775,9 +777,11 @@ class Model
 		{
 			$id = $this->conn->insert_id();
 		}
-		$row = (array) $this->conn->query('select')
+		if (!$row) {
+			$row = (array) $this->conn->query('select')
 				->table($this->table)
 				->where($this->id_field, $id)->execute()->current();
+		}
 		$this->values($row, true);
 		return $this;
 	}

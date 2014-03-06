@@ -769,7 +769,7 @@ class Model
 		if ($row && isset($row[$this->id_field])) {
 			$this->_row[$this->id_field] = $row[$this->id_field];
 		}
-		if ($this->loaded() || $this->_row[$this->id_field])
+		if ($this->loaded() || (isset($this->_row[$this->id_field])&&$this->_row[$this->id_field]))
 		{
 			$id = $this->_row[$this->id_field];
 		}

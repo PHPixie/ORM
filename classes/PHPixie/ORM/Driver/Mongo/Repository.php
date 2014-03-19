@@ -4,13 +4,12 @@ namespace PHPixie\ORM\Driver\Mongo;
 
 class Repository extends \PHPixie\ORM\Repository
 {
-    protected $collection;
+    protected $collectionName;
     protected $idField;
 
-    public function __construct($db, $modelName, $pluralName, $config)
+    public function __construct($modelName, $connection, $pluralName, $config)
     {
-        parent::__construct($modelName, $pluralName, $config);
-        $this->collection = $config->get('collection', $pluralName);
+        parent::__construct($modelName, $connection, $pluralName, $config);
         $this->idField  = $config->get('id_field', '_id');
     }
 

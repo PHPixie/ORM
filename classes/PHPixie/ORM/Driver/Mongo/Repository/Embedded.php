@@ -2,25 +2,28 @@
 
 namespace PHPixie\ORM\Driver\Mongo\Repository;
 
-class Embedded extends \PHPixie\ORM\Repository
+class Embedded extends \PHPixie\ORM\Driver\Mongo\Repository
 {
-    protected $collection;
-    protected $idField = '_id';
     protected $path;
 
-    public function __construct($db, $modelName, $pluralName, $config)
+    public function __construct($modelName, $connection, $pluralName, $config)
     {
-        parent::__construct($modelName, $pluralName, $config);
-        $this->collection = $config->get('collection', $pluralName)
+        parent::__construct($modelName, $connection, $pluralName, $config);
+        $this->collection = $config->get('collection');
     }
 
     public function dbQuery($type)
     {
-        return $this->orm->embeddedQuery($type, $connectionName);
+        return $this->orm->embeddedQuery($type, $this->connection);
     }
 
     public function idField()
     {
-        return $this->idField;
+        return $this->path.'.'.$this->idField;
+    }
+    
+    public function delete()
+    {
+        
     }
 }

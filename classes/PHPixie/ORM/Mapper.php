@@ -25,7 +25,7 @@ class Mapper
 
         return $plan;
     }
-
+.
     public function mapUpdate($query, $data)
     {
         $plan = $this->orm->plan();

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Types\OneToMany;
 
-class Link extends PHPixie\ORM\Relationship\Link
+class Side extends PHPixie\ORM\Relationship\Side
 {
     public function modelName()
     {
@@ -20,6 +20,6 @@ class Link extends PHPixie\ORM\Relationship\Link
 
     public function relationship()
     {
-        return 'embedded'
+        return 'oneToMany'
     }
 }

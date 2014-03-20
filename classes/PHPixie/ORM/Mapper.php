@@ -76,9 +76,9 @@ class Mapper
         $registry = $this->repositoryRegistry->get($model);
         $loader = $this->orm->loader($registry);
 
-        $link = $this->relationshipRegistry->getLink($model, $relationship);
-        $handler = $this->orm->handler($link->relationshipType());
+        $side = $this->relationshipRegistry->getSide($model, $relationship);
+        $handler = $this->orm->handler($side->relationshipType());
 
-        return $handler->preloader($link, $loader, $resultStep, $preloadPlan);
+        return $handler->preloader($side, $loader, $resultStep, $preloadPlan);
     }
 }

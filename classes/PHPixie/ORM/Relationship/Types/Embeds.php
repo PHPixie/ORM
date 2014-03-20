@@ -9,9 +9,9 @@ class Embedded extends PHPixie\ORM\Relationship\Type
         return new Embedded\Side\Config($config);
     }
 
-    public function link($type, $config)
+    public function side($propertyName, $config)
     {
-        return new Embedded\Link($this, $type, $config);
+        return new Embedded\Side($this, $propertyName, $config);
     }
 
     public function buildHandler()
@@ -19,9 +19,9 @@ class Embedded extends PHPixie\ORM\Relationship\Type
         return new Embedded\Handler();
     }
 
-    protected function links($config)
+    protected function sideTypes($config)
     {
-        return array('owner', 'items');
+        return $config->properties();
     }
 
 }

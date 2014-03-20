@@ -4,14 +4,14 @@ namespace PHPixie\ORM\Model;
 
 abstract class Preloader
 {
-    protected $link;
+    protected $side;
     protected $loader;
     protected $reusableResultStep;
     protected $items;
 
-    public function __construct($link, $loader, $reusableResultStep)
+    public function __construct($side, $loader, $reusableResultStep)
     {
-        $this->link = $link;
+        $this->link = $side;
         $this->loader = $loader;
         $this->reusableResultStep = $reusableResultStep;
     }

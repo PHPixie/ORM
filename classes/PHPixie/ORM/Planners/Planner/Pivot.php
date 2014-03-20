@@ -6,8 +6,8 @@ class Pivot extends \PHPixie\ORM\Query\Plan\Planner
 {
     public function link($pivot, $firstSide, $secondSide, $plan)
     {
-        $linkMethod = $this->linkMethod($pivot, $firstSide, $secondSide);
-        $this->$linkMethod($pivot, $firstSide, $secondSide, $plan);
+        $sideMethod = $this->linkMethod($pivot, $firstSide, $secondSide);
+        $this->$sideMethod($pivot, $firstSide, $secondSide, $plan);
     }
 
     public function unlink($pivot, $firstSide, $plan, $secondSide = null)

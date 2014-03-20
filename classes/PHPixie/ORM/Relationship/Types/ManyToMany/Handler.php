@@ -4,28 +4,28 @@ namespace PHPixe\ORM\Relationships\Types\ManyToMany;
 
 class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 {
-    public function query($link, $related)
+    public function query($side, $related)
     {
-        $config = $link->config();
-        $side = $link->type();
+        $config = $side->config();
+        $side = $side->type();
 
         return $this->buildQuery($config->{"{$side}_model"}, $config->{"{$side}_property"}, $related);
     }
 
-    public function link($link, $items, $opposingItems)
+    public function link($side, $items, $opposingItems)
     {
-        return $this->modifyLink('link', $link, $items, $opposingItems);
+        return $this->modifyLink('link', $side, $items, $opposingItems);
     }
 
-    public function unlink($link, $items, $opposingItems)
+    public function unlink($side, $items, $opposingItems)
     {
-        return $this->modifyLink('unlink', $link, $items, $opposingItems);
+        return $this->modifyLink('unlink', $side, $items, $opposingItems);
     }
 
-    public function unlinkAll($link, $items)
+    public function unlinkAll($side, $items)
     {
-        $side = $link->type();
-        $config = $link->config();
+        $side = $side->type();
+        $config = $side->config();
 
         $firstSide = $this->getPlannerSide($config, $side, $items);
         $pivot = $this->getPlannerPivot($config);
@@ -36,10 +36,10 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         return $plan;
     }
 
-    protected function modifyLink($method, $link, $items, $opposingItems)
+    protected function modifyLink($method, $side, $items, $opposingItems)
     {
-        $side = $link->type();
-        $config = $link->config();
+        $side = $side->type();
+        $config = $side->config();
 
         $firstSide = $this->getPlannerSide($config, $side, $items);
         $secondSide = $this->getPlannerSide($config, $this->opposingSide($side), $opposingItems);
@@ -105,10 +105,10 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         return $sides;
     }
 
-    public function mapRelationship($link, $group, $query, $plan)
+    public function mapRelationship($side, $group, $query, $plan)
     {
-        $side = $link->type();
-        $config = $link->config();
+        $side = $side->type();
+        $config = $side->config();
         $opposing = $this->opposingSide($side);
         $sides = $this->getSides($config);
         $pivotConnection = $this->db->get($config->pivotConnection);
@@ -138,10 +138,10 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
                         );
     }
 
-    public function preload($link, $loader, $resultStep, $resultPlan)
+    public function preload($side, $loader, $resultStep, $resultPlan)
     {
-        $side = $link->type();
-        $config = $link->config();
+        $side = $side->type();
+        $config = $side->config();
         $opposing = $this->opposingSide($side);
         $sides = $this->getSides($config);
         $pivotConnection = $this->db->get($config->pivotConnection);

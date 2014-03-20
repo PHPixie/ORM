@@ -9,7 +9,7 @@ class Owner extends \PHPixie\ORM\Model\Preloader\Single
         $this->items = array();
         $this->idsMap = array();
         $idField = $this->repository->idField();
-        $key = $this->link->config()->itemKey;
+        $key = $this->side->config()->itemKey;
         foreach ($this->reusableResultStep->iterator() as $itemData) {
             $id = $itemData->$idField;
             $this->items[$id] = $itemData;
@@ -22,7 +22,7 @@ class Owner extends \PHPixie\ORM\Model\Preloader\Single
 
     protected function getItem($item)
     {
-        $key = $this->link->config()->itemKey;
+        $key = $this->side->config()->itemKey;
 
         return $this->idsMap[$item];
     }

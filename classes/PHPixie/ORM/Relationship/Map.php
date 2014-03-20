@@ -12,16 +12,16 @@ class Map
             $type = $params['type'];
             $relationshipConfig = $this->config->slice($key);
             $relationship = $orm->relationship($type);
-            $links = $relationship->getLinks($relationshipConfig);
-            foreach($links as $link)
-                $this->addLink($link);
+            $sides = $relationship->getSides($relationshipConfig);
+            foreach($sides as $side)
+                $this->addSide($side);
         }
     }
 
-    public function addLink($link)
+    public function addSide($side)
     {
-        $modelName = $link->modelName();
-        $propertyName = $link->propertyName();
+        $modelName = $side->modelName();
+        $propertyName = $side->propertyName();
 
         if (!isset($this->propertyMap[$modelName]))
             $this->propertyMap[$modelName] = array();
@@ -29,10 +29,10 @@ class Map
         if (isset($this->propertyMap[$modelName][$propertyName]))
             throw new \PHPixie\ORM\Exception\Mapper("Property '$propertyName' on '$modelName' model has already been defined by a different relationship.");
 
-        $this->propertyMap[$model][$property] = $link;
+        $this->propertyMap[$model][$property] = $side;
     }
 
-    public function getLink($modelName, $propertyName)
+    public function getSide($modelName, $propertyName)
     {
         return $this->propertyMap[$modelName][$propertyName];
     }

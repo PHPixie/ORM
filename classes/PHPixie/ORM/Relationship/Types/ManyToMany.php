@@ -9,9 +9,9 @@ class ManyToMany extends PHPixie\ORM\Relationship\Type
         return new ManyToMany\Side\Config($config);
     }
 
-    public function link($type, $config)
+    public function side($type, $config)
     {
-        return new ManyToMany\Link($this, $type, $config);
+        return new ManyToMany\Side($this, $type, $config);
     }
 
     public function buildHandler()
@@ -19,7 +19,7 @@ class ManyToMany extends PHPixie\ORM\Relationship\Type
         return new ManyToMany\Handler();
     }
 
-    protected function links($config)
+    protected function sideTypes($config)
     {
         return array('left', 'right');
     }

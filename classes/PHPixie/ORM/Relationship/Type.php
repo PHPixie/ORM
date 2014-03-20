@@ -4,14 +4,14 @@ namespace PHPixie\ORM\Relationship;
 
 abstract class Type
 {
-    public function getLinks($config)
+    public function getSides($config)
     {
         $config = $this->config($config);
         $sides = array();
-        foreach($this->linkTypes($config) as $link)
-            $links[] = $this->link($link, $config);
+        foreach($this->sideTypes($config) as $type)
+            $sides[] = $this->side($type, $config);
 
-        return $links;
+        return $sides;
     }
 
     abstract public function config($config);

@@ -59,14 +59,14 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
                                 ));
     }
 
-    public function mapRelationship($link, $group, $query, $plan)
+    public function mapRelationship($side, $group, $query, $plan)
     {
-        $config = $link->config();
+        $config = $side->config();
         $itemRepository = $this->registryRepository->get($config->itemModel);
         $ownerRepository = $this->registryRepository->get($config->ownerModel);
         $conditions = $group->conditions();
 
-        if ($link->type() === 'item') {
+        if ($side->type() === 'item') {
             $subqueryRepository = $itemRepository;
             $queryField = $ownerRepository->idField();
             $subqueryField = $config->itemKey;
@@ -89,12 +89,12 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
                                     );
     }
 
-    public function preload($link, $loader, $resultStep, $resultPlan)
+    public function preload($side, $loader, $resultStep, $resultPlan)
     {
-        $config = $link->config();
+        $config = $side->config();
         $preloadPlan = $resultPlan->preloadPlan();
 
-        if ($link->type() === 'item') {
+        if ($side->type() === 'item') {
             $queryRepository = $itemRepository;
             $queryField = $config->itemKey;
             $resultField = $ownerRepository->idField();

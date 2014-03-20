@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationship;
 
-abstract class Link
+abstract class Side
 {
     protected $relationship;
     protected $config;

@@ -1,7 +1,7 @@
 <?php
 
 namespace PHPixie\ORM\Model;
-
+include(__DIR__.'/Data/SubdocumentArray.php');
 class Data {
     protected $data;
     protected $target;
@@ -17,8 +17,19 @@ class Data {
     public function setDataProperties()
     {
         foreach($this->data as $key => $value) {
-            $this->target->$key = $value;
+            $this->target->$key = $this->normalizeValue($value);
         }
+    }
+    
+    protected function normalizeValue($value)
+    {
+        if ($value instanceof \stdClass)
+            $value = new \PHPixie\ORM\Model\Data($value);
+        
+        if (is_array($value))
+            $value = new \PHPixie\ORM\Model\Data\SubdocumentArray($value);
+        
+        return $value;
     }
     
     public function currentData() {
@@ -29,8 +40,7 @@ class Data {
         
         $currentData = new \stdClass;
         foreach($targetData as $key => $value) {
-            var_dump($value);
-            if ($value instanceof static)
+            if ($value instanceof \PHPixie\ORM\Model\Data)
                 $value = $value->currentData();
             $currentData->$key = $value;
         }
@@ -42,7 +52,6 @@ class Data {
     {
         $old = $this->data;
         $current = $this->currentData();
-        var_dump([$current, $old]);
         return $this->objectDiff($current, $old);
     }
     
@@ -77,10 +86,9 @@ class Data {
             
             }elseif($valueIsObject && $oldValueIsObject) {
                 list($subSet, $subUnset) = $this->objectDiff($value, $oldValue, $subPrefix);
-                var_dump([$subSet, $subUnset]);
+                print_r([$value, $oldValue, $subSet, $subUnset]);
                 $set = array_merge($set, $subSet);
                 $unset = array_merge($unset, $subUnset);
-                
             }else
                 $set[$subPrefix] = $value;
             

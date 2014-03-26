@@ -12,8 +12,9 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
     {
 		parent::__construct($types);
         $this->originalArray = $originalArray;
+		$this->currentArray = array();
         foreach($originalArray as $key => $value)
-            $this->currentArray = $this->types->convertValue($value);
+            $this->currentArray[] = $this->convertValue($value);
     }
     
     public function offsetExists($key)
@@ -69,11 +70,6 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
     {
         return count($this->currentArray);
     }
-    
-	public function isModified()
-	{
-		return $this->isDataModified($this->currentArray, $this->originalArray);
-	}
 	
 	public function currentData()
 	{
@@ -82,5 +78,9 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
 			$current[$key] = $this->convertType($value);
 		
 		return $current;
+	}
+	
+	public function push($value){
+		$this->currentArray[] = $value;
 	}
 }

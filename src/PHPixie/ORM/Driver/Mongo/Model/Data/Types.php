@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM\Driver\Mongo\Model\Data;
+namespace PHPixie\ORM\Driver\Mongo\Model\Data;
 
 class Types{
 	

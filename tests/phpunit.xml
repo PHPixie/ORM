@@ -1,1 +1,12 @@
-<phpunit bootstrap="bootstrap.php"></phpunit>
+<phpunit bootstrap="phpunit.php">
+    <testsuites>
+        <testsuite name="PHPixie ORM Module">
+            <directory>../src/</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+      <blacklist>
+        <directory suffix=".php">./</directory>
+      </blacklist>
+    </filter>
+</phpunit>

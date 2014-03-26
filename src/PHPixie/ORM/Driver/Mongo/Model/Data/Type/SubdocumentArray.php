@@ -10,9 +10,9 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
     
     public function __construct($types, $originalArray)
     {
-		parent::__construct($types);
+        parent::__construct($types);
         $this->originalArray = $originalArray;
-		$this->currentArray = array();
+        $this->currentArray = array();
         foreach($originalArray as $key => $value)
             $this->currentArray[] = $this->convertValue($value);
     }
@@ -30,7 +30,7 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
     
     public function offsetSet($key, $value)
     {
-        $this->currentArray[$key] = $value;
+        $this->currentArray[$key] = $this->convertValue($value);
     }
     
     public function offsetUnset($key)
@@ -70,17 +70,33 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
     {
         return count($this->currentArray);
     }
-	
-	public function currentData()
-	{
-		$current = array();
-		foreach($this->currentArray as $key => $value)
-			$current[$key] = $this->convertType($value);
-		
-		return $current;
-	}
-	
-	public function push($value){
-		$this->currentArray[] = $value;
-	}
+    
+    public function currentData()
+    {
+        $current = array();
+        foreach($this->currentArray as $key => $value)
+            $current[$key] = $this->convertType($value);
+        
+        return $current;
+    }
+    
+    public function push($value = null)
+    {
+        $this->currentArray[] = $this->convertValue($value);
+        return $this;
+    }
+    
+    public function last()
+    {
+        return $this->currentArray[$this->count()-1];
+    }
+    
+    public function pushArray($data = array()) {
+        return $this->currentArray[]= $this->types->subdocumentArray($data);
+    }
+    
+    public function pushSubdocument($data = null) {
+        return $this->currentArray[]= $this->types->subdocument($data);
+    }
+
 }

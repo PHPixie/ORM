@@ -7,7 +7,11 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
     public function mapRelationship($side, $group, $query, $plan)
     {
         $config = $side->config();
-		$this->mapper->mapConditionGroup($group->conditions, $query, $config->embeddedMap());
+        $this->mapper->mapConditionGroup($group->conditions, $query, $config->embeddedMap());
+    }
+    
+    public function addItems($side, $items, $model) {
+        
     }
     
 }

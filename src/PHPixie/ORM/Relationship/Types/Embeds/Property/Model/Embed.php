@@ -2,19 +2,11 @@
 
 namespace PHPixie\ORM\Relationship\Types\OneToMany\Property\Model;
 
-class Items extends \PHPixie\ORM\Relationship\Types\OneToMany\Property\Model
+class Embed extends \PHPixie\ORM\Relationship\Types\OneToMany\Property\Model
 {
-    public function load()
+    public function add($items)
     {
-        return $this->query()->findAll();
-    }
-
-    public function add($items, $reset = true)
-    {
-        $plan = $this->handler->linkPlan($this->side->config(), $this->model, $items);
-        $plan->execute();
-        if($reset)
-            $this->reset();
+        $this->handler->addItems($this->side, $items, $this->model);
     }
 
     public function remove($items, $reset = true)
@@ -24,5 +16,4 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneToMany\Property\Model
         if($reset)
             $this->reset();
     }
-
 }

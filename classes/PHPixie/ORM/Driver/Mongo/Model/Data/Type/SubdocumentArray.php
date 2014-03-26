@@ -1,18 +1,19 @@
 <?php
 
-namespace PHPixie\ORM\Model\Data;
+namespace PHPixie\ORM\Driver\Mongo\Model\Data\Type;
 
-class SubdocumentArray implements \ArrayAccess, \Iterator, \Countable {
+class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type implements \ArrayAccess, \Iterator, \Countable {
 
     protected $originalArray;
     protected $currentArray;
     protected $reachedEnd = false;
     
-    public function __construct($originalArray)
+    public function __construct($types, $originalArray)
     {
+		parent::__construct($types);
         $this->originalArray = $originalArray;
         foreach($originalArray as $key => $value)
-            $this->currentArray = $this->normalizeValue($value);
+            $this->currentArray = $this->types->convertValue($value);
     }
     
     public function offsetExists($key)
@@ -69,14 +70,17 @@ class SubdocumentArray implements \ArrayAccess, \Iterator, \Countable {
         return count($this->currentArray);
     }
     
-    protected function normalizeValue($value)
-    {
-        if ($value instanceof \stdClass)
-            $value = new \PHPixie\ORM\Model\Data($value);
-        
-        if (is_array($value))
-            $value = new \PHPixie\ORM\Model\Data\SubdocumentArray($value);
-        
-        return $value;
-    }
+	public function isModified()
+	{
+		return $this->isDataModified($this->currentArray, $this->originalArray);
+	}
+	
+	public function currentData()
+	{
+		$current = array();
+		foreach($this->currentArray as $key => $value)
+			$current[$key] = $this->convertType($value);
+		
+		return $current;
+	}
 }

@@ -1,35 +1,25 @@
 <?php
 
-namespace PHPixie\ORM\Model;
-include(__DIR__.'/Data/SubdocumentArray.php');
-class Data {
+namespace \PHPixie\ORM\Driver\Mongo\Model\Data\Type;
+
+class Subdocument extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type {
     protected $data;
     protected $target;
     protected $propertiesSet = false;
     
-    public function __construct($data, $target = null)
+    public function __construct($types, $data)
     {
+		parent::__construct($types);
         $this->data = $data;
-        $this->target = $target !== null ? $target : $this;
+        $this->target = $this;
         $this->setDataProperties();
     }
     
     public function setDataProperties()
     {
         foreach($this->data as $key => $value) {
-            $this->target->$key = $this->normalizeValue($value);
+            $this->target->$key = $this->types->convertValue($value);
         }
-    }
-    
-    protected function normalizeValue($value)
-    {
-        if ($value instanceof \stdClass)
-            $value = new \PHPixie\ORM\Model\Data($value);
-        
-        if (is_array($value))
-            $value = new \PHPixie\ORM\Model\Data\SubdocumentArray($value);
-        
-        return $value;
     }
     
     public function currentProperties() {
@@ -44,36 +34,46 @@ class Data {
     {
         $oldData = get_object_vars($this->data);
         $currentProperties = $this->currentProperties();
-		$unset = array_diff(array_keys($oldData), array_keys($newData));
+		$unset = array_diff(array_keys($oldData), array_keys($currentProperties));
 		$set = array();
 		
 		foreach($currentProperties as $key => $value) {
-            if (!array_key_exists($key, $oldData)){
-                $set[$key] = $this->denormalizeValue($value);
-                continue;
-            }
-            
-			if($oldValue instanceof \stdClass){
-				if ($value instanceof static) {
-					list($subSet, $subUnset) = $value->modified();
+			if (array_key_exists($key, $oldData)) {
+				if ($value instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type) {
+					if (!$value-> isModified())
+						continue;
 					
-				}else
-					$set[$key] = $this->denormalizeValue($value);
-			}elseif(is_array($oldValue)) {
-				if ($value instanceof \PHPixie\ORM\Model\Data\SubdocumentArray) {
-					if ($value->isModified())
-						$set[$key] = $this->denormalizeValue($value);
-				}else
-					$set[$key] = $this->denormalizeValue($value);
-			}elseif($oldValue != $value)
-				$set[$key] = $this->denormalizeValue($value);
+					if ($value instanceof static) {
+						list($subSet, $subUnset) = $value->modified();
+					}
+				}elseif($value === $oldData[$key])
+					continue;
+			}
+			
+			$set[$key] = $this->convertType($value);
         }
-        
+		
         return array($set, $unset);
     }
+	
+	public function isModified()
+	{
+		$oldData = get_object_vars($this->data);
+        $currentProperties = $this->currentProperties();
+		return $this->isDataModified($currentProperties, $oldData)
+	}
+	
+	public function currentData()
+	{
+		$currentProperties = $this->getCurrentProperties();
+		$current = new \stdClass;
+		foreach($currentProperties as $key => $value)
+			$current->$key = $this->convertType($value);
+		return $current;
+	}
     
 }
-
+/*
 $old = new \stdClass;
 $old->a = 5;
 $old->b = 'pixie';
@@ -111,4 +111,4 @@ $d->f = 9;
 
 
 
-print_r($d->modified());
+print_r($d->modified());*/

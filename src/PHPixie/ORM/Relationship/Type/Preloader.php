@@ -4,28 +4,25 @@ namespace PHPixie\ORM\Model;
 
 abstract class Preloader
 {
+    protected $relationshipType;
     protected $side;
-    protected $loader;
+    protected $repository;
     protected $reusableResultStep;
-    protected $items;
+    protected $items = array();
 
-    public function __construct($side, $loader, $reusableResultStep)
+    public function __construct($relationshipType, $side, $repository, $reusableResultStep)
     {
-        $this->link = $side;
-        $this->loader = $loader;
+        $this->relationshipType = $relationshipType;
+        $this->side = $side;
+        $this->repository = $repository;
         $this->reusableResultStep = $reusableResultStep;
-    }
-
-    public function propertyName()
-    {
-        return $this->propertyName;
     }
 
     public function getModel($id)
     {
+        
         $data = $this->items[$id];
         if($data instanceof \PHPixie\ORM\Model)
-
             return $data;
 
         $model = $this->loader->load($data);
@@ -33,7 +30,5 @@ abstract class Preloader
 
         return $model;
     }
-
-    abstract public function loadFor($owner);
-
+    
 }

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Query\Plan\Step\Query;
 
-abstract class Result extends \PHPixie\ORM\Query\Plan\Step\Query
+abstract class Result extends \PHPixie\ORM\Query\Plan\Step\Query implements \IteratorAggregate
 {
     protected $result;
     protected function execute()
@@ -21,5 +21,13 @@ abstract class Result extends \PHPixie\ORM\Query\Plan\Step\Query
         return $this->result;
     }
 
-    abstract public function iterator();
+    public function getField($field)
+    {
+        foreach($this as $row)
+            $values[] = $row->$field;
+
+        return $values;
+    }
+    
+    abstract public function getIterator();
 }

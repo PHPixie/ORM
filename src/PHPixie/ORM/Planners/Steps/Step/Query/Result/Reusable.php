@@ -14,8 +14,8 @@ class Reusable extends \PHPixie\ORM\Query\Plan\Step\Query\Result
         return $this->data;
     }
 
-    public function iterator()
+    public function getIterator()
     {
-        return $this->orm->resultDataIterator($this->data());
+        return new \ArrayIterator($this->data());
     }
 }

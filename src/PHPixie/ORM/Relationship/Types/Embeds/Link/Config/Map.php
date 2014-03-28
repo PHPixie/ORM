@@ -6,12 +6,12 @@ class Map {
     
     protected $map = array();
     
-    public function __construct($embedded, $config)
+    public function __construct($embedded, $config, $defaultOwnerProperty)
     {
         $properties = array_keys($config->get(null, array()));
         
         foreach($properties as $property) {
-            $this->embedded[$property] = $embedded->config($config->slice($property), $property);
+            $this->map[$property] = $embedded->config($config->slice($property), $property, $defaultOwnerProperty);
         }
     }
 }

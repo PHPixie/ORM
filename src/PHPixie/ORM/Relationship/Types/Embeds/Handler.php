@@ -10,8 +10,19 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         $this->mapper->mapConditionGroup($group->conditions, $query, $config->embeddedMap());
     }
     
-    public function addItems($side, $items, $model) {
-        
-    }
+	protected function getSubdocument($path, $createMissing = false)
+	{
+		$current = $this->owner->data();
+		foreach($path as $step) {
+			if (!property_exists($current, $step)) {
+				if (!$createMissing)
+					return null;
+				$current->addSubdocument($step);
+			}
+			$current = $curent->$step;
+		}
+		
+		return $current;	
+	}
     
 }

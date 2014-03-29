@@ -1,17 +1,17 @@
 <?php
 
-namespace PHPixie\ORM\Loaders;
+namespace PHPixie\ORM\Loaders\Loader\Result;
 
-class SingleUse extends \PHPixie\ORM\Loaders\Reusable
+class SingleUse extends \PHPixie\ORM\Loaders\Loader\Result
 {
     protected $resultIterator;
     protected $currentOffset = null;
     protected $currentModel = null;
     protected $reachedEnd = false;
     
-    public function __construct($repository, $resultStep)
+    public function __construct($loaders, $repository, $resultStep)
     {
-        parent::__construct($orm, $repository, $preloaders);
+        parent::__construct($loaders, $repository, $preloaders);
         $this->resultIterator = $resultStep->getIterator();
     }
     

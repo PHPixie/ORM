@@ -1,15 +1,15 @@
 <?php
 
-namespace PHPixie\ORM;
+namespace PHPixie\ORM\Loaders;
 
 abstract class Loader implements \IteratorAggregate
 {
-    protected $orm;
+    protected $loaders;
     protected $preloaders;
     
-    public function __construct($orm, $preloaders)
+    public function __construct($loaders, $preloaders)
     {
-        $this->orm = $orm;
+        $this->loaders = $loaders;
         $this->preloaders = $preloaders;
     }
     
@@ -24,20 +24,15 @@ abstract class Loader implements \IteratorAggregate
         return $array;
     }
     
-    protected function processPreloaders($model)
-    {
+    public function getByOffset($offset){
+        $model = $this->getModelByOffset($offset);
         foreach($this->preloaders as $property => $preloader)
             $model->$property->setValue($preloader->loadFor($model));
-    }
-    
-    public abstract function getByOffset($offset){
-        $model = $this->getModelByOffset($offset);
-        $this->processPreloaders($model);
         return $model;
     }
     
     public function getIterator() {
-        return $this->orm->loaderIterator($this);
+        return $this->loaders->iterator($this);
     }
     
     public abstract function offsetExists($offset);

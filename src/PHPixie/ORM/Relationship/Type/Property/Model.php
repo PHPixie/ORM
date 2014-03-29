@@ -25,8 +25,8 @@ abstract class Model
 
     public function reload()
     {
-        $this->laded = true;
-        $this->loaded = $this->load();
+        $this->loaded = true;
+        $this->value = $this->load();
 
         return $this->loaded;
     }

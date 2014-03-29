@@ -1,15 +1,15 @@
 <?php
 
-namespace PHPixie\ORM\Loaders;
+namespace PHPixie\ORM\Loaders\Loader;
 
-class Preloader extends \PHPixie\ORM\Loader
+class Preloader extends \PHPixie\ORM\Loaders\Loader
 {
     protected $preloader;
     protected $ids;
     
-    public function __construct($orm, $preloader, $ids, $preloaders)
+    public function __construct($loaders, $preloader, $ids, $preloaders)
     {
-        parent::__construct($orm, $preloaders);
+        parent::__construct($loaders, $preloaders);
         $this->preloader = $preloader;
         $this->ids = $ids;
     }

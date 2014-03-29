@@ -1,16 +1,16 @@
 <?php
 
-namespace PHPixie\ORM\Loaders;
+namespace PHPixie\ORM\Loaders\Loader\Result;
 
-class Reusable extends \PHPixie\ORM\Loaders\Reusable
+class Reusable extends \PHPixie\ORM\Loaders\Loader\Result
 {
     protected $repository;
     protected $reusableResultStep;
     protected $models;
     
-    public function __construct($orm, $repository, $reusableResultStep, $preloaders)
+    public function __construct($loaders, $repository, $reusableResultStep, $preloaders)
     {
-        parent::__construct($orm, $repository, $preloaders);
+        parent::__construct($loaders, $repository, $preloaders);
         $this->reusableResultStep = $reusableResultStep;
     }
     

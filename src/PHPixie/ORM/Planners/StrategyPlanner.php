@@ -2,7 +2,7 @@
 
 namespace \PHPixie\ORM\Planners;
 
-abstract class StrategyPlanner
+abstract class Planner
 {
     protected $strategies = array();
 

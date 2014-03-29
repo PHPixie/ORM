@@ -80,9 +80,9 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
         return $current;
     }
     
-    public function push($value = null)
+    public function push($value = null, $key)
     {
-        $this->currentArray[] = $this->convertValue($value);
+        $this->pushToCurrent($this->convertValue($value), $key);
         return $this;
     }
     
@@ -91,12 +91,23 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
         return $this->currentArray[$this->count()-1];
     }
     
-    public function pushArray($data = array()) {
-        return $this->currentArray[]= $this->types->subdocumentArray($data);
+    public function pushArray($data = array(), $key = null) {
+        return $this->pushToCurrent($this->types->subdocumentArray($data), $key);
     }
     
-    public function pushSubdocument($data = null) {
-        return $this->currentArray[]= $this->types->subdocument($data);
+    public function pushSubdocument($data = null, $key = null) {
+		return $this->pushToCurrent($this->types->subdocument($data), $key);
     }
+	
+	protected function pushToCurrent($value, $key === null)
+	{
+		if ($key !== null){
+			$this->currentArray[$key] = $value;
+		}else
+			$this->currentArray[] = $value;
+		
+		return $value;
+	}
+	
 
 }

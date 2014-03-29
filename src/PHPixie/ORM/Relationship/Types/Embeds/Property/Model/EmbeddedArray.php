@@ -1,32 +1,39 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Types\Embeds\Model\Property;
+namespace PHPixie\ORM\Relationship\Types\Embeds\Property\Model;
 
-class Model
+class EmbeddedArray extends PHPixie\ORM\Relationship\Types\Embeds\Property\Model
 {
-	protected $model;
-	protected $loaded = false;
-	protected $embedsType;
-	protected $embedConfig;
-	protected $owner;
-	
-	public function __construct($embedsType, $embedConfig, $owner)
+	public function __invoke($createMissing = false)
 	{
-		$this->embedsType = $embedsType;
-		$this->embedConfig = $embedConfig;
-		$this->owner = $owner;
-	}
-	
-	public function reload($createMissing = false)
-	{
-		$this->model = null;
-		$subdocument = $this->getSubdocument($this->path, $createMissing);
-		if ($subdocument !== null)
-			$this->embedsType->model($subdocument, $owner, $this->embedConfig)
+		if (!$this->loaded)
+			$this->reload();
 		
-		$this->loaded = true;
+		if ($createMissing && $this->value === null)
+			$this->create();
+		
+		return $this->value;
 	}
 	
-
+	protected function load()
+	{
+		return $this->handler->getEmbedded($this->model, $this->embedConfig);
+	}
 	
+	public function create()
+	{
+		$this->loaded = true;
+		return $this->handler->createEmbedded($this->model, $this->embedConfig);
+	}
+	
+	public function remove()
+	{
+		return $this->handler->removeEmbedded($this->model, $this->embedConfig);
+	}
+	
+	public function set($model)
+	{
+		$this->loaded = true;
+		return $this->handler->setEmbedded($this->model, $this->embedConfig, $model);
+	}
 }

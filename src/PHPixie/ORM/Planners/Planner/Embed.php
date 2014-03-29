@@ -2,34 +2,52 @@
 
 namespace \PHPixie\ORM\Query\Plan\Planner;
 
-class Embed
+class Document
 {
-    public function pushTo($owner, $relationship, $itemCollection, $itemRepository, $plan)
-    {
-        $pushStep = $this->steps->push($this->updateQuery($owner, $owerRepository), $itemRepository->path());
-        $pullStep = $this->steps->pull($this->updateQuery($owner, $owerRepository), $itemRepository->path(), $itemRepository->idField());
-
-        foreach ($itemCollection->addedModels() as $item) {
-            $pushStep->addItem($item->fullData());
-            $pullStep->addId($item->id());
-        }
-
-        foreach ($itemCollection->addedQuesries() as $query) {
-            $resultPlan = $query->map();
-            $resultStep->peek();
-            $pushStep->addResultStep($resultStep);
-            $pullStep->addResultStep($resultStep);
-            $plan->prependPlan($resultPlan);
-        }
-
-        $plan->push($pullStep);
-        $plan->push($pushStep);
-    }
-
-    protected function updateQuery($owner, $ownerRepository)
-    {
-        return $ownerRepository
-                        ->query('update')
-                        ->where($onwerRepository->idField(), $owner->id());
-    }
+    public function add($document, $key)
+	{
+		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray)
+			return $document->pushSubdocument(null, $key);
+		
+		return $document->addSubdocument($key);
+	}
+	
+    public function set($document, $key, $value)
+	{
+		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray){
+			$document->offsetSet($key, $value);
+		}else
+			return $document->$key = $value;
+	}
+	
+    public function remove($document, $key)
+	{
+		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray){
+			unset $document->offsetUnset($key);
+		}else
+			unset $document->$key;
+	}
+	
+    public function get($document, $key)
+	{
+		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray){
+			$subdocument = $document->offsetGet($key);
+		}else
+			$subdocument = $document->$key;
+		
+		if (!($subdocument instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type))
+			return null;
+		
+		return $subdocument;
+	}
+	
+    public function exists($document, $key)
+	{
+		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray)
+			return $document->offsetExists($key);
+		
+		return property_exists($document, $key);
+	}
+	
+	
 }

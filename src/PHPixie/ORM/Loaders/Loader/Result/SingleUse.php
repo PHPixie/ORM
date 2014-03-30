@@ -11,7 +11,7 @@ class SingleUse extends \PHPixie\ORM\Loaders\Loader\Result
     
     public function __construct($loaders, $repository, $resultStep)
     {
-        parent::__construct($loaders, $repository, $preloaders);
+        parent::__construct($loaders, $repository);
         $this->resultIterator = $resultStep->getIterator();
     }
     

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Driver\Mongo\Model\Data\Type;
 
-class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type implements \ArrayAccess, \Iterator, \Countable {
+class DocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type implements \ArrayAccess, \Iterator, \Countable {
 
     protected $originalArray;
     protected $currentArray;
@@ -19,7 +19,7 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
     
     public function offsetExists($key)
     {
-        return array_key_exists($key, $this->currentArray);
+        return $this->handler->getEmbedded($this->model, $this->embedConfig);
     }
     
     public function offsetGet($key)
@@ -30,6 +30,9 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
     
     public function offsetSet($key, $value)
     {
+        if (!is_numeric($key))
+            throw new \PHPixie\ORM\Exception\Model("Only numeric keys are allowed.");
+        
         $this->currentArray[$key] = $this->convertValue($value);
     }
     
@@ -71,6 +74,11 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
         return count($this->currentArray);
     }
     
+    public function clear()
+    {
+        $this->currentArray = array();
+    }
+    
     public function currentData()
     {
         $current = array();
@@ -92,22 +100,23 @@ class SubdocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type impleme
     }
     
     public function pushArray($data = array(), $key = null) {
-        return $this->pushToCurrent($this->types->subdocumentArray($data), $key);
+        return $this->pushToCurrent($this->types->documentArray($data), $key);
     }
     
-    public function pushSubdocument($data = null, $key = null) {
-		return $this->pushToCurrent($this->types->subdocument($data), $key);
+    public function pushDocument($data = null, $key = null) {
+        return $this->pushToCurrent($this->types->document($data), $key);
     }
-	
-	protected function pushToCurrent($value, $key === null)
-	{
-		if ($key !== null){
-			$this->currentArray[$key] = $value;
-		}else
-			$this->currentArray[] = $value;
-		
-		return $value;
-	}
-	
+    
+    protected function pushToCurrent($value, $key === null)
+    {
+        if ($key !== null){
+            $this->currentArray[$key] = $value;
+        }else
+            $this->currentArray[] = $value;
+        
+        return $value;
+    }
+    
+    
 
 }

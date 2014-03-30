@@ -15,9 +15,9 @@ abstract class Type{
     public function convertValue($value)
     {
         if ($value instanceof \stdClass) {
-            $value = $this->types->subdocument($value);
+            $value = $this->types->document($value);
         }elseif(is_array($value)) {
-            $value = $this->types->subdocumentArray($value);
+            $value = $this->types->documentArray($value);
         }
         
         return $value;

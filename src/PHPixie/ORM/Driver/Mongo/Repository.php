@@ -24,4 +24,27 @@ class Repository extends \PHPixie\ORM\Repository
     {
         return $this->idField;
     }
+    
+    public function save($model)
+    {
+        $data = $model->data();
+        list($set, $unset) = $data->getDataDiff();
+        $idField = $this->idField;
+        
+        if ($model->isNew()) {
+            $this->dbQuery('insert')
+                        ->data($set)
+                        ->execute();
+            $model->$idField => $this->connection()->insertId();
+            $model->setIsNew(false);
+        }else {
+            $this->dbQuery('update')
+                ->data($set)
+                ->unset($unset)
+                ->where($idField, $model->id())
+                ->execute();
+        }
+        
+        $data->setCurrentAsOriginal();
+    }
 }

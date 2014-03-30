@@ -7,7 +7,7 @@ class Side extends PHPixie\ORM\Relationship\Side
     public function modelName()
     {
         if ($this->type === 'owner') {
-            return $this->config->get($this->config->itemsModel);
+            return $this->config->get($this->config->itemModel);
         } else {
             return $this->config->get($this->config->ownerModel);
         }
@@ -20,6 +20,6 @@ class Side extends PHPixie\ORM\Relationship\Side
 
     public function relationship()
     {
-        return 'oneToMany'
+        return 'oneToOne'
     }
 }

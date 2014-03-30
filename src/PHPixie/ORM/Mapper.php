@@ -5,11 +5,13 @@ namespace PHPixie\ORM;
 class Mapper
 {
     protected $orm;
+    protected $loaders;
     protected $groupMapper;
 
-    public function __construct($orm, $groupMapper, $repositoryRegistry)
+    public function __construct($orm, $loaders, $groupMapper, $repositoryRegistry)
     {
         $this->orm = $orm;
+        $this->loaders = $loaders;
         $this->groupMapper = $groupMapper;
     }
 
@@ -74,7 +76,7 @@ class Mapper
     protected function buildPreloader($model, $relationship, $resultStep, $plan)
     {
         $registry = $this->repositoryRegistry->get($model);
-        $loader = $this->orm->loader($registry);
+        $loader = $this->loaders->singleUseResult($registry);
 
         $side = $this->relationshipRegistry->getSide($model, $relationship);
         $handler = $this->orm->handler($side->relationshipType());

@@ -4,50 +4,92 @@ namespace \PHPixie\ORM\Query\Plan\Planner;
 
 class Document
 {
-    public function add($document, $key)
-	{
-		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray)
-			return $document->pushSubdocument(null, $key);
-		
-		return $document->addSubdocument($key);
-	}
-	
+    public function getDocument($document, $key)
+    {
+        $document = $document->$key;
+        return $this->checkDocument($document);
+    }
+    
+    public function getArray($document, $key)
+    {
+        $document = $document->$key;
+        return $this->checkArray($document);
+    }
+    
+    public function addDocument($document, $key)
+    {
+        return $document->addDocument($key);
+    }
+    
+    public function addArray($document, $key)
+    {
+        return $document->addDocumentArray($key);
+    }
+    
     public function set($document, $key, $value)
-	{
-		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray){
-			$document->offsetSet($key, $value);
-		}else
-			return $document->$key = $value;
-	}
-	
-    public function remove($document, $key)
-	{
-		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray){
-			unset $document->offsetUnset($key);
-		}else
-			unset $document->$key;
-	}
-	
-    public function get($document, $key)
-	{
-		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray){
-			$subdocument = $document->offsetGet($key);
-		}else
-			$subdocument = $document->$key;
-		
-		if (!($subdocument instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type))
-			return null;
-		
-		return $subdocument;
-	}
-	
+    {
+        return $document->$key = $value;
+    }
+    
+    public function unset($document, $key)
+    {
+        unset $document->$key;
+    }
+    
     public function exists($document, $key)
-	{
-		if ($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\SubdocumentArray)
-			return $document->offsetExists($key);
-		
-		return property_exists($document, $key);
-	}
-	
-	
+    {
+        return property_exists($document, $key);
+    }
+    
+    public function arrayGet($array, $key)
+    {
+        $document = $array->offsetGet($key);
+        return $this->checkDocument($document);
+    }
+    
+    public function arrayAddDocument($array, $key = null)
+    {
+        return $document->pushDocument(null, $key);
+    }
+    
+    public function arraySet($array, $key, $value)
+    {
+        $array->offsetSet($key, $value);
+    }
+    
+    public function arrayUnset($array, $key)
+    {
+        unset $array[$key];
+    }
+    
+    public function arrayExists($array, $key)
+    {
+        return $array->offsetExists($key);
+    }
+    
+    public function arrayCount($array)
+    {
+        return $array->count();
+    }
+    
+    public function arrayClear($array)
+    {
+        return $array->clear();
+    }
+    
+    protected function checkDocument($document)
+    {
+         if (!($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\Document))
+            return null;
+        
+        return $document;
+    }
+    
+    protected function checkArray($array)
+    {
+         if (!($array instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\DocumentArray))
+            return null;
+        
+        return $array;
+    }
 }

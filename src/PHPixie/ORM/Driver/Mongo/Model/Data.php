@@ -2,22 +2,42 @@
 
 namespace PHPixie\ORM\Driver\Mongo\Model;
 
-class Data {
-    protected $subdocument;
+class Data extends \PHPixie\ORM\Model\Data{
+    protected $document;
     protected $originalData;
-    public function __construct($subdocument, $originalData) {
-        $this->subdocument = $subdocument;
-        $this->originalData = $originalData;
+    public function __construct($document, $originalData) {
+        parent::__construct($originalData);
+        $this->document = $document;
+    }
+    
+    public function document()
+    {
+        return $this->document;
     }
     
     public function setModel($model)
     {
-        $this->subdocument->setTarget($model);
+        $this->document->setTarget($model);
     }
     
-    public function modified()
+    public function currentData()
     {
-        return $this->getObjectDiff($this->subdocument->currentData(), $this->originalData);
+        $currentProperties = $this->model->dataProperties();
+        $current = new \stdClass;
+        foreach($currentProperties as $key => $value)
+            $current->$key = $value;
+        
+        return $currentData;
+    }
+    
+    public function modelProperties()
+    {
+        return get_object_vars($this->document->currentData());
+    }
+    
+    public function getDataDiff()
+    {
+        return $this->getObjectDiff($this->currentData(), $this->originalData);
     }
     
     protected function getObjectDiff($new, $old)

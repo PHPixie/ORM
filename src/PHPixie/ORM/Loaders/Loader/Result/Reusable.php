@@ -8,9 +8,9 @@ class Reusable extends \PHPixie\ORM\Loaders\Loader\Result
     protected $reusableResultStep;
     protected $models;
     
-    public function __construct($loaders, $repository, $reusableResultStep, $preloaders)
+    public function __construct($loaders, $repository, $reusableResultStep)
     {
-        parent::__construct($loaders, $repository, $preloaders);
+        parent::__construct($loaders, $repository);
         $this->reusableResultStep = $reusableResultStep;
     }
     

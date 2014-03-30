@@ -9,6 +9,7 @@ class ORM
     protected $relationshipMap;
     protected $propertyBuilder;
     protected $repositoryRegistry;
+    protected $loaders;
     protected $relationshipTypes = array();
     protected $drivers = array();
     protected $mapper;
@@ -93,7 +94,6 @@ class ORM
     {
         if ($this->propertyBuilder === null)
             $this->propertyBuilder = $this->buildPropertyBuilder();
-
         return $this->propertyBuilder;
     }
 
@@ -102,6 +102,18 @@ class ORM
         return new \PHPixie\ORM\Properties\Builder($this, $this->relationshipMap());
     }
 
+    public function loaders()
+    {
+        if ($this->loaders === null)
+            $this->loaders = $this->buildLoaders();
+        return $this->loaders;
+    }
+    
+    public function buildLoaders()
+    {
+        return new \PHPixie\ORM\Loaders();
+    }
+    
     public function modelProperty($side, $model)
     {
         $relationship = $this->relationshipType($side->relationshipType());
@@ -139,7 +151,7 @@ class ORM
 
     public function buildMapper()
     {
-        return \PHPixie\ORM\Mapper($this, $this->groupMapper());
+        return \PHPixie\ORM\Mapper($this, $this->loaders(), $this->groupMapper());
     }
 
     public function conditions()

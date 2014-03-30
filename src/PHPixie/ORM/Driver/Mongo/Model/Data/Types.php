@@ -4,14 +4,14 @@ namespace PHPixie\ORM\Driver\Mongo\Model\Data;
 
 class Types{
 	
-	public function subdocument($dataOject = null)
+	public function document($dataOject = null)
 	{
-		return new Type\Subdocument($this, $dataOject);
+		return new Type\Document($this, $dataOject);
 	}
 	
-	public function subdocumentArray($array = array())
+	public function documentArray($array = array())
 	{
-		return new Type\SubdocumentArray($this, $array);
+		return new Type\DocumentArray($this, $array);
 	}
 	
 }

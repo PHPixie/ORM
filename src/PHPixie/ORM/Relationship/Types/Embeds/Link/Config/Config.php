@@ -15,13 +15,13 @@ class Config {
         $this->name = $name;
 		$this->ownerProperty = $config->get('owner_property', $defaultOwnerProperty);
 		
-        $this->type = $config->get('type', 'subdocument');
+        $this->type = $config->get('type', 'document');
         
-        if ($this->type !== 'subdocument' && $this->type !== 'array')
-            throw new \PHPixie\ORM\Exception\Mapper("Embed type must be either 'subdocument' or 'array'");
+        if ($this->type !== 'document' && $this->type !== 'array')
+            throw new \PHPixie\ORM\Exception\Mapper("Embed type must be either 'document' or 'array'");
         
         if(($modelName = $config->get('model')) === null) {
-            if($this->type === 'subdocument'){
+            if($this->type === 'document'){
                 $modelName = $propertyName;
             }else{
                 $modelName = $inflector->singular($propertyName);

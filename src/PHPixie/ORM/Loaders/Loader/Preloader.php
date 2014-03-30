@@ -7,9 +7,9 @@ class Preloader extends \PHPixie\ORM\Loaders\Loader
     protected $preloader;
     protected $ids;
     
-    public function __construct($loaders, $preloader, $ids, $preloaders)
+    public function __construct($loaders, $preloader, $ids)
     {
-        parent::__construct($loaders, $preloaders);
+        parent::__construct($loaders);
         $this->preloader = $preloader;
         $this->ids = $ids;
     }

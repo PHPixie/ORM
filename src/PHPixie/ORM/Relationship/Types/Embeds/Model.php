@@ -4,13 +4,13 @@ namespace PHPixie\ORM\Relationship\Types\Embeds;
 
 class Model
 {
-    protected $subdocument;
+    protected $document;
 	protected $config;
 	protected $properties;
 	
-    public function __construct($embedsType, $subdocument, $properties)
+    public function __construct($embedsType, $document, $properties)
     {
-		$this->subdocument = $subdocument;
+		$this->document = $document;
 		$this->config = $config;
 		$this->properties = $property;
     }
@@ -22,6 +22,6 @@ class Model
 	
 	public function data()
 	{
-		return $this->subdocument;
+		return $this->document;
 	}
 }

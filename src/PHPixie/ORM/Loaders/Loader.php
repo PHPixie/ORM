@@ -5,12 +5,16 @@ namespace PHPixie\ORM\Loaders;
 abstract class Loader implements \IteratorAggregate
 {
     protected $loaders;
-    protected $preloaders;
+    protected $preloaders = array();
     
-    public function __construct($loaders, $preloaders)
+    public function __construct($loaders)
     {
         $this->loaders = $loaders;
-        $this->preloaders = $preloaders;
+    }
+    
+    public function addPreloader($relationship, $preloader)
+    {
+        $this->preloaders[$relationship] = $preloader;
     }
     
     public function asArray($modelsAsArrays = false)

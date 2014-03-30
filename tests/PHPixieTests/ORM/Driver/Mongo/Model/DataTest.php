@@ -31,7 +31,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         $old->d->db = 3;
         $old->e->ea = array(1, 2);
 
-        $data = new \PHPixie\ORM\Driver\Mongo\Model\Data($this->types->subdocument($old), $old);
+        $data = new \PHPixie\ORM\Driver\Mongo\Model\Data($this->types->document($old), $old);
         $data->setModel($data);
         
         unset($data->a);

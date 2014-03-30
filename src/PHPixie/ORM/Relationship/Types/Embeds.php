@@ -23,5 +23,10 @@ class Embedded extends PHPixie\ORM\Relationship\Type
     {
         return $config->properties();
     }
+    
+    public function arrayLoader($property, $models)
+    {
+        return new Embeds\Property\Model\EmbeddedArray($this->orm->loaders(), $property, $models);
+    }
 
 }

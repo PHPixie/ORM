@@ -4,6 +4,8 @@ namespace PHPixe\ORM\Relationships\OneToMany;
 
 abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 {
+
+	
     public function query($side, $related)
     {
         $config = $side->config();
@@ -35,7 +37,15 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         return $plan;
     }
 
-    public function unlinkItemsPlan($config, $items)
+    public function unlinkItemPlan($config, $item)
+    {
+        $itemRepository = $this->registryRepository->get($config->itemModel);
+        $query = $itemRepository->query()->in($item);
+
+        return $this->getUpdatePlan($config, $query, null);
+    }
+	
+    public function unlinkItemsPlan($config, $owner, $items)
     {
         $itemRepository = $this->registryRepository->get($config->itemModel);
         $query = $itemRepository->query()->in($item);

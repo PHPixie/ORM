@@ -1,9 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Types\OneToMany\Property;
+namespace PHPixie\ORM\Relationship\Types\OneTo\Type\One\Property;
 
-class Model extends \PHPixie\ORM\Properties\Property\Model
+abstract class Model extends \PHPixie\ORM\Relationship\Types\OneTo\Property\Model
 {
-    protected $handler;
 
 }

@@ -52,5 +52,10 @@ abstract class Model
         $this->loaded = true;
     }
     
+	public function loaded()
+	{
+		return $this->loaded();
+	}
+	
     abstract protected function load();
 }

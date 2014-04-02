@@ -5,7 +5,6 @@ namespace PHPixe\ORM\Relationships\OneToMany;
 abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 {
 
-	
     public function query($side, $related)
     {
         $config = $side->config();
@@ -18,14 +17,12 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 
     public function linkPlan($config, $owner, $items)
     {
-        $itemsRepository = $this->registryRepository->get($config->itemModel);
+        $itemRepository = $this->registryRepository->get($config->itemModel);
         $ownerRepository = $this->registryRepository->get($config->ownerModel);
-
-        $ownerCollection = $this->orm->collection($config->ownerModel);
-        $ownerCollection->add($owner);
-
+        $ownerCollection = $this->planners->collection($config->ownerModel, $owner);
+		
         $plan = $this->orm->plan();
-        $query = $itemsRepository->query()->in($items);
+        $query = $itemRepository->query()->in($items);
         $updatePlanner = $this->planners->update();
         $ownerField = $updatePlanner->field($owner, $ownerRepository->idField());
         $updatePlanner->plan(
@@ -33,41 +30,21 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
                                 array($config->itemKey => $ownerField),
                                 $plan
                             );
-
         return $plan;
     }
-
-    public function unlinkItemPlan($config, $item)
-    {
-        $itemRepository = $this->registryRepository->get($config->itemModel);
-        $query = $itemRepository->query()->in($item);
-
-        return $this->getUpdatePlan($config, $query, null);
-    }
 	
-    public function unlinkItemsPlan($config, $owner, $items)
-    {
-        $itemRepository = $this->registryRepository->get($config->itemModel);
-        $query = $itemRepository->query()->in($item);
-
-        return $this->getUpdatePlan($config, $query, null);
-    }
-
-    public function unlinkOwnerPlan($config, $owner)
-    {
-        $itemRepository = $this->registryRepository->get($config->itemModel);
-        $query = $itemRepository->query()
-                                        ->related($config->itemProperty, $owner);
-
-        return $this->getUpdatePlan($config, $query, null);
-    }
-
-    protected function getUpdatePlan($config, $query, $ownerId)
-    {
-        return $query->updatePlan(array(
-                                    $config->itemKey => $ownerId
-                                ));
-    }
+	public function unlinkPlan($config, $owner = null, $items = null)
+	{
+        $query = $this->registryRepository->get($config->itemModel)->query();
+		
+		if ($items !== null)
+			$query->in($items);
+			
+		if ($owner !== null)
+			$query->related($config->itemProperty, $owner);
+		
+		return $query->planUpdate(array($config->itemKey => null));
+	}
 
     public function mapRelationship($side, $group, $query, $plan)
     {
@@ -99,12 +76,14 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
                                     );
     }
 
-    public function preload($side, $loader, $resultStep, $resultPlan)
+    public function preload($side, $resultStep, $plan)
     {
+	    $itemRepository = $this->registryRepository->get($config->itemModel);
+        $ownerRepository = $this->registryRepository->get($config->ownerModel);
+		
         $config = $side->config();
-        $preloadPlan = $resultPlan->preloadPlan();
 
-        if ($side-> type() !== 'owner') {
+        if ($side->type() !== 'owner') {
             $queryRepository = $ownerRepository;
             $queryField = $ownerRepository->idField();
             $resultField = $config->itemKey;
@@ -115,20 +94,15 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         }
 
         $query = $preloadRepository->dbQuery();
-
-        $placeholder = $query->getWhereBuilder()->addPlaceholder();
+        $placeholder = $query->getBuilder()->addPlaceholder();
+		
         $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $resultField);
         $preloadPlan->push($inStep);
-
-        $preloadStep = $this->steps->result($query);
-
-        return $preloadStep;
+		
+        $preloadStep = $this->steps->resusableResult($query);
+		$preloadPlan->push($preloadStep);
+		
+		return $this->relationshipType->preloader($side->type(), $side, $queryRepository, $preloadStep);
     }
-
-    public function resetOwnerProperty($config, $owner)
-    {
-        if (($property = $this->getLoadedProperty($owner, $config->ownerProperty)) !== null)
-            $property->reset();
-    }
-
+	
 }

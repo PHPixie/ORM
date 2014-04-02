@@ -8,7 +8,7 @@ class Group
 
     protected function mapConditions($dbQuery, $conditions, $modelName, $plan)
     {
-        $builder = $query->getBuilder('where');
+        $builder = $query->getBuilder();
 
         foreach ($conditions as $cond) {
 

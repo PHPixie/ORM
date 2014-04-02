@@ -7,15 +7,15 @@ abstract class Preloader
     protected $relationshipType;
     protected $side;
     protected $repository;
-    protected $reusableResultStep;
+    protected $resultStep;
     protected $items = array();
 
-    public function __construct($relationshipType, $side, $repository, $reusableResultStep)
+    public function __construct($relationshipType, $side, $repository, $resultStep)
     {
         $this->relationshipType = $relationshipType;
         $this->side = $side;
         $this->repository = $repository;
-        $this->reusableResultStep = $reusableResultStep;
+        $this->resultStep = $resultStep;
     }
 
     public function getModel($id)
@@ -30,5 +30,10 @@ abstract class Preloader
 
         return $model;
     }
+	
+	public function resultStep()
+	{
+		return $this->resultStep;
+	}
     
 }

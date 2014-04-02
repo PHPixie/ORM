@@ -7,23 +7,7 @@ class Owner extends \PHPixie\ORM\Relationship\Types\OneTo\Type\One\Property\Mode
 
     public function set($owner)
     {
-        $plan = $this->handler->linkPlan($this->side->config(), $owner, $this->model);
-        $plan->execute();
-		
-		if($owner instanceof \PHPixie\ORM\Model)
-			$this->processSet($owner);
+        $this->processSet($owner, $this->model);
     }
-
-    public function unset()
-    {
-        $plan = $this->handler->unlinkItemPlan($this->side->config(), $this->model);
-        $plan->execute();
-		$this->processUnset();
-    }
-	
-	protected function opposingPropertyName()
-	{
-		return $this->side->config()->ownerProperty;
-	}
 	
 }

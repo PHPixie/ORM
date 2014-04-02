@@ -6,9 +6,9 @@ abstract class Result extends \PHPixie\ORM\Loaders\Loader
 {
     protected $repository;
     
-    public function __construct($loaders, $repository, $preloaders)
+    public function __construct($loaders, $repository)
     {
-        parent::__construct($loaders, $preloaders);
+        parent::__construct($loaders);
         $this->repository = $repository;
     }
     

@@ -20,7 +20,7 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Que
     
     public function removeAll()
     {
-        $plan = $this->handler->unlinkOwnerPlan($this->side->config(), $this->query);
+        $plan = $this->handler->unlinkPlan($this->config, $this->query);
         $plan->execute();
     }
 }

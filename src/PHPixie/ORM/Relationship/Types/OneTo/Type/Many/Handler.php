@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixe\ORM\Relationships\Types\OneTo\Type\Many;
+namespace PHPixie\ORM\Relationships\Types\OneTo\Type\Many;
 
-class Handler extends \PHPixe\ORM\Relationships\Types\OneTo\Handler
+class Handler extends \PHPixie\ORM\Relationships\Types\OneTo\Handler
 {
     public function setItemsOwner($config, $items, $newOwner, $restrictOldOwner = null)
     {
@@ -58,4 +58,6 @@ class Handler extends \PHPixe\ORM\Relationships\Types\OneTo\Handler
                 $property->reset();
         }
     }
+	
+
 }

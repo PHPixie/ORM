@@ -18,7 +18,7 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Mod
 
     public function remove($items)
     {
-        $plan = $this->handler->unlinkPlan($this->config, $items, $this->model, $this);
+        $plan = $this->handler->unlinkPlan($this->config, $this->model, $items);
         $plan->execute();
         $this->handler->setItemsOwner($this->config, $items, null, $this->model);
     }

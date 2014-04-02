@@ -50,37 +50,37 @@ class Mapper
 
         $dbQuery = $repository->query('select');
         $this->groupMapper->mapConditions($dbQuery, $query->conditions(), $modelName, $resultPlan->requiredPlan());
+		
         $resultStep = $this->steps->reusableResult($dbQuery);
         $plan->setResultStep($resultStep);
+		
+		$loader = $this->loaders->reusableResult($resultStep);
+		$plan->setLoader($loader);
 
         foreach($preload as $relationship)
-            $this->addPreloaders($relationship, $model, $plan->loader(), $plan->preloadPlan());
+            $this->addPreloaders($model, $relationship, $loader, $plan->preloadPlan());
 
         return $plan;
     }
 
-    protected function addPreloaders($relationship, $model, $loader, $plan)
+    protected function addPreloaders($model, $relationship, $loader, $plan)
     {
         $path = explode('.', $relationship);
         foreach ($path as $rel) {
             $preloader = $loader->getPreloader($relationship);
             if ($preloader === null) {
                 $preloader = $this->buildPreloader($model, $relationship, $loader->resultStep(), $plan);
-                $loader->setPreloader($relationship, $loader);
+                $loader->setPreloader($relationship, $preloader);
             }
             $model = $preloader->modelName();
-            $loader = $preloader->getLoader();
+            $loader = $preloader;
         }
     }
 
     protected function buildPreloader($model, $relationship, $resultStep, $plan)
     {
-        $registry = $this->repositoryRegistry->get($model);
-        $loader = $this->loaders->singleUseResult($registry);
-
         $side = $this->relationshipRegistry->getSide($model, $relationship);
-        $handler = $this->orm->handler($side->relationshipType());
-
-        return $handler->preloader($side, $loader, $resultStep, $preloadPlan);
+        $handler = $this->orm->relationshipType($side->relationshipType())->handler();
+        return $handler->preloader($side, $resultStep, $plan);
     }
 }

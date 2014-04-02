@@ -114,20 +114,6 @@ class ORM
         return new \PHPixie\ORM\Loaders();
     }
     
-    public function modelProperty($side, $model)
-    {
-        $relationship = $this->relationshipType($side->relationshipType());
-
-        return $relationship->modelProperty($side);
-    }
-
-    public function queryProperty($side, $model)
-    {
-        $relationship = $this->relationship($side->relationshipType());
-
-        return $relationship->queryProperty($side);
-    }
-
     public function groupMapper()
     {
         if($this->groupMapper === null)

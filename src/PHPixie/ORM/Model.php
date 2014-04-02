@@ -4,13 +4,13 @@ namespace PHPixie\ORM;
 
 class Model
 {
-    protected $propertyBuilder;
+    protected $relationshipMap;
     protected $properties;
     protected $isNew = true;
     
-    public function __construct($propertyBuilder)
+    public function __construct($relationshipMap)
     {
-        $this->propertyBuilder = $propertyBuilder;
+        $this->relationshipMap = $relationshipMap;
     }
 
     public function asArray()
@@ -27,9 +27,11 @@ class Model
 
     public function __get($name)
     {
-        $property = $this->propertyBuilder->modelProperty($this, $name);
+		$property = $this->relationshipProperty($name);
         if ($property !== null)
-            return $this->$name = $property;
+            return $property;
+		
+		throw new \PHPixie\Exception\Model("Property '$name' doesn't exist");
     }
     
     public function setData($data)
@@ -67,4 +69,22 @@ class Model
     {
         $this->isNew = $isNew;
     }
+	
+	public function relationshipProperty($name, $createMissing = true)
+	{
+		if (!array_key_exists($name, $this->properties)){
+			if (!$createMissing)
+				return null;
+			
+			$property = $this->relationshipMap->modelProperty($this, $name);
+			
+			if ($property === null)
+				return null;
+			
+			$this->properties[$name] = $property;
+			$this->$name = $property;
+		}
+		
+		return $this->properties[$name];
+	}
 }

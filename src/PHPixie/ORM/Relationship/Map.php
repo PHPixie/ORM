@@ -11,7 +11,7 @@ class Map
         foreach ($config->data() as $key => $params) {
             $type = $params['type'];
             $relationshipConfig = $this->config->slice($key);
-            $relationship = $orm->relationship($type);
+            $relationship = $orm->relationshipType($type);
             $sides = $relationship->getSides($relationshipConfig);
             foreach($sides as $side)
                 $this->addSide($side);
@@ -35,6 +35,20 @@ class Map
     public function getSide($modelName, $propertyName)
     {
         return $this->propertyMap[$modelName][$propertyName];
+    }
+	
+    public function modelProperty($model, $propertyName)
+    {
+		$side = $this->getSide($model->modelName(), $propertyName);
+		$relationshipType = $this->orm->relationshipType($side->relationshipType());
+        return $relationshipType->modelProperty($side, $model);
+    }
+
+    public function queryProperty($query, $name)
+    {
+        $side = $this->getSide($query->modelName(), $propertyName);
+		$relationshipType = $this->orm->relationshipType($side->relationshipType());
+        return $relationshipType->queryProperty($side, $model);
     }
 
 }

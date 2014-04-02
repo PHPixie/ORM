@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM
+namespace PHPixie\ORM\Loaders\Loader
 
-class Collection implements \IteratorAggregate
+class Collection extends \IteratorAggregate
 {
     protected $added = array();
     protected $removed = array();

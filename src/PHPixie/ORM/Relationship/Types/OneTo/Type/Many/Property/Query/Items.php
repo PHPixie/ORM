@@ -13,7 +13,7 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Que
 
     public function remove($items)
     {
-        $plan = $this->handler->unlinkPlan($this->side->config(), $this->query, $items);
+        $plan = $this->handler->unlinkPlan($this->config, $this->query, $items);
         $plan->execute();
         $this->handler->resetItemsProperties($this->config, $items);
     }

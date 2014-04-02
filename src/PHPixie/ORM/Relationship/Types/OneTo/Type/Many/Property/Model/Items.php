@@ -13,15 +13,14 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Mod
     {
         $plan = $this->handler->linkPlan($this->config, $this->model, $items);
         $plan->execute();
-        $this->handler->setItemsPropertiesOwner($this->config, $items, $this->model);
+        $this->handler->setItemsOwner($this->config, $items, $this->model);
     }
 
     public function remove($items)
     {
-        $plan = $this->handler->unlinkItemsPlan($this->config, $items, $this->model);
+        $plan = $this->handler->unlinkPlan($this->config, $items, $this->model, $this);
         $plan->execute();
-        $this->handler->setItemsPropertiesOwner($this->config, $items, null);
-        $this->reset();
+        $this->handler->setItemsOwner($this->config, $items, null, $this->model);
     }
     
     public function removeAll()
@@ -29,8 +28,8 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Mod
         $plan = $this->handler->unlinkOwnerPlan($this->config, $this->model);
         $plan->execute();
         if ($this->loaded && $this->value !== null)
-            $this->handler->setItemsPropertiesOwner($this->config, $this->value, null);
-        $this->reset();
+            $this->handler->setItemsOwner($this->config, $this->value->usedModels(), null, $this->model);
+            $this->value->removeAll();
+        }
     }
-    
 }

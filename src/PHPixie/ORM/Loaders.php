@@ -9,6 +9,11 @@ class Loaders
         return new Loaders\Iterator($loader);
     }
     
+    public function Editable($loader)
+    {
+        return new Loaders\Loader\Preloader($this, $loader);
+    }
+    
     public function preloader($preloader, $ids)
     {
         return new Loaders\Loader\Preloader($this, $preloader, $ids);

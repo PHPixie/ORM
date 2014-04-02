@@ -38,10 +38,15 @@ class SingleUse extends \PHPixie\ORM\Loaders\Loader\Result
             $this->currentOffset++;
             
         }else
-            throw new \PHPixie\ORM\Exception\Loader("Models may only be accessed in sequential order when using this loader.");
+            throw new \PHPixie\ORM\Exception\Loader("Models can only be accessed in sequential order when using this loader.");
         
         $data = $this->resultIterator->current();
         $this->currentModel = $this->loadModel($data);
+        return $this->currentModel;
+    }
+    
+    public function currentModel()
+    {
         return $this->currentModel;
     }
 }

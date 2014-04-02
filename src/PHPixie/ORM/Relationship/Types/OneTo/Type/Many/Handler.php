@@ -4,39 +4,48 @@ namespace PHPixe\ORM\Relationships\Types\OneTo\Type\Many;
 
 class Handler extends \PHPixe\ORM\Relationships\Types\OneTo\Handler
 {
-    public function setItemsPropertiesOwner($config, $items, $newOwner)
+    public function setItemsOwner($config, $items, $newOwner, $restrictOldOwner = null)
     {
         $ownerPropertyName = $config->itemProperty;
-        $resetNewOwner = false;
+        $itemsHaveQueries = false;
         
         foreach($items as $item) {
             if ($item instanceof \PHPixie\ORM\Query) {
-                $resetNewOwner = true;
+                $itemsHaveQueries = true;
                 continue;
             }
             
-            $ownerProperty = $item->relationshipProperty($config->itemProperty, false);
+            if (($ownerProperty = $this->getLoadedProperty($item, $config->itemProperty))!==null)
+                continue;
+                
+            $oldOwner = $ownerProperty->value();
             
-            if ($ownerProperty === null)
+            if ($restrictOldOwner !== null && $oldOwner->id() !== $newOwner->id())
                 continue;
             
-            if (!$ownerProperty->loaded() || $ownerProperty->value() === $newOwner)
-                continue;
+            if ($restrictOldOwner === null)
+                if(($oldOwnerProperty = $this->getLoadedProperty($oldOwner, $config->ownerProperty))!==null)
+                    $oldOwnerProperty->value()->remove(array($item));
             
-            $resetNewOwner = true;
-            $this->resetOwnerProperty($config, $ownerProperty->value());
             $ownerProperty->setValue($newOwner);
         }
         
-        if ($resetNewOwner && $newOwner !== null)
-            $this->resetOwnerProperty($config, $newOwner);
-    }
-    
-    public function resetOwnerProperty($config, $owner)
-    {
-        $itemsProperty = $owner->relationshipProperty($config->ownerProperty, false);
-        if($itemsProperty!==null)
-            $itemsProperty->reset();
+        $oldItemsProperty = $this->getLoadedProperty($restrictOldOwner, $config->ownerProperty);
+        $newItemsProperty = $this->getLoadedProperty($newOwner, $config->ownerProperty);
+        
+        if ($itemsHaveQueries) {
+            if ($oldItemsProperty)
+                $oldItemsProperty->reset();
+            
+            if ($newItemsProperty)
+                $newItemsProperty->reset();
+        }else {
+            if ($oldItemsProperty)
+                $oldItemsProperty->value()->remove($items);
+            
+            if ($newItemsProperty)
+                $newItemsProperty->value()->add($items);            
+        }
     }
     
     public function resetItemsProperties($config, $items)
@@ -45,9 +54,8 @@ class Handler extends \PHPixe\ORM\Relationships\Types\OneTo\Handler
             if (!($item instanceof \PHPixie\ORM\Model))
                 continue;
             
-            $ownerProperty = $item->relationshipProperty($config->itemProperty, false);
-            if($ownerProperty !== null)
-                $ownerProperty->reset();
+            if (($property = $this->getLoadedProperty($item, $config->itemProperty)) !== null)
+                $property->reset();
         }
     }
 }

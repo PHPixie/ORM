@@ -125,4 +125,10 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         return $preloadStep;
     }
 
+    public function resetOwnerProperty($config, $owner)
+    {
+        if (($property = $this->getLoadedProperty($owner, $config->ownerProperty)) !== null)
+            $property->reset();
+    }
+
 }

@@ -101,8 +101,9 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 		
         $preloadStep = $this->steps->resusableResult($query);
 		$preloadPlan->push($preloadStep);
+        $loader = $this->loaders->reusableResult($queryRepository, $preloadStep);
 		
-		return $this->relationshipType->preloader($side->type(), $side, $queryRepository, $preloadStep);
+		return $this->relationshipType->preloader($side, $loader);
     }
-	
+
 }

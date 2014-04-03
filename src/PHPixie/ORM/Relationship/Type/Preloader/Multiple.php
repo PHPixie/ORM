@@ -12,12 +12,12 @@ abstract class Multiple extends \PHPixie\ORM\Model\Preloader
             $this->map = $this->mapItems();
         
         $ids = $this->itemIdsFor($owner);
-        return $this->loader();
+        return $this->loader($ids);
     }
     
     protected function loader($ids)
     {
-        return $this->relationshipType->preloaderLoader($this, $ids);
+        return $this->loaders->preloader($this, $ids);
     }
     
     protected abstract function mapItems();

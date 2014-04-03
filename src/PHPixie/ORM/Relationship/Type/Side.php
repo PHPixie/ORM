@@ -4,13 +4,11 @@ namespace PHPixie\ORM\Relationship;
 
 abstract class Side
 {
-    protected $relationship;
     protected $config;
     protected $type;
 
-    public function __construct($relationship, $type, $config)
+    public function __construct($type, $config)
     {
-        $this->relationship = $relationship;
         $this->type = $type;
         $this->config = $config;
     }

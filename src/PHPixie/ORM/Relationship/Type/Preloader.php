@@ -4,18 +4,17 @@ namespace PHPixie\ORM\Model;
 
 abstract class Preloader
 {
-    protected $relationshipType;
+    protected $loaders;
     protected $side;
-    protected $repository;
+    protected $loader;
     protected $resultStep;
     protected $items = array();
 
-    public function __construct($relationshipType, $side, $repository, $resultStep)
+    public function __construct($loaders, $side, $loader)
     {
-        $this->relationshipType = $relationshipType;
-        $this->side = $side;
-        $this->repository = $repository;
-        $this->resultStep = $resultStep;
+        $this->loaders    = $loaders;
+        $this->side       = $side;
+        $this->loader = $loader;
     }
 
     public function getModel($id)
@@ -30,10 +29,5 @@ abstract class Preloader
 
         return $model;
     }
-	
-	public function resultStep()
-	{
-		return $this->resultStep;
-	}
     
 }

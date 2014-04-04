@@ -30,7 +30,10 @@ class Side extends \PHPixie\ORM\Relaionship\Type\Property\Model
         list($left, $right) = $this->getSides(null);
         $plan = $this->handler->unlinkPlan($this->config, $left, $right);
         $plan->execute();
-        $this->value->removeAll();
+        if ($this->loaded && $this->value !== null)
+            $this->handler->unlinkProperties($this->config, $this->value->usedModels(), null);
+            $this->value->removeAll();
+        }
     }
     
     protected function getSides($opposing)

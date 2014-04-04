@@ -19,4 +19,11 @@ class Items extends \PHPixie\ORM\Relationship\Type\Preloader\Result\Single
             $this->map[$ownerId] = $id;
         }
     }
+    
+    public function getMappedFor($owner)
+    {
+        $item = parent::getMappedFor($item);
+        $itemProperty = $this->config->itemProperty;
+        $item->$itemProperty->setValue($owner);
+    }
 }

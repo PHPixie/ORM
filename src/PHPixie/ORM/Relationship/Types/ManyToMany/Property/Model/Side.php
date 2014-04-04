@@ -2,27 +2,43 @@
 
 namespace PHPixie\ORM\Relationship\Types\OneToMany\Property\Model;
 
-class Side extends \PHPixie\ORM\Relationship\Types\OneToMany\Property\Model
+class Side extends \PHPixie\ORM\Relaionship\Type\Property\Model
 {
     public function load()
     {
-        return $this->query()->findAll();
+        return $this->handler->loadProperty($this->side, $this->model);
     }
 
-    public function add($items, $reset = true)
+    public function add($items)
     {
-        $plan = $this->handler->linkPlan($this->link, $this->model, $items);
+        list($left, $right) = $this->getSides($items);
+        $plan = $this->handler->linkPlan($this->config, $left, $right);
         $plan->execute();
-        if($reset)
-            $this->reset();
+        $this->handler->linkProperties($this->config, $left, $right);
     }
 
-    public function remove($items, $reset = true)
+    public function remove($items)
     {
-        $plan = $this->handler->unlinkItemsPlan($this->link, $items, $this->model);
+        list($left, $right) = $this->getSides($items);
+        $plan = $this->handler->unlinkPlan($this->config, $left, $right);
         $plan->execute();
-        if($reset)
-            $this->reset();
+        $this->handler->unlinkProperties($this->config, $left, $right);
+    }
+    
+    public function removeAll()
+    {
+        list($left, $right) = $this->getSides(null);
+        $plan = $this->handler->unlinkPlan($this->config, $left, $right);
+        $plan->execute();
+        $this->value->removeAll();
+    }
+    
+    protected function getSides($opposing)
+    {
+        if ($this->side-> type() === 'right')
+            return ($this->model, $opposing);
+        
+        return ($opposing, $this->model);
     }
 
 }

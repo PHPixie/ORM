@@ -22,9 +22,9 @@ class OneToMany extends PHPixie\ORM\Relationship\Type
     public function preloader($side, $loader)
     {
         if ($side->type() === 'owner')
-            return new OneTo\Type\Many\Preloader\Owner($this->orm->loaders(), $side, $loader);
+            return new OneTo\Type\Many\Preloader\Owner($this->orm->loaders(), $this, $side, $loader);
         
-        return new OneTo\Type\Many\Preloader\Items($this->orm->loaders(), $side, $loader);
+        return new OneTo\Type\Many\Preloader\Items($this->orm->loaders(), $this, $side, $loader);
     }
     
     public function modelProperty($side, $model)
@@ -43,9 +43,14 @@ class OneToMany extends PHPixie\ORM\Relationship\Type
         return new OneTo\Type\Many\Property\Query\Items($this->handler(), $side, $query);
     }
     
+    public function ownerLoader($loader, $itemPropertyName, $owner)
+    {
+        return new OneTo\Type\Many\Loader\Owner($this->orm->loaders(), $loader, $itemPropertyName, $owner);
+    }
+    
     protected function sideTypes($config)
     {
         return array('owner', 'items');
     }
-
+    
 }

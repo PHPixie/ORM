@@ -2,14 +2,8 @@
 
 namespace PHPixie\ORM\Relationships\OneTo\Preloader;
 
-class Owner extends \PHPixie\ORM\Relationship\Type\Preloader\Result\Single
+abstract class Owner extends \PHPixie\ORM\Relationship\Type\Preloader\Result\Single
 {
-    protected $itemKey;
-    
-    public function __construct()
-    {
-        $this->itemKey = $this->side-> config()->itemKey;
-    }
     
     protected function mapItems()
     {
@@ -19,7 +13,7 @@ class Owner extends \PHPixie\ORM\Relationship\Type\Preloader\Result\Single
     
     public function getMappedFor($model)
     {
-        $itemKey = $this->itemKey;
+        $itemKey = $this->config->itemKey;
         return $this->getModel($model->$itemKey);
     }
 }

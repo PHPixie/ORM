@@ -58,6 +58,16 @@ class Handler extends \PHPixie\ORM\Relationships\Types\OneTo\Handler
                 $property->reset();
         }
     }
-	
-
+    
+    public function loadProperty($side, $related)
+    {
+        if($side === 'owner')
+            return  parent::loadProperty($side, $related);
+        
+        $loader = $this->query($side, $related)->findAll();
+        if ($related instanceof \PHPixie\ORM\Model)
+            $loader = $this->relationshipType->ownerLoader($loader, $side->config()->itemProperty, $related);
+            
+        return $this->loaders->editable($loader);
+    }
 }

@@ -22,9 +22,9 @@ class OneToOne extends PHPixie\ORM\Relationship\Type
     public function preloader($side, $loader)
     {
         if ($side->type() === 'owner')
-            return new OneTo\Type\Many\Preloader\Owner($this->orm->loaders(), $side, $loader);
+            return new OneTo\Type\Many\Preloader\Owner($this->orm->loaders(), $this, $side, $loader);
         
-        return new OneTo\Type\Many\Preloader\Items($this->orm->loaders(), $side, $loader);
+        return new OneTo\Type\Many\Preloader\Items($this->orm->loaders(), $this, $side, $loader);
     }
     
     public function modelProperty($side, $model)

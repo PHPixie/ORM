@@ -2,9 +2,9 @@
 
 namespace PHPixie\ORM\Relationship\Types\OneTo\Type\One\Property;
 
-abstract class Model extends \PHPixie\ORM\Relationship\Type\Property\Model
+abstract class Model extends \PHPixie\ORM\Relationship\Types\OneTo\Property\Model
 {
-	protected function processSet($owner, $item)
+    protected function processSet($owner, $item)
     {
         if ($owner !== null && $item !== null ) {
             $plan = $this->handler->linkPlan($this->config, $owner, $item);

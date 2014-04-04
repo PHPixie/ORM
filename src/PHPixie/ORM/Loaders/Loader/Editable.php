@@ -66,14 +66,10 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     
     public function offsetExists($offset)
     {
-        return $this->getModelByOffset($offset);
+        return $this->getByOffset($offset);
     }
     
-    public function getByOffset($offset){
-        return $this->getModelByOffset($offset);
-    }
-    
-    public function getModelByOffset($offset)
+    public function getByOffset($offset)
     {
         if ($offset > $this->maxAllowedOffset)
             throw new \PHPixie\ORM\Exception\Loader("Items can only be accessed in sequential order");
@@ -94,7 +90,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         
         if ($model === null && $this->loaderItemsCount === null) {
             $this->loaderItemsCount = $loaderOffset;
-            return $this->getModelByOffset($offset);
+            return $this->getByOffset($offset);
         }
         
         $id = $model->id();
@@ -103,7 +99,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         if (array_key_exists($id, $this->skipped)) {
             $this->skipped[$id] = $loaderOffset;
             $this->updateAdjustedOffsets();
-            return $this->getModelByOffset($offset);
+            return $this->getByOffset($offset);
         }
         
         return $model;

@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Result;
+namespace PHPixie\ORM\Loaders\Loader\Preloadable\Result;
 
-class Reusable extends \PHPixie\ORM\Loaders\Loader\Result
+class Reusable extends \PHPixie\ORM\Loaders\Loader\Preloadable\Result
 {
     protected $repository;
     protected $reusableResultStep;
@@ -27,5 +27,15 @@ class Reusable extends \PHPixie\ORM\Loaders\Loader\Result
         }
         
         return $this->models[$offset];
+    }
+    
+    public function resultStep()
+    {
+        return $this->reusableResultStep;
+    }
+    
+    public function repository()
+    {
+        return $this->repository;
     }
 }

@@ -69,18 +69,18 @@ class Mapper
         foreach ($path as $rel) {
             $preloader = $loader->getPreloader($relationship);
             if ($preloader === null) {
-                $preloader = $this->buildPreloader($model, $relationship, $loader->resultStep(), $plan);
+                $preloader = $this->buildPreloader($model, $relationship, $loader, $plan);
                 $loader->setPreloader($relationship, $preloader);
             }
             $model = $preloader->modelName();
-            $loader = $preloader;
+            $resultLoader = $preloader->loader();
         }
     }
 
-    protected function buildPreloader($model, $relationship, $resultStep, $plan)
+    protected function buildPreloader($model, $relationship, $loader, $plan)
     {
         $side = $this->relationshipRegistry->getSide($model, $relationship);
         $handler = $this->orm->relationshipType($side->relationshipType())->handler();
-        return $handler->preloader($side, $resultStep, $plan);
+        return $handler->preloader($side, $loader, $plan);
     }
 }

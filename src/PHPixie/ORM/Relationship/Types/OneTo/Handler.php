@@ -76,7 +76,7 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
                                     );
     }
 
-    public function preload($side, $resultStep, $plan)
+    public function preload($side, $resultLoader, $plan)
     {
 	    $itemRepository = $this->registryRepository->get($config->itemModel);
         $ownerRepository = $this->registryRepository->get($config->ownerModel);
@@ -96,7 +96,7 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         $query = $preloadRepository->dbQuery();
         $placeholder = $query->getBuilder()->addPlaceholder();
 		
-        $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $resultField);
+        $inStep = $this->steps->in($placeholder, $queryField, $resultLoader->resultStep(), $resultField);
         $preloadPlan->push($inStep);
 		
         $preloadStep = $this->steps->resusableResult($query);

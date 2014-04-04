@@ -9,5 +9,4 @@ class Owner extends \PHPixie\ORM\Relationship\Types\OneTo\Type\One\Property\Mode
     {
         $this->processSet($owner, $this->model);
     }
-	
 }

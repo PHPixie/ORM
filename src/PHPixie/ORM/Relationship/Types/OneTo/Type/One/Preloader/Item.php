@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\OneTo\Type\Many\Preloader;
+namespace PHPixie\ORM\Relationships\OneTo\Type\One\Preloader;
 
-class Items extends \PHPixie\ORM\Relationship\Type\Preloader\Result\Multiple
+class Items extends \PHPixie\ORM\Relationship\Type\Preloader\Result\Single
 {
 
     protected function mapItems()
@@ -16,12 +16,7 @@ class Items extends \PHPixie\ORM\Relationship\Type\Preloader\Result\Multiple
             $id = $itemData->$idField;
             $ownerId = $itemData->$key;
             $this->idOffsets[$id] = $offset;
-            
-            if (!isset($this->map[$ownerId]))
-                $this->map[$ownerId] = array();
-            
-            $this->map[$ownerId][] = $id;
+            $this->map[$ownerId] = $id;
         }
     }
-    
 }

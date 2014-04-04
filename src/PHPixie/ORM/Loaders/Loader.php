@@ -12,11 +12,6 @@ abstract class Loader implements \IteratorAggregate
         $this->loaders = $loaders;
     }
     
-    public function addPreloader($relationship, $preloader)
-    {
-        $this->preloaders[$relationship] = $preloader;
-    }
-    
     public function asArray($modelsAsArrays = false)
     {
         $array = array();
@@ -28,17 +23,10 @@ abstract class Loader implements \IteratorAggregate
         return $array;
     }
     
-    public function getByOffset($offset){
-        $model = $this->getModelByOffset($offset);
-        foreach($this->preloaders as $property => $preloader)
-            $model->$property->setValue($preloader->loadFor($model));
-        return $model;
-    }
-    
     public function getIterator() {
         return $this->loaders->iterator($this);
     }
     
     public abstract function offsetExists($offset);
-    protected abstract function getModelByOffset($offset);
+    protected abstract function getByOffset($offset);
 }

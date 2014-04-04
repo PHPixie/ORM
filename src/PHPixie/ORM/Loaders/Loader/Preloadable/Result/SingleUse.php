@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Result;
+namespace PHPixie\ORM\Loaders\Loader\Preloadable\Result;
 
 class SingleUse extends \PHPixie\ORM\Loaders\Loader\Result
 {

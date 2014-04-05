@@ -65,13 +65,13 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 
         $subquery = $subqueryRepository->query();
         $this->groupMapper->mapConditions($subquery, $conditions, $subqueryRepository->modelName(), $plan);
-        $this->planners->inSubquery(
+        $this->planners->in()->subquery(
                                         $query,
                                         $queryField,
                                         $subquery,
                                         $subqueryField,
                                         $plan,
-                                        $group->logic,
+                                        $group->logic(),
                                         $group->negated()
                                     );
     }
@@ -94,16 +94,12 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         }
 
         $query = $preloadRepository->dbQuery();
-        $placeholder = $query->getBuilder()->addPlaceholder();
-		
-        $inStep = $this->steps->in($placeholder, $queryField, $resultLoader->resultStep(), $resultField);
-        $preloadPlan->push($inStep);
-		
+        $this->planners->in()->loader($query, $queryField, $resultLoader, $loaderField, $plan);
+        
         $preloadStep = $this->steps->resusableResult($query);
-		$preloadPlan->push($preloadStep);
+        $preloadPlan->push($preloadStep);
         $loader = $this->loaders->reusableResult($queryRepository, $preloadStep);
 		
 		return $this->relationshipType->preloader($side, $loader);
     }
-
 }

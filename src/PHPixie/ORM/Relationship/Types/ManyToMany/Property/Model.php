@@ -2,8 +2,14 @@
 
 namespace PHPixie\ORM\Relationship\Types\OneToMany\Property\Model;
 
-class Side extends \PHPixie\ORM\Relaionship\Type\Property\Model
+class Model extends \PHPixie\ORM\Relaionship\Type\Property
 {
+
+    public function query()
+    {
+        return $this->handler->query($this->side, $this->model);
+    }
+    
     public function load()
     {
         return $this->handler->loadProperty($this->side, $this->model);
@@ -19,6 +25,8 @@ class Side extends \PHPixie\ORM\Relaionship\Type\Property\Model
 
     public function remove($items)
     {
+        if ($items === null)
+            return;
         list($left, $right) = $this->getSides($items);
         $plan = $this->handler->unlinkPlan($this->config, $left, $right);
         $plan->execute();

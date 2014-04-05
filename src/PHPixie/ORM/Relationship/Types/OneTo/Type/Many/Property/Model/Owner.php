@@ -18,7 +18,7 @@ class Owner extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Mod
             $plan = $this->handler->unlinkPlan($this->config, null, $this->model);
         
         $plan->execute();
-        $this->handler->setItemsPropertiesOwner($this->config, array($this->model), $owner);
+        $this->handler->setItemsOwner($this->config, $this->model, $owner);
     }
     
 }

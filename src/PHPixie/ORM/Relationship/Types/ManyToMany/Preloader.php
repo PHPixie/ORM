@@ -1,53 +1,43 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\ManyToMany;
+namespace PHPixie\ORM\Relationship\Types\ManyToMany;
 
 class Preloader
 {
-    protected $repository;
-    protected $result;
-    protected $ownerField;
-    protected $itemsMap;
-
-    public function __construct($preloaders)
+    protected $pivotStep;
+    
+    public function __construct($loaders, $relationshipType, $side, $loader, $pivotStep)
     {
-        $this->repository = $repository;
-        $this->result = $result;
-        $this->ownerField = $ownerField;
+        parent::__construct($loaders, $relationshipType, $side, $loader);
+        $this->pivotStep = $pivotStep;
     }
-
-    public function set($owner, $property)
+    
+    protected function mapItems()
     {
-        $property = $this->getProperty();
-        $loader = $this->orm->loader($itemModel, $this->getItems($owner), $preloaders);
-        $property->setLoader($loader);
-    }
-
-    protected function getItems($owner)
-    {
-        if ($this->itemsMap === null)
-            $this->itemsMap = $this->buildItemsMap();
-
-        return $this->itemsMap[$owner->id()];
-    }
-
-    protected function buildItemsMap()
-    {
-        $items = array();
-        $idField = $this->repository->idField();
-        foreach($this->dataResult as $row)
-            $items[$row->$idField] = &$row;
-
-        $itemsMap = array();
-        $ownerKey = $this->ownerPivotKey;
-        $itemKey = $this->pivotItemKey;
-
-        foreach ($this->pivotResult as $row) {
-            if (!isset($itemsMap[$row->$ownerKey]))
-                $itemsMap[$row->ownerKey] = array();
-            $itemsMap[$row->ownerKey][] = &$items[$row->$itemKey];
+        if ($side == 'right') {
+            $ownerIdField = $config->leftPivotKey;
+            $itemIdField = $config->rightPivotKey;
+        }else {
+            $ownerIdField = $config->rightPivotKey;
+            $itemIdField = $config->leftPivotKey;
         }
-
-        return $itemsMap;
+        
+        $fields = $this->pivotStep->getFields(array($ownerIdField, $itemIdField));
+        
+        foreach ($fields as $pivotData) {
+            $id = $itemData->$itemIdField;
+            $ownerId = $pivotData->$ownerIdField;
+            
+            if (!isset($this->map[$ownerId]))
+                $this->map[$ownerId] = array();
+            
+            $this->map[$ownerId][] = $id;
+        }
+        
+        $idField = $this->loader->repository()->idField();
+        $ids = $this->loader->resultStep->getFields(array($idField));
+        foreach($ids as $offset => $id) {
+            $this->idOffsets[$id] = $offset;
+        }
     }
 }

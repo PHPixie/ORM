@@ -9,6 +9,9 @@ class Handler extends \PHPixie\ORM\Relationships\Types\OneTo\Handler
         $ownerPropertyName = $config->itemProperty;
         $itemsHaveQueries = false;
         
+        if (!is_array($items))
+            $items = array($items);
+        
         foreach($items as $item) {
             if ($item instanceof \PHPixie\ORM\Query) {
                 $itemsHaveQueries = true;

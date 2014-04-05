@@ -41,15 +41,4 @@ class Config extends \PHPixie\ORM\Relationship\Side\Config
 				$this->$property = $inflector->singular($this->get($opposing.'Property')).'_id';
 		}
     }
-	
-	public function getSide($side)
-	{
-			return array(
-				'model' => $this->{$side.'Model'},
-				'pivotKey' => $this->{$side.'PivotKey'},
-				'property' => $this->{$side.'Property'},
-			);
-		}
-	}
-	
 }

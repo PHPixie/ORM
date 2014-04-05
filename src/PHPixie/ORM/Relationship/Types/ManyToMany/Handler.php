@@ -6,10 +6,8 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 {
     public function query($side, $related)
     {
-        $config = $side->config();
-        $side = $side->type();
-
-        return $this->buildQuery($config->{"{$side}_model"}, $config->{"{$side}_property"}, $related);
+        $side = $side->config()->getSide($side-> type());
+        return $this->registryRepository->get($side['model'])->related($side['property'], $related);
     }
 
     public function link($side, $items, $opposingItems)

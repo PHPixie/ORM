@@ -4,6 +4,12 @@ namespace PHPixe\ORM\Relationships\Embeds;
 
 class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 {
+	public function setItemsOwner($embedConfig, $owner, $item)
+    {
+        $ownerPropertyName = $embedConfig->ownerProperty;
+        if($item->$ownerPropertyName() !==
+    }
+	
     public function mapRelationship($side, $group, $query, $plan)
     {
         $config = $side->config();
@@ -32,6 +38,11 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
     
     public function setEmbedded($model, $embedConfig, $embeddedModel)
     {
+		$ownerProperty = $embedConfig->ownerProperty;
+		if ($embeddedModel->$ownerProperty() !== null) {
+			$embeddedModel->$ownerProperty->set(null);
+		}
+		
         $path = getPath($model, $embedConfig);
         $this->checkEmbeddedClass($embedConfig, $embeddedModel);
         list($parent, $key) = $this->getParentAndKey($model, $path, true);

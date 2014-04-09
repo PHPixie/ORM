@@ -4,12 +4,33 @@ namespace PHPixe\ORM\Relationships\Embeds;
 
 class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 {
-	public function setItemsOwner($embedConfig, $owner, $item)
+    public function setOwnerProperty($embedConfig, $item, $owner)
     {
-        $ownerPropertyName = $embedConfig->ownerProperty;
-        if($item->$ownerPropertyName() !==
+        $itemPropertyName = $embedConfig->ownerProperty;
+        $ownerPropertyName = $embedConfig->name;
+        
+        $itemProperty = $item->$itemPropertyName;
+        $oldOwner = $itemProperty->value();
+        
+        if ($oldOwner !== null) {
+            $oldOwnerProperty = $oldOwner->$ownerPropertyName;
+            if ($oldOwnerProperty instanceof Embeds\Property\Model\EmbeddedArray) {
+                $oldOwner->$ownerPropertyName->remove($item);
+            }else {
+                $this->unsetOwnerProperty($embedConfig, $item);
+            }
+        }
+        
+        $itemProperty->setValue($owner);
     }
-	
+    
+    public function unsetOwnerProperty($embedConfig, $item)
+    {
+        $itemPropertyName = $embedConfig->ownerProperty;
+        $item->$itemPropertyName->setValue(null);
+    }
+    
+    
     public function mapRelationship($side, $group, $query, $plan)
     {
         $config = $side->config();

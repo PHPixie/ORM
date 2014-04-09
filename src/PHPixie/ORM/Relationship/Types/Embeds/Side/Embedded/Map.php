@@ -11,7 +11,7 @@ class Map {
         $properties = array_keys($config->get(null, array()));
         
         foreach($properties as $property) {
-            $this->map[$property] = $embedded->config($config->slice($property), $property, $defaultOwnerProperty);
+            $this->map[$property] = $embedded->config($property, $config->slice($property), $defaultOwnerProperty);
         }
     }
 }

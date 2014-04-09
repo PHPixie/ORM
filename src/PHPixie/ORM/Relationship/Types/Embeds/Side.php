@@ -7,16 +7,16 @@ class Side extends PHPixie\ORM\Relationship\Side
     
     protected $propertyName;
     
-    public function __construct($relationship, $propertyName, $config)
+    public function __construct($propertyName, $config)
     {
-        parent::__construct($relationship, 'embeds', $config);
+        parent::__construct('embeds', $config);
         $this->propertyName = $propertyName;
         
     }
     
     public function modelName()
     {
-        return $this->config->model;
+        return $this->config->modelName;
     }
 
     public function propertyName()

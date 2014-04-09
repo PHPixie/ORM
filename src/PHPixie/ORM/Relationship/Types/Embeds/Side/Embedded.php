@@ -11,13 +11,13 @@ class Embedded
         $this->inflector = $inflector;
     }
     
-    public function map($config)
+    public function map($config, $defaultOwnerProperty)
     {
-        return new Embedded\Map($this, $config);
+        return new Embedded\Map($this, $config, $defaultOwnerProperty);
     }
     
-    public function config($propertyName, $config)
+    public function config($propertyName, $config, $defaultOwnerProperty)
     {
-        return new Embedded\Config($this, $this->inflector, $propertyName, $config);
+        return new Embedded\Config($this, $this->inflector, $propertyName, $config, $defaultOwnerProperty);
     }
 }

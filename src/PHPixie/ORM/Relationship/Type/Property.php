@@ -13,10 +13,5 @@ abstract class Property
         $this->side = $side;
     }
 
-    public function query()
-    {
-        return $this->handler->query($this->side, $this->propertyOwner());
-    }
-
     abstract protected function propertyOwner();
 }

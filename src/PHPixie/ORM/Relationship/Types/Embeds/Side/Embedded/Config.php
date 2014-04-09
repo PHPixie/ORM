@@ -5,30 +5,29 @@ namespace PHPixie\ORM\Relationships\Types\Embeds\Side\Config\Embedded;
 class Config {
 
     public $name;
-	public $type;
-	public $ownerProperty;
+    public $type;
+    public $ownerProperty;
     public $modelName;
     public $map;
     
-    public function __construct($embeddedConfig, $inflector, $name, $defaultOwnerProperty, $config)
+    public function __construct($embedded, $inflector, $name, $config, $defaultOwnerProperty)
     {
         $this->name = $name;
-		$this->ownerProperty = $config->get('owner_property', $defaultOwnerProperty);
-		
-        $this->type = $config->get('type', 'document');
+        $this->ownerProperty = $config->get('ownerProperty', $defaultOwnerProperty);
         
-        if ($this->type !== 'document' && $this->type !== 'array')
-            throw new \PHPixie\ORM\Exception\Mapper("Embed type must be either 'document' or 'array'");
+        $this->type = $config->get('type', 'one');
         
-        if(($modelName = $config->get('model')) === null) {
-            if($this->type === 'document'){
-                $modelName = $propertyName;
+        if ($this->type !== 'one' && $this->type !== 'many')
+            throw new \PHPixie\ORM\Exception\Mapper("Embed type must be either 'one' or 'many'");
+        
+        if(($this->modelName = $config->get('model')) === null) {
+            if($this->type === 'one'){
+                $this->modelName = $name;
             }else{
-                $modelName = $inflector->singular($propertyName);
+                $this->modelName = $inflector->singular($name);
             }
         }
         
-        $this->modelName = $modelName;
-        $this->map = $embeddedConfig->map($config->slice('embeds'), $this->name);
+        $this->map = $embedded->map($config->slice('embeds'), $this->name);
     }
 }

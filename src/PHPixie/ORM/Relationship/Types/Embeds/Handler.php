@@ -37,109 +37,6 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         $this->mapper->mapConditionGroup($group->conditions, $query, $config->embeddedMap());
     }
     
-    public function getEmbedded($model, $embedConfig)
-    {
-        $path = getPath($model, $embedConfig);
-        $document = $this->getDocument($model->data()->document(), $this->explodePath($path));
-        
-        if ($document === null)
-            return null;
-        
-        return $this->embeddedModel($embedConfig, $document, $path);
-    }
-    
-    public function createEmbedded($model, $embedConfig)
-    {
-        $path = getPath($model, $embedConfig);
-        list($parent, $key) = $this->getParentAndKey($model, $path, true);
-        $document = $this->planners->document()->add($parent, $key);
-        return $this->embeddedModel($embedConfig, $document, $path);
-        
-    }
-    
-    public function setEmbedded($model, $embedConfig, $embeddedModel)
-    {
-		$ownerProperty = $embedConfig->ownerProperty;
-		if ($embeddedModel->$ownerProperty() !== null) {
-			$embeddedModel->$ownerProperty->set(null);
-		}
-		
-        $path = getPath($model, $embedConfig);
-        $this->checkEmbeddedClass($embedConfig, $embeddedModel);
-        list($parent, $key) = $this->getParentAndKey($model, $path, true);
-        $this->planners->document()->set($parent, $key, $embeddedModel->data()->document());
-    }
-    
-    public function removeEmbedded($model, $embedConfig)
-    {
-        $path = getPath($model, $embedConfig);
-        $documentPlanner = $this->planners->document();
-        list($parent, $key) = $this->getParentAndKey($model, $path);
-        if ($parent !== null && $documentPlanner->exists($parent, $key))
-            $documentPlanner->remove($parent, $key);
-    }
-    
-    public function arrayAddEmbedded($model, $embedConfig, $key = null)
-    {
-        $path = getPath($model, $embedConfig);
-        $array = $this->getArray($model, $path, true);
-        $document = $this->planners->document()->arrayAddDocument($array, $key);
-        return $this->embeddedModel($embedConfig, $document, $path.'.'.$key);
-    }
-
-    public function arrayGetEmbedded($model, $embedConfig, $key)
-    {
-        $path = getPath($model, $embedConfig);
-        $array = $this->getArray($model, $path);
-        if ($array === null)
-            return null;
-        
-        $document = $this->planners->document()->arrayGet($array, $key);
-        return $this->embeddedModel($embedConfig, $document, $path.'.'.$key);
-    }
-    
-    public function arrayExistsEmbedded($model, $embedConfig, $key)
-    {
-        $path = getPath($model, $embedConfig);
-        $array = $this->getArray($model, $path);
-        if ($array === null)
-            return false;
-        
-        return $this->planners->document()->arrayExists($array, $key);
-    }
-    
-    public function arraySetEmbedded($model, $embedConfig, $key, $embeddedModel)
-    {
-        $path = getPath($model, $embedConfig);
-        $this->checkEmbeddedClass($embedConfig, $embeddedModel);
-        $array = $this->getArray($model, $path, true);
-        $this->planners->document()->arraySet($array, $key, $embeddedModel->data()->document());
-    }
-    
-    public function arreyUnsetEmbedded($model, $embedConfig, $key)
-    {
-        $path = getPath($model, $embedConfig);
-        $array = $this->getArray($model, $path);
-        if($array !== null)
-            $this->planners->document()->arrayUnset($array, $key);
-    }
-    
-    public function arrayCountEmbedded($model, $embedConfig)
-    {
-        $path = getPath($model, $embedConfig);
-        $array = $this->getArray($model, $path);
-        if ($array !== null)
-            return 0;
-        return $this->planners->document()->arrayCount($array);
-    }
-    
-    public function arrayClearEmbedded($model, $embedConfig)
-    {
-        $path = getPath($model, $embedConfig);
-        $array = $this->getArray($model, $path);
-        if ($array !== null)
-            $this->planners->document()->arrayClear($array);
-    }
     
     public function arrayLoader($property, $models)
     {
@@ -155,9 +52,6 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
     protected function getPath($model, $embedConfig)
     {
         $path = $embedConfig->path;
-        if ($model instanceof Model)
-            $path = $model->path().'.'.$path;
-            
         return $path;
     }
     
@@ -198,21 +92,6 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         return $current;
     }
     
-    protected function getArray($model, $path, $createMissing = false)
-    {
-        $documentPlanner = $this->planners->document();
-        list($parent, $key) = $this->getParentAndKey($model, $path, $createMissing);
-        if ($parent === null)
-            return null;
-        
-        $array = $documentPlanner->getArray($parent, $key);
-        if ($array === null){
-            if(!$createMissing)
-                return null;
-            $array = $documentPlanner->addArray($parent, $key);
-        }
-        
-        return $array;
-    }
+
     
 }

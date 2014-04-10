@@ -51,7 +51,7 @@ class ORM
         return new $class($this);
     }
 
-    public function repository($modelName, $modelConfig)
+    public function buildRepository($modelName, $modelConfig)
     {
         $connectionName = $modelConfig->get('connection');
         $driverName = $this->db->driverName($connectionName);

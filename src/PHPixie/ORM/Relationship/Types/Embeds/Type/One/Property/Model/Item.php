@@ -17,7 +17,7 @@ class EmbeddedModel extends PHPixie\ORM\Relationship\Types\Embeds\Property\Model
 	
 	protected function load()
 	{
-		return $this->handler->getEmbedded($this->embedConfig, $this->model);
+		return $this->handler->getEmbeddedModel($this->embedConfig, $this->model);
 	}
 	
 	public function create()

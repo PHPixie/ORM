@@ -20,7 +20,7 @@ abstract class Config extends \PHPixie\ORM\Relationship\Side\Config
         $this->itemProperty = $config->get($itemOptionsPrefix.'.ownerProperty', $this->ownerModel);
         $this->itemKey = $config->get($itemOptionsPrefix.'.ownerKey', $this->itemProperty.'_id');
         
-        $this->ownerProperty = $config->get('ownerOptions.itemsProperty', null);
+        $this->ownerProperty = $config->get('ownerOptions.'.$itemOptionName.'Property', null);
         if ($this->ownerProperty === null)
             $this->ownerProperty = $this->defaultOwnerProperty($inflector);
     }

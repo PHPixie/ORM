@@ -26,17 +26,17 @@ class Document
         return $document->addDocumentArray($key);
     }
     
-    public function set($document, $key, $value)
+    public function setDocument($document, $key, $value)
     {
         return $document->$key = $value;
     }
     
-    public function unset($document, $key)
+    public function removeDocument($document, $key)
     {
         unset $document->$key;
     }
     
-    public function exists($document, $key)
+    public function documentExists($document, $key)
     {
         return property_exists($document, $key);
     }

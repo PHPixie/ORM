@@ -40,7 +40,8 @@ class Handler extends PHPixie\ORM\Relationships\Types\Embeds\Handler {
     public function unset($embedConfig, $owner, $key)
     {
         $array = $this->getArray($owner, $embedConfig->path, true);
-        $this->planners->document()->arrayUnset($array, $key);
+		if($array === null && $this->planners->document()->arrayExists($key))
+			$this->planners->document()->arrayUnset($array, $key);
     }
     
     public function count($embedConfig, $owner)

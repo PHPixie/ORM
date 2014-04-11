@@ -6,6 +6,7 @@ class Config extends PHPixie\ORM\Relationship\Side\Config
 {
     public $ownerModel;
     public $itemModel;
+	public $path;
     public $ownerProperty;
     public $itemProperty;
     
@@ -21,6 +22,8 @@ class Config extends PHPixie\ORM\Relationship\Side\Config
         $this->ownerProperty = $config->get('ownerOptions.'.$itemOptionName.'Property', null);
         if ($this->ownerProperty === null)
             $this->ownerProperty = $this->defaultOwnerProperty($inflector);
+		
+		$this->path = $config->get('path', $this->ownerProperty.'_data');
     }
     
     abstract protected function itemOptionName();

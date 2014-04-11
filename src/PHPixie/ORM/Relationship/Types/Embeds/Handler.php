@@ -2,7 +2,7 @@
 
 namespace PHPixe\ORM\Relationships\Embeds;
 
-class Handler extends \PHPixie\ORM\Relationship\Type\Handler
+abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 {
     public function setOwnerProperty($embedConfig, $item, $owner)
     {

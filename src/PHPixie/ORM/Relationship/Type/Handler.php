@@ -10,6 +10,7 @@ class Handler
     protected $planners;
     protected $steps;
     protected $loaders;
+	protected $groupMapper;
 
     public function __construct($orm, $relationship, $repositoryRegistry, $planners, $steps, $loaders)
     {

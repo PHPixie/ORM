@@ -54,7 +54,7 @@ class Collection
         return $this->queries;
     }
 
-    public function fields($fields)
+    public function modelFields($fields)
     {
         $data = array();
         foreach ($this->models as $model) {
@@ -66,9 +66,9 @@ class Collection
         return $data;
     }
 
-    public function field($field)
+    public function modelField($field)
     {
-        return array_column($this->fields(array($field), $skipQueries), $field));
+        return array_column($this->modelFields(array($field), $field));
     }
 
 }

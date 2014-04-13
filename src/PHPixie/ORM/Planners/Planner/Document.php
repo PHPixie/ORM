@@ -1,8 +1,8 @@
 <?php
 
-namespace \PHPixie\ORM\Query\Plan\Planner;
+namespace \PHPixie\ORM\Planners\Planner;
 
-class Document
+class Document extends \PHPixie\ORM\Planners\Planner
 {
     public function getDocument($document, $key)
     {

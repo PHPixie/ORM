@@ -34,7 +34,7 @@ abstract class Model
         $this->loaded = false;
     }
 
-    protected function propertyOwner()
+    public function model()
     {
         return $this->model;
     }

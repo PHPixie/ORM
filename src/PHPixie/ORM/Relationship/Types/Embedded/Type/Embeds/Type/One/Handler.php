@@ -3,35 +3,45 @@
 namespace PHPixie\ORM\Relationships\Types\Embeds\Type\One;
 
 class Handler extends PHPixie\ORM\Relationships\Types\Embeds\Handler {
-	
-    public function get($embedConfig, $owner)
+
+    public function setOwnerProperty($config, $item, $owner)
     {
-        $document = $this->getDocument($model->data()->document(), $this->explodePath($embedConfig->path));
+        $this->removeItemFromOwner($item);
+        if($owner !== null){
+            $ownerProperty = $config->ownerProperty;
+            $item->setOwnerProperty($owner, $ownerProperty);
+            $owner->$ownerProperty->setValue($item);
+        }
+    }
+    
+    public function get($config, $owner)
+    {
+        $document = $this->getDocument($model->data()->document(), $this->explodePath($config->path));
         
         if ($document === null)
             return null;
         
-        return $this->embeddedModel($embedConfig, $owner);
+        return $this->embeddedModel($config, $document, $owner);
     }
     
-    public function create($embedConfig, $owner)
+    public function create($config, $owner)
     {
-        list($parent, $key) = $this->getParentAndKey($owner, $embedConfig->path, true);
+        list($parent, $key) = $this->getParentAndKey($owner, $config->path, true);
         $document = $this->planners->document()->addDocument($parent, $key);
-        return $this->embeddedModel($embedConfig, $document);
+        return $this->embeddedModel($config, $document, $owner);
     }
     
-    public function set($embedConfig, $owner, $item)
+    public function set($config, $owner, $item)
     {
-        $this->checkEmbeddedClass($embedConfig, $item);
-        list($parent, $key) = $this->getParentAndKey($owner, $embedConfig->path, true);
-        $this->planners->document()->setDocument($parent, $key, $embeddedModel->data()->document());
+        $this->assertModelName($item, $config->itemModel);
+        list($parent, $key) = $this->getParentAndKey($owner, $config->path, true);
+        $this->planners->document()->setDocument($parent, $key, $model->data()->document());
     }
     
-    public function remove($embedConfig, $owner)
+    public function remove($config, $owner)
     {
         $documentPlanner = $this->planners->document();
-        list($parent, $key) = $this->getParentAndKey($owner, $embedConfig->path);
+        list($parent, $key) = $this->getParentAndKey($owner, $config->path);
         if ($parent !== null && $documentPlanner->documentExists($parent, $key))
             $documentPlanner->removeDocument($parent, $key);
     }

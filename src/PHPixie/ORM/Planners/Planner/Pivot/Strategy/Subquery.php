@@ -1,8 +1,8 @@
 <?php
 
-namespace \PHPixie\ORM\Query\Plan\Planner\Cross\Strategy;
+namespace \PHPixie\ORM\Planners\Planner\Pivot\Strategy;
 
-class Subquery extends \PHPixie\ORM\Query\Plan\Planner\Cross\Strategy
+class Subquery extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
 {
     public function linkPlan($leftCollection, $rightCollection, $leftRepository, $rightRepository, $leftPivotKey, $rightPivotKey, $plan)
     {

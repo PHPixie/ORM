@@ -13,10 +13,10 @@ abstract class Result extends \PHPixie\ORM\Reltionship\Type\Preloader
         $model = $this->loader->getByOffset($this->idOffsets[$id]);
     }
     
-    public function loadFor($model)
+    public function loadFor($property)
     {
         $this->ensureMapped();
-        $this->getMappedFor($model);
+        $property->setValue($this->getMappedFor($property->model()));
     }
     
     protected function ensureMapped()

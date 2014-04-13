@@ -23,12 +23,9 @@ class Result extends \PHPixie\ORM\Query\Plan
         return $this->requiredPlan;
     }
 
-    public function resultPlan()
+    public function resultStep()
     {
-        if ($this->resultPlan === null)
-            $this->resultPlan = $this->orm->plan();
-
-        return $this->resultPlan;
+        return $this->resultStep;
     }
 
     public function preloadPlan()

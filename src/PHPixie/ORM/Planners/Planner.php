@@ -2,17 +2,16 @@
 
 namespace \PHPixie\ORM\Planners;
 
-abstract class StrategyPlanner
+abstract class Planner
 {
-    protected $strategies = array();
-
-    protected function strategy($name)
+    protected $planners;
+    protected $steps;
+    protected $repositoryRegistry;
+    
+    public function __construct($planners, $steps, $repositoryRegistry)
     {
-        if (!isset($this->strategies[$name]))
-            $this->strategies[$name] = $this->buildStrategy($name);
-
-        return $this->strategies[$name];
+        $this->planners = $planners;
+        $this->steps = $steps;
+        $this->repositoryRegistry = $repositoryRegistry;
     }
-
-    abstract protected function buildStrategy($name);
 }

@@ -1,61 +1,62 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\Embeds\Type\Many;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Type\Many;
 
-class Handler extends PHPixie\ORM\Relationships\Types\Embeds\Handler {
+class Handler extends \PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Handler {
     
-    public function add($embedConfig, $owner, $key = null)
+    public function add($config, $owner, $key = null)
     {
-        $array = $this->getArray($model, $embedConfig->path, true);
+        $array = $this->getArray($owner, $config->path, true);
         $document = $this->planners->document()->arrayAddDocument($array, $key);
-        return $this->embeddedModel($embedConfig, $document);
+        return $this->embeddedModel($config, $document);
     }
 
-    public function get($embedConfig, $owner, $key)
+    public function get($config, $owner, $key)
     {
-        $array = $this->getArray($model, $embedConfig->path);
+        $array = $this->getArray($owner, $config->path);
         if ($array === null)
             return null;
         
         $document = $this->planners->document()->arrayGetDocument($array, $key);
-        return $this->embeddedModel($embedConfig, $document);
+        return $this->embeddedModel($config, $document, $owner);
     }
     
-    public function exists($embedConfig, $owner, $key)
+    public function exists($config, $owner, $key)
     {
-        $array = $this->getArray($model, $embedConfig->path);
+        $array = $this->getArray($owner, $config->path);
         if ($array === null)
             return false;
         
         return $this->planners->document()->arrayExists($array, $key);
     }
     
-    public function set($embedConfig, $owner, $item, $key)
+    public function set($config, $owner, $item, $key)
     {
-        $this->checkEmbeddedClass($embedConfig, $item);
-        $array = $this->getArray($owner, $embedConfig->path, true);
-        $this->planners->document()->arraySet($array, $key, $embeddedModel->data()->document());
+        $this->assertModelName($item, $config->itemModel);
+        $array = $this->getArray($owner, $config->path, true);
+        $this->planners->document()->arraySet($array, $key, $item->data()->document());
     }
     
-    public function unset($embedConfig, $owner, $key)
+    public function unset($config, $owner, $key)
     {
-        $array = $this->getArray($owner, $embedConfig->path, true);
-		if($array === null && $this->planners->document()->arrayExists($key))
-			$this->planners->document()->arrayUnset($array, $key);
+        $documentPlanner = $this->planners->document();
+        $array = $this->getArray($owner, $config->path, true);
+		if($array === null && $documentPlanner->arrayExists($array, $key))
+			$documentPlanner->arrayUnset($array, $key);
     }
     
-    public function count($embedConfig, $owner)
+    public function count($config, $owner)
     {
-        $array = $this->getArray($owner, $embedConfig->path);
+        $array = $this->getArray($owner, $config->path);
         if ($array === null)
             return 0;
         
         return $this->planners->document()->arrayCount($array);
     }
     
-    public function clear($embedConfig, $owner)
+    public function clear($config, $owner)
     {
-        $array = $this->getArray($owner, $embedConfig->path);
+        $array = $this->getArray($owner, $config->path);
         if ($array !== null)
             $this->planners->document()->arrayClear($array);
     }
@@ -75,5 +76,15 @@ class Handler extends PHPixie\ORM\Relationships\Types\Embeds\Handler {
         }
         
         return $array;
+    }
+    
+    public function propertyLoader($property)
+    {
+        return $this->loaders->arrayAccess($property);
+    }
+    
+    protected function fieldPrefix($oldPrefix, $path)
+    {
+        return parent::fieldPrefix($oldPrefix, $path).'.$';
     }
 }

@@ -6,91 +6,27 @@ class Pivot extends \PHPixie\ORM\Query\Plan\Planner
 {
     public function link($pivot, $firstSide, $secondSide, $plan)
     {
-        $sideMethod = $this->linkMethod($pivot, $firstSide, $secondSide);
-        $this->$sideMethod($pivot, $firstSide, $secondSide, $plan);
+       $strategy = $this->selectStrategy($pivot, $firstSide, $secondSide);
+       $strategy->link($pivot, $firstSide, $secondSide, $plan);
     }
 
-    public function unlink($pivot, $firstSide, $plan, $secondSide = null)
+    public function unlink($pivot, $firstSide, $secondSide, $plan)
     {
-        $deleteQuery = $pivot->query('delete');
-        $sides = array($firstSide);
-        if ($secondSide !== null)
-            $sides[] = $secondSide;
-        foreach($sides as $side)
-            $this->planners->in()->->collection(
-                                                    $deleteQuery,
-                                                    $side->pivotKey(),
-                                                    $side->collection(),
-                                                    $side->idField(),
-                                                    $plan,
-                                                    'and',
-                                                    false
-                                                );
-        $step = $this->steps->query($deleteQuery);
-        $plan->push($step);
+       $strategy = $this->selectStrategy($pivot, $firstSide, $secondSide);
+       $strategy->unlink($pivot, $firstSide, $secondSide, $plan);
     }
-
-    protected function linkMethod($pivot, $firstSide, $secondSide)
+    
+    protected function selectStrategy($pivot, $firstSide, $secondSide)
     {
-        $pConn = $pivot->connection();
-        $fConn = $firstSide-> repository->connection();
-        $sConn = $secondSide-> repository->connection();
-
-        if ($pConn === $fConn && $fConn === $sConn && $pConn instanceof PHPixie\DB\Driver\PDO\Connection)
-            return 'link_pdo';
-        return 'link_generic';
-    }
-
-    protected function linkPdo($pivot, $firstSide, $secondSide, $plan)
-    {
-        $firstQuery = $this->idQuery($firstSide, $plan);
-        $secondQuery = $this->idQuery($firstSide, $plan);
-
-        $crossQuery = $pivot->connection()->query('select')
-                                                ->fields(array(
-                                                    'first_side.'$sides[0]['id_field'],
-                                                    'second_side.'$sides[1]['id_field']
-                                                ))
-                                                ->table($queries[0], 'first_side')
-                                                ->join($queries[1], 'second_side', 'cross');
-        $insertQuery = $pivot->query('insert')
-                                    ->onDuplicateKey('update')
-                                    ->batchData(array(
-                                        $firstSide->pivotKey(),
-                                        $secondSide->pivotKey()
-                                    ), $crossQuery);
-        $step = $this->steps->query($insertQuery);
-        $plan->push($step);
-    }
-
-    protected function linkGeneric($pivot, $firstSide, $secondSide, $plan)
-    {
-        $firstQuery = $this->idQuery($firstSide, $plan);
-        $secondQuery = $this->idQuery($firstSide, $plan);
-
-        $firstStep = $this->steps->result($firstQuery);
-        $secondStep = $this->steps->result($secondQuery);
-
-        $insertQuery = $pivot->query('insert')
-                            ->onDuplicateKey('update');
-        $keys = array(
-            $firstSide->pivotKey(),
-            $secondSide->pivotKey()
-        );
-
-        $step = $this->steps->pivotInsert($insertQuery, $keys, array($firstStep, $secondStep));
-        $plan->push($step);
-
-    }
-
-    protected function idQuery($side)
-    {
-        $repository = $side->repository();
-        $idField = $repository()->idField();
-        $query = $repository->dbQuery()->fields(array($idField));
-        $this->planners->in()->collection($query, $idField, $collection, $idField, $plan, 'and', false);
-
-        return $query;
+        $pivotConnection = $pivot->connection();
+        if (!($pivotConnection instanceof \PHPixie\DB\Driver\PDO\Connection))
+            return $this->strategy('multiquery');
+        
+        foreach(array($firstSide, $secondSide) as $side)
+            if ($side !== null && $side->repository->connection() !== $pivotConnection)
+                return $this->strategy('multiquery');
+            
+        return $this->strategy('subquery');
     }
 
     public function pivot($connection, $pivot)
@@ -101,5 +37,11 @@ class Pivot extends \PHPixie\ORM\Query\Plan\Planner
     public function side($collection, $idField, $pivotKey)
     {
         return new Pivot\Side($collection, $idField, $pivotKey);
+    }
+    
+    protected function buildStrategy($name)
+    {
+        $class = '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\\'.$name;
+        return new $class($this->steps);
     }
 }

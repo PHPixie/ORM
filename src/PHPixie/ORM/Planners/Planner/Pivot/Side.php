@@ -4,9 +4,9 @@ namespace \PHPixie\ORM\Query\Plan\Planner\Pivot;
 
 class Side
 {
-    protected $collection;
-    protected $repository;
-    protected $pivotKey;
+    public $collection;
+    public $repository;
+    public $pivotKey;
 
     public function __construct($collection, $repository, $pivotKey)
     {

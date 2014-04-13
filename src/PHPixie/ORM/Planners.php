@@ -32,11 +32,6 @@ class Planners
         return $this->plannerInstance('in');
     }
 
-    public function buildUpdateField($valueSource, $valueField)
-    {
-        return new \PHPixie\ORM\Planners\Planner\Update\Field($valueSource, $valueField);
-    }
-
     public function plannerInstance($name)
     {
         if (!isset($this->instances[$name]))

@@ -24,5 +24,5 @@ abstract class Preloader
         return $this->loader();
     }
     
-    public abstract function loadFor($model);
+    public abstract function loadProperty($property);
 }

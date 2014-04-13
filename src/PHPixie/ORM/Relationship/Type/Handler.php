@@ -39,4 +39,11 @@ class Handler
             
         return $property;
     }
+    
+    protected function assertModelName($model, $requiredModel)
+    {
+        if ($model->modelName() !== $requiredModel)
+            throw new \PHPixie\ORM\Exception\Mappper("Only '$requiredModel' models can be used for this relationship.");
+    }
+    
 }

@@ -2,13 +2,13 @@
 
 namespace PHPixie\ORM\Relationship\Types\Embeds\Property\Model;
 
-class EmbeddedArray extends PHPixie\ORM\Relationship\Types\Embeds\Property\Model implements \ArrayAccess, \Countable
+class Items extends PHPixie\ORM\Relationship\Type\Property\Model implements \ArrayAccess, \Countable
 {
     protected $models = array();
     
     public function load()
     {
-        return $this->handler->arrayLoader($this, $this->models);
+        return $this->handler->propertyLoader($this);
     }
     
     public function offsetExists($key)
@@ -16,7 +16,7 @@ class EmbeddedArray extends PHPixie\ORM\Relationship\Types\Embeds\Property\Model
         if (array_key_exists($key, $this->models))
             return true;
         
-        return $this->handler->arrayExistsEmbedded($this->model, $this->embedConfig, $key);
+        return $this->handler->arrayExistsEmbedded($this->model, $this->config(), $key);
     }
     
     public function offsetGet($key)
@@ -24,47 +24,58 @@ class EmbeddedArray extends PHPixie\ORM\Relationship\Types\Embeds\Property\Model
         if (array_key_exists($key, $this->models))
             return $this->models[$key];
         
-        $embeddedModel = $this->handler->arrayGetEmbedded($this->model, $this->embedConfig, $key);
-        $this->models[$key] = $embeddedModel;
-        return $embeddedModel;
+        $item = $this->handler->arrayGetEmbedded($this->model, $this->config(), $key);
+        $this->models[$key] = $item;
+        return $item;
     }
     
-    public function offsetSet($key, $embeddedModel)
+    public function offsetSet($key, $item)
     {
-        $this->handler->arraySetEmbedded($this->model, $this->embedConfig, $key, $embeddedModel);
-        $this->handler->setOwnerProperty($this->embedConfig, $embeddedModel, $this->model);
-        $this->models[$key] = $embeddedModel;
+        $config = $this->config();
+        $this->handler->arraySetEmbedded($this->model, $config, $key, $item);
+        $this->handler->setOwnerProperty($config, $item, $this->model);
+        $this->models[$key] = $item;
     }
     
     public function offsetUnset($key)
     {
-        $this->handler->arrayUnsetEmbedded($this->model, $this->embedConfig, $key);
-        $this->handler->unsetOwnerProperty($this->embedConfig, $this->models[$key], null);
+        $config = $this->config();
+        $this->handler->arrayUnsetEmbedded($this->model, $config, $key);
+        $this->handler->unsetOwnerProperty($config, $this->models[$key], null);
         unset($this->models[$key]);
     }
     
-    public function add($key = null)
+    public function create($key = null)
     {
-        $embeddedModel = $this->handler->arrayAddEmbedded($this->model, $this->embedConfig, $key);
-        $this->handler->setOwnerProperty($this->embedConfig, $embeddedModel, $this->model);
+        $config = $this->config();
+        $item = $this->handler->arrayAddEmbedded($this->model, $config, $key);
+        $this->handler->setOwnerProperty($this->embedConfig, $item, $this->model);
         
         if($key === null){
-            $this->models[$key] = $embeddedModel;
+            $this->models[$key] = $item;
         }else {
-            $this->models[] = $embeddedModel;
+            $this->models[] = $item;
         }
-        return $embeddedModel;
+        return $item;
     }
     
-    public function remove($models)
+    public function add($item, $key = null)
     {
-        if (!is_array($models))
-            $models = array($models);
+        if ($key === null)
+            $key = $this->count();
         
-        while (!empty($models)) {
-            $model = array_pop($models);
-            $key = array_search($model, $this->models, true);
-            if ($id === false)
+        return $this->set($key, $item);
+    }
+    
+    public function remove($items)
+    {
+        if (!is_array($items))
+            $items = array($items);
+        
+        while (!empty($items)) {
+            $item = array_pop($items);
+            $key = array_search($item, $this->models, true);
+            if ($key === false)
                 throw new \PHPixie\ORM\Exception\Model("The model to be removed was not found.");
             $this->offsetUnset($key);
         }
@@ -72,17 +83,22 @@ class EmbeddedArray extends PHPixie\ORM\Relationship\Types\Embeds\Property\Model
     
     public function count()
     {
-        return $this->handler->arrayCountEmbedded($this->model, $this->embedConfig);
+        return $this->handler->arrayCountEmbedded($this->model, $this->config());
     }
     
     public function clear()
     {
-        return $this->handler->arrayClear($this->model, $this->embedConfig);
+        return $this->handler->arrayClear($this->model, $this->config());
     }
     
     public function reset()
     {
         $this->models = array();
         parent::reset();
+    }
+    
+    public function setValue($models)
+    {
+        $this->models = $models;
     }
 }

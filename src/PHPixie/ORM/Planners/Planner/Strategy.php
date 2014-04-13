@@ -1,8 +1,8 @@
 <?php
 
-namespace \PHPixie\ORM\Planners;
+namespace \PHPixie\ORM\Planners\Planner;
 
-abstract class Planner
+abstract class Strategy extends \PHPixie\ORM\Planners\Planner
 {
     protected $strategies = array();
 

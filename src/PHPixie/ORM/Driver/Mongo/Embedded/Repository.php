@@ -23,4 +23,6 @@ class Repository extends \PHPixie\ORM\Repository
     {
         throw new \PHPixie\ORM\Exception\Mapper("Embedded models cannot be saved individually. Save the root model instead.");
     }
+    
+    public function loadModel()
 }

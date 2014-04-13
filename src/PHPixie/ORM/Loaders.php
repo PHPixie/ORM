@@ -9,9 +9,14 @@ class Loaders
         return new Loaders\Iterator($loader);
     }
     
-    public function Editable($loader)
+    public function editable($loader)
     {
-        return new Loaders\Loader\Preloader($this, $loader);
+        return new Loaders\Loader\Editable($this, $loader);
+    }
+    
+    public function arrayAccess($arrayAccess)
+    {
+        return new Loaders\Loader\Editable($this, $arrayAccess);
     }
     
     public function preloader($preloader, $ids)

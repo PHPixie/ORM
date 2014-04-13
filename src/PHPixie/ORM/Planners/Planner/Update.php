@@ -1,17 +1,16 @@
 <?php
 
-namespace \PHPixie\ORM\Query\Plan\Planner;
+namespace \PHPixie\ORM\Planners\Planner;
 
-class Update extends \PHPixie\ORM\Query\Plan\Planner
+class Update extends \PHPixie\ORM\Planners\Planner
 {
     public function plan($ormQuery, $data, $plan)
     {
         $requiresSteps = false;
-
         foreach ($data as $field => $value) {
             if ($value instanceof Update\Field) {
                 $valueField = $value->valueField();
-                $valueSource = $value-> value_source();
+                $valueSource = $value->valueSource();
 
                 if ($valueSource isntanceof \PHPixie\ORM\Model) {
                     $data[$field] = $valueSource->$valueField;
@@ -30,7 +29,7 @@ class Update extends \PHPixie\ORM\Query\Plan\Planner
 
     public function field($valueSource, $valueField)
     {
-        $this->planners->buildUpdateField($valueSource, $valueField);
+        return new \PHPixie\ORM\Planners\Planner\Update\Field($valueSource, $valueField);
     }
 
     protected function subqueryField($query, $subquery, $subqueryField, $plan)

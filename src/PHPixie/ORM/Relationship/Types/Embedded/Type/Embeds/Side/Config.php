@@ -5,10 +5,10 @@ namespace PHPixie\ORM\Relationships\Types\Embeds\Side;
 class Config extends PHPixie\ORM\Relationship\Side\Config
 {
     public $ownerModel;
-    public $itemModel;
-	public $path;
     public $ownerProperty;
-    public $itemProperty;
+    public $itemModel;
+    public $path;
+    
     
     protected function processConfig($config, $inflector)
     {
@@ -17,13 +17,12 @@ class Config extends PHPixie\ORM\Relationship\Side\Config
         $this->itemModel = $config->get($itemOptionName);
         
         $itemOptionsPrefix = $itemOptionsName.'Options';
-        $this->itemProperty = $config->get($itemOptionsPrefix.'.ownerProperty', $this->ownerModel);
         
         $this->ownerProperty = $config->get('ownerOptions.'.$itemOptionName.'Property', null);
         if ($this->ownerProperty === null)
             $this->ownerProperty = $this->defaultOwnerProperty($inflector);
-		
-		$this->path = $config->get('path', $this->ownerProperty.'_data');
+        
+        $this->path = $config->get('path', $this->ownerProperty.'_data');
     }
     
     abstract protected function itemOptionName();

@@ -4,55 +4,51 @@ namespace PHPixe\ORM\Relationship\Types\Embedded\Type\Embeds;
 
 abstract class Handler extends \PHPixie\ORM\Relationship\Types\Embedded\Handler
 {
-    public function setOwnerProperty($embedConfig, $item, $owner)
+
+    public function mapRelationship($side, $query, $group, $plan, $fieldPrefix = null)
     {
-        $itemPropertyName = $embedConfig->ownerProperty;
-        $ownerPropertyName = $embedConfig->name;
-        
-        $itemProperty = $item->$itemPropertyName;
-        $oldOwner = $itemProperty->value();
-        
-        if ($oldOwner !== null) {
-            $oldOwnerProperty = $oldOwner->$ownerPropertyName;
-            if ($oldOwnerProperty instanceof Embeds\Property\Model\EmbeddedArray) {
-                $oldOwner->$ownerPropertyName->remove($item);
+        $query->startWhereGroup($group->logic, $group->negated());
+        $this->groupMapper->mapConditions($query, $group->conditions(), $side->itemModel, $plan, $this->getFieldPrefix($fieldPrefix, $side->path));
+        $query->endWhereGroup();
+    }
+    
+    protected function removeItemFromOwner($item)
+    {
+        $oldOwner = $item->owner();
+        if($oldOwner !== null) {
+            $oldOwnerPropertyName = $item->ownerPropertyName();
+            $oldOwnerProperty = $oldOwner->$oldOwnerPropertyName;
+            
+            if ($oldOwnerProperty instanceof \PHPixie\ORM\Relationships\Types\Embedded\Embeds\Type\One\Property\Item) {
+                $oldOwnerProperty->remove();
             }else {
-                $this->unsetOwnerProperty($embedConfig, $item);
+                $oldOwnerProperty->remove($item);
             }
         }
         
-        $itemProperty->setValue($owner);
     }
     
-    public function unsetOwnerProperty($embedConfig, $item)
+    protected function embeddedModel($config, $document, $owner)
     {
-        $itemPropertyName = $embedConfig->ownerProperty;
-        $item->$itemPropertyName->setValue(null);
+        $model = $this->repositoryRegistry($config->itemModel)->loadModel($document);
+        $model->setOwnerProperty($owner, $config->ownerProperty);
+        return $model;
     }
     
-    
-    public function mapRelationship($side, $group, $query, $plan)
+    protected function fieldPrefix($oldPrefix, $path)
     {
-        $config = $side->config();
-        $this->mapper->mapConditionGroup($group->conditions, $query, $config->embeddedMap());
+        if ($oldPrefix === null)
+            return $path;
+            
+        if ($path === null)
+            return $oldPrefix;
+            
+        return $oldPrefix.'.'.$path;
     }
     
-    
-    public function arrayLoader($property, $models)
+    public function preload($side, $loader, $plan)
     {
-        return $this->relationship->arrayLoader($property, $models);
+        $loader = $this->relationshipType->loader($side->config, $loader);
+        return $this->relationshipType->preloader($side, $loader);
     }
-    
-    protected function checkEmbeddedClass($embedConfig, $embeddedModel)
-    {
-        if (!($embeddedModel instanceof $embedConfig->modelClass))
-            throw new \PHPixie\ORM\Exception\Handler("Only isntances of '{$embedConfig->modelClass}' can be used for this relationship.");
-    }
-    
-    
-    protected function embeddedModel($embedConfig, $document, $path)
-    {
-        return $this->relationship->embeddedModel($embedConfig, $document, $path)
-    }
-    
 }

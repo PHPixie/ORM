@@ -4,12 +4,6 @@ namespace PHPixie\ORM\Relationships\Embeds;
 
 abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 {
-
-	protected function mergePaths($parent, )
-	{
-		
-	}
-	
     protected function explodePath($path)
     {
         return explode('.', $path);
@@ -25,7 +19,7 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
             if ($next === null) {
                 if (!$createMissing)
                     return null;
-                $next = $documentPlanner->addDocument$current, $step);
+                $next = $documentPlanner->addDocument($current, $step);
             }
             
             $current = $next;

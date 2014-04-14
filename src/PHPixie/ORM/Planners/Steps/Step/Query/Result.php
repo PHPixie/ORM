@@ -16,7 +16,7 @@ abstract class Result extends \PHPixie\ORM\Query\Plan\Step\Query implements \Ite
     protected function result()
     {
         if ($this->result === null)
-            throw new \PHPixie\Exception\Step("This query step has not been executed yet.")
+            throw new \PHPixie\Exception\Step("This plan step has not been executed yet.")
 
         return $this->result;
     }

@@ -4,13 +4,13 @@ namespace \PHPixie\ORM\Query\Plan\Planner\Pivot;
 
 class Side
 {
-    public $collection;
+    public $items;
     public $repository;
     public $pivotKey;
 
-    public function __construct($collection, $repository, $pivotKey)
+    public function __construct($items, $repository, $pivotKey)
     {
-        $this->collection = $collection;
+        $this->items = $items;
         $this->repository = $repository;
         $this->pivotKey = $pivotKey;
     }

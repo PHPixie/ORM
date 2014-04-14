@@ -41,7 +41,7 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
                 $sides[] = null;
             }else {
                 $sides[] = $pivotPlanner->side(
-                                            $this->planners->collection($model, $items)
+                                            $items
                                             $this->repositoryRegistry->get($model),
                                             $config->get($side.'PivotKey')
                                         );

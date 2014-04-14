@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationship\Types\ManyToMany;
 
-class Preloader
+class Preloader extends \PHPixie\ORM\Relationship\Type\Preloader\Result\Multiple
 {
     protected $pivotStep;
     

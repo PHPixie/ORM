@@ -148,8 +148,18 @@ class ORM
         return $this->conditions;
     }
 
-    protected function getConditions()
+    protected function buildConditions()
     {
         return new \PHPixie\DB\Conditions();
+    }
+    
+    public function plan()
+    {
+        return new \PHPixie\ORM\Plan();
+    }
+    
+    public function loaderPlan()
+    {
+        return new \PHPixie\ORM\Plan\Loader();
     }
 }

@@ -6,7 +6,7 @@ class Plan
 {
     protected $steps = array();
 
-    public function push($step)
+    public function add($step)
     {
         $this->steps[] = $step;
     }

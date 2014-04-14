@@ -6,6 +6,13 @@ use \PHPixie\ORM\Planners\Steps\Step;
 
 class Steps
 {
+    protected $planners;
+    
+    public function __construct($planners)
+    {
+        $this->planners = $planners;
+    }
+    
     public function query($query)
     {
         return new Step\Query($query);
@@ -21,29 +28,18 @@ class Steps
         return new Step\Query\Result\Reusable($query);
     }
 
-    public function inSubquery($query, $placeholder, $logic, $negated, $field)
+    public function in($query, $placeholder, $logic, $negated, $field)
     {
-        return new Step\InSubquery($query, $placeholder, $logic, $negated, $field);
+        return new Step\In($query, $placeholder, $logic, $negated, $field);
     }
-
-    public function crossInsert($query, $leftKey, $rightKey)
+    
+    public function pivotCartesian($resultSteps)
     {
-        return new Step\Cross\Insert($query, $leftKey, $rightKey);
+        return new Step\Pivot\Cartesian($resultSteps);
     }
-
-    public function crossDelete($query, $leftKey, $rightKey)
+    
+    public function pivotInsert($queryConnection, $queryTarget, $fields, $cartesianStep)
     {
-        return new Step\Cross\Delete($query, $leftKey, $rightKey);
+        return new Step\Pivot\Insert($queryPlanner, $queryConnection, $queryTarget, $fields, $cartesianStep);
     }
-
-    public function push($updateQuery, $path)
-    {
-        return new Step\Push($updateQuery, $path);
-    }
-
-    public function pull($updateQuery, $path, $idField)
-    {
-        return new Step\Pull($updateQuery, $path, $idField);
-    }
-
 }

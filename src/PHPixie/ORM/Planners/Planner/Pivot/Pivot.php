@@ -4,13 +4,12 @@ namespace \PHPixie\ORM\Query\Plan\Planner\Pivot;
 
 class Pivot
 {
-    protected $pivotConnection;
+    protected $connection;
     protected $pivot;
-
-    public function __construct($pivotConnection, $pivot)
+    
+    public function __construct($connection, $pivot)
     {
-        $this->pivotConnection = $pivotConnection;
+        $this->connection = $connection;
         $this->pivot = $pivot;
     }
-
 }

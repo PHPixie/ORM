@@ -26,7 +26,7 @@ class Pivot extends \PHPixie\ORM\Query\Plan\Planner
             if ($side !== null && $side->repository->connection() !== $pivotConnection)
                 return $this->strategy('multiquery');
             
-        return $this->strategy('subquery');
+        return $this->strategy('SQL');
     }
 
     public function pivot($connection, $pivot)
@@ -34,14 +34,14 @@ class Pivot extends \PHPixie\ORM\Query\Plan\Planner
         return new Pivot\Pivot($connection, $pivot);
     }
 
-    public function side($collection, $idField, $pivotKey)
+    public function side($items, $idField, $pivotKey)
     {
-        return new Pivot\Side($collection, $idField, $pivotKey);
+        return new Pivot\Side($items, $idField, $pivotKey);
     }
     
     protected function buildStrategy($name)
     {
-        $class = '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\\'.$name;
-        return new $class($this->steps);
+        $class = '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\\'.ucfirst($name);
+        return new $class($this->planners, $this->steps);
     }
 }

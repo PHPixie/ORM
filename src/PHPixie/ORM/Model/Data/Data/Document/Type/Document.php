@@ -1,13 +1,15 @@
 <?php
 
-namespace PHPixie\ORM\Driver\Mongo\Model\Data\Type;
+namespace PHPixie\ORM\Model\Data\Document\Type;
 
-class Document extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type {
+class Document extends \PHPixie\ORM\Model\Data\Document\Type
+{
+
     protected $originalData;
     
-    public function __construct($types, $originalData)
+    public function __construct($documentBuilder, $originalData)
     {
-        parent::__construct($types);
+        parent::__construct($documentBuilder);
         $this->originalData = $originalData;
         foreach($this->originalData as $key => $value) {
             $this->$key = $this->convertValue($value);
@@ -33,11 +35,11 @@ class Document extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type {
     }
     
     public function addArray($key, $data = array()) {
-        return $this->$target->$key = $this->types->documentArray($data);
+        return $this->$target->$key = $this->documentBuilder->documentArray($data);
     }
     
     public function addDocument($key, $data = null) {
-        return $this->$target->$key = $this->types->document($data);
+        return $this->$target->$key = $this->documentBuilder->document($data);
     }
     
 }

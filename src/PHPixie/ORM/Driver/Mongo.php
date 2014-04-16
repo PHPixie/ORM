@@ -6,8 +6,20 @@ class Mongo extends \PHPixie\Mongo\Driver
 {
     public function repository($modelName, $modelConfig)
     {
-        $type = $modelConfig->get('type', 'collection');
-        $class = 'Mongo\Repository\\'.$type;
-        return new $class($this->orm, $modelName, $modelConfig);
+        if ($modelConfig->get('type', null) === 'embedded')
+            return $this->buildEmbeddedRepository($modelName, $modelConfig);
+        
+        return $this->buildRepository($modelName, $modelConfig);
     }
+    
+    protected function buildRepository($modelName, $modelConfig)
+    {
+        return Mongo\Repository($this->orm, $this, $modelName, $modelConfig);
+    }
+    
+    protected function buildEmbeddedRepository($modelName, $modelConfig)
+    {
+        return Mongo\Embedded\Repository($this->orm, $this, $modelName, $modelConfig);
+    }
+    
 }

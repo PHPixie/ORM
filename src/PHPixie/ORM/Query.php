@@ -10,7 +10,7 @@ class Query
     protected $offset;
     protected $orderBy = array();
 
-    public function ->conditionBuilder($conditionBuilder, $mapper) {
+    public function __construct($conditionBuilder, $mapper) {
         $this->conditionBuilder = $conditionBuilder;
         $this->mapper = $mapper;
     }

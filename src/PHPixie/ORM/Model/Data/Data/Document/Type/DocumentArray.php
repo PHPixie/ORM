@@ -1,16 +1,16 @@
 <?php
 
-namespace PHPixie\ORM\Driver\Mongo\Model\Data\Type;
+namespace PHPixie\ORM\Model\Data\Document\Type;
 
-class DocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type implements \ArrayAccess, \Iterator, \Countable {
+class DocumentArray extends \PHPixie\ORM\Model\Data\Document\Type implements \ArrayAccess, \Iterator, \Countable {
 
     protected $originalArray;
     protected $currentArray;
     protected $reachedEnd = false;
     
-    public function __construct($types, $originalArray)
+    public function __construct($documentBuilder, $originalArray)
     {
-        parent::__construct($types);
+        parent::__construct($documentBuilder);
         $this->originalArray = $originalArray;
         $this->currentArray = array();
         foreach($originalArray as $key => $value)
@@ -100,11 +100,11 @@ class DocumentArray extends \PHPixie\ORM\Driver\Mongo\Model\Data\Type implements
     }
     
     public function pushArray($data = array(), $key = null) {
-        return $this->pushToCurrent($this->types->documentArray($data), $key);
+        return $this->pushToCurrent($this->documentBuilder->documentArray($data), $key);
     }
     
     public function pushDocument($data = null, $key = null) {
-        return $this->pushToCurrent($this->types->document($data), $key);
+        return $this->pushToCurrent($this->documentBuilder->document($data), $key);
     }
     
     protected function pushToCurrent($value, $key === null)

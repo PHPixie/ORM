@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Driver\Mongo\Model\Data;
+namespace PHPixie\ORM\Model\Data\Document;
 
 abstract class Type{
     protected $types;

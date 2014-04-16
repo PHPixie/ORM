@@ -1,10 +1,12 @@
 <?php
 
-namespace PHPixie\ORM\Driver\Mongo\Model;
+namespace PHPixie\ORM\Model\Data;
 
-class Data extends \PHPixie\ORM\Model\Data{
+class Document extends \PHPixie\ORM\Model\Data
+
     protected $document;
     protected $originalData;
+    
     public function __construct($document, $originalData) {
         parent::__construct($originalData);
         $this->document = $document;
@@ -72,7 +74,7 @@ class Data extends \PHPixie\ORM\Model\Data{
                 $set[$key] = $value;
         }
         
-        return array($set, $unset);
+        return $this->diff($set, $unset)
     }
     
     protected function isArrayEqual($new, $old)

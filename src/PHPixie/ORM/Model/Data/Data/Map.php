@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Driver\PDO\Model;
+namespace PHPixie\ORM\Model\Data;
 
-class Data extends \PHPixie\ORM\PDO\Data
+class Map extends \PHPixie\ORM\Model\Data
 {
     protected $model;
     

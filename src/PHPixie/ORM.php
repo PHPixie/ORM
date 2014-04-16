@@ -8,7 +8,7 @@ class ORM
     protected $config;
     protected $relationshipMap;
     protected $propertyBuilder;
-    protected $repositoryRegistry;
+    protected $repositories;
     protected $loaders;
     protected $relationshipTypes = array();
     protected $drivers = array();
@@ -54,7 +54,7 @@ class ORM
     public function buildRepository($modelName, $modelConfig)
     {
         $connectionName = $modelConfig->get('connection');
-        $driverName = $this->db->driverName($connectionName);
+        $driverName = $this->db->connectionDriverName($connectionName);
         $driver = $this->driver($driverName);
 
         return $driver->repository($modelName, $modelConfig);
@@ -75,19 +75,19 @@ class ORM
         return new \PHPixie\ORM\Relationship\Map($this, $relationshipConfig);
     }
 
-    public function repositoryRegistry()
+    public function repositories()
     {
-        if($this->repositoryRegistry === null)
-            $this->repositoryRegistry = $this->buildRepositoryRegistry();
+        if($this->repositories === null)
+            $this->repositories = $this->buildRepositories();
 
-        return $this->repositoryRegistry;
+        return $this->repositories;
     }
 
-    protected function buildRepositoryRegistry()
+    protected function buildRepositories()
     {
-        $modelConfig = $this->config->slice('models');
+        $modelsConfig = $this->config->slice('models');
 
-        return new \PHPixie\ORM\Relationship\Registry($this, $modelConfig);
+        return new \PHPixie\ORM\Repositories($this, $modelsConfig);
     }
 
     public function propertyBuilder()
@@ -161,5 +161,10 @@ class ORM
     public function loaderPlan()
     {
         return new \PHPixie\ORM\Plan\Loader();
+    }
+    
+    public function databaseConnection($name)
+    {
+        return $this->database->get($name);
     }
 }

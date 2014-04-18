@@ -5,13 +5,15 @@ namespace PHPixie\ORM\Model;
 abstract class Repository
 {
     protected $orm;
+    protected $dataBuilder;
     protected $driver;
     protected $modelName;
     protected $connectionName;
     
-    public function __construct($orm, $driver, $modelName, $config)
+    public function __construct($orm, $dataBuilder, $driver, $modelName, $config)
     {
         $this->orm = $orm;
+        $this->dataBuilder = $dataBuilder;
         $this->driver = $driver;
         $this->modelName = $modelName;
     }

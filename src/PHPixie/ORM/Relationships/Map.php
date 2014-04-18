@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationship;
+namespace PHPixie\ORM;
 
-class Map
+class Relationships
 {
     protected $propertyMap = array();
 

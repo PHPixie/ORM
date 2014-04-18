@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationship;
+namespace PHPixie\ORM\Relationships;
 
-abstract class Type
+abstract class Relationship
 {
     public function getSides($config)
     {

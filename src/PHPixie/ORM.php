@@ -4,7 +4,7 @@ namespace PHPixie;
 
 class ORM
 {
-    protected $db;
+    protected $database;
     protected $config;
     protected $relationshipMap;
     protected $propertyBuilder;
@@ -15,9 +15,9 @@ class ORM
     protected $mapper;
     protected $groupMapper;
 
-    public function __construct($db, $config)
+    public function __construct($database, $config)
     {
-        $this->db = $db;
+        $this->database = $database;
         $this->config = $config;
     }
 

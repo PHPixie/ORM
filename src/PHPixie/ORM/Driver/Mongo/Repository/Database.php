@@ -32,4 +32,6 @@ class Database extends \PHPixie\ORM\Model\Repository\Database
         
         $data->setCurrentAsOriginal();
     }
+    
+    public function load
 }

@@ -51,15 +51,18 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         return $sides;
     }
     
+	protected function pivotConnection($config)
+	{
+		if ($config->pivotConnection !== null)
+			return $this->orm->databaseConnection($config->pivotConnection);
+		
+        return $this->repositoryRegistry->get($config->leftModel)->connection();
+	}
+	
     protected function plannerPivot($config)
     {
-        if ($config->pivotConnection !== null) {
-            $connection = $this->orm->databaseConnection($config->pivotConnection);
-        }else {
-            $connection = $this->repositoryRegistry->get($config->leftModel)->connection();
-        }
-        
-        return $this->planners->pivot()->pivot($connection, $config->pivot);
+		$pivotConnection = $this->pivotConnection($config);
+        return $this->planners->pivot()->pivot($pivotConnection, $config->pivot);
     }
     
     public function mapRelationship($side, $group, $query, $plan)
@@ -197,4 +200,16 @@ class Handler extends \PHPixie\ORM\Relationship\Type\Handler
             }
         }
     }
+	
+	public function handleDeletion($modelName, $side, $resultStep, $plan)
+	{
+		$config = $side->config();
+		$query = $this->pivotConnection($config)->query('delete');
+		$this->planners->query()->setSource($query, $config->pivot);
+		$pivotKey = $config->get($side-> type().'PivotKey');
+		$repository = $this->repositoryRegistry->get($modelName);
+		$this->planners->in()->result($query, $pivotKey, $resultStep, $repository->idField());
+		$deleteStep = $this->steps->query($query);
+		$plan->push($deleteStep);
+	}
 }

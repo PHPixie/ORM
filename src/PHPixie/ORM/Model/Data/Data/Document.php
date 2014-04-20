@@ -17,11 +17,6 @@ class Document extends \PHPixie\ORM\Model\Data
         return $this->document;
     }
     
-    public function setModel($model)
-    {
-        $this->document->setTarget($model);
-    }
-    
     public function currentData()
     {
         $currentProperties = $this->model->dataProperties();
@@ -32,17 +27,20 @@ class Document extends \PHPixie\ORM\Model\Data
         return $currentData;
     }
     
-    public function modelProperties()
+    public function properties()
     {
         return get_object_vars($this->document->currentData());
     }
     
-    public function getDataDiff()
+    public function diff()
     {
-        return $this->getObjectDiff($this->currentData(), $this->originalData);
+		if (($originalData = $this->originalData) === null)
+			$originalData = new \stdClass;
+		
+        return $this->objectDiff($this->currentData(), $this->originalData);
     }
     
-    protected function getObjectDiff($new, $old)
+    protected function objectDiff($new, $old)
     {
         $newData = get_object_vars($new);
         $oldData = get_object_vars($old);

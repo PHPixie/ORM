@@ -4,15 +4,20 @@ namespace PHPixie\ORM;
 
 class Query
 {
-    protected $conditionBuilder;
+    protected $conditions;
     protected $mapper;
+	protected $relationshipMap;
+	protected $modelName;
+	
     protected $limit;
     protected $offset;
     protected $orderBy = array();
 
-    public function __construct($conditionBuilder, $mapper) {
-        $this->conditionBuilder = $conditionBuilder;
+    public function __construct($conditions, $mapper, $relationhipMap, $modelName) {
+        $this->conditionBuilder = $conditions;
         $this->mapper = $mapper;
+		$this->relationhipMap = $relationshipMap;
+		$this->modelName = $modelName;
     }
 
     public function limit($limit)
@@ -60,7 +65,7 @@ class Query
         return $this->orderBy;
     }
 
-    public function planDelete($type)
+    public function planDelete()
     {
         return $this->mapper->mapDelete($this);
     }
@@ -77,7 +82,7 @@ class Query
 
     public function delete()
     {
-        $this->deletePlan()->execute();
+        $this->planDelete()->execute();
     }
 
     public function update($data)

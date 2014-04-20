@@ -14,4 +14,6 @@ abstract class Property
     }
 
     abstract protected function propertyOwner();
+	
+	abstract public function data($recursive = true);
 }

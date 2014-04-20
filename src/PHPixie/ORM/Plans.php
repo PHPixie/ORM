@@ -4,12 +4,12 @@ namespace PHPixie\ORM;
 
 class Plans
 {
-    public function plan()
+    public function step()
     {
-        return new ORM\Plans\Plan();
+        return new ORM\Plans\Plan\Step();
     }
     
-    public function plan()
+    public function loader()
     {
         return new ORM\Plans\Plan\Loader($this);
     }

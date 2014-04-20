@@ -5,17 +5,27 @@ namespace PHPixie\ORM;
 class Model
 {
     protected $relationshipMap;
-    protected $properties;
-    protected $isNew = true;
+    protected $properties = array();
+	protected $isNew;
+	
     
-    public function __construct($relationshipMap)
+    public function __construct($relationshipMap, $data, $isNew = true)
     {
         $this->relationshipMap = $relationshipMap;
+		$this->setData($data);
+		$this->isNew = $isNew;
     }
 
-    public function asArray()
+    public function asObject($recursive = true)
     {
-        $data = $this->repository->modelData($this, $properties);
+		$data = $this->repository->modelAsObject($this);
+		
+		if($recursive && !$this->isDeleted())
+			foreach($this->properties as $name => $property)
+				if($property->isLoaded())
+					$data->$name = $property->data();
+		
+		return $data;
     }
 
     public function save()
@@ -27,6 +37,7 @@ class Model
 
     public function __get($name)
     {
+		
 		$property = $this->relationshipProperty($name);
         if ($property !== null)
             return $property;
@@ -34,10 +45,10 @@ class Model
 		throw new \PHPixie\Exception\Model("Property '$name' doesn't exist");
     }
     
-    public function setData($data)
+    protected function setData($data)
     {
         $data->setModel($this);
-        foreach($data->modelProperties() as $key => $value)
+        foreach($data->properties() as $key => $value)
             $this->$key = $value;
     }
     

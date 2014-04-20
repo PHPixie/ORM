@@ -35,4 +35,12 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Mod
             $this->value->removeAll();
         }
     }
+	
+	public function data($recursive = true)
+	{
+		$data = array();
+		foreach($this->value() as $model)
+			$data[] = $model->asObject($recursive);
+		return $data;
+	}
 }

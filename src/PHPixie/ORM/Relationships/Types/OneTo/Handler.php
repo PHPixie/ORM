@@ -102,4 +102,35 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 		
 		return $this->relationshipType->preloader($side, $loader);
     }
+	
+	public function handleDeletion($modelName, $side, $resultStep, $plan)
+	{
+		if ($side->type() === 'owner')
+			return;
+		
+		$config = $side->config();
+		$itemKey = $config->itemKey;
+		$itemModel = $config->itemModel;
+		
+		$itemRepository = $this->repositoryRegistry->get($itemModel);
+		$ownerRepository = $this->repositoryRegistry->get($modelName);
+		
+		$hasHandledSides = false;
+		
+		if ($config->onDelete === 'update') {
+			$query = $repository->databaseQuery('update')->data(array($itemKey => null));
+		}else {
+			$handledSides = $this->cascadeMapper=>deletionSides($itemModel);
+			$hasHandledSides = !empty($handlesSides);
+			$query = $repository->databaseQuery($hasHandledSides ? 'select' : 'delete');
+		}
+		
+		$this->planners->in()->result($query, $itemKey, $resultStep, $ownerRepository->idField());
+		
+		if ($hasHandledSides)
+			$query = $this->cascadeMapper->deletion($query, $handledSides, $itemRepository, $plan)
+		
+		$deleteStep = $this->steps->query($query);
+		$plan->add($deleteStep);
+	}
 }

@@ -51,5 +51,13 @@ class Model extends \PHPixie\ORM\Relaionship\Type\Property
         
         return ($opposing, $this->model);
     }
+	
+	public function asObject($recursive = true)
+	{
+		$data = array();
+		foreach($this->value() as $model)
+			$data[] = $model->asObject($recursive);
+		return $data;
+	}
 
 }

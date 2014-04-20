@@ -9,6 +9,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     protected $idOffsets = array();
     protected $adjustedOffsets = array();
     protected $skipped = array();
+	protected $deletedOffsets = array();
     protected $addedModels = array();
     protected $loaderItemsCount;
     
@@ -66,7 +67,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     
     public function offsetExists($offset)
     {
-        return $this->getByOffset($offset);
+        return $this->getByOffset($offset) !== null;
     }
     
     public function getByOffset($offset)
@@ -93,18 +94,28 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
             return $this->getByOffset($offset);
         }
         
+		if ($$model->isDeleted()) {
+			$this->deletedOffsets[] = $loaderOffset;
+			return $this->updateAndGet($offset);
+		}
+		
         $id = $model->id();
         $this->idOffsets[$id] = $loaderOffset;
         
         if (array_key_exists($id, $this->skipped)) {
             $this->skipped[$id] = $loaderOffset;
-            $this->updateAdjustedOffsets();
-            return $this->getByOffset($offset);
+			return $this->updateAndGet($offset);
         }
-        
+		
         return $model;
     }
     
+	protected function updateAndGet($offset)
+	{
+		$this->updateAdjustedOffsets();
+        return $this->getByOffset($offset);
+	}
+	
     protected function skipId($id)
     {
         if (!array_key_exists($id, $this->skip)) {

@@ -2,8 +2,17 @@
 
 namespace PHPixie\ORM\Relatinship\Types\Embedded\Mapper;
 
-class Group extends \PHPixie\ORM\Mapper\Group
+class Group
 {
+	protected $ormBuilder;
+	protected $relationshipMap;
+	
+	public function __construct($ormBuilder, $relationshipMap)
+	{
+		$this->ormBuilder = $ormBuilder;
+		$this->relationshipMap = $relationshipMap;
+	}
+	
     protected function mapConditions($dbQuery, $conditions, $modelName, $plan, $fieldPrefix = null)
     {
 
@@ -37,7 +46,7 @@ class Group extends \PHPixie\ORM\Mapper\Group
     protected function mapRelationshipGroup($group, $query, $modelName, $plan, $fieldPrefix)
     {
         $side = $this->relationshipMap->getSide($modelName, $group->relationship);
-        $handler = $this->orm->relationshipType($side-> relationshipType())->handler();
+        $handler = $this->ormBuilder->relationshipType($side-> relationshipType())->handler();
 		
 		if (!($handler instanceof \PHPixie\ORM\Relationship\Types\Embedded\Handler))
 			throw new \PHPixie\ORM\Exception\Mapper("Embedded models can only hve embedded reltionships.");

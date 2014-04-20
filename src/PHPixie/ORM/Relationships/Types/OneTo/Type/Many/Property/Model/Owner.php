@@ -21,4 +21,20 @@ class Owner extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Mod
         $this->handler->setItemsOwner($this->config, $this->model, $owner);
     }
     
+	public function value()
+	{
+		if ($this->value !== null && $this->value->isDeleted())
+			$this->setValue(null);
+		
+		return parent::value();
+	}
+	
+	public function data($recursive = true)
+	{
+		$value = $this->value();
+		if ($value === null)
+			return null;
+			
+		return $model->asObject($recursive);
+	}
 }

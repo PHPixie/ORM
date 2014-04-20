@@ -4,19 +4,14 @@ namespace \PHPixie\ORM;
 
 class Planners
 {
-    protected $steps;
-
-    protected function steps()
-    {
-        if ($this->steps === null)
-            $this->steps = $this->buildSteps();
-    }
-
-    protected function buildSteps()
-    {
-        return new \PHPixie\ORM\Planners\Steps();
-    }
-
+	protected $ormBulder;
+    protected $planners;
+	
+	public function __construct($ormBuilder)
+	{
+		$this->ormBuilder = $ormBuilder;
+	}
+	
     public function embed()
     {
         return $this->plannerInstance('embed');
@@ -34,17 +29,17 @@ class Planners
 
     public function plannerInstance($name)
     {
-        if (!isset($this->instances[$name]))
-            $this->instances[$name] = $this->buildPlanner($name);
-
-        return $this->instances[$name];
+        if (!isset($this->planners[$name])) {
+			$steps = $this->ormBuilder->steps();
+            $this->planners[$name] = $this->buildPlanner($name, $steps);
+		}
+        return $this->planners[$name];
     }
 
-    protected function buildPlanner($name)
+    protected function buildPlanner($name, $steps)
     {
         $class = '\PHPixie\ORM\Planners\Planner\\'.ucfirst($name);
-
-        return new $class($this->steps());
+        return new $class($steps);
     }
 
 }

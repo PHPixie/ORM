@@ -4,8 +4,21 @@ namespace PHPixie\ORM\Mapper;
 
 class Group
 {
+	protected $ormBuilder;
+	protected $repositoryRegistry;
+	protected $planners;
     protected $optimizer;
-
+	protected $optimizerEnabled = true;
+	
+	public function __construct($ormBuilder, $repositoryRegistry, $planners, $optimizer)
+	{
+		$this->ormBuilder = $ormBuilder;
+		$this->repositoryRegistry = $repositoryRegistry;
+		$this->planners = $planners;
+		$this->optimizer = $optimizer;
+		
+	}
+	
     protected function mapConditions($dbQuery, $conditions, $modelName, $plan)
     {
         $builder = $query->getBuilder();
@@ -39,14 +52,14 @@ class Group
     protected function mapRelationshipGroup($group, $query, $modelName, $plan)
     {
         $side = $this->relationshipMap->getSide($modelName, $group->relationship);
-        $handler = $this->orm->relationshipType($side->relationshipType())->handler();
+        $handler = $this->ormBuilder->relationshipType($side->relationshipType())->handler();
         $handler->mapRelationship($side, $query, $group, $plan);
     }
 
     protected function mapCollection($collectionCondition, $dbQuery, $modelName, $plan)
     {
         $idField = $this->repositoryRegistry($modelName)->idField();
-        $this->planners->in->collection(
+        $this->planners->in()->collection(
                                             $dbQuery,
                                             $idField,
                                             $collectionCondition->collection(),
@@ -56,5 +69,15 @@ class Group
                                             $collectionCondition->negated()
                                         );
     }
+	
+	public function setOptimizerEnabled($enableOptimizer)
+	{
+		$this->optimizerEnabled = $enableOptimizer;
+	}
+	
+	public function optimizerEnabled()
+	{
+		return $this->optimizerEnabled;
+	}
 
 }

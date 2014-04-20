@@ -1,32 +1,26 @@
 <?php
 
-namespace PHPixie\ORM\Driver\PDO;
+namespace PHPixie\ORM\Drivers\Driver\PDO;
 
-class Repository extends \PHPixie\ORM\Repository
+class Database extends \PHPixie\ORM\Model\Repository\Database
 {
     protected $table;
-    protected $idField;
 
-    public function __construct($db, $modelName, $pluralName, $config)
+    public function __construct($ormBuilder, $driver, $dataBuilder, $inflector, $modelName, $config)
     {
-        parent::__construct($modelName, $pluralName, $config);
-        $this->table = $config->get('table', $pluralName)
-        $this->idField  = $config->get('id_field', 'id');
+        parent::__construct($ormBuilder, $driver, $dataBuilder, $inflector, $modelName, $config);
+        if (($this->table = $config->get('table', null)) === null)
+			$this->table = $inflector->plural($modelName);
     }
 
-    public function dbQuery($type)
+    public function databaseQuery($type = 'select')
     {
         return $this->connection()
                     ->query($type)
                     ->table($this->table);
     }
 
-    public function idField()
-    {
-        return $this->idField;
-    }
-    
-    public function save($model)
+    public function processSave($model)
     {
         $data = $model->data();
         $data = $data->getDataDiff();
@@ -47,4 +41,10 @@ class Repository extends \PHPixie\ORM\Repository
         
         $data->setCurrentAsOriginal();
     }
+	
+	protected function buildModel($data = null)
+	{
+		$data = $this->dataBuilder->map($data);
+		return $this->driver->model($data, $data !== null);
+	}	
 }

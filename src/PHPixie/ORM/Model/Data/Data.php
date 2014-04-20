@@ -16,8 +16,7 @@ abstract class Data {
         $this->originalData = $this->currentData();
     }
     
-    abstract public function setModel($model);
-    abstract public function getDataDiff();
+    abstract public function diff();
     abstract public function currentData();
-    abstract public function modelProperties();
+    abstract public function properties();
 }

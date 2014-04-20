@@ -30,9 +30,12 @@ class Collection
             if ($item->modelName() !== $this->requiredModel)
                 throw new \PHPixie\ORM\Exception\Mapper("Instance of the '{$item->modelName()}' model passed, but '{$this->requiredModel}' was expected.");
 
-            if (!$item->loaded())
+            if ($item->isNew())
                 throw new \PHPixie\ORM\Exception\Mapper("You can only use saved models.");
-
+			
+			if (!$item->isDeleted())
+                throw new \PHPixie\ORM\Exception\Mapper("You cannot use deleted models for relationships.");
+				
             $this->models[] = $item;
         } elseif ($item instanceof \PHPixie\ORM\Query) {
 

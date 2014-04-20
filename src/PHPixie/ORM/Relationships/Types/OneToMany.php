@@ -14,9 +14,9 @@ class OneToMany extends PHPixie\ORM\Relationship\Type
         return new OneTo\Type\Many\Side\Config($type, $config);
     }
 
-    public function buildHandler()
+    public function buildHandler($repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper)
     {
-        return new OneTo\Type\Many\Handler();
+        return new OneTo\Type\Many\Handler($this->ormBuilder, $this, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper);
     }
 
     public function preloader($side, $loader)

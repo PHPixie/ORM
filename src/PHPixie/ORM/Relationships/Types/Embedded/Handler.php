@@ -4,6 +4,14 @@ namespace PHPixie\ORM\Relationships\Embeds;
 
 abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 {
+	protected $embedsGroupMapper;
+	
+	public function __construct($orm, $relationship, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper, $embedsGroupMapper)
+	{
+		$this->embedsGroupMapper = $embedsGroupMapper;
+		parent::__construct($orm, $relationship, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper);
+	}
+	
     protected function explodePath($path)
     {
         return explode('.', $path);

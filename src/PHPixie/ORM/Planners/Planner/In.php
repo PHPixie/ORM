@@ -28,7 +28,7 @@ class In extends \PHPixie\ORM\Planners\Planner\Strategy
         $query->endWhereGroup();
     }
 
-    public function result($query, $queryField, $resultStep, $resultField, $plan, $logic = 'and', $negate = false)
+    public function result($query, $queryField, $resultStep, $resultField, $logic = 'and', $negate = false)
     {
         $placeholder = $query->getWhereBuilder()->addPlaceholder($logic, $negate);
         $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $resultField);

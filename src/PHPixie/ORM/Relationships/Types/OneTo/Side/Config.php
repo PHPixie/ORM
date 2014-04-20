@@ -9,7 +9,8 @@ abstract class Config extends \PHPixie\ORM\Relationship\Side\Config
     public $itemKey;
     public $ownerProperty;
     public $itemProperty;
-    
+    public $onDelete;
+	
     protected function processConfig($config, $inflector)
     {
         $itemOptionName = $this->itemOptionName();
@@ -19,7 +20,8 @@ abstract class Config extends \PHPixie\ORM\Relationship\Side\Config
         $itemOptionsPrefix = $itemOptionsName.'Options';
         $this->itemProperty = $config->get($itemOptionsPrefix.'.ownerProperty', $this->ownerModel);
         $this->itemKey = $config->get($itemOptionsPrefix.'.ownerKey', $this->itemProperty.'_id');
-        
+        $this->onDelete = $config->get($itemOptionsPrefix.'.onOwnerDelete', 'update');
+		
         $this->ownerProperty = $config->get('ownerOptions.'.$itemOptionName.'Property', null);
         if ($this->ownerProperty === null)
             $this->ownerProperty = $this->defaultOwnerProperty($inflector);

@@ -19,4 +19,9 @@ abstract class Side extends PHPixie\ORM\Relationship\Side
 		
 		return $this->config->itemProperty;
     }
+	
+	public function handleDeletions()
+	{
+		return $this->type !== 'owner';
+	}
 }

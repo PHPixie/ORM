@@ -14,9 +14,9 @@ class ManyToMany extends PHPixie\ORM\Relationship\Type
         return new ManyToMany\Side($this, $type, $config);
     }
 
-    public function buildHandler()
+    public function buildHandler($repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper)
     {
-        return new ManyToMany\Handler();
+        return new ManyToMany\Handler($this->ormBuilder, $this, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper);
     }
 
     public function preloader($side, $loader)

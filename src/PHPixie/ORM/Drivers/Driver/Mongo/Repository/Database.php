@@ -1,17 +1,27 @@
 <?php
 
-namespace PHPixie\ORM\Driver\Mongo\Repository;
+namespace PHPixie\ORM\Drivers\Driver\Mongo\Repository;
 
 class Database extends \PHPixie\ORM\Model\Repository\Database
 {
-    public function databaseQuery($type)
+
+    protected $collection;
+	
+    public function __construct($ormBuilder, $driver, $dataBuilder, $inflector, $modelName, $config)
+    {
+        parent::__construct($ormBuilder, $driver, $dataBuilder, $inflector, $modelName, $config);
+        if (($this->collection = $config->get('table', null)) === null)
+			$this->collection = $inflector->plural($modelName);
+    }
+	
+    public function databaseQuery($type = 'select')
     {
         return $this->connection()
                     ->query($type)
                     ->collection($this->collection);
     }
 
-    public function save($model)
+    public function processSave($model)
     {
         $data = $model->data();
         $diff = $data->getDataDiff();
@@ -33,5 +43,9 @@ class Database extends \PHPixie\ORM\Model\Repository\Database
         $data->setCurrentAsOriginal();
     }
     
-    public function load
+	protected function buildModel($data = null)
+	{
+		$data = $this->dataBuilder->document($data);
+		return $this->driver->databaseModel($data, $data !== null);
+	}
 }

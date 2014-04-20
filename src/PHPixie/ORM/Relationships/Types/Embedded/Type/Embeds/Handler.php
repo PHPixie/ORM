@@ -8,7 +8,7 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Types\Embedded\Handler
     public function mapRelationship($side, $query, $group, $plan, $fieldPrefix = null)
     {
         $query->startWhereGroup($group->logic, $group->negated());
-        $this->groupMapper->mapConditions($query, $group->conditions(), $side->itemModel, $plan, $this->getFieldPrefix($fieldPrefix, $side->path));
+        $this->embedsGroupMapper->mapConditions($query, $group->conditions(), $side->itemModel, $plan, $this->getFieldPrefix($fieldPrefix, $side->path));
         $query->endWhereGroup();
     }
     

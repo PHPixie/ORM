@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Query;
+namespace PHPixie\ORM\Relationships\Types\OneTo\Type\Many\Property\Query;
 
-class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Query
+class Items extends \PHPixie\ORM\Relationships\Types\OneTo\Type\Many\Property\Query
 {
     public function add($items)
     {
@@ -15,12 +15,12 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Que
     {
         if ($items === null)
             return;
-        
+
         $plan = $this->handler->unlinkPlan($this->config, $this->query, $items);
         $plan->execute();
         $this->handler->resetItemsProperties($this->config, $items);
     }
-    
+
     public function removeAll()
     {
         $plan = $this->handler->unlinkPlan($this->config, $this->query);

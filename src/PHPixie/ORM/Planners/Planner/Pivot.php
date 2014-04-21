@@ -15,17 +15,17 @@ class Pivot extends \PHPixie\ORM\Query\Plan\Planner
        $strategy = $this->selectStrategy($pivot, $firstSide, $secondSide);
        $strategy->unlink($pivot, $firstSide, $secondSide, $plan);
     }
-    
+
     protected function selectStrategy($pivot, $firstSide, $secondSide)
     {
         $pivotConnection = $pivot->connection();
         if (!($pivotConnection instanceof \PHPixie\DB\Driver\PDO\Connection))
             return $this->strategy('multiquery');
-        
+
         foreach(array($firstSide, $secondSide) as $side)
             if ($side !== null && $side->repository->connection() !== $pivotConnection)
                 return $this->strategy('multiquery');
-            
+
         return $this->strategy('SQL');
     }
 
@@ -38,10 +38,11 @@ class Pivot extends \PHPixie\ORM\Query\Plan\Planner
     {
         return new Pivot\Side($items, $idField, $pivotKey);
     }
-    
+
     protected function buildStrategy($name)
     {
         $class = '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\\'.ucfirst($name);
+
         return new $class($this->planners, $this->steps);
     }
 }

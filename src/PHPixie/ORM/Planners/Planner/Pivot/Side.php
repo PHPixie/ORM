@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM\Query\Plan\Planner\Pivot;
+namespace \PHPixie\ORM\Planners\Planner\Pivot;
 
 class Side
 {

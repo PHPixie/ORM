@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Properties\Property;
+namespace PHPixie\ORM\Relationships\Relationship\Property;
 
 abstract class Query
 {

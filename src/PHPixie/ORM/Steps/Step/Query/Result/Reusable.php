@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Query\Plan\Step\Query\Result;
+namespace PHPixie\ORM\Steps\Step\Query\Result;
 
-class Reusable extends \PHPixie\ORM\Query\Plan\Step\Query\Result
+class Reusable extends \PHPixie\ORM\Steps\Step\Query\Result
 {
     protected $data;
 

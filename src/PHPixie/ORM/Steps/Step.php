@@ -1,8 +1,11 @@
 <?php
 
-namespace PHPixie\ORM\Query\Plan;
+namespace PHPixie\ORM\Steps;
 
-interface Step
+abstract class Step
 {
     public function execute();
+	public function usedConnections() {
+		return array();
+	}
 }

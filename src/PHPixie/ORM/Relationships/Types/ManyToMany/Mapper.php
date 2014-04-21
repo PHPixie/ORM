@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\OneToMany;
+namespace PHPixie\ORM\Relationships\Types\ManyToMany;
 
 class Mapper
 {

@@ -1,14 +1,9 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Model;
+namespace PHPixie\ORM\Relationships\Types\OneTo\Type\Many\Property\Model;
 
-class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Model {
-
-    public function load()
-    {
-        return $this->query()->findAll();
-    }
-    
+class Items extends \PHPixie\ORM\Relationships\Types\OneTo\Type\Many\Property\Model
+{
     public function add($items)
     {
         $plan = $this->handler->linkPlan($this->config, $this->model, $items);
@@ -20,12 +15,12 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Mod
     {
         if ($items === null)
             return;
-        
+
         $plan = $this->handler->unlinkPlan($this->config, $this->model, $items);
         $plan->execute();
         $this->handler->setItemsOwner($this->config, $items, null, $this->model);
     }
-    
+
     public function removeAll()
     {
         $plan = $this->handler->unlinkOwnerPlan($this->config, $this->model);
@@ -35,12 +30,13 @@ class Items extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Mod
             $this->value->removeAll();
         }
     }
-	
-	public function data($recursive = true)
-	{
-		$data = array();
-		foreach($this->value() as $model)
-			$data[] = $model->asObject($recursive);
-		return $data;
-	}
+
+    public function data($recursive = true)
+    {
+        $data = array();
+        foreach($this->value() as $model)
+            $data[] = $model->asObject($recursive);
+
+        return $data;
+    }
 }

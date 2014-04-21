@@ -6,17 +6,17 @@ class Mapper
 {
     protected $orm;
     protected $loaders;
-	protected $repositoryRegistry;
+    protected $repositoryRegistry;
     protected $groupMapper;
-	protected $cascadeMapper;
+    protected $cascadeMapper;
 
     public function __construct($orm, $loaders, $repositoryRegistry, $groupMapper, $cascadeMapper)
     {
         $this->orm = $orm;
         $this->loaders = $loaders;
-		$this->repositoryRegistry = $repositoryRegistry;
+        $this->repositoryRegistry = $repositoryRegistry;
         $this->groupMapper = $groupMapper;
-		$this->cascadeMapper = $cascadeMapper;
+        $this->cascadeMapper = $cascadeMapper;
     }
 
     public function mapDelete($query)
@@ -24,18 +24,18 @@ class Mapper
         $plan = $this->plans->delete();
         $modelName = $query->modelName();
         $repository = $this->repositoryRegistry->get($modelName);
-		
-		$handledSides = $this->cascadeMapper->deletionSides($modelName);
-		$hasHandledSides = !empty($handledSides);
+
+        $handledSides = $this->cascadeMapper->deletionSides($modelName);
+        $hasHandledSides = !empty($handledSides);
         $dbQuery = $repository->query($hasHandledSides? 'select' : 'delete');
         $this->groupMapper->mapConditions($dbQuery, $query->conditions(), $modelName, $plan);
-		
-		if ($hasHandledSides)
-			$query = $this->cascadeMapper->deletion($query, $handledSides, $repository, $plan);
-			
-		$deleteStep = $this->steps->query($query);
-		$plan->add($deleteStep);
-		
+
+        if ($hasHandledSides)
+            $query = $this->cascadeMapper->deletion($query, $handledSides, $repository, $plan);
+
+        $deleteStep = $this->steps->query($query);
+        $plan->add($deleteStep);
+
         $plan->push($this->steps->query($dbQuery))
 
         return $plan;
@@ -63,12 +63,12 @@ class Mapper
 
         $dbQuery = $repository->query('select');
         $this->groupMapper->mapConditions($dbQuery, $query->conditions(), $modelName, $resultPlan->requiredPlan());
-		
+
         $resultStep = $this->steps->reusableResult($dbQuery);
         $plan->setResultStep($resultStep);
-		
-		$loader = $this->loaders->reusableResult($resultStep);
-		$plan->setLoader($loader);
+
+        $loader = $this->loaders->reusableResult($resultStep);
+        $plan->setLoader($loader);
 
         foreach($preload as $relationship)
             $this->addPreloaders($model, $relationship, $loader, $plan->preloadPlan());
@@ -94,7 +94,8 @@ class Mapper
     {
         $side = $this->relationshipRegistry->getSide($model, $relationship);
         $handler = $this->orm->relationshipType($side->relationshipType())->handler();
+
         return $handler->preloader($side, $loader, $plan);
     }
-	
+
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Query\Plan\Step\Query;
+namespace PHPixie\ORM\Steps\Step\Query;
 
-abstract class Result extends \PHPixie\ORM\Query\Plan\Step\Query implements \IteratorAggregate
+abstract class Result extends \PHPixie\ORM\Steps\Step\Query implements \IteratorAggregate
 {
     protected $result;
     protected function execute()
@@ -28,6 +28,6 @@ abstract class Result extends \PHPixie\ORM\Query\Plan\Step\Query implements \Ite
 
         return $values;
     }
-    
+
     abstract public function getIterator();
 }

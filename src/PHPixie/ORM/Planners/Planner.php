@@ -7,7 +7,7 @@ abstract class Planner
     protected $planners;
     protected $steps;
     protected $repositoryRegistry;
-    
+
     public function __construct($planners, $steps, $repositoryRegistry)
     {
         $this->planners = $planners;

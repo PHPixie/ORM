@@ -1,34 +1,34 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Types\OneTo\Type\One\Property;
+namespace PHPixie\ORM\Relationships\Types\OneTo\Type\One\Property;
 
-abstract class Model extends \PHPixie\ORM\Relationship\Types\OneTo\Property\Model
+abstract class Model extends \PHPixie\ORM\Relationships\Types\OneTo\Property\Model
 {
     protected function processSet($owner, $item)
     {
-        if ($owner !== null && $item !== null ) {
+        if ($owner !== null && $item !== null) {
             $plan = $this->handler->linkPlan($this->config, $owner, $item);
         }else
             $plan = $this->handler->unlinkPlan($this->config, $owner, null);
-        
+
         $plan->execute();
         $this->handler->setItemOwner($this->config, $item, $owner);
     }
-	
-	public function value()
-	{
-		if ($this->value !== null && $this->value->isDeleted())
-			$this->setValue(null);
-		
-		return parent::value();
-	}
-	
-	public function data($recursive = true)
-	{
-		$value = $this->value();
-		if ($value === null)
-			return null;
-			
-		return $model->asObject($recursive);
-	}
+
+    public function value()
+    {
+        if ($this->value !== null && $this->value->isDeleted())
+            $this->setValue(null);
+
+        return parent::value();
+    }
+
+    public function data($recursive = true)
+    {
+        $value = $this->value();
+        if ($value === null)
+            return null;
+
+        return $model->asObject($recursive);
+    }
 }

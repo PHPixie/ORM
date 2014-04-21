@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Types\Embedded\Type\Embeds\Type\Many;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Type\Many;
 
-class Loader extends \PHPixie\ORM\Relationship\Types\Embedded\Type\Embeds\Loader
+class Loader extends \PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Loader
 {
     protected function addPropertyItems($property)
     {

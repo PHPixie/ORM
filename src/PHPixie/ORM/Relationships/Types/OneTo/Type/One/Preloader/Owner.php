@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\OneTo\Type\One\Preloader;
+namespace PHPixie\ORM\Relationships\Types\OneTo\Type\One\Preloader;
 
-class Owner extends \PHPixie\ORM\Relationships\OneTo\Preloader\Owner
+class Owner extends \PHPixie\ORM\Relationships\Types\OneTo\Preloader\Owner
 {
     public function getMappedFor($item)
     {

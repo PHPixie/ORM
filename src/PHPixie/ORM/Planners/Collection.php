@@ -11,7 +11,7 @@ class Collection
     public function __construct($requiredModel, $items = array())
     {
         $this->requiredModel = $requiredModel;
-		$this->add($items);
+        $this->add($items);
     }
 
     public function add($items)
@@ -32,10 +32,10 @@ class Collection
 
             if ($item->isNew())
                 throw new \PHPixie\ORM\Exception\Mapper("You can only use saved models.");
-			
-			if (!$item->isDeleted())
+
+            if (!$item->isDeleted())
                 throw new \PHPixie\ORM\Exception\Mapper("You cannot use deleted models for relationships.");
-				
+
             $this->models[] = $item;
         } elseif ($item instanceof \PHPixie\ORM\Query) {
 
@@ -66,6 +66,7 @@ class Collection
                 $dataRow[$field] = $model->$field;
             $data[] = $dataRow;
         }
+
         return $data;
     }
 

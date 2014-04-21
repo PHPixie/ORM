@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\OneTo\Types\Many;
+namespace PHPixie\ORM\Relationships\Types\OneTo\Type\One;
 
 class Side extends \PHPixie\ORM\Relationships\Types\OneTo\Side
 {

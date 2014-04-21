@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Types;
 
-class ManyToMany extends PHPixie\ORM\Relationship\Type
+class ManyToMany extends PHPixie\ORM\Relationships\Relationship\Type
 {
     public function config($config)
     {
@@ -23,17 +23,17 @@ class ManyToMany extends PHPixie\ORM\Relationship\Type
     {
         return new ManyToMany\Preloader($this->orm->loaders(), $this, $side, $loader);
     }
-    
+
     public function modelProperty($side, $model)
     {
         return new ManyToMany\Property\Model($this->handler(), $side, $model);
     }
-    
+
     public function queryProperty($side, $model)
     {
         return new ManyToMany\Property\Query($this->handler(), $side, $model);
     }
-    
+
     protected function sideTypes($config)
     {
         return array('left', 'right');

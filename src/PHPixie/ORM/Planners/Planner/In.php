@@ -12,7 +12,7 @@ class In extends \PHPixie\ORM\Planners\Planner\Strategy
             $query->orWhere($queryField, 'in', $ids);
 
         $collectionQueries = $collection->addedQueries();
-        if (!empty($collectionQueries)) { 
+        if (!empty($collectionQueries)) {
             $collectionConnection = $this
                             ->repositoryRegistry($collection->modelName())
                             ->connection();
@@ -34,28 +34,29 @@ class In extends \PHPixie\ORM\Planners\Planner\Strategy
         $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $resultField);
         $plan->push($inStep);
     }
-    
+
     public function loader($query, $queryField, $loader, $loaderField, $plan, $logic = 'and', $negate = false)
     {
         $this->result($query, $queryField, $loader->resultStep(), $loaderField, $plan, $logic, $negate);
     }
-    
+
     public function subquery($query, $queryField, $subquery, $subqueryField, $plan, $logic = 'and', $negate = false)
     {
         $strategy = $this->selectStrategy($dbQuery->connection(), $subqery->connection());
         $strategy->in($query, $queryField, $subquery, $subqueryField, $plan, $logic, $negate);
     }
-    
+
     protected function selectStrategy($queryConnection, $subqueryConnection)
     {
         if ($queryConnection instanceof PHPixie\DB\Driver\PDO\Connection && $queryConnection === $subqueryConnection)
             return $this->strategy('subquery');
         return $this->strategy('multiquery');
     }
-    
+
     protected function buildStrategy($name)
     {
         $class = '\PHPixie\ORM\Planners\Planner\In\Strategy\\'.$name;
+
         return new $class($this->steps);
     }
 }

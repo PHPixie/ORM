@@ -1,14 +1,16 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\Embeds\Type\Many\Side;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Type\Embeds\Type\Many\Side;
 
-class Config extends \PHPixie\ORM\Relationships\Types\Embeds\Side\Config
+class Config extends \PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Type\Embeds\Side\Config
 {
-    protected function itemOptionName() {
+    protected function itemOptionName()
+    {
         return 'items'
     }
-    
-    protected function defaultOwnerProperty($inflector){
+
+    protected function defaultOwnerProperty($inflector)
+    {
         return $inflector->plural($this->itemModel);
     }
 }

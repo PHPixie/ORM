@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Type\Property;
+namespace PHPixie\ORM\Relationships\Relationship\Property;
 
 abstract class Model
 {
@@ -38,24 +38,25 @@ abstract class Model
     {
         return $this->model;
     }
-    
+
     public function value()
     {
         if ($this->loaded)
             $this->reload();
+
         return $this->value;
     }
-    
+
     public function setValue($value)
     {
         $this->value = $value;
         $this->loaded = true;
     }
-    
-	public function loaded()
-	{
-		return $this->loaded();
-	}
-	
+
+    public function loaded()
+    {
+        return $this->loaded();
+    }
+
     abstract protected function load();
 }

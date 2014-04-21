@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Query\Plan\Step;
+namespace PHPixie\ORM\Steps\Step;
 
-class In
+class In extends \PHPixie\ORM\Steps\Step
 {
     protected $placeholder;
     protected $placeholderField;

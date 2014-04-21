@@ -1,14 +1,16 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\Embeds\Type\One\Side;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Type\One\Side;
 
-class Config extends \PHPixie\ORM\Relationships\Types\Embeds\Side\Config
+class Config extends \PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Side\Config
 {
-    protected function itemOptionName() {
+    protected function itemOptionName()
+    {
         return 'item'
     }
-    
-    protected function defaultOwnerProperty($inflector){
+
+    protected function defaultOwnerProperty($inflector)
+    {
         return $this->itemModel;
     }
 }

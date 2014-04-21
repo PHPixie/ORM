@@ -46,7 +46,7 @@ class ORM
 
     public function buildRelationshipType($name)
     {
-        $class = '\PHPixie\ORM\Relationship\Types\\'.$name;
+        $class = '\PHPixie\ORM\Relationships\Types\\'.$name;
 
         return new $class($this);
     }
@@ -72,7 +72,7 @@ class ORM
     {
         $relationshipConfig = $this->config->slice('relationships');
 
-        return new \PHPixie\ORM\Relationship\Map($this, $relationshipConfig);
+        return new \PHPixie\ORM\Relationships\Relationship\Map($this, $relationshipConfig);
     }
 
     public function repositories()
@@ -94,6 +94,7 @@ class ORM
     {
         if ($this->propertyBuilder === null)
             $this->propertyBuilder = $this->buildPropertyBuilder();
+
         return $this->propertyBuilder;
     }
 
@@ -106,14 +107,15 @@ class ORM
     {
         if ($this->loaders === null)
             $this->loaders = $this->buildLoaders();
+
         return $this->loaders;
     }
-    
+
     public function buildLoaders()
     {
         return new \PHPixie\ORM\Loaders();
     }
-    
+
     public function groupMapper()
     {
         if($this->groupMapper === null)
@@ -152,17 +154,17 @@ class ORM
     {
         return new \PHPixie\DB\Conditions();
     }
-    
+
     public function plan()
     {
         return new \PHPixie\ORM\Plan();
     }
-    
+
     public function loaderPlan()
     {
         return new \PHPixie\ORM\Plan\Loader();
     }
-    
+
     public function databaseConnection($name)
     {
         return $this->database->get($name);

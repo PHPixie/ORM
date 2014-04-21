@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\Embed;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds;
 
-class Side extends PHPixie\ORM\Relationship\Side
+class Side extends PHPixie\ORM\Relationships\Relationship\Side
 {
     public function modelName()
     {

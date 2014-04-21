@@ -36,18 +36,20 @@ class Map
     {
         return $this->propertyMap[$modelName][$propertyName];
     }
-	
+
     public function modelProperty($model, $propertyName)
     {
-		$side = $this->getSide($model->modelName(), $propertyName);
-		$relationshipType = $this->orm->relationshipType($side->relationshipType());
+        $side = $this->getSide($model->modelName(), $propertyName);
+        $relationshipType = $this->orm->relationshipType($side->relationshipType());
+
         return $relationshipType->modelProperty($side, $model);
     }
 
     public function queryProperty($query, $name)
     {
         $side = $this->getSide($query->modelName(), $propertyName);
-		$relationshipType = $this->orm->relationshipType($side->relationshipType());
+        $relationshipType = $this->orm->relationshipType($side->relationshipType());
+
         return $relationshipType->queryProperty($side, $model);
     }
 

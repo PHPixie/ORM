@@ -4,11 +4,13 @@ namespace PHPixie\ORM\Planners\Planner\Query\Strategy;
 
 class PDO extends \PHPixie\ORM\Planners\Planner\Query\Strategy
 {
-    public function setSource($query, $source) {
+    public function setSource($query, $source)
+    {
         $query->table($source);
     }
-    
-    public function setBatchData($query, $fields, $data) {
+
+    public function setBatchData($query, $fields, $data)
+    {
         $query->batchData($fields, $data);
     }
 }

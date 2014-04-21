@@ -18,11 +18,11 @@ abstract class Preloader
         $this->config              = $side->config();
         $this->loader              = $loader;
     }
-    
+
     public function loader()
     {
         return $this->loader();
     }
-    
-    public abstract function loadProperty($property);
+
+    abstract public function loadProperty($property);
 }

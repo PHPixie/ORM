@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Query\Plan\Step;
+namespace PHPixie\ORM\Steps\Step;
 
-class Query extends \PHPixie\ORM\Query\Plan\Step
+class Query extends \PHPixie\ORM\Steps\Step
 {
     protected $query;
 
@@ -20,4 +20,9 @@ class Query extends \PHPixie\ORM\Query\Plan\Step
     {
         return $this->query();
     }
+	
+	public function usedConnections()
+	{
+		return array($this->query->connection());
+	}
 }

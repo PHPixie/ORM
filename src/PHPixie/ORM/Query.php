@@ -6,18 +6,19 @@ class Query
 {
     protected $conditions;
     protected $mapper;
-	protected $relationshipMap;
-	protected $modelName;
-	
+    protected $relationshipMap;
+    protected $modelName;
+
     protected $limit;
     protected $offset;
     protected $orderBy = array();
 
-    public function __construct($conditions, $mapper, $relationhipMap, $modelName) {
+    public function __construct($conditions, $mapper, $relationhipMap, $modelName)
+    {
         $this->conditionBuilder = $conditions;
         $this->mapper = $mapper;
-		$this->relationhipMap = $relationshipMap;
-		$this->modelName = $modelName;
+        $this->relationhipMap = $relationshipMap;
+        $this->modelName = $modelName;
     }
 
     public function limit($limit)

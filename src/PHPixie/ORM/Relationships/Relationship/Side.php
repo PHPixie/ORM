@@ -26,5 +26,5 @@ abstract class Side
     abstract public function modelName();
     abstract public function propertyName();
     abstract public function relationship();
-	abstract public function handleDeletions();
+    abstract public function handleDeletions();
 }

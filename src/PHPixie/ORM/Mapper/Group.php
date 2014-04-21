@@ -4,21 +4,21 @@ namespace PHPixie\ORM\Mapper;
 
 class Group
 {
-	protected $ormBuilder;
-	protected $repositoryRegistry;
-	protected $planners;
+    protected $ormBuilder;
+    protected $repositoryRegistry;
+    protected $planners;
     protected $optimizer;
-	protected $optimizerEnabled = true;
-	
-	public function __construct($ormBuilder, $repositoryRegistry, $planners, $optimizer)
-	{
-		$this->ormBuilder = $ormBuilder;
-		$this->repositoryRegistry = $repositoryRegistry;
-		$this->planners = $planners;
-		$this->optimizer = $optimizer;
-		
-	}
-	
+    protected $optimizerEnabled = true;
+
+    public function __construct($ormBuilder, $repositoryRegistry, $planners, $optimizer)
+    {
+        $this->ormBuilder = $ormBuilder;
+        $this->repositoryRegistry = $repositoryRegistry;
+        $this->planners = $planners;
+        $this->optimizer = $optimizer;
+
+    }
+
     protected function mapConditions($dbQuery, $conditions, $modelName, $plan)
     {
         $builder = $query->getBuilder();
@@ -69,15 +69,15 @@ class Group
                                             $collectionCondition->negated()
                                         );
     }
-	
-	public function setOptimizerEnabled($enableOptimizer)
-	{
-		$this->optimizerEnabled = $enableOptimizer;
-	}
-	
-	public function optimizerEnabled()
-	{
-		return $this->optimizerEnabled;
-	}
+
+    public function setOptimizerEnabled($enableOptimizer)
+    {
+        $this->optimizerEnabled = $enableOptimizer;
+    }
+
+    public function optimizerEnabled()
+    {
+        return $this->optimizerEnabled;
+    }
 
 }

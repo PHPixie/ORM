@@ -8,10 +8,11 @@ class Embedded extends \PHPixie\ORM\Model\Repository\Embedded
     {
         return $this->ormBuilder->embeddedModel($this, $document, false);
     }
-	
+
     public function model()
     {
-		$document = $this->dataBuilder->document(null);
+        $document = $this->dataBuilder->document(null);
+
         return $this->ormBuilder->embeddedModel($this, $document);
     }
 }

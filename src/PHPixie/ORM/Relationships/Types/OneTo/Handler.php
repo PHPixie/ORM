@@ -1,14 +1,23 @@
 <?php
 
-namespace PHPixe\ORM\Relationships\OneToMany;
+namespace PHPixie\ORM\Relationships\Types\OneTo;
 
-abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
+abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 {
 
     public function query($side, $related)
     {
         $config = $side->config();
-        if($side->type() == 'items')
+        if ($side->type() !== 'owner') {
+            $model = $config->itemModel;
+            $property = $config->itemProperty;
+        } else {
+            $model = $config->ownerModel;
+            $property = $config->ownerProperty;
+        }
+
+        return $this->registryRepository->get($model)->related($property, $related);
+    }
 
             return $this->buildQuery($config->itemModel, $related->ownerProperty, $related);
 
@@ -20,7 +29,7 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
         $itemRepository = $this->registryRepository->get($config->itemModel);
         $ownerRepository = $this->registryRepository->get($config->ownerModel);
         $ownerCollection = $this->planners->collection($config->ownerModel, $owner);
-		
+
         $plan = $this->orm->plan();
         $query = $itemRepository->query()->in($items);
         $updatePlanner = $this->planners->update();
@@ -30,21 +39,22 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
                                 array($config->itemKey => $ownerField),
                                 $plan
                             );
+
         return $plan;
     }
-	
-	public function unlinkPlan($config, $owner = null, $items = null)
-	{
+
+    public function unlinkPlan($config, $owner = null, $items = null)
+    {
         $query = $this->registryRepository->get($config->itemModel)->query();
-		
-		if ($items !== null)
-			$query->in($items);
-			
-		if ($owner !== null)
-			$query->related($config->itemProperty, $owner);
-		
-		return $query->planUpdate(array($config->itemKey => null));
-	}
+
+        if ($items !== null)
+            $query->in($items);
+
+        if ($owner !== null)
+            $query->related($config->itemProperty, $owner);
+
+        return $query->planUpdate(array($config->itemKey => null));
+    }
 
     public function mapRelationship($side, $group, $query, $plan)
     {
@@ -78,9 +88,9 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 
     public function preload($side, $resultLoader, $plan)
     {
-	    $itemRepository = $this->registryRepository->get($config->itemModel);
+        $itemRepository = $this->registryRepository->get($config->itemModel);
         $ownerRepository = $this->registryRepository->get($config->ownerModel);
-		
+
         $config = $side->config();
 
         if ($side->type() !== 'owner') {
@@ -95,42 +105,42 @@ abstract class Handler extends \PHPixie\ORM\Relationship\Type\Handler
 
         $query = $preloadRepository->dbQuery();
         $this->planners->in()->loader($query, $queryField, $resultLoader, $loaderField, $plan);
-        
+
         $preloadStep = $this->steps->resusableResult($query);
         $preloadPlan->push($preloadStep);
         $loader = $this->loaders->reusableResult($queryRepository, $preloadStep);
-		
-		return $this->relationshipType->preloader($side, $loader);
+
+        return $this->relationshipType->preloader($side, $loader);
     }
-	
-	public function handleDeletion($modelName, $side, $resultStep, $plan)
-	{
-		if ($side->type() === 'owner')
-			return;
-		
-		$config = $side->config();
-		$itemKey = $config->itemKey;
-		$itemModel = $config->itemModel;
-		
-		$itemRepository = $this->repositoryRegistry->get($itemModel);
-		$ownerRepository = $this->repositoryRegistry->get($modelName);
-		
-		$hasHandledSides = false;
-		
-		if ($config->onDelete === 'update') {
-			$query = $repository->databaseQuery('update')->data(array($itemKey => null));
-		}else {
-			$handledSides = $this->cascadeMapper=>deletionSides($itemModel);
-			$hasHandledSides = !empty($handlesSides);
-			$query = $repository->databaseQuery($hasHandledSides ? 'select' : 'delete');
-		}
-		
-		$this->planners->in()->result($query, $itemKey, $resultStep, $ownerRepository->idField());
-		
-		if ($hasHandledSides)
-			$query = $this->cascadeMapper->deletion($query, $handledSides, $itemRepository, $plan)
-		
-		$deleteStep = $this->steps->query($query);
-		$plan->add($deleteStep);
-	}
+
+    public function handleDeletion($modelName, $side, $resultStep, $plan)
+    {
+        if ($side->type() === 'owner')
+            return;
+
+        $config = $side->config();
+        $itemKey = $config->itemKey;
+        $itemModel = $config->itemModel;
+
+        $itemRepository = $this->repositoryRegistry->get($itemModel);
+        $ownerRepository = $this->repositoryRegistry->get($modelName);
+
+        $hasHandledSides = false;
+
+        if ($config->onDelete === 'update') {
+            $query = $repository->databaseQuery('update')->data(array($itemKey => null));
+        } else {
+            $handledSides = $this->cascadeMapper=>deletionSides($itemModel);
+            $hasHandledSides = !empty($handlesSides);
+            $query = $repository->databaseQuery($hasHandledSides ? 'select' : 'delete');
+        }
+
+        $this->planners->in()->result($query, $itemKey, $resultStep, $ownerRepository->idField());
+
+        if ($hasHandledSides)
+            $query = $this->cascadeMapper->deletion($query, $handledSides, $itemRepository, $plan)
+
+        $deleteStep = $this->steps->query($query);
+        $plan->add($deleteStep);
+    }
 }

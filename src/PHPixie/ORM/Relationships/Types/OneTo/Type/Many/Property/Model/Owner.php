@@ -1,15 +1,15 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Model;
+namespace PHPixie\ORM\Relationships\Types\OneTo\Type\Many\Property\Model;
 
-class Owner extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Model
+class Owner extends \PHPixie\ORM\Relationships\Types\OneTo\Type\Many\Property\Model
 {
     public function load()
     {
         $owner = parent::load();
         $this->handler->setItemOwner($this->config, $this->model, $owner);
     }
-    
+
     public function set($owner)
     {
         if ($owner !== null) {
@@ -20,21 +20,21 @@ class Owner extends \PHPixie\ORM\Relationship\Types\OneTo\Type\Many\Property\Mod
         $plan->execute();
         $this->handler->setItemsOwner($this->config, $this->model, $owner);
     }
-    
-	public function value()
-	{
-		if ($this->value !== null && $this->value->isDeleted())
-			$this->setValue(null);
-		
-		return parent::value();
-	}
-	
-	public function data($recursive = true)
-	{
-		$value = $this->value();
-		if ($value === null)
-			return null;
-			
-		return $model->asObject($recursive);
-	}
+
+    public function value()
+    {
+        if ($this->value !== null && $this->value->isDeleted())
+            $this->setValue(null);
+
+        return parent::value();
+    }
+
+    public function data($recursive = true)
+    {
+        $value = $this->value();
+        if ($value === null)
+            return null;
+
+        return $model->asObject($recursive);
+    }
 }

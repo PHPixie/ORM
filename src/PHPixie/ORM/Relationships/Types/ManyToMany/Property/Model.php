@@ -1,15 +1,15 @@
 <?php
 
-namespace PHPixie\ORM\Relationship\Types\OneToMany\Property\Model;
+namespace PHPixie\ORM\Relationships\Types\ManyToMany\Property;
 
-class Model extends \PHPixie\ORM\Relaionship\Type\Property
+class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
 {
 
     public function query()
     {
         return $this->handler->query($this->side, $this->model);
     }
-    
+
     public function load()
     {
         return $this->handler->loadProperty($this->side, $this->model);
@@ -32,7 +32,7 @@ class Model extends \PHPixie\ORM\Relaionship\Type\Property
         $plan->execute();
         $this->handler->unlinkProperties($this->config, $left, $right);
     }
-    
+
     public function removeAll()
     {
         list($left, $right) = $this->getSides(null);
@@ -43,21 +43,22 @@ class Model extends \PHPixie\ORM\Relaionship\Type\Property
             $this->value->removeAll();
         }
     }
-    
+
     protected function getSides($opposing)
     {
         if ($this->side-> type() === 'right')
             return ($this->model, $opposing);
-        
+
         return ($opposing, $this->model);
     }
-	
-	public function asObject($recursive = true)
-	{
-		$data = array();
-		foreach($this->value() as $model)
-			$data[] = $model->asObject($recursive);
-		return $data;
-	}
+
+    public function asObject($recursive = true)
+    {
+        $data = array();
+        foreach($this->value() as $model)
+            $data[] = $model->asObject($recursive);
+
+        return $data;
+    }
 
 }

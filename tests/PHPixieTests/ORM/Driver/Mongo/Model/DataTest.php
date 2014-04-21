@@ -7,12 +7,12 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
     protected $types;
     protected $data;
-    
+
     protected function setUp()
     {
         $this->types = new \PHPixie\ORM\Driver\Mongo\Model\Data\Types;
     }
-    
+
     public function testModified()
     {
         $old = new \stdClass;
@@ -33,7 +33,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
         $data = new \PHPixie\ORM\Driver\Mongo\Model\Data($this->types->document($old), $old);
         $data->setModel($data);
-        
+
         unset($data->a);
         $data->b = 'trixie';
         $data->c->ca = 'pixie';
@@ -41,14 +41,13 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
         unset($data->d->da->daa);
         $data->d->da->dab = 4;
-        
+
         $data->d->dc = new \stdClass;
         $data->d->dc->dca = 5;
-        
-            
+
         $data->e->ea->push(8);
         $data->f = 9;
-        
+
         print_r($data->modified());
     }
 }

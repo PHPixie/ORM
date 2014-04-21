@@ -4,28 +4,28 @@ namespace PHPixie\ORM;
 
 class Builder
 {
-	protected $database;
-	protected $config;
-	
-	protected $inflector;
+    protected $database;
+    protected $config;
+
+    protected $inflector;
     protected $drivers = array();
     protected $relationships = array();
     protected $relationshipMap;
-	protected $repositories;
+    protected $repositories;
     protected $groupMapper;
-	protected $conditions;
+    protected $conditions;
     protected $mapper;
     protected $loaders;
-	protected $steps;
+    protected $steps;
     protected $planners;
-	protected $plans;
-    
-	public function __construct($database, $config)
-	{
-		$this->database = $database;
-		$this->config = $config;
-	}
-	
+    protected $plans;
+
+    public function __construct($database, $config)
+    {
+        $this->database = $database;
+        $this->config = $config;
+    }
+
     public function inflector()
     {
         if ($this->inflector === null)
@@ -38,7 +38,7 @@ class Builder
     {
         return new \PHPixie\ORM\Inflector();
     }
-    
+
     public function driver($name)
     {
         if (!isset($this->drivers[$name]))
@@ -50,9 +50,10 @@ class Builder
     protected function buildDriver($name)
     {
         $class = '\PHPixie\ORM\Drivers\Driver\\'.$name;
+
         return new $class($this);
     }
-    
+
     public function relationship($name)
     {
         if (!isset($this->relationships[$name]))
@@ -64,9 +65,10 @@ class Builder
     public function buildRelationship($name)
     {
         $class = '\PHPixie\ORM\Relationships\Relationship\\'.$name;
+
         return new $class($this);
     }
-	
+
     public function repositories()
     {
         if($this->repositories === null)
@@ -78,14 +80,15 @@ class Builder
     protected function buildRepositories()
     {
         $modelsConfig = $this->config->slice('models');
+
         return new \PHPixie\ORM\Repositories($this, $modelsConfig);
     }
-    
+
     public function relationshipMap()
     {
         if ($this->relationshipMap === null)
             $this->relationshipMap = $this->buildRelationshipMap();
-        
+
         return $this->relationshipMap;
     }
 
@@ -117,25 +120,27 @@ class Builder
 
     public function buildCascadeMapper()
     {
-		$repositoryRegistry = $this->repositoryRegistry();
-		$relationshipMap = $this->relationshipMap();
-		$planners = $this->planners();
-		$steps = $this->steps();
-		$optimizer = $this->buildOptimizer();
+        $repositoryRegistry = $this->repositoryRegistry();
+        $relationshipMap = $this->relationshipMap();
+        $planners = $this->planners();
+        $steps = $this->steps();
+        $optimizer = $this->buildOptimizer();
+
         return \PHPixie\ORM\Mapper\Cascade($this, $repositoryRegistry, $relationshipMap, $planners, $steps, $optimizer);
     }
-	
-	protected function buildOptimizer()
-	{
-		$optimizerMerger = $this->buildGroupOptimizerMerger();
-		return new \PHPixie\ORM\Mapper\Group\Optimizer($this, $optimizerMerger);
-	}
-	
-	protected function buildGroupOptimizerMerger()
-	{
-		return new \PHPixie\ORM\Mapper\Group\Optimizer\Merger($this);
-	}
-	
+
+    protected function buildOptimizer()
+    {
+        $optimizerMerger = $this->buildGroupOptimizerMerger();
+
+        return new \PHPixie\ORM\Mapper\Group\Optimizer($this, $optimizerMerger);
+    }
+
+    protected function buildGroupOptimizerMerger()
+    {
+        return new \PHPixie\ORM\Mapper\Group\Optimizer\Merger($this);
+    }
+
     public function mapper()
     {
         if($this->mapper === null)
@@ -148,7 +153,7 @@ class Builder
     {
         return \PHPixie\ORM\Mapper($this, $this->loaders(), $this->groupMapper());
     }
-    
+
     public function conditions()
     {
         if ($this->conditions === null)
@@ -161,14 +166,15 @@ class Builder
     {
         return new \PHPixie\ORM\Conditions();
     }
-	
+
     public function loaders()
     {
         if ($this->loaders === null)
             $this->loaders = $this->buildLoaders();
+
         return $this->loaders;
     }
-    
+
     public function buildLoaders()
     {
         return new \PHPixie\ORM\Loaders();
@@ -178,50 +184,53 @@ class Builder
     {
         if ($this->steps === null)
             $this->steps = $this->buildSteps();
+
         return $this->steps;
     }
-    
+
     public function buildSteps()
     {
         return new \PHPixie\ORM\Steps();
     }
-	
+
     public function planners()
     {
         if ($this->planners === null) {
             $this->planners = $this->buildPlanners($this->steps());
-		}
+        }
+
         return $this->planners;
     }
-    
+
     public function buildPlanners($steps)
     {
         return new \PHPixie\ORM\Planners($steps);
     }
-    
+
     public function plans()
     {
         if ($this->plans === null)
             $this->plans = $this->buildPlans();
+
         return $this->plans;
     }
-    
+
     public function buildPlans()
     {
         return new \PHPixie\ORM\Plans();
     }
-	
-	public function databaseConnection($name)
-	{
-		return $this->database->connection($name);
-	}
-	
-	public function query($modelName)
-	{
-		$conditions = $this->conditions();
-		$mapper = $this->mapper();
-		$relationshipMap = $this->relationshipMap();
-		
-		return new Query($conditions, $mapper, $relationhipMap, $modelName);
-	}
+
+    public function databaseConnection($name)
+    {
+        return $this->database->connection($name);
+    }
+
+    public function query($modelName)
+    {
+        $conditions = $this->conditions();
+        $mapper = $this->mapper();
+        $relationshipMap = $this->relationshipMap();
+
+        return new Query($conditions, $mapper, $relationhipMap, $modelName);
+    }
 }

@@ -4,22 +4,22 @@ namespace PHPixie\ORM\Relatinship\Types\Embedded\Mapper;
 
 class Group
 {
-	protected $ormBuilder;
-	protected $relationshipMap;
-	
-	public function __construct($ormBuilder, $relationshipMap)
-	{
-		$this->ormBuilder = $ormBuilder;
-		$this->relationshipMap = $relationshipMap;
-	}
-	
+    protected $ormBuilder;
+    protected $relationshipMap;
+
+    public function __construct($ormBuilder, $relationshipMap)
+    {
+        $this->ormBuilder = $ormBuilder;
+        $this->relationshipMap = $relationshipMap;
+    }
+
     protected function mapConditions($dbQuery, $conditions, $modelName, $plan, $fieldPrefix = null)
     {
 
         foreach ($conditions as $cond) {
 
             if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Operator) {
-				$prefix = $fieldPrefix === null ? '' : $fieldPrefix.'.';
+                $prefix = $fieldPrefix === null ? '' : $fieldPrefix.'.';
                 $dbQuery->getWhereBuilder()->addOperatorCondition($cond->logic, $cond->negated, $prefix.$cond->field, $cond->operator, $cond->values);
 
             } elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
@@ -47,10 +47,10 @@ class Group
     {
         $side = $this->relationshipMap->getSide($modelName, $group->relationship);
         $handler = $this->ormBuilder->relationshipType($side-> relationshipType())->handler();
-		
-		if (!($handler instanceof \PHPixie\ORM\Relationship\Types\Embedded\Handler))
-			throw new \PHPixie\ORM\Exception\Mapper("Embedded models can only hve embedded reltionships.");
-		
+
+        if (!($handler instanceof \PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Handler))
+            throw new \PHPixie\ORM\Exception\Mapper("Embedded models can only hve embedded reltionships.");
+
         $handler->mapRelationship($side, $query, $group, $plan, $fieldPrefix);
     }
 

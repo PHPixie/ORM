@@ -1,8 +1,8 @@
 <?php
 
-namespace \PHPixie\ORM\Query\Plan\Planner;
+namespace \PHPixie\ORM\Planners\Planner;
 
-class Pivot extends \PHPixie\ORM\Query\Plan\Planner
+class Pivot extends \PHPixie\ORM\Planners\Planner
 {
     public function link($pivot, $firstSide, $secondSide, $plan)
     {

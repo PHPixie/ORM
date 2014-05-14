@@ -18,11 +18,11 @@ class Query extends \PHPixie\ORM\Steps\Step
 
     public function query()
     {
-        return $this->query();
+        return $this->query;
     }
-	
-	public function usedConnections()
-	{
-		return array($this->query->connection());
-	}
+
+    public function usedConnections()
+    {
+        return array($this->query->connection());
+    }
 }

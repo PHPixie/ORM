@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Preloader\Result;
+namespace PHPixie\ORM\Loaders\Loader\Preloadable\Result;
 
-class Reusable extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result
+class Reusable extends \PHPixie\ORM\Loaders\Loader\Preloadable\Result
 {
     protected $repository;
     protected $reusableResultStep;

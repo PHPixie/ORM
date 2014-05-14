@@ -5,27 +5,29 @@ namespace PHPixie\ORM\Steps\Step\Query;
 abstract class Result extends \PHPixie\ORM\Steps\Step\Query implements \IteratorAggregate
 {
     protected $result;
-    protected function execute()
+    
+    public function execute()
     {
         $this->result = $this->query->execute();
 
         if ($this->result === null)
-            throw new \PHPixie\Exception\Step("Query did not return a result.")
+            throw new \PHPixie\ORM\Exception\Plan("Query did not return a result.");
     }
 
-    protected function result()
+    public function result()
     {
         if ($this->result === null)
-            throw new \PHPixie\Exception\Step("This plan step has not been executed yet.")
+            throw new \PHPixie\ORM\Exception\Plan("This plan step has not been executed yet.");
 
         return $this->result;
     }
 
     public function getField($field)
     {
+        $values = array();
         foreach($this as $row)
-            $values[] = $row->$field;
-
+            if(property_exists($row, $field))
+                $values[] = $row->$field;
         return $values;
     }
 

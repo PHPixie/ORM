@@ -1,13 +1,13 @@
 <?php
 
-namespace \PHPixie\ORM\Plans;
+namespace PHPixie\ORM\Plans;
 
 class Transaction
 {
-    public function start($connections)
+    public function begin($connections)
     {
         foreach($this->getTransactable($connections) as $connection)
-            $connection->startTransaction();
+            $connection->beginTransaction();
     }
 
     public function commit($connections)

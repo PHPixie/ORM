@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Relationship\Preloader\Result;
 
-abstract class Single extends \PHPixie\ORM\Model\Preloader
+abstract class Single extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result
 {
     public function getMappedFor($model)
     {

@@ -31,11 +31,11 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $ownerCollection = $this->planners->collection($config->ownerModel, $owner);
 
         $plan = $this->orm->plan();
-        $query = $itemRepository->query()->in($items);
+        $itemQuery = $itemRepository->query()->in($items);
         $updatePlanner = $this->planners->update();
         $ownerField = $updatePlanner->field($owner, $ownerRepository->idField());
         $updatePlanner->plan(
-                                $query,
+                                $itemQuery,
                                 array($config->itemKey => $ownerField),
                                 $plan
                             );

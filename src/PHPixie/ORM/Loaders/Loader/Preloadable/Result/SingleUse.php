@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Preloader\Result;
+namespace PHPixie\ORM\Loaders\Loader\Preloadable\Result;
 
-class SingleUse extends \PHPixie\ORM\Loaders\Loader\Result
+class SingleUse extends \PHPixie\ORM\Loaders\Loader\Preloadable\Result
 {
     protected $resultIterator;
     protected $currentOffset = null;

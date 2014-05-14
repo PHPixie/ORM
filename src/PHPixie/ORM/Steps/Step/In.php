@@ -19,7 +19,7 @@ class In extends \PHPixie\ORM\Steps\Step
 
     public function execute()
     {
-        $values = $this->resultStep->result()->getColumn($resultField);
-        $placeholder->where($this->placeholderField, 'in', $values);
+        $values = $this->resultStep->getField($this->resultField);
+        $this->placeholder->where($this->placeholderField, 'in', $values);
     }
 }

@@ -28,10 +28,10 @@ class Update extends \PHPixie\ORM\Steps\Step
 
         $this->query->update($data);
     }
-	
-	public function usedConnections()
-	{
-		return array($this->query->connection());
-	}
+
+    public function usedConnections()
+    {
+        return array($this->query->connection());
+    }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM\Plans;
+namespace PHPixie\ORM\Plans;
 
 abstract class Plan
 {
@@ -15,7 +15,7 @@ abstract class Plan
         $steps = $this->steps();
         $connections = $this->usedConnections();
         $transaction = $this->plans->transaction();
-        $transaction->start($connections);
+        $transaction->begin($connections);
 
         try {
             foreach($steps as $step)
@@ -33,7 +33,7 @@ abstract class Plan
         $connections = array();
         foreach ($this->steps() as $step) {
             foreach($step->usedConnections() as $connection)
-                if (!in_array($connection, $connections))
+                if (!in_array($connection, $connections, true))
                     $connections[] = $connection;
         }
 

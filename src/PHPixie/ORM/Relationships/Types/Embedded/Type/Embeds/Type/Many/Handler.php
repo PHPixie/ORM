@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Type\Embeds\Type\Many;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Type\Many;
 
-class Handler extends \PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Type\Embeds\Handler
+class Handler extends PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Handler
 {
     public function add($config, $owner, $key = null)
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationship;
+namespace PHPixie\ORM\Relationships\Relationship;
 
 abstract class Side
 {

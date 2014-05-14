@@ -8,23 +8,17 @@ abstract class Composite extends \PHPixie\ORM\Plans\Plan
 
     protected function subplan($name, $createMissing = true)
     {
-        if (!array_key_exists($this->subplans[$name]))
+        if (!array_key_exists($name, $this->subplans))
             $this->subplans[$name] = $this->plans->plan();
 
         return $this->subplans[$name];
     }
 
-    protected function executeSubplan($name)
-    {
-        if (array_key_exists($this->subplans[$name]))
-            $this->subplans[$name]->execute();
-    }
-
     protected function subplanSteps($name)
     {
-        if (!array_key_exists($this->subplans[$name]))
+        if (($subplan = $this->subplan($name)) === null)
             return array();
 
-        return $this->subplans[$name]->steps();
+        return $subplan->steps();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Type;
+namespace PHPixie\ORM\Relationships\Relationship;
 
 class Handler
 {

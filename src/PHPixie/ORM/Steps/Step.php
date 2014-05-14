@@ -4,8 +4,10 @@ namespace PHPixie\ORM\Steps;
 
 abstract class Step
 {
-    public function execute();
-	public function usedConnections() {
-		return array();
-	}
+    public function usedConnections()
+    {
+        return array();
+    }
+    
+    abstract public function execute();
 }

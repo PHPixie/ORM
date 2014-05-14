@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Planners
+namespace PHPixie\ORM\Planners;
 
 class Collection
 {

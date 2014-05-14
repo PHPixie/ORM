@@ -26,18 +26,13 @@ class Loader extends \PHPixie\ORM\Plans\Plan\Composite
         return $this->subplan('preload');
     }
 
-    public function execute()
-    {
-        $this->executeSubplan('required');
-        $this->resultStep->execute();
-        $this->executeSubplan('preload');
-    }
-
     public function steps()
     {
+        
         $steps = $this->subplanSteps('required');
         $steps[]= $this->resultStep;
 
         return array_merge($steps, $this->subplanSteps('preload'));
     }
+
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Properties;
+namespace PHPixie\ORM\Relationships\Relationship;
 
 abstract class Property
 {

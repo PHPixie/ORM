@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Type\Embeds\Type\One;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Type\One;
 
-class Handler extends PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Type\Embeds\Handler
+class Handler extends PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Handler
 {
     public function setOwnerProperty($config, $item, $owner)
     {

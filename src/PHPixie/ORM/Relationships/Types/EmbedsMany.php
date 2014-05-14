@@ -17,9 +17,7 @@ class EmbedsMany extends PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds
 
     public function buildHandler($repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper)
     {
-        $embedsGroupMapper = $this->buildEmbedsGroupMapper();
-
-        return new Embeds\Handler($this->ormBuilder, $this, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper, $embedsGroupMapper);
+        return new Embedded\Type\Embeds\Type\Many\Handler($this->ormBuilder, $this, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper, $this->embeddedGroupMapper);
     }
 
     protected function sideTypes($config)
@@ -27,16 +25,22 @@ class EmbedsMany extends PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds
         return $config->properties();
     }
 
-    protected buildEmbedsGroupMapper()
+    public function loader($config, $ownerLoader)
     {
-        $relationshipMap = $this->ormBuilder->relationshipMap();
+        $loaders = $this->ormBuilder->loaders();
 
-        return new Embedded\Mapper\Group($this->ormBuilder, $relationshipMap);
+        return new Embedded\Type\Embeds\Type\Many\Loader($loaders, $config, $ownerLoader);
     }
 
-    public function arrayLoader($property, $models)
+    public function preloader($side, $loader)
     {
-        return new Embeds\Property\Model\EmbeddedArray($this->orm->loaders(), $property, $models);
+        $loaders = $this->ormBuilder->loaders();
+
+        return new Embedded\Type\Embeds\Type\Many\Loader($loaders, $this, $side, $loader);
     }
 
+    public function modelProperty($side, $model)
+    {
+        return new Embedded\Type\Embeds\Type\Many\Property\Model\Items($this->handler(), $side, $model);
+    }
 }

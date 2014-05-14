@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Type\Embeds\Side;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds\Side;
 
 class Config extends PHPixie\ORM\Relationships\Relationship\Side\Config
 {

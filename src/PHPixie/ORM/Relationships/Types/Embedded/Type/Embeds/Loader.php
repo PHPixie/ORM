@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds;
 
-class Loader extends \PHPixie\ORM\Loaders\Loader\Preloadable
+abstract class Loader extends \PHPixie\ORM\Loaders\Loader\Preloadable
 {
     protected $config
     protected $ownerLoader;

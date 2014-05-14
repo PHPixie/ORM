@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relatinship\Types\Embedded\Mapper;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Mapper;
 
 class Group
 {

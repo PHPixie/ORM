@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Type\Embeds;
+namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embeds;
 
-abstract class Handler extends \PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Handler
+abstract class Handler extends \PHPixie\ORM\Relationships\Types\Embedded\Handler
 {
 
     public function mapRelationship($side, $query, $group, $plan, $fieldPrefix = null)

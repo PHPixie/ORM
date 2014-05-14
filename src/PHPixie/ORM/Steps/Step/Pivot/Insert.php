@@ -48,9 +48,9 @@ class Insert extends \PHPixie\ORM\Steps\Step
 
         return $query;
     }
-	
-	public function usedConnections()
-	{
-		return array($this->queryConnection);
-	}
+
+    public function usedConnections()
+    {
+        return array($this->queryConnection);
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Types\Embedded\Type\Embedsded\Type\Embeds;
+namespace PHPixie\ORM\Relationships\Types\Embedded;
 
 abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 {

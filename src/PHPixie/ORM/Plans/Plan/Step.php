@@ -21,11 +21,4 @@ class Step extends \PHPixie\ORM\Plans\Plan
         return $this->steps;
     }
 
-    public function execute()
-    {
-        foreach ($this->steps as $step) {
-            $step->execute();
-        }
-    }
-
 }

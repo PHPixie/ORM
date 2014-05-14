@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Model\Repository\Database\Model
+namespace PHPixie\ORM\Model\Repository\Database;
 
 abstract class Model extends \PHPixie\ORM\Model
 {

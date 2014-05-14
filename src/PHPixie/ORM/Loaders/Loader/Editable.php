@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader
+namespace PHPixie\ORM\Loaders\Loader;
 
 class Editable extends \PHPixie\ORM\Loaders\Loader
 {

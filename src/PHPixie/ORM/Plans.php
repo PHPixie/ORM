@@ -4,16 +4,16 @@ namespace PHPixie\ORM;
 
 class Plans
 {
-    protected $planTransaction;
+    protected $transaction;
 
     public function plan()
     {
-        return new ORM\Plans\Plan\Step($this);
+        return new Plans\Plan\Step($this);
     }
 
     public function loader()
     {
-        return new ORM\Plans\Plan\Loader($this);
+        return new Plans\Plan\Composite\Loader($this);
     }
 
     public function transaction()
@@ -24,8 +24,8 @@ class Plans
         return $this->transaction;
     }
 
-    public function buildTransaction()
+    protected function buildTransaction()
     {
-        return new Plans\Plan\Transaction();
+        return new Plans\Transaction();
     }
 }

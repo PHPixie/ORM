@@ -40,4 +40,16 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
     {
         return new DatabaseResultStub($data);
     }
+    
+    protected function assertException($callback, $exceptionClass)
+    {
+        $except = false;
+        try{
+            $callback();
+        }catch(\Exception $e){
+            $except = $e instanceof $exceptionClass;
+        }
+        
+        $this->assertEquals(true, $except);
+    }
 }

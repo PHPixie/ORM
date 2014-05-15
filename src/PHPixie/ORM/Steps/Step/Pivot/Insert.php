@@ -2,13 +2,41 @@
 
 namespace PHPixie\ORM\Steps\Step\Pivot;
 
-class Insert extends \PHPixie\ORM\Steps\Step
+class Insert extends \PHPixie\ORM\Steps\Step\Insert\Batch
 {
-    protected $queryPlanner;
-    protected $queryConnection;
-    protected $queryTarget;
+    protected $cartesianStep;
+    
+    public function __construct($insertQuery, $queryPlanner, $fields, $cartesianStep)
+    {
+        parent::_construct($insertQuery, $queryPlanner);
+        $this->fields = $fields;
+        $this->cartesianStep = $cartesianStep;
+    }
+    
+    protected function prepareBatchData()
+    {
+        $this->data = $this->cartesianStep->product();
+    }
+}
+    
+    
+    
+    protected $fields;
+    
+    protected $
+    protected $insertQuery;
+    protected $selectQuery;
     protected $fields;
     protected $cartesianStep;
+    
+    public function execute()
+    {
+        $product = $this->cartesianStep->product();
+        if($this->skipDuplicates){
+        $query = $this->query('select')->fields($this->fields);
+        foreach($this->fields as $key => $field)
+            $query->where($field, 'in', $product[$key]);
+    }
 
     public function __construct($queryPlanner, $queryConnection, $queryTarget, $fields, $cartesianStep)
     {
@@ -21,11 +49,7 @@ class Insert extends \PHPixie\ORM\Steps\Step
 
     public function execute()
     {
-        $product = $this->cartesianStep->product();
 
-        $query = $this->query('select')->fields($this->fields);
-        foreach($this->fields as $key => $field)
-            $query->where($field, 'in', $product[$key]);
 
         $existing = array();
         foreach($query->execute() as $existingItem)

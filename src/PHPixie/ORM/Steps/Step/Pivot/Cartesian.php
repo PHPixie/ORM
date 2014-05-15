@@ -4,12 +4,12 @@ namespace PHPixie\ORM\Steps\Step\Pivot;
 
 class Cartesian extends \PHPixie\ORM\Steps\Step
 {
-    protected $resultSteps;
+    protected $resultStepsMap;
     protected $product;
 
-    public function __construct($resultSteps)
+    public function __construct($resultStepsMap)
     {
-        $this->resultSteps = $resultSteps;
+        $this->resultStepsMap = $resultStepsMap;
     }
 
     public function execute()
@@ -20,19 +20,20 @@ class Cartesian extends \PHPixie\ORM\Steps\Step
     public function product()
     {
         if ($this->product === null)
-            throw new \PHPixie\Exception\Step("This plan step has not been executed yet.")
+            throw new \PHPixie\ORM\Exception\Plan("This plan step has not been executed yet.");
 
         return $this->product;
     }
 
     protected function buildProduct()
     {
-        if (empty($this->resultSteps))
+        if (empty($this->resultStepsMap))
             return array();
-
+        
         $product = array(array());
-        foreach ($this->resultSteps as $resultStep) {
-            $product = $this->updateProduct($product, $resultStep->result());
+        foreach ($this->resultStepsMap as $resultStepMap) {
+            $rows = $resultStepMap['resultStep']->getFields($resultStepMap['fields']);
+            $product = $this->updateProduct($product, $rows);
             if (empty($product))
                 break;
         }
@@ -41,13 +42,12 @@ class Cartesian extends \PHPixie\ORM\Steps\Step
 
     }
 
-    protected function updateProduct($product, $result)
+    protected function updateProduct($product, $rows)
     {
         $updatedProduct = array();
         foreach($product as $productRow)
-            foreach($result as $resultItem)
-                $updatedProduct = array_merge($productRow, array_values(get_object_vars($resultItem)));
-
+            foreach($rows as $row)
+                $updatedProduct[] = array_merge($productRow, array_values(get_object_vars($resultItem)));
         return $updatedProduct;
     }
 

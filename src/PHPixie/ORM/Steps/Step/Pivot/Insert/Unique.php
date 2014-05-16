@@ -17,17 +17,24 @@ class Unique extends \PHPixie\ORM\Steps\Step\Pivot\Insert
         $product = $this->cartesianStep->product();
         $this->selectQuery->fields($this->fields);
         
-        foreach($this->fields as $key => $field)
-            $query->where($field, 'in', array_column($product, $key));
+        foreach($this->fields as $key => $field) {
+            $values = array();
+            foreach($product as $productRow){
+                $values[]=$productRow[$field];
+            }
+            $this->selectQuery->where($field, 'in', $values);
+        }
 
+        $existingItems = $this->selectQuery->execute()->getFields($this->fields);
+        
         $existing = array();
-        foreach($query->execute() as $existingItem) {
+        foreach($existingItems as $existingItem) {
             $existingValues = array();
             foreach($this->fields as $field)
-                $existingValues[]=$existingItem[$field];
-            $existing[]= $existingValues();
+                $existingValues[$field]=$existingItem[$field];
+            $existing[]= $existingValues;
         }
-        
+
         $filteredProduct = array();
         foreach($product as $productRow)
             if(!in_array($productRow, $existing))

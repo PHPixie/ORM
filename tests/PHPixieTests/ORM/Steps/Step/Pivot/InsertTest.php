@@ -3,55 +3,35 @@
 namespace PHPixieTests\ORM\Steps\Step\Pivot;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Steps\Step\Pivot\Cartesian
+ * @coversDefaultClass \PHPixie\ORM\Steps\Step\Pivot\Insert
  */
-class CartesianTest extends \PHPixieTests\ORM\Steps\StepTest
+class InsertTest extends \PHPixieTests\ORM\Steps\Step\Insert\BatchTest
 {
-    protected $resultSteps;
+    protected $cartesianStep;
+    protected $fields = array('a', 'b', 'c', 'd');
+    protected $product   = array(
+                            array('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4),
+                            array('a' => 4, 'b' => 2, 'c' => 3, 'd' => 4),
+                            array('a' => 8, 'b' => 2, 'c' => 5, 'd' => 4),
+                        );
+    protected $data;
     
     public function setUp()
     {
-        $this->resultSteps = array(
-            $this->quickMock('\PHPixie\ORM\Steps\Step\Result', array('result')),
-            $this->quickMock('\PHPixie\ORM\Steps\Step\Result', array('result'))
-        );
-        
-        $this->method($this->resultSteps[0], 'result', array(
-            (object) array('a' => 1, 'b' => 2),
-            (object) array('a' => 3, 'b' => 4)
-        ));
-        
-        $this->method($this->resultSteps[1], 'result', array(
-            (object) array('a' => 5, 'c' => 6),
-            (object) array('a' => 7, 'c' => 8)
-        ));
-        
+        $this->cartesianStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Pivot\Cartesian', array('product'));
+        $this->method($this->cartesianStep, 'product', $this->product);
+        $this->data = $this->product;
         parent::setUp();
-    }
-    
-    /**
-     * @covers ::<protected>
-     * @covers ::execute
-     * @covers ::product
-     */
-    public function testProduct()
-    {
-        $step = $this->step;
-        $this->assertException(function() use($step){
-            $step->product();
-        }, '\PHPixie\ORM\Exception\Plan');
-        
-        $step->execute();
-        $this->assertEquals(array(
-            array(1,2,5,6),
-            array(1,2,7,8),
-            array(3,4,5,6),
-            array(3,4,7,8),
-        ), $step->product());
     }
     
     protected function getStep()
     {
-        return new \PHPixie\ORM\Steps\Step\Pivot\Cartesian($this->resultSteps);
+        return new \PHPixie\ORM\Steps\Step\Pivot\Insert(
+                                            $this->insertQuery,
+                                            $this->queryPlanner,
+                                            $this->fields,
+                                            $this->cartesianStep,
+                                            $this->selectQuery
+                                        );
     }
 }

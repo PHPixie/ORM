@@ -4,12 +4,12 @@ namespace PHPixie\ORM\Steps\Step\Pivot;
 
 class Cartesian extends \PHPixie\ORM\Steps\Step
 {
-    protected $resultStepsMap;
+    protected $resultFilters;
     protected $product;
 
-    public function __construct($resultStepsMap)
+    public function __construct($resultFilters)
     {
-        $this->resultStepsMap = $resultStepsMap;
+        $this->resultFilters = $resultFilters;
     }
 
     public function execute()
@@ -27,12 +27,12 @@ class Cartesian extends \PHPixie\ORM\Steps\Step
 
     protected function buildProduct()
     {
-        if (empty($this->resultStepsMap))
+        if (empty($this->resultFilters))
             return array();
         
         $product = array(array());
-        foreach ($this->resultStepsMap as $resultStepMap) {
-            $rows = $resultStepMap['resultStep']->getFields($resultStepMap['fields']);
+        foreach ($this->resultFilters as $resultFilter) {
+            $rows = $resultFilter->getFilteredData();
             $product = $this->updateProduct($product, $rows);
             if (empty($product))
                 break;

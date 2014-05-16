@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM\Planners\Planner;
+namespace PHPixie\ORM\Planners\Planner;
 
 abstract class Strategy extends \PHPixie\ORM\Planners\Planner
 {

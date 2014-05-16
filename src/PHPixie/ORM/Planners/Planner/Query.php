@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM\Planners\Planner;
+namespace PHPixie\ORM\Planners\Planner;
 
 class Query extends \PHPixie\ORM\Planners\Planner\Strategy
 {

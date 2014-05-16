@@ -13,21 +13,21 @@ class CartesianTest extends \PHPixieTests\ORM\Steps\StepTest
     {
         $this->resultStepsMap = array(
             array(
-                'resultStep' => $this->quickMock('\PHPixie\ORM\Steps\Step\Result', array('getFields')), 
+                'resultStep' => $this->quickMock('\PHPixie\ORM\Steps\ResultFilter', array('getFilteredData')), 
                 'fields' => array('a', 'b')
             ),
             array(
-                'resultStep' => $this->quickMock('\PHPixie\ORM\Steps\Step\Result', array('getFields')), 
+                'resultStep' => $this->quickMock('\PHPixie\ORM\Steps\Step\Result', array('getFilteredData')), 
                 'fields' => array('a', 'c')
             )
         );
         
-        $this->method($this->resultSteps[0], 'getFields', array(
+        $this->method($this->resultSteps[0], 'getFilteredData', array(
             (object) array('a' => 1, 'b' => 2),
             (object) array('a' => 3, 'b' => 4)
         ));
         
-        $this->method($this->resultSteps[1], 'getFields', array(
+        $this->method($this->resultSteps[1], 'getFilteredData', array(
             (object) array('a' => 5, 'c' => 6),
             (object) array('a' => 7, 'c' => 8)
         ));

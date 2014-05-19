@@ -27,8 +27,8 @@ class InsertTest extends \PHPixieTests\ORM\Steps\Step\Insert\BatchTest
     protected function getStep()
     {
         return new \PHPixie\ORM\Steps\Step\Pivot\Insert(
-                                            $this->insertQuery,
                                             $this->queryPlanner,
+                                            $this->insertQuery,
                                             $this->fields,
                                             $this->cartesianStep,
                                             $this->selectQuery

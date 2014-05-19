@@ -12,7 +12,7 @@ class DatabaseResultStub extends \ArrayIterator
 
 abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
 {
-    protected function quickMock($class, $methods)
+    protected function quickMock($class, $methods = array())
     {
         return $this->getMock($class, $methods, array(), '', false);
     }

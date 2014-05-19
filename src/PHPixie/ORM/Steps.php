@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM;
+namespace PHPixie\ORM;
 
 class Steps
 {
@@ -18,7 +18,7 @@ class Steps
 
     public function result($query)
     {
-        return new Steps\Step\Query\Result\Single($query);
+        return new Steps\Step\Query\Result\SingleUse($query);
     }
 
     public function reusableResult($query)
@@ -26,18 +26,19 @@ class Steps
         return new Steps\Step\Query\Result\Reusable($query);
     }
 
-    public function in($query, $placeholder, $logic, $negated, $field)
+    public function in($placeholder, $placeholderField, $resultStep, $resultField)
     {
-        return new Steps\Step\In($query, $placeholder, $logic, $negated, $field);
+        return new Steps\Step\In($placeholder, $placeholderField, $resultStep, $resultField);
     }
 
-    public function pivotCartesian($resultSteps)
+    public function pivotCartesian($resultFiters)
     {
-        return new Steps\Step\Pivot\Cartesian($resultSteps);
+        return new Steps\Step\Pivot\Cartesian($resultFiters);
     }
 
-    public function pivotInsert($queryConnection, $queryTarget, $fields, $cartesianStep)
+    public function pivotInsert($insertQuery, $fields, $cartesianStep)
     {
-        return new Steps\Step\Pivot\Insert($queryPlanner, $queryConnection, $queryTarget, $fields, $cartesianStep);
+        $queryPlanner = $this->planners->query();
+        return new Steps\Step\Pivot\Insert($queryPlanner, $insertQuery, $fields, $cartesianStep);
     }
 }

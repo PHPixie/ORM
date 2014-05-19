@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Planners\Planner;
+namespace PHPixie\ORM\Planners\Planner\Strategy;
 
 class Query extends \PHPixie\ORM\Planners\Planner\Strategy
 {
@@ -20,7 +20,7 @@ class Query extends \PHPixie\ORM\Planners\Planner\Strategy
 
     protected function selectStrategy($query)
     {
-        if ($queryConnection instanceof PHPixie\DB\Driver\PDO\Query)
+        if ($queryConnection instanceof PHPixie\Database\Driver\PDO\Query)
             return $this->strategy('pdo');
         return $this->strategy('mongo');
     }

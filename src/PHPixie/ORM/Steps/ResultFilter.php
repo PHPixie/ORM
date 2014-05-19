@@ -15,7 +15,7 @@ class ResultFilter
     
     public function getFirstFieldValues()
     {
-        return $this->resultStep->getField($fields[0]);
+        return $this->resultStep->getField($this->fields[0]);
     }
     
     public function getFilteredData()

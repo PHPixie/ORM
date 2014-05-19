@@ -4,15 +4,10 @@ namespace PHPixie\ORM\Planners\Planner;
 
 abstract class Strategy extends \PHPixie\ORM\Planners\Planner
 {
-    protected $strategies = array();
-
-    protected function strategy($name)
+    protected $strategies;
+    
+    public function __construct($strategies)
     {
-        if (!isset($this->strategies[$name]))
-            $this->strategies[$name] = $this->buildStrategy($name);
-
-        return $this->strategies[$name];
+        $this->strategies = $strategies;
     }
-
-    abstract protected function buildStrategy($name);
 }

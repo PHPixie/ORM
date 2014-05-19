@@ -16,7 +16,7 @@ class Repositories
 
     public function get($name)
     {
-        if (!array_key_exists($name, $this->repositories)) {
+        if (!array_key_exists($name, $this->repositories))
             $this->repositories[$name] = $this->buildRepository($name, $this->config->slice($modelName));
 
         return $this->repositories[$name];

@@ -8,7 +8,7 @@ abstract class Batch extends \PHPixie\ORM\Steps\Step\Insert
     protected $fields;
     protected $data;
     
-    public function __construct($insertQuery, $queryPlanner)
+    public function __construct($queryPlanner, $insertQuery)
     {
         parent::__construct($insertQuery);
         $this->queryPlanner = $queryPlanner;

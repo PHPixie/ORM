@@ -7,10 +7,12 @@ namespace PHPixieTests\ORM\Planners;
  */
 abstract class PlannerTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $strategies;
     protected $planner;
     
     public function setUp()
     {
+        $this->strategies = $this->quickMock('\PHPixie\ORM\Planners\Strategies');
         $this->planner = $this->getPlanner();
     }
     

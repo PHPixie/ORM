@@ -12,14 +12,14 @@ class Query extends \PHPixie\ORM\Planners\Planner
 
     public function setBatchData($query, $fields, $data)
     {
-        $this->selectStrategy($query)->setBatchData($query, $source);
+        $this->selectStrategy($query)->setBatchData($query, $fields, $data);
         return $query;
     }
 
     protected function selectStrategy($query)
     {
-        if ($query instanceof \PHPixie\Database\Driver\PDO\Query){
-            return $this->strategies->query('PDO');
+        if ($query instanceof \PHPixie\Database\SQL\Query){
+            return $this->strategies->query('SQL');
         }
         return $this->strategies->query('Mongo');
     }

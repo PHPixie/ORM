@@ -17,12 +17,12 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
         return $this->getMock($class, $methods, array(), '', false);
     }
     
-    protected function method($mock, $method, $return, $at = null, $setWith = false, $with = null) {
+    protected function method($mock, $method, $return, $with = null, $at = null) {
         $method = $mock
             ->expects($at === null ? $this->any() : $this->at($at))
             ->method($method);
         
-        if ($setWith)
+        if ($with !== null)
             $method = call_user_func_array(array($method, 'with'), $with);
         
         if (is_callable($return) && !is_array($return)) {

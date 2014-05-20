@@ -47,12 +47,12 @@ class Collection
             throw new \PHPixie\ORM\Exception\Mapper("Only '{$this->requiredModel}' models and queries are allowed.");
     }
 
-    public function addedModels()
+    public function models()
     {
         return $this->models;
     }
 
-    public function addedQueries()
+    public function queries()
     {
         return $this->queries;
     }
@@ -74,5 +74,8 @@ class Collection
     {
         return array_column($this->modelFields(array($field), $field));
     }
+    
+    public function connection()
+    {}
 
 }

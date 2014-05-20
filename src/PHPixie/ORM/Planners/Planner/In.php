@@ -1,23 +1,20 @@
 <?php
 
-namespace \PHPixie\ORM\Planners\Planner;
+namespace PHPixie\ORM\Planners\Planner;
 
-class In extends \PHPixie\ORM\Planners\Planner\Strategy
+class In extends \PHPixie\ORM\Planners\Planner
 {
     public function collection($query, $queryField, $collection, $collectionField, $plan, $logic = 'and', $negate = false)
     {
-        $query->startWhereGroup($logic, $negated);
+        $query->startWhereGroup($logic, $negate);
         $ids = $collection->modelField($collectionField);
         if (!empty($ids))
-            $query->orWhere($queryField, 'in', $ids);
+            $query->where($queryField, 'in', $ids);
 
-        $collectionQueries = $collection->addedQueries();
+        $collectionQueries = $collection->queries();
         if (!empty($collectionQueries)) {
-            $collectionConnection = $this
-                            ->repositoryRegistry($collection->modelName())
-                            ->connection();
-            $strategy = $this->selectStrategy($query->connection(), $collectionConnection);
-            foreach ($collection->addedQueries() as $collectionQuery) {
+            $strategy = $this->selectStrategy($query->connection(), $collection->connection());
+            foreach ($collectionQueries as $collectionQuery) {
                 $subplan = $collectionQuery->planFind();
                 $plan->appendPlan($subplan->requiredPlan());
                 $subquery = $subplan->resultStep()->query();
@@ -48,15 +45,8 @@ class In extends \PHPixie\ORM\Planners\Planner\Strategy
 
     protected function selectStrategy($queryConnection, $subqueryConnection)
     {
-        if ($queryConnection instanceof PHPixie\DB\Driver\PDO\Connection && $queryConnection === $subqueryConnection)
-            return $this->strategy('subquery');
-        return $this->strategy('multiquery');
-    }
-
-    protected function buildStrategy($name)
-    {
-        $class = '\PHPixie\ORM\Planners\Planner\In\Strategy\\'.$name;
-
-        return new $class($this->steps);
+        if ($queryConnection instanceof \PHPixie\Database\Driver\PDO\Connection && $queryConnection === $subqueryConnection)
+            return $this->strategies->in('subquery');
+        return $this->strategies->in('multiquery');
     }
 }

@@ -55,6 +55,25 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
         $this->collectionTest($collectionConnection, $queryConnection, $this->subquery);
     }
     
+    public function testResult()
+    {
+        $placeholder = $this->quickMock('\PHPixie\Database\Conditions\Condition\Placeholder');
+        $placeholder = $this->quickMock('\PHPixie\Database\Conditions\Condition\Placeholder');
+        $builder = $this->quickMock('\PHPixie\Database\Conditions\Builder', array('addPlaceholder'));
+        $this->method($builder, 'addPlaceholder', $placeholder, array('or', true), 0);
+        $this->method($this->steps, 'in', $inStep, array($placeholder, 'pixie', $resultStep, 'fairy'), 0);
+        
+        public function result($query, $queryField, $resultStep, $resultField, $logic = 'and', $negate = false)
+        $placeholder = $query->getWhereBuilder()->addPlaceholder($logic, $negate);
+        $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $resultField);
+        $plan->push($inStep);
+    }
+    
+    protected function resultTest()
+    {
+    
+    }
+    
     protected function collectionTest($collectionConnection, $queryConnection, $strategy)
     {
         $query = $this->quickMock('\PHPixie\Database\Query\Items', array('startWhereGroup', 'endWhereGroup', 'where', 'connection'));

@@ -57,23 +57,40 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
     
     public function testResult()
     {
-        $placeholder = $this->quickMock('\PHPixie\Database\Conditions\Condition\Placeholder');
+		$query = $this->quickMock('\PHPixie\Database\Query\Items', array('getWhereBuilder'));
+		$resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
+		$plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Step');
+		
+		$this->prepareResultTest($query, $resultStep, $plan, 'or', true);
+        $this->planner->result($query, 'pixie', $resultStep, 'fairy', $plan, 'or', true);
+        $this->prepareResultTest($query, $resultStep, $plan, 'and', false);
+        $this->planner->result($query, 'pixie', $resultStep, 'fairy', $plan);
+    }
+    
+    public function testSubquerySamePdo()
+    {
+		$connection = $this->quickMock('\PHPixie\Database\Driver\PDO\Connection');
+	}
+    
+    protected function prepareSubqueryTest($query, $subquery, $strategy, $logic, $negate)
+    {
+		$query = $this->quickMock('\PHPixie\Database\Query\Items', array('connection'));
+	}
+    
+    protected function prepareResultTest($query, $resultStep, $plan, $logic, $negate)
+    {
         $placeholder = $this->quickMock('\PHPixie\Database\Conditions\Condition\Placeholder');
         $builder = $this->quickMock('\PHPixie\Database\Conditions\Builder', array('addPlaceholder'));
-        $this->method($builder, 'addPlaceholder', $placeholder, array('or', true), 0);
+        
+        $this->method($query, 'getWhereBuilder', $builder, array(), 0);
+        $this->method($builder, 'addPlaceholder', $placeholder, array($logic, $negate), 0);
+        
+        $inStep = $this->quickMock('\PHPixie\ORM\Steps\Step\In');
         $this->method($this->steps, 'in', $inStep, array($placeholder, 'pixie', $resultStep, 'fairy'), 0);
         
-        public function result($query, $queryField, $resultStep, $resultField, $logic = 'and', $negate = false)
-        $placeholder = $query->getWhereBuilder()->addPlaceholder($logic, $negate);
-        $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $resultField);
-        $plan->push($inStep);
-    }
-    
-    protected function resultTest()
-    {
-    
-    }
-    
+        $this->method($plan, 'add', null, array($inStep), 0);
+	}
+	
     protected function collectionTest($collectionConnection, $queryConnection, $strategy)
     {
         $query = $this->quickMock('\PHPixie\Database\Query\Items', array('startWhereGroup', 'endWhereGroup', 'where', 'connection'));
@@ -121,6 +138,6 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
     
     protected function getPlanner()
     {
-        return new \PHPixie\ORM\Planners\Planner\In($this->strategies);
+        return new \PHPixie\ORM\Planners\Planner\In($this->strategies, $this->steps);
     }
 }

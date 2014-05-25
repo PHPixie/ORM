@@ -4,6 +4,16 @@ namespace PHPixie\ORM\Planners\Planner;
 
 class In extends \PHPixie\ORM\Planners\Planner
 {
+	
+    protected $strategies;
+    protected $steps;
+    
+    public function __construct($strategies, $steps)
+    {
+        $this->strategies = $strategies;
+        $this->steps = $steps;
+    }
+    
     public function collection($query, $queryField, $collection, $collectionField, $plan, $logic = 'and', $negate = false)
     {
         $query->startWhereGroup($logic, $negate);
@@ -25,16 +35,11 @@ class In extends \PHPixie\ORM\Planners\Planner
         $query->endWhereGroup();
     }
 
-    public function result($query, $queryField, $resultStep, $resultField, $logic = 'and', $negate = false)
+    public function result($query, $queryField, $resultStep, $resultField, $plan, $logic = 'and', $negate = false)
     {
         $placeholder = $query->getWhereBuilder()->addPlaceholder($logic, $negate);
         $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $resultField);
-        $plan->push($inStep);
-    }
-
-    public function loader($query, $queryField, $loader, $loaderField, $plan, $logic = 'and', $negate = false)
-    {
-        $this->result($query, $queryField, $loader->resultStep(), $loaderField, $plan, $logic, $negate);
+        $plan->add($inStep);
     }
 
     public function subquery($query, $queryField, $subquery, $subqueryField, $plan, $logic = 'and', $negate = false)

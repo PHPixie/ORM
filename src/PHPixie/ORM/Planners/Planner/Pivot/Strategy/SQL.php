@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM\Planners\Planner\Pivot\Strategy;
+namespace PHPixie\ORM\Planners\Planner\Pivot\Strategy;
 
 class SQL extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
 {
@@ -26,7 +26,7 @@ class SQL extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
                 'productAlias' => $name,
                 'productKey' => $this->productAlias.'.'.$name,
                 'pivotKey' => $pivotTable.'.'.$side->pivotKey,
-            )
+            );
         }
 
         $productQuery = $pivot->connection->query()
@@ -40,7 +40,7 @@ class SQL extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
         $filteredQuery = $pivot->connection->query('select')
                                                 ->fields(array($sides[0]['productKey'], $sides[1]['productKey']))
                                                 ->table($productQuery, $this->productAlias)
-                                                ->join($pivotTable, null, 'left_outer');
+                                                ->join($pivotTable, null, 'left_outer')
                                                     ->on($sides[0]['productKey'], $sideData[0]['pivotKey'])
                                                     ->on($sides[1]['productKey'], $sideData[1]['pivotKey'])
                                                 ->where($sideData[0]['pivotKey'], null);

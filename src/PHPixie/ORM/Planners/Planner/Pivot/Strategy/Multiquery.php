@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM\Planners\Planner\Pivot\Strategy;
+namespace PHPixie\ORM\Planners\Planner\Pivot\Strategy;
 
 class Multiquery extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
 {

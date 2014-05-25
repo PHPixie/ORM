@@ -26,14 +26,14 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
     protected function selectStrategy($pivot, $firstSide, $secondSide)
     {
         $pivotConnection = $pivot->connection();
-        if (!($pivotConnection instanceof \PHPixie\DB\Driver\PDO\Connection))
-            return $this->strategy('multiquery');
+        if (!($pivotConnection instanceof \PHPixie\Database\Driver\PDO\Connection))
+            return $this->strategies->pivot('multiquery');
 
         foreach(array($firstSide, $secondSide) as $side)
-            if ($side !== null && $side->repository->connection() !== $pivotConnection)
-                return $this->strategy('multiquery');
+            if ($side !== null && $side->connection() !== $pivotConnection)
+                return $this->strategies->pivot('multiquery');
 
-        return $this->strategy('SQL');
+        return $this->strategies->pivot('SQL');
     }
 
     public function pivot($connection, $source)

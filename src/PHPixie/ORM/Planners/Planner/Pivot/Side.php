@@ -29,4 +29,9 @@ class Side
     {
         return $this->pivotKey;
     }
+    
+    public function connection()
+    {
+        return $this->repository->connection();
+    }
 }

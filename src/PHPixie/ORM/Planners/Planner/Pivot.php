@@ -1,9 +1,16 @@
 <?php
 
-namespace \PHPixie\ORM\Planners\Planner;
+namespace PHPixie\ORM\Planners\Planner;
 
 class Pivot extends \PHPixie\ORM\Planners\Planner
 {
+    protected $strategies;
+    
+    public function __construct($strategies)
+    {
+        $this->strategies = $strategies;    
+    }
+    
     public function link($pivot, $firstSide, $secondSide, $plan)
     {
        $strategy = $this->selectStrategy($pivot, $firstSide, $secondSide);
@@ -29,20 +36,13 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
         return $this->strategy('SQL');
     }
 
-    public function pivot($connection, $pivot)
+    public function pivot($connection, $source)
     {
-        return new Pivot\Pivot($connection, $pivot);
+        return new Pivot\Pivot($connection, $source);
     }
 
-    public function side($items, $idField, $pivotKey)
+    public function side($items, $repository, $pivotKey)
     {
-        return new Pivot\Side($items, $idField, $pivotKey);
-    }
-
-    protected function buildStrategy($name)
-    {
-        $class = '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\\'.ucfirst($name);
-
-        return new $class($this->planners, $this->steps);
+        return new Pivot\Side($items, $repository, $pivotKey);
     }
 }

@@ -44,7 +44,7 @@ class In extends \PHPixie\ORM\Planners\Planner
 
     public function subquery($query, $queryField, $subquery, $subqueryField, $plan, $logic = 'and', $negate = false)
     {
-        $strategy = $this->selectStrategy($dbQuery->connection(), $subqery->connection());
+        $strategy = $this->selectStrategy($query->connection(), $subquery->connection());
         $strategy->in($query, $queryField, $subquery, $subqueryField, $plan, $logic, $negate);
     }
 

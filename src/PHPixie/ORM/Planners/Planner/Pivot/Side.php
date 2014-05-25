@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM\Planners\Planner\Pivot;
+namespace PHPixie\ORM\Planners\Planner\Pivot;
 
 class Side
 {
@@ -14,5 +14,19 @@ class Side
         $this->repository = $repository;
         $this->pivotKey = $pivotKey;
     }
-
+    
+    public function items()
+    {
+        return $this->items;
+    }
+    
+    public function repository()
+    {
+        return $this->repository;
+    }
+    
+    public function pivotKey()
+    {
+        return $this->pivotKey;
+    }
 }

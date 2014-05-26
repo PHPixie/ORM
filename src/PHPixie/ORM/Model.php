@@ -6,7 +6,6 @@ class Model
 {
     protected $relationshipMap;
     protected $properties = array();
-    protected $isNew;
 
     public function __construct($relationshipMap, $data, $isNew = true)
     {
@@ -70,16 +69,6 @@ class Model
         return $dataProperties;
     }
 
-    public function isNew()
-    {
-        return $this->isNew;
-    }
-
-    public function setIsNew($isNew)
-    {
-        $this->isNew = $isNew;
-    }
-
     public function relationshipProperty($name, $createMissing = true)
     {
         if (!array_key_exists($name, $this->properties)) {
@@ -97,4 +86,5 @@ class Model
 
         return $this->properties[$name];
     }
+    
 }

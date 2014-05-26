@@ -11,7 +11,8 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     protected $skipped = array();
     protected $deletedOffsets = array();
     protected $addedModels = array();
-    protected $loaderItemsCount;
+    protected $addedOffsets = array();
+    protected $loaderItemsCount = null;
 
     public function __construct($loaders, $loader)
     {
@@ -24,7 +25,8 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         foreach ($models as $model) {
             $id = $model->id();
             $this->skipId($id);
-            $this->addedModels[$id] = $model;
+            $this->addedModels[] = $model;
+            $this->addedOffsets[$id] = count($this->addedModels) - 1;
         }
     }
 
@@ -33,14 +35,17 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         foreach ($models as $model) {
             $id = $model->id();
             $this->skipId($id);
-            if (array_key_exists($id, $this->addedModels))
-                unset($this->addedModels[$id]);
+            if (array_key_exists($id, $this->addedOffsets)){
+                $offset = $this->addedOffsets[$id];
+                unset($this->addedModels[$offset]);
+                unset($this->addedOffsets[$id]);
+            }
         }
     }
 
     public function usedModels()
     {
-        $models = array_values($this->addedModels);
+        $models = $this->addedModels;
         if ($this->loader instanceof Result\SingleUse) {
             $model = $this->loader->currentModel();
             if ($model !== null)
@@ -79,25 +84,28 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
             $this->maxAllowedOffset++;
 
         $loaderOffset = $this->loaderOffset($offset);
-
         if ($this->loaderItemsCount !== null && $loaderOffset >= $this->loaderItemsCount) {
             $addedModelsOffset = $loaderOffset - $this->loaderItemsCount;
             if (array_key_exists($addedModelsOffset, $this->addedModels))
                 return $this->addedModels[$addedModelsOffset];
             return null;
         }
-
+        
+        if(!$this->loader->offsetExists($loaderOffset)){
+            
+            if ($this->loaderItemsCount === null) {
+                $this->loaderItemsCount = $loaderOffset;
+                return $this->getByOffset($offset);
+            }
+            
+            return null;
+        }
+        
         $model = $this->loader->getByOffset($loaderOffset);
 
-        if ($model === null && $this->loaderItemsCount === null) {
-            $this->loaderItemsCount = $loaderOffset;
-
-            return $this->getByOffset($offset);
-        }
-
-        if ($$model->isDeleted()) {
+        if ($model->isDeleted()) {
             $this->deletedOffsets[] = $loaderOffset;
-
+            
             return $this->updateAndGet($offset);
         }
 
@@ -122,11 +130,12 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
 
     protected function skipId($id)
     {
-        if (!array_key_exists($id, $this->skip)) {
+        if (!array_key_exists($id, $this->skipped)) {
             $offset = null;
-            if (!array_key_exists($id, $this->idOffsets))
+            if (array_key_exists($id, $this->idOffsets)) {
                 $offset = $this->idOffsets[$id];
-            $this->skip[$id] = $offset;
+                $this->skipped[$id] = $offset;
+            }
         }
     }
 
@@ -136,27 +145,36 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
 
         $adjusted = 0;
         $previous = 0;
-
-        asort($this->skipped);
-        foreach ($this->skipped as $current) {
+        
+        $skipped = $this->skipped;
+        foreach($this->deletedOffsets as $deletedOffset)
+            $skipped[]=$deletedOffset;
+        
+        asort($skipped);
+        foreach ($skipped as $current) {
             if ($current === null)
                 continue;
             $adjusted = $adjusted + $current - $previous;
             $this->adjustedOffsets[] = $adjusted;
         }
+        
     }
 
     protected function loaderOffset($offset)
     {
         if (empty($this->adjustedOffsets))
             return $offset;
-
+        
+        print_r($this->adjustedOffsets);
+        
         if (!array_key_exists($offset, $this->adjustedOffsets)) {
             $maxAdjusted = $this->maxAdjustedOffset($offset);
+            echo($maxAdjusted);
             $adjustedOffset = $this->adjustedOffsets[$maxAdjusted] + $offset - $maxAdjusted;
             $this->adjustedOffsets[$offset] = $adjustedOffset;
         }
-
+        echo($this->adjustedOffsets[$offset]);
+        die;
         return $this->adjustedOffsets[$offset];
     }
 

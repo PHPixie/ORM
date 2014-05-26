@@ -5,7 +5,6 @@ namespace PHPixie\ORM\Loaders;
 abstract class Loader implements \IteratorAggregate
 {
     protected $loaders;
-    protected $preloaders = array();
 
     public function __construct($loaders)
     {
@@ -30,5 +29,5 @@ abstract class Loader implements \IteratorAggregate
     }
 
     abstract public function offsetExists($offset);
-    abstract protected function getByOffset($offset);
+    abstract public function getByOffset($offset);
 }

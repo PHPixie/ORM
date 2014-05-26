@@ -5,7 +5,14 @@ namespace PHPixie\ORM\Model\Repository\Database;
 abstract class Model extends \PHPixie\ORM\Model
 {
     protected $isDeleted = false;
+    protected $isNew;
 
+    public function __construct($isNew = true)
+    {
+        parent::__construct($relationshipMap, $data);
+        $this->isNew = $isNew;
+    }
+    
     public function id()
     {
         $this->assertNotDeleted();

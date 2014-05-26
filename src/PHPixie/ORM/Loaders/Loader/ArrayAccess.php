@@ -8,8 +8,8 @@ class ArrayAccess extends \PHPixie\ORM\Loaders\Loader
 
     public function __construct($loaders, $arrayAccess)
     {
-        $this->property = $property;
-        parent::construct($loaders);
+        $this->arrayAccess = $arrayAccess;
+        parent::__construct($loaders);
     }
 
     public function offsetExists($offset)
@@ -17,8 +17,8 @@ class ArrayAccess extends \PHPixie\ORM\Loaders\Loader
         return $this->arrayAccess->offsetExists($offset);
     }
 
-    protected function getModelByOffset($offset)
+    public function getByOffset($offset)
     {
-        return $this->property->offsetGet($offset);
+        return $this->arrayAccess->offsetGet($offset);
     }
 }

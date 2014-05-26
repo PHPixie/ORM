@@ -2,38 +2,47 @@
 
 namespace PHPixie\ORM\Loaders;
 
-class Iterator
+class Iterator implements \Iterator
 {
     protected $loader;
     protected $offset = 0;
+    protected $reachedEnd = false;
 
     public function __construct($loader)
     {
         $this->loader = $loader;
     }
 
-    public function offset()
+    public function key()
     {
         return $this->offset;
     }
 
     public function current()
     {
-        return $this->loader->getByOffset($this->key);
+        return $this->loader->getByOffset($this->offset);
     }
 
     public function rewind()
     {
-        $this->key = 0;
+        $this->offset = 0;
+        $this->reachedEnd = false;
     }
 
     public function valid()
     {
-        $this->loader->offsetExists($this->offset);
+        if($this->reachedEnd)
+            return false;
+        
+        return $this->loader->offsetExists($this->offset);
     }
 
     public function next()
     {
-        $this->offset++;
+        if($this->loader->offsetExists($this->offset+1)){
+            $this->offset++;
+        }else{
+            $this->reachedEnd = true;
+        }
     }
 }

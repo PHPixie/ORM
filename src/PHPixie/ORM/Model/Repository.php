@@ -32,7 +32,12 @@ abstract class Repository
     {
         return $model->data()->currentData();
     }
-
+    
+    public function connection()
+    {
+        $this->ormBuilder->databaseConnection($this->connectionName);
+    }
+    
     abstract public function save($model);
     abstract public function delete($model);
     abstract public function load($data);

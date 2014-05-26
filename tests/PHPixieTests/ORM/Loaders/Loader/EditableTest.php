@@ -28,6 +28,7 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     {
         $this->prepareSubloader();
         $this->assertItems(array(0, 2));
+        echo('-----------');
         $model = $this->model(3);
         $this->loader->add(array($model));
         $this->loader->offsetExists(0);

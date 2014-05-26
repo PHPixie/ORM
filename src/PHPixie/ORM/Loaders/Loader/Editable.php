@@ -84,6 +84,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
             $this->maxAllowedOffset++;
 
         $loaderOffset = $this->loaderOffset($offset);
+        print_r(array($offset, $loaderOffset, $this->loaderItemsCount));
         if ($this->loaderItemsCount !== null && $loaderOffset >= $this->loaderItemsCount) {
             $addedModelsOffset = $loaderOffset - $this->loaderItemsCount;
             if (array_key_exists($addedModelsOffset, $this->addedModels))
@@ -94,7 +95,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         if(!$this->loader->offsetExists($loaderOffset)){
             
             if ($this->loaderItemsCount === null) {
-                $this->loaderItemsCount = $loaderOffset;
+                $this->loaderItemsCount = $loaderOffset-1;
                 return $this->getByOffset($offset);
             }
             
@@ -106,6 +107,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         if ($model->isDeleted()) {
             $this->deletedOffsets[] = $loaderOffset;
             
+            echo('--'.$offset.$loaderOffset);
             return $this->updateAndGet($offset);
         }
 
@@ -124,7 +126,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     protected function updateAndGet($offset)
     {
         $this->updateAdjustedOffsets();
-
+        var_Dump($offset);
         return $this->getByOffset($offset);
     }
 
@@ -164,17 +166,15 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     {
         if (empty($this->adjustedOffsets))
             return $offset;
-        
         print_r($this->adjustedOffsets);
         
         if (!array_key_exists($offset, $this->adjustedOffsets)) {
             $maxAdjusted = $this->maxAdjustedOffset($offset);
-            echo($maxAdjusted);
+            echo('LL'.$maxAdjusted);
             $adjustedOffset = $this->adjustedOffsets[$maxAdjusted] + $offset - $maxAdjusted;
             $this->adjustedOffsets[$offset] = $adjustedOffset;
         }
         echo($this->adjustedOffsets[$offset]);
-        die;
         return $this->adjustedOffsets[$offset];
     }
 

@@ -28,12 +28,13 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $this->prepareSubloader();
         
         $this->assertItems(array(0, 2, 3, 4));
-        /*
+        
         $this->assertItems(array(0, 2, 3, 4));
         
         $model5 = $this->model(5);
         $this->loader->add(array($model5));
         $this->assertItems(array(0, 2, 3, 4, 5));
+        
         
         $this->loader->add(array($this->model(6)));
         $this->assertItems(array(0, 2, 3, 4, 5, 6));
@@ -44,11 +45,13 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $model0 = $this->loader->getByOffset(0);
         $model0->setIsDeleted(true);
         $this->assertItems(array(2, 3, 4, 6));
-        */
+        /*
         $this->loader->remove(array($this->loader->getByOffset(2)));
         $this->loader->getByOffset(0);
         $this->loader->getByOffset(1);
         $this->loader->getByOffset(2);
+        */
+        
     }
     
     protected function assertItems($expected)

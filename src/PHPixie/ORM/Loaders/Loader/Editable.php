@@ -160,7 +160,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         $last = count($skippedOffsets) - 1;
         
         foreach($skippedOffsets as $key => $skippedOffset) {
-            $adjustedOffset = $skippedOffset + $adjustment + 1;
+            $adjustedOffset = $skippedOffset + $adjustment;
             while($key === $last || ($key < $last && $skippedOffsets[$key + 1] === $adjustedOffset)){
                 $key++;
                 $adjustedOffset++;
@@ -200,11 +200,15 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
             }
         }
         
-        if($high === -1)
-            return $offset;
+        if($high === -1) {
+            $adjusted = $offset;
+        }else{
+            $maxAdjusted = $this->skippedOffsets[$high];
+            $adjusted = $this->adjustedOffsets[$maxAdjusted] + $offset - $maxAdjusted;
+        }
         
-        $maxAdjusted = $this->skippedOffsets[$high];
-        return $this->adjustedOffsets[$maxAdjusted] + $offset - $maxAdjusted;
+        var_dump([$offset, $adjusted]);
+        return $adjusted;
         
     }
         

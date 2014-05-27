@@ -20,12 +20,6 @@ abstract class Preloadable extends \PHPixie\ORM\Loaders\Loader
         return null;
     }
 
-    public function preloadModelProperties($model)
-    {
-        foreach($this->preloaders as $relationship => $preloader)
-            $model->$relationship = $preloader->loadFor($model);
-    }
-
     public function getByOffset($offset)
     {
         $model = $this->getModelByOffset($offset);
@@ -34,5 +28,11 @@ abstract class Preloadable extends \PHPixie\ORM\Loaders\Loader
         return $model;
     }
 
+    protected function preloadModelProperties($model)
+    {
+        foreach($this->preloaders as $relationship => $preloader)
+            $model->setProperty($preloader->loadFor($model));
+    }
+    
     abstract public function getModelByOffset($offset);
 }

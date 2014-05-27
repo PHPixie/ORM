@@ -35,23 +35,105 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $this->loader->add(array($model5));
         $this->assertItems(array(0, 2, 3, 4, 5));
         
+        $model7 = $this->model(7);
+        $model7->setIsDeleted(true);
+        $this->loader->add(array($model7));
+        $this->assertItems(array(0, 2, 3, 4, 5));
+        
         
         $this->loader->add(array($this->model(6)));
         $this->assertItems(array(0, 2, 3, 4, 5, 6));
         
+        
         $model5->setIsDeleted(true);
         $this->assertItems(array(0, 2, 3, 4, 6));
+        
         
         $model0 = $this->loader->getByOffset(0);
         $model0->setIsDeleted(true);
         $this->assertItems(array(2, 3, 4, 6));
-        /*
-        $this->loader->remove(array($this->loader->getByOffset(2)));
-        $this->loader->getByOffset(0);
-        $this->loader->getByOffset(1);
-        $this->loader->getByOffset(2);
-        */
         
+        
+        $this->loader->remove(array($this->loader->getByOffset(2)));
+        $this->assertItems(array(2, 3, 6));
+        
+        $this->loader->remove(array($this->loader->getByOffset(0), $this->loader->getByOffset(1)));
+        $this->assertItems(array(6));
+        
+        $this->loader->remove(array($this->loader->getByOffset(0)));
+        $this->assertItems(array());
+    }
+    
+    /**
+     * @covers ::<protected>
+     * @covers ::add
+     * @covers ::remove
+     * @covers ::removeAll
+     * @covers ::offsetExists
+     * @covers ::getByOffset
+     */
+    public function testRemoval()
+    {
+        $this->prepareSubloader();
+        $this->assertItems(array(0, 2, 3, 4));
+        $this->loader->add(array($this->model(5)));
+        $this->assertItems(array(0, 2, 3, 4, 5));
+        $this->loader->removeAll();
+        $this->assertItems(array());
+    }
+
+    /**
+     * @covers ::<protected>
+     * @covers ::add
+     * @covers ::remove
+     * @covers ::offsetExists
+     * @covers ::getByOffset
+     */
+    public function testRemoveBeforeLoad()
+    {
+        $this->prepareSubloader();
+        $this->loader->remove(array($this->model(2)));
+        $this->assertItems(array(0, 3, 4));
+    }
+    
+    /**
+     * @covers ::<protected>
+     * @covers ::add
+     * @covers ::remove
+     * @covers ::offsetExists
+     * @covers ::getByOffset
+     */
+    public function testRemoveAllByOneBeforeLoad()
+    {
+        $this->prepareSubloader();
+        $this->loader->remove(array(
+            $this->model(0),
+            $this->model(2),
+            $this->model(3),
+            $this->model(4),
+        ));
+        $this->loader->add(array(
+            $this->model(5),
+        ));
+        $this->assertItems(array(5));
+    }
+    
+    /**
+     * @covers ::<protected>
+     * @covers ::removeAll
+     * @covers ::offsetExists
+     * @covers ::getByOffset
+     * @covers ::add
+     */
+    public function testRemoveAllBeforeLoad()
+    {
+        $this->prepareSubloader();
+        $this->loader->removeAll();
+        $this->assertItems(array());
+        $this->loader->add(array(
+            $this->model(5),
+        ));
+        $this->assertItems(array(5));
     }
     
     protected function assertItems($expected)

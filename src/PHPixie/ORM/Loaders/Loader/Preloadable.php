@@ -31,7 +31,7 @@ abstract class Preloadable extends \PHPixie\ORM\Loaders\Loader
     protected function preloadModelProperties($model)
     {
         foreach($this->preloaders as $relationship => $preloader)
-            $model->setProperty($preloader->loadFor($model));
+            $model->setRelationshipProperty($preloader->loadFor($model));
     }
     
     abstract public function getModelByOffset($offset);

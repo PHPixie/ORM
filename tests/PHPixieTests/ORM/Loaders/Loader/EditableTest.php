@@ -20,19 +20,33 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
      * @covers ::<protected>
      * @covers ::add
      * @covers ::remove
-     * @covers ::removeAll
      * @covers ::offsetExists
      * @covers ::getByOffset
      */
     public function testEdit()
     {
         $this->prepareSubloader();
-        $this->assertItems(array(0, 2));
-        echo('-----------');
-        $model = $this->model(3);
-        $this->loader->add(array($model));
-        $this->loader->offsetExists(0);
-        /*$this->assertItems(array(0, 2, 3));*/
+        
+        $this->assertItems(array(0, 2, 3, 4));
+        /*
+        $this->assertItems(array(0, 2, 3, 4));
+        
+        $model5 = $this->model(5);
+        $this->loader->add(array($model5));
+        $this->assertItems(array(0, 2, 3, 4, 5));
+        
+        $this->loader->add(array($this->model(6)));
+        $this->assertItems(array(0, 2, 3, 4, 5, 6));
+        
+        $model5->setIsDeleted(true);
+        $this->assertItems(array(0, 2, 3, 4, 6));
+        
+        $model0 = $this->loader->getByOffset(0);
+        $model0->setIsDeleted(true);
+        $this->assertItems(array(2, 3, 4, 6));
+        */
+        $this->loader->remove(array($this->loader->getByOffset(2)));
+        $this->assertItems(array(2, 3, 6));
     }
     
     protected function assertItems($expected)
@@ -47,24 +61,21 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $expectedIds = array();
         foreach($expected as $idKey)
             $expectedIds[]=$this->ids[$idKey];
-        
+        print_r($ids);
         $this->assertEquals($expectedIds, $ids);
     }
     
     protected function model($id, $isDeleted = false)
     {
         $id=$this->ids[$id];
-        $model = $this->quickMock('\PHPixie\ORM\Model\Repository\Database\Model');
+        $model = $this->quickMock('\PHPixie\ORM\Model\Repository\Database\Model', array('id'));
         
         $model
             ->expects($this->any())
             ->method('id')
             ->will($this->returnValue($id));
         
-        $model
-            ->expects($this->any())
-            ->method('isDeleted')
-            ->will($this->returnValue($isDeleted));
+        $model->setIsDeleted($isDeleted);
         
         return $model;
     }
@@ -72,7 +83,7 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     protected function prepareSubloader()
     {
         $models = array();
-        for($i=0; $i<3; $i++)
+        for($i=0; $i<5; $i++)
             $models[] = $this->model($i, $i==1);
         
         $this->subloader

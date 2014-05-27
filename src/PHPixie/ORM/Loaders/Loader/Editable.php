@@ -11,6 +11,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     protected $skippedIds = array();
     protected $deletedOffsets = array();
     protected $skippedOffsets = array();
+    protected $adjustedOffsets = array();
     
     protected $loaderItemsCount = null;
     
@@ -131,6 +132,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     protected function updateAndGet($offset)
     {
         $this->updateSkippedOffsets();
+        print_r([$this->adjustedOffsets, $offset]);
         return $this->getByOffset($offset);
     }
 
@@ -147,36 +149,50 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
 
     protected function updateSkippedOffsets()
     {
-        $this->skippedOffsets = array_merge(
-            array_values($this->skippedIds),
-            $this->deletedOffsets
-        );
+        $this->adjustedOffsets = array();
+        $adjustment = 0;
         
-        sort($this->skippedOffsets);
+        $skippedOffsets = array_values($this->skippedIds);
+        foreach($this->deletedOffsets as $deletedOffset)
+            $skippedOffsets[]=$deletedOffset;
+        
+        sort($skippedOffsets);
+        $last = count($skippedOffsets) - 1;
+        
+        foreach($skippedOffsets as $key => $skippedOffset) {
+            $adjustedOffset = $skippedOffset + $adjustment + 1;
+            while($key === $last || ($key < $last && $skippedOffsets[$key + 1] === $adjustedOffset)){
+                $key++;
+                $adjustedOffset++;
+            }
+            $this->adjustedOffsets[$skippedOffset] = $adjustedOffset;
+            $adjustment = $adjustedOffset - $skippedOffset;
+        }
+        
+        $this->skippedOffsets = $skippedOffsets;
     }
 
     protected function loaderOffset($offset)
     {
-        if (empty($this->skippedOffsets))
+        if (empty($this->adjustedOffsets))
             return $offset;
         
-        return $offset + $this->getAdjustment($offset);
+        return $this->getAdjustment($offset);
     }
 
-    protected function getAdjustment($max)
+    protected function getAdjustment($offset)
     {
         $low = 0;
         $high = count($this->skippedOffsets) - 1;
-        print_r($this->skippedOffsets);
         
         while ($low <= $high) {
             $mid = (int) (($high - $low) / 2) + $low;
             
             $midOffset = $this->skippedOffsets[$mid];
             
-            if ($midOffset < $max) {
+            if ($midOffset < $offset) {
                 $low = $mid + 1;
-            } elseif ($midOffset > $max) {
+            } elseif ($midOffset > $offset) {
                 $high = $mid - 1;
             } else {
                 $high = $mid;
@@ -184,13 +200,14 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
             }
         }
         
-        if($high > -1)
-            while(array_key_exists($high+1, $this->skippedOffsets) && $this->skippedOffsets[$high] + 1 === $this->skippedOffsets[$high+1] )
-                $high++;
-
-        return $high + 1;
+        if($high === -1)
+            return $offset;
+        
+        $maxAdjusted = $this->skippedOffsets[$high];
+        return $this->adjustedOffsets[$maxAdjusted] + $offset - $maxAdjusted;
+        
     }
-
+        
 }
 
 /*
@@ -259,7 +276,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         $this->loaderItemsCount = 0;
         $this->idOffsets = array();
         $this->skippedIds = array();
-        $this->skippedOffsets = array();
+        $this->adjustedOffsets = array();
         $this->loader = null;
     }
 
@@ -337,17 +354,17 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
 
     protected function updateSkippedOffsets()
     {
-        $this->skippedOffsets = array_merge(
+        $this->adjustedOffsets = array_merge(
             array_values($this->skippedIds),
             $this->deletedOffsets
         );
         
-        sort($this->skippedOffsets);
+        sort($this->adjustedOffsets);
     }
 
     protected function loaderOffset($offset)
     {
-        if (empty($this->skippedOffsets))
+        if (empty($this->adjustedOffsets))
             return $offset;
         
         return $offset + $this->getAdjustment($offset);
@@ -356,13 +373,13 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     protected function getAdjustment($max)
     {
         $low = 0;
-        $high = count($this->skippedOffsets) - 1;
+        $high = count($this->adjustedOffsets) - 1;
         
         
         while ($low <= $high) {
             $mid = (int) (($high - $low) / 2) + $low;
             
-            $midOffset = $this->skippedOffsets[$mid];
+            $midOffset = $this->adjustedOffsets[$mid];
             
             if ($midOffset < $max) {
                 $low = $mid + 1;
@@ -378,3 +395,4 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     }
 
 }
+*/

@@ -46,7 +46,9 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $this->assertItems(array(2, 3, 4, 6));
         */
         $this->loader->remove(array($this->loader->getByOffset(2)));
-        $this->assertItems(array(2, 3, 6));
+        $this->loader->getByOffset(0);
+        $this->loader->getByOffset(1);
+        $this->loader->getByOffset(2);
     }
     
     protected function assertItems($expected)

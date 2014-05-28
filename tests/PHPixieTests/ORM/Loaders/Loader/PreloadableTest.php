@@ -14,8 +14,8 @@ abstract class PreloadableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     public function setUp()
     {
         $this->preloaders = array(
-            $this->quickMock('\PHPixie\ORM\Loaders\Loader\Preloader'),
-            $this->quickMock('\PHPixie\ORM\Loaders\Loader\Preloader'),
+            'pixie' => $this->quickMock('\PHPixie\ORM\Relationships\Relationship\Preloader'),
+            'fairy' => $this->quickMock('\PHPixie\ORM\Relationships\Relationship\Preloader'),
         );
         
         $this->preloadableModels = array(
@@ -25,10 +25,10 @@ abstract class PreloadableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         
         $this->properties = array();
         foreach(range(0, 4) as $i) {
-            $this->properties[]=$this->quickMock('\PHPixie\ORM\Relationships\Relationship\Property');
+            $this->properties[]=$this->quickMock('\PHPixie\ORM\Relationships\Types\ManyToMany\Preloader');
         }
         
-        parent:setUp();
+        parent::setUp();
     }
     
     /**
@@ -37,10 +37,10 @@ abstract class PreloadableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
      */
     public function testAddGetPreloader()
     {
-        foreach(array(1, 2) as $key){
-            $this->assertEquals(null, $this->loader->getPreloader($key));
-            $this->loader->addPreloader($key, $this->preloaders[$key]);
-            $this->assertEquals($this->preloaders[0], $this->loader->getPreloader($key));
+        foreach($this->preloaders as $relationship => $preloader){
+            $this->assertEquals(null, $this->loader->getPreloader($relationship));
+            $this->loader->addPreloader($relationship, $preloader);
+            $this->assertEquals($preloader, $this->loader->getPreloader($relationship));
         }
     }
     
@@ -52,16 +52,19 @@ abstract class PreloadableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     {
         $this->preparePreloadableModels();
         
-        foreach($this->preloaders as $pkey => $preloader) {
+        $pkey = 0;
+        foreach($this->preloaders as $relationship => $preloader) {
+            
             foreach($this->preloadableModels as $mkey => $model) {
                 $property = $this->properties[$pkey*2+$mkey];
                 $this->method($preloader, 'loadFor', $property, array($model), $mkey);
-                $this->method($model, 'setRelationshipProperty', null, array($property), $pkey);
+                $this->method($model, 'setRelationshipProperty', null, array($relationship, $property), $pkey);
             }
-        }
-        
-        $this->loader->addPreloader('pixie', $this->preloaders[0]);
-        $this->loader->addPreloader('fairy', $this->preloaders[1]);
+            
+            $this->loader->addPreloader($relationship, $preloader);
+            $pkey++;
+        }        
+
         foreach($this->preloadableModels as $key => $model)
         {
             $this->assertEquals($model, $this->loader->getByOffset($key));

@@ -33,6 +33,11 @@ class Model
         return $this;
     }
 
+    public function setRelationshipProperty($relationship, $property)
+    {
+        $this->relationship = $property;
+    }
+    
     public function __get($name)
     {
 

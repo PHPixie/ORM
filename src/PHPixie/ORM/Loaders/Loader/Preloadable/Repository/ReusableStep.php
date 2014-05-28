@@ -1,12 +1,11 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Preloadable\Result;
+namespace PHPixie\ORM\Loaders\Loader\Preloadable\Repository;
 
-class Reusable extends \PHPixie\ORM\Loaders\Loader\Preloadable\Result
+class ReusableStep extends \PHPixie\ORM\Loaders\Loader\Preloadable\Repository
 {
     protected $repository;
     protected $reusableResultStep;
-    protected $models;
 
     public function __construct($loaders, $repository, $reusableResultStep)
     {
@@ -21,12 +20,8 @@ class Reusable extends \PHPixie\ORM\Loaders\Loader\Preloadable\Result
 
     public function getModelByOffset($offset)
     {
-        if (!array_key_exists($offset, $this->models)) {
-            $data = $this->reusableResultStep->getByOffset($offset);
-            $this->models[$offset] = $this->loadModel($data);
-        }
-
-        return $this->models[$offset];
+        $data = $this->reusableResultStep->getByOffset($offset);
+        return $this->loadModel($data);
     }
 
     public function resultStep()
@@ -34,8 +29,4 @@ class Reusable extends \PHPixie\ORM\Loaders\Loader\Preloadable\Result
         return $this->reusableResultStep;
     }
 
-    public function repository()
-    {
-        return $this->repository;
-    }
 }

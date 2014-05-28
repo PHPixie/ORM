@@ -1,18 +1,18 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Preloadable\Result;
+namespace PHPixie\ORM\Loaders\Loader\Preloadable\Repository;
 
-class SingleUse extends \PHPixie\ORM\Loaders\Loader\Preloadable\Result
+class Iterator extends \PHPixie\ORM\Loaders\Loader\Preloadable\Repository
 {
-    protected $resultIterator;
+    protected $iterator;
     protected $currentOffset = null;
     protected $currentModel = null;
     protected $reachedEnd = false;
 
-    public function __construct($loaders, $repository, $resultStep)
+    public function __construct($loaders, $repository, $iterator)
     {
         parent::__construct($loaders, $repository);
-        $this->resultIterator = $resultStep->getIterator();
+        $this->iterator = $iterator;
     }
 
     public function offsetExists($offset)
@@ -30,25 +30,25 @@ class SingleUse extends \PHPixie\ORM\Loaders\Loader\Preloadable\Result
 
         } elseif ($this->currentOffset + 1 === $offset) {
 
-            $this->resultIterator->next();
-            if (!$this->resultIterator->valid()) {
+            $this->iterator->next();
+            if (!$this->iterator->valid()) {
                 $this->reachedEnd = true;
 
-                return null;
+                throw new \PHPixie\ORM\Exception\Loader("Offset $offset doesn't exist.");
             }
             $this->currentOffset++;
 
         }else
             throw new \PHPixie\ORM\Exception\Loader("Models can only be accessed in sequential order when using this loader.");
 
-        $data = $this->resultIterator->current();
+        $data = $this->iterator->current();
         $this->currentModel = $this->loadModel($data);
 
         return $this->currentModel;
     }
 
-    public function currentModel()
+    public function iterator()
     {
-        return $this->currentModel;
+        return $this->iterator;
     }
 }

@@ -11,12 +11,12 @@ abstract class Loader implements \IteratorAggregate
         $this->loaders = $loaders;
     }
 
-    public function asArray($modelsAsArrays = false)
+    public function asArray($modelsAsObjects = false)
     {
         $array = array();
         foreach ($this as $model) {
-            if ($modelsAsArrays)
-                $model = $model->asArray();
+            if ($modelsAsObjects)
+                $model = $model->asObject(true);
             $array[] = $model;
         }
 

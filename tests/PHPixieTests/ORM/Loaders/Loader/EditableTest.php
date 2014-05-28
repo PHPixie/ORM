@@ -65,6 +65,30 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     }
     
     /**
+     * @covers ::getByOffset
+     * @covers ::<protected>
+     */
+    public function testNotFoundException()
+    {
+        $this->prepareSubloader();
+        $this->loader->removeAll();
+        $this->setExpectedException('\PHPixie\ORM\Exception\Loader');
+        $this->loader->getByOffset(0);
+    }
+    
+    /**
+     * @covers ::getByOffset
+     * @covers ::<protected>
+     */
+    public function testMaxAllowedException()
+    {
+        $this->prepareSubloader();
+        $this->setExpectedException('\PHPixie\ORM\Exception\Loader');
+        $this->loader->getByOffset(1);
+    }
+    
+    
+    /**
      * @covers ::<protected>
      * @covers ::add
      * @covers ::remove
@@ -148,7 +172,6 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $expectedIds = array();
         foreach($expected as $idKey)
             $expectedIds[]=$this->ids[$idKey];
-        print_r($ids);
         $this->assertEquals($expectedIds, $ids);
     }
     

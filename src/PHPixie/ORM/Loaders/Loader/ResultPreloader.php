@@ -2,15 +2,15 @@
 
 namespace PHPixie\ORM\Loaders\Loader;
 
-class Preloader extends \PHPixie\ORM\Loaders\Loader
+class ResultPreloader extends \PHPixie\ORM\Loaders\Loader
 {
-    protected $preloader;
+    protected $resultPreloader;
     protected $ids;
 
-    public function __construct($loaders, $preloader, $ids)
+    public function __construct($loaders, $resultPreloader, $ids)
     {
         parent::__construct($loaders);
-        $this->preloader = $preloader;
+        $this->resultPreloader = $resultPreloader;
         $this->ids = $ids;
     }
 
@@ -21,6 +21,6 @@ class Preloader extends \PHPixie\ORM\Loaders\Loader
 
     public function getByOffset($offset)
     {
-        return $this->preloader->getModel($this->ids[$offset]);
+        return $this->resultPreloader->getModel($this->ids[$offset]);
     }
 }

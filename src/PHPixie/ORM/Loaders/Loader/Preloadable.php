@@ -4,7 +4,7 @@ namespace PHPixie\ORM\Loaders\Loader;
 
 abstract class Preloadable extends \PHPixie\ORM\Loaders\Loader
 {
-    protected $preloaders;
+    protected $preloaders = array();
 
     public function addPreloader($relationship, $preloader)
     {
@@ -31,7 +31,7 @@ abstract class Preloadable extends \PHPixie\ORM\Loaders\Loader
     protected function preloadModelProperties($model)
     {
         foreach($this->preloaders as $relationship => $preloader)
-            $model->setRelationshipProperty($preloader->loadFor($model));
+            $model->setRelationshipProperty($relationship, $preloader->loadFor($model));
     }
     
     abstract public function getModelByOffset($offset);

@@ -77,19 +77,19 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     
     public function offsetExists($offset)
     {
-        return $this->getByOffset($offset) !== null;
+        return $this->getModelByOffset($offset) !== null;
     }
 
-    protected function assertAllowedOffset($offset)
+    public function getByOffset($offset)
     {
-        if ($offset > $this->maxAllowedOffset)
-            throw new \PHPixie\ORM\Exception\Loader("Items can only be accessed in sequential order");
-
-        if ($offset === $this->maxAllowedOffset)
-            $this->maxAllowedOffset++;
+        $model = $this->getModelByOffset($offset);
+        if($model === null)
+            throw new \PHPixie\ORM\Exception\Loader("Offset $offset does not exist.");
+        
+        return $model;
     }
     
-    public function getByOffset($offset)
+    protected function getModelByOffset($offset)
     {
         $this->assertAllowedOffset($offset);
         $loaderOffset = $this->loaderOffset($offset);
@@ -99,6 +99,15 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
             return $this->getLoadedByOffset($loaderOffset, $offset);
         }
         
+    }
+
+    protected function assertAllowedOffset($offset)
+    {
+        if ($offset > $this->maxAllowedOffset)
+            throw new \PHPixie\ORM\Exception\Loader("Items can only be accessed in sequential order");
+
+        if ($offset === $this->maxAllowedOffset)
+            $this->maxAllowedOffset++;
     }
     
     protected function getAddedByOffset($addedOffset)
@@ -136,7 +145,6 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         $id = $model->id();
         $this->idOffsets[$id] = $loaderOffset;
 
-        print_r([$id, $this->skippedIds]);
         if (array_key_exists($id, $this->skippedIds)) {
             $this->skippedIds[$id] = $loaderOffset;
             return $this->updateAndGet($offset);
@@ -148,7 +156,6 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     protected function updateAndGet($offset)
     {
         $this->updateSkippedOffsets();
-        echo($offset);
         return $this->getByOffset($offset);
     }
 
@@ -186,7 +193,6 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
         }
         
         $this->skippedOffsets = $skippedOffsets;
-        print_r([$this->skippedOffsets, $this->existingBefore]);
     }
 
     protected function loaderOffset($offset)
@@ -222,7 +228,6 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
             $adjusted = $this->skippedOffsets[$low-1] + $offset - $this->existingBefore[$low-1] + 1;
         }
         
-        print_r([$offset, $adjusted]);
         return $adjusted;
         
     }

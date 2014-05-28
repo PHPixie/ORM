@@ -18,4 +18,14 @@ class Reusable extends \PHPixie\ORM\Steps\Step\Query\Result
     {
         return new \ArrayIterator($this->data());
     }
+    
+    public function getByOffset($offset)
+    {
+        return $this->data[$offset];
+    }
+    
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this->data);
+    }
 }

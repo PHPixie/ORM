@@ -1,16 +1,10 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader;
+namespace PHPixie\ORM\Loaders\Loader\Proxy;
 
-class Caching extends \PHPixie\ORM\Loaders\Loader
+class Caching extends \PHPixie\ORM\Loaders\Loader\Proxy
 {
-    protected $loader;
     protected $models = array();
-    
-    public function __construct($loader)
-    {
-        $this->loader = $loader;
-    }
     
     public function getByOffset($offset)
     {

@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Preloadable;
+namespace PHPixie\ORM\Loaders\Loader;
 
-abstract class Repository extends \PHPixie\ORM\Loaders\Loader\Preloadable
+abstract class Repository extends \PHPixie\ORM\Loaders\Loader
 {
     protected $repository;
 

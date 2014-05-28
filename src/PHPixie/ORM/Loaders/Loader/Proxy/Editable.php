@@ -1,10 +1,9 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader;
+namespace PHPixie\ORM\Loaders\Loader\Proxy;
 
-class Editable extends \PHPixie\ORM\Loaders\Loader
+class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
 {
-    protected $loader;
     protected $maxAllowedOffset = 0;
     protected $idOffsets = array();
     
@@ -19,12 +18,6 @@ class Editable extends \PHPixie\ORM\Loaders\Loader
     protected $addedModels = array();
     protected $addedIdsOffsets = array();
     protected $addedOffsetsIds = array();
-    
-    public function __construct($loaders, $loader)
-    {
-        parent::__construct($loaders);
-        $this->loader = $loader;
-    }
     
     public function add($models)
     {

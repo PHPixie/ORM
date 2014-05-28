@@ -13,14 +13,14 @@
         }
     ],
     "require": {
-        "phpixie/db": "2.*@dev"
+        "phpixie/database": "3.*@dev"
     },
     "autoload": {
         "psr-0": {"PHPixie": "classes/"}
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.x-dev"
+            "dev-master": "3.x-dev"
         }
     }
 }

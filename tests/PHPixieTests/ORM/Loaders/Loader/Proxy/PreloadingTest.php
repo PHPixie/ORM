@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Loaders\Loader;
+namespace PHPixieTests\ORM\Loaders\Loader\Proxy;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Preloadable
+ * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Proxy\Preloading
  */
-abstract class PreloadableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
+class PreloadingTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
 {
     protected $preloaders;
     protected $preloadableModels;
@@ -46,11 +46,25 @@ abstract class PreloadableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     
     /**
      * @covers ::<protected>
-     * @covers ::getByOffser
+     * @covers ::offsetExists
+     */
+    public function testOffsetExists()
+    {
+        $this->method($this->subloader, 'offsetExists', true, array(0), 0);
+        $this->method($this->subloader, 'offsetExists', false, array(1), 1);
+        
+        $this->assertEquals(true, $this->loader->offsetExists(0));
+        $this->assertEquals(false, $this->loader->offsetExists(1));
+    }
+    
+    /**
+     * @covers ::<protected>
+     * @covers ::getByOffset
      */
     public function testPreloadProperty()
     {
-        $this->preparePreloadableModels();
+        $this->method($this->subloader, 'getByOffset', $this->preloadableModels[0], array(0), 0);
+        $this->method($this->subloader, 'getByOffset', $this->preloadableModels[1], array(1), 1);
         
         $pkey = 0;
         foreach($this->preloaders as $relationship => $preloader) {
@@ -71,5 +85,8 @@ abstract class PreloadableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         }
     }
     
-    abstract protected function preparePreloadableModels();
+    protected function getLoader()
+    {
+        return new \PHPixie\ORM\Loaders\Loader\Proxy\Preloading($this->loaders, $this->subloader);
+    }
 }

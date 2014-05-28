@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Loaders\Loader\Preloadable\Repository;
+namespace PHPixieTests\ORM\Loaders\Loader\Repository;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Preloadable\Repository\ReusableStep
+ * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Repository\ReusableStep
  */
-class ReusableStepTest extends \PHPixieTests\ORM\Loaders\Loader\Preloadable\RepositoryTest
+class ReusableStepTest extends \PHPixieTests\ORM\Loaders\Loader\RepositoryTest
 {
     protected $reusableResultStep;
     
@@ -42,14 +42,7 @@ class ReusableStepTest extends \PHPixieTests\ORM\Loaders\Loader\Preloadable\Repo
     
     protected function getLoader()
     {
-        return new \PHPixie\ORM\Loaders\Loader\Preloadable\Repository\ReusableStep($this->loaders, $this->repository, $this->reusableResultStep);
-    }
-    
-    protected function preparePreloadableModels(){
-        foreach($this->preloadableModels as $key => $model) {
-            $this->method($this->reusableResultStep, 'getByOffset', $this->data[$key], array($key), $key);
-            $this->method($this->repository, 'load', $model, array($this->data[$key]), $key);
-        }
+        return new \PHPixie\ORM\Loaders\Loader\Repository\ReusableStep($this->loaders, $this->repository, $this->reusableResultStep);
     }
     
     

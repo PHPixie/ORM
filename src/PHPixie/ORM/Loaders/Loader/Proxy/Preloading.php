@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader;
+namespace PHPixie\ORM\Loaders\Loader\Proxy;
 
-abstract class Preloadable extends \PHPixie\ORM\Loaders\Loader
+class Preloading extends \PHPixie\ORM\Loaders\Loader\Proxy
 {
     protected $preloaders = array();
 
@@ -20,9 +20,14 @@ abstract class Preloadable extends \PHPixie\ORM\Loaders\Loader
         return null;
     }
 
+    public function offsetExists($offset)
+    {
+        return $this->loader->offsetExists($offset);
+    }
+    
     public function getByOffset($offset)
     {
-        $model = $this->getModelByOffset($offset);
+        $model = $this->loader->getByOffset($offset);
         $this->preloadModelProperties($model);
 
         return $model;
@@ -34,5 +39,4 @@ abstract class Preloadable extends \PHPixie\ORM\Loaders\Loader
             $model->setRelationshipProperty($relationship, $preloader->loadFor($model));
     }
     
-    abstract public function getModelByOffset($offset);
 }

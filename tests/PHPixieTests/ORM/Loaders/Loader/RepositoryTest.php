@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Loaders\Loader\Preloadable;
+namespace PHPixieTests\ORM\Loaders\Loader;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Preloadable\Repository
+ * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Repository
  */
-abstract class RepositoryTest extends \PHPixieTests\ORM\Loaders\Loader\PreloadableTest
+abstract class RepositoryTest extends \PHPixieTests\ORM\Loaders\LoaderTest
 {
     protected $repository;
     protected $data = array();
@@ -26,6 +26,5 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Loaders\Loader\Preloadab
     public function testRepository()
     {
         $this->assertEquals($this->repository, $this->loader->repository());
-    }
-    
+    }    
 }

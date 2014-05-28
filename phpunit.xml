@@ -1,0 +1,12 @@
+<phpunit bootstrap="./tests/phpunit.php">
+    <testsuites>
+        <testsuite name="PHPixie ORM Module">
+
+        </testsuite>
+    </testsuites>
+    <filter>
+      <whitelist>
+        <directory suffix=".php">./srdddc</directory>
+      </whitelist>
+    </filter>
+</phpunit>

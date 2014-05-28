@@ -1,20 +1,13 @@
 <?php
 
-namespace PHPixieTests\ORM\Loaders\Loader;
+namespace PHPixieTests\ORM\Loaders\Loader\Proxy;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Editable
+ * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Proxy\Editable
  */
-class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
+class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
 {
-    protected $subloader;
     protected $ids = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
-    
-    public function setUp()
-    {
-        $this->subloader = $this->quickMock('\PHPixie\ORM\Loaders\Loader');
-        parent::setUp();
-    }
     
     /**
      * @covers ::<protected>
@@ -34,6 +27,8 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $model5 = $this->model(5);
         $this->loader->add(array($model5));
         $this->assertItems(array(0, 2, 3, 4, 5));
+        $this->assertEquals(false, $this->loader->offsetExists(5));
+        $this->assertEquals(true, $this->loader->offsetExists(3));
         
         $model7 = $this->model(7);
         $model7->setIsDeleted(true);
@@ -59,16 +54,49 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         
         $this->loader->remove(array($this->loader->getByOffset(0), $this->loader->getByOffset(1)));
         $this->assertItems(array(6));
+        $this->assertEquals(true, $this->loader->offsetExists(0));
         
         $this->loader->remove(array($this->loader->getByOffset(0)));
         $this->assertItems(array());
+        $this->assertEquals(false, $this->loader->offsetExists(0));
+    }
+    
+    /**
+     * @covers ::<protected>
+     * @covers ::add
+     * @covers ::remove
+     * @covers ::offsetExists
+     * @covers ::getByOffset
+     */
+    public function testRemovedAndAdd()
+    {
+        $this->prepareSubloader();
+        $this->assertItems(array(0, 2, 3, 4));
+        
+        $model3 = $this->loader->getByOffset(2);
+        
+        $this->loader->remove(array($model3));
+        $this->assertItems(array(0, 2, 4));
+        
+        $this->loader->add(array($model3));
+        $this->assertItems(array(0, 2, 4, 3));
+        
+        $model5 = $this->model(5);
+        $this->loader->add(array($model5));
+        $this->assertItems(array(0, 2, 4, 3, 5));
+        
+        $this->loader->remove(array($model5));
+        $this->assertItems(array(0, 2, 4, 3));
+        
+        $this->loader->add(array($model5));
+        $this->assertItems(array(0, 2, 4, 3, 5));
     }
     
     /**
      * @covers ::getByOffset
      * @covers ::<protected>
      */
-    public function testNotFoundException()
+    public function testRemovedNotFoundException()
     {
         $this->prepareSubloader();
         $this->loader->removeAll();
@@ -215,6 +243,6 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     
     protected function getLoader()
     {
-        return new \PHPixie\ORM\Loaders\Loader\Editable($this->loaders, $this->subloader);
+        return new \PHPixie\ORM\Loaders\Loader\Proxy\Editable($this->loaders, $this->subloader);
     }
 }

@@ -9,33 +9,39 @@ class Loaders
         return new Loaders\Iterator($loader);
     }
 
+    public function arrayAccess($arrayAccess)
+    {
+        return new Loaders\Loader\ArrayAccess($this, $arrayAccess);
+    }
+    
+    public function resultPreloader($resultPreloader, $ids)
+    {
+        return new Loaders\Loader\ResultPreloader($this, $resultPreloader, $ids);
+    }
+    
     public function editable($loader)
     {
-        return new Loaders\Loader\Editable($this, $loader);
+        return new Loaders\Loader\Proxy\Editable($this, $loader);
     }
 
     public function caching($loader)
     {
-        return new Loaders\Loader\Editable($this, $loader);
+        return new Loaders\Loader\Proxy\Caching($this, $loader);
     }
     
-    public function arrayAccess($arrayAccess)
+    public function preloading($loader)
     {
-        return new Loaders\Loader\Editable($this, $arrayAccess);
+        return new Loaders\Loader\Proxy\Preloading($this, $loader);
     }
-
-    public function resultPreloader($resultPreloader, $ids)
-    {
-        return new Loaders\Loader\Preloader($this, $resultPreloader, $ids);
-    }
-
+    
     public function reusableStep($repository, $reusableResultStep)
     {
-        return new Loaders\Loader\Preloadable\Repository\ReusableStep($this, $repository, $reusableResultStep);
+        return new Loaders\Loader\Repository\ReusableStep($this, $repository, $reusableResultStep);
+    }
+    
+    public function dataIterator($repository, $reusableResultStep)
+    {
+        return new Loaders\Loader\Repository\DataIterator($this, $repository, $reusableResultStep);
     }
 
-    public function iterator($repository, $iterator)
-    {
-        return new Loaders\Loader\Result\SingleUse($this, $repository, $iterator);
-    }
 }

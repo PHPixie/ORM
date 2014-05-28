@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Loaders\Loader\Preloadable\Repository;
+namespace PHPixieTests\ORM\Loaders\Loader\Repository;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Preloadable\Repository\Iterator
+ * @coversDefaultClass \PHPixie\ORM\Loaders\Loader\Repository\DataIterator
  */
-class IteratorTest extends \PHPixieTests\ORM\Loaders\Loader\Preloadable\RepositoryTest
+class DataIteratorTest extends \PHPixieTests\ORM\Loaders\Loader\RepositoryTest
 {
     protected $iterator;
     
@@ -15,11 +15,11 @@ class IteratorTest extends \PHPixieTests\ORM\Loaders\Loader\Preloadable\Reposito
     }
     
     /**
-     * @covers ::iterator
+     * @covers ::dataIterator
      */
-    public function testIterator()
+    public function testDataIterator()
     {
-        $this->assertEquals($this->iterator, $this->loader->iterator());
+        $this->assertEquals($this->iterator, $this->loader->dataIterator());
     }
     
     /**
@@ -52,14 +52,7 @@ class IteratorTest extends \PHPixieTests\ORM\Loaders\Loader\Preloadable\Reposito
     protected function getLoader()
     {
         $this->iterator = new \ArrayIterator($this->data);
-        return new \PHPixie\ORM\Loaders\Loader\Preloadable\Repository\Iterator($this->loaders, $this->repository, $this->iterator);
+        return new \PHPixie\ORM\Loaders\Loader\Repository\DataIterator($this->loaders, $this->repository, $this->iterator);
     }
-    
-    protected function preparePreloadableModels(){
-        foreach($this->preloadableModels as $key => $model) {
-            $this->method($this->repository, 'load', $model, array($this->data[$key]), $key);
-        }
-    }
-    
     
 }

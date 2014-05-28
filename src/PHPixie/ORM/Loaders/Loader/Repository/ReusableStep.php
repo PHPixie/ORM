@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Preloadable\Repository;
+namespace PHPixie\ORM\Loaders\Loader\Repository;
 
-class ReusableStep extends \PHPixie\ORM\Loaders\Loader\Preloadable\Repository
+class ReusableStep extends \PHPixie\ORM\Loaders\Loader\Repository
 {
     protected $repository;
     protected $reusableResultStep;
@@ -18,7 +18,7 @@ class ReusableStep extends \PHPixie\ORM\Loaders\Loader\Preloadable\Repository
         $data = $this->reusableResultStep->offsetExists($offset);
     }
 
-    public function getModelByOffset($offset)
+    public function getByOffset($offset)
     {
         $data = $this->reusableResultStep->getByOffset($offset);
         return $this->loadModel($data);

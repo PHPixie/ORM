@@ -27,6 +27,15 @@ class ArrayAccessTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $this->assertEquals(false, $this->loader->offsetExists(99)); 
     }
     
+    /**
+     * @covers ::offsetGet
+     */
+    public function testNotFoundException()
+    {
+        $this->setExpectedException('\Exception');
+        $this->loader->getByOffset(100);
+    }
+    
     protected function getLoader()
     {
         return new \PHPixie\ORM\Loaders\Loader\ArrayAccess($this->loaders, new \ArrayObject($this->data));

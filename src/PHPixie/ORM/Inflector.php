@@ -1,6 +1,6 @@
 <?php
 
-namespace \PHPixie\ORM;
+namespace PHPixie\ORM;
 
 class Inflector
 {
@@ -11,8 +11,6 @@ class Inflector
         '/$/i'                      => 's',
     );
 
-    protected $pluralCache = array();
-
     protected $singularRules = array(
         '/^(.*?us)$/i' => '\\1',
         '/^(.*?[sxz])es$/i' => '\\1',
@@ -21,32 +19,42 @@ class Inflector
         '/^(.*?)s$/' => '\\1',
     );
 
+    protected $pluralCache = array();
     protected $singularCache = array();
 
     public function plural($singular)
     {
-        if(!isset($this->pluralCache[$singular]))
-            $this->pluralCache[$singular] = $this->applySingleRule($singular, $this->pluralRules);
+        if(!isset($this->pluralCache[$singular])) {
+            $plural = $this->applySingleRule($singular, $this->pluralRules);
+            $this->cachePair($singular, $plural);
+        }
 
         return $this->pluralCache[$singular];
     }
 
     public function singular($plural)
     {
-        if(!isset($this->singularCache[$plural]))
-            $this->singularCache[$plural] = $this->applySingleRule($plural, $this->singularRules);
-
+        if(!isset($this->singularCache[$plural])) {
+            $singular = $this->applySingleRule($plural, $this->singularRules);
+            $this->cachePair($singular, $plural);
+        }
         return $this->singularCache[$plural];
     }
 
+    protected function cachePair($singular, $plural)
+    {
+        $this->pluralCache[$singular] = $plural;
+        $this->singularCache[$plural] = $singular;
+    }
+    
     protected function applySingleRule($word, $rules)
     {
         foreach ($rules as $pattern => $replacement) {
-            $str = preg_replace($pattern, $replacement, $str, -1, $count);
+            $word = preg_replace($pattern, $replacement, $word, -1, $count);
             if ($count > 0)
                 break;
         }
 
-        return $str;
+        return $word;
     }
 }

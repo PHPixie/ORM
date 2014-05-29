@@ -7,27 +7,21 @@ namespace PHPixieTests\ORM\Steps\Step\Pivot;
  */
 class CartesianTest extends \PHPixieTests\ORM\Steps\StepTest
 {
-    protected $resultSteps;
+    protected $resultFilters;
     
     public function setUp()
     {
-        $this->resultStepsMap = array(
-            array(
-                'resultStep' => $this->quickMock('\PHPixie\ORM\Steps\ResultFilter', array('getFilteredData')), 
-                'fields' => array('a', 'b')
-            ),
-            array(
-                'resultStep' => $this->quickMock('\PHPixie\ORM\Steps\Step\Result', array('getFilteredData')), 
-                'fields' => array('a', 'c')
-            )
+        $this->resultFilters = array(
+            $this->quickMock('\PHPixie\ORM\Steps\ResultFilter', array('getFilteredData')),
+            $this->quickMock('\PHPixie\ORM\Steps\ResultFilter', array('getFilteredData'))
         );
         
-        $this->method($this->resultSteps[0], 'getFilteredData', array(
+        $this->method($this->resultFilters[0], 'getFilteredData', array(
             (object) array('a' => 1, 'b' => 2),
             (object) array('a' => 3, 'b' => 4)
         ));
         
-        $this->method($this->resultSteps[1], 'getFilteredData', array(
+        $this->method($this->resultFilters[1], 'getFilteredData', array(
             (object) array('a' => 5, 'c' => 6),
             (object) array('a' => 7, 'c' => 8)
         ));
@@ -58,6 +52,6 @@ class CartesianTest extends \PHPixieTests\ORM\Steps\StepTest
     
     protected function getStep()
     {
-        return new \PHPixie\ORM\Steps\Step\Pivot\Cartesian($this->resultSteps);
+        return new \PHPixie\ORM\Steps\Step\Pivot\Cartesian($this->resultFilters);
     }
 }

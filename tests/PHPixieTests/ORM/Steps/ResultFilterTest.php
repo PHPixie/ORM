@@ -31,7 +31,7 @@ class ResultFilterTest extends \PHPixieTests\AbstractORMTest
      */
     public function testGetFirstFieldValues()
     {
-        $this->method($this->resultStep, 'getField', array(5), 0, true, array('a'));
+        $this->method($this->resultStep, 'getField', array(5), array('a'), 0);
         $this->assertEquals(array(5), $this->resultFilter->getFirstFieldValues());
     }
     
@@ -40,7 +40,7 @@ class ResultFilterTest extends \PHPixieTests\AbstractORMTest
      */
     public function testGetFilteredData()
     {
-        $this->method($this->resultStep, 'getFields', array(5), 0, true, array($this->fields));
+        $this->method($this->resultStep, 'getFields', array(5), array($this->fields), 0);
         $this->assertEquals(array(5), $this->resultFilter->getFilteredData());
     }
 }

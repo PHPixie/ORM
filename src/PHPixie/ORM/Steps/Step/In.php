@@ -20,6 +20,6 @@ class In extends \PHPixie\ORM\Steps\Step
     public function execute()
     {
         $values = $this->resultStep->getField($this->resultField);
-        $this->placeholder->_and($this->placeholderField, 'in', $values);
+        $this->placeholder->builder()->_and($this->placeholderField, 'in', $values);
     }
 }

@@ -57,7 +57,7 @@ class LoaderTest extends \PHPixieTests\ORM\Plans\Plan\CompositeTest
     protected function setPlans($n = 2)
     { 
         for ($i = 0; $i < $n; $i++)
-            $this->method($this->plans, 'plan', $this->subplans[$i], $i);
+            $this->method($this->plans, 'plan', $this->subplans[$i], array(), $i);
     }
     
     protected function addSteps()

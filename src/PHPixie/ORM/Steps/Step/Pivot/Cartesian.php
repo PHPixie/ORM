@@ -46,8 +46,8 @@ class Cartesian extends \PHPixie\ORM\Steps\Step
     {
         $updatedProduct = array();
         foreach($product as $productRow)
-            foreach($rows as $row)
-                $updatedProduct[] = array_merge($productRow, array_values(get_object_vars($resultItem)));
+            foreach($rows as $item)
+                $updatedProduct[] = array_merge($productRow, array_values(get_object_vars($item)));
         return $updatedProduct;
     }
 

@@ -27,12 +27,12 @@ class QueryTest extends \PHPixieTests\ORM\Planners\PlannerTest
     {
         $this->prepareStrategies();
         
-        $query = $this->quickMock('\PHPixie\Database\SQL\Query', array('table'));
-        $this->method($this->sqlStrategy, 'setSource', null, 0, true, array($query, 'pixie'));
+        $query = $this->abstractMock('\PHPixie\Database\SQL\Query', array('table'));
+        $this->method($this->sqlStrategy, 'setSource', null, array($query, 'pixie'), 0);
         $this->assertEquals($query, $this->planner->setSource($query, 'pixie'));
         
-        $query = $this->quickMock('\PHPixie\Database\Driver\Mongo\Query', array('collection'));
-        $this->method($this->mongoStrategy, 'setSource', null, 0, true, array($query, 'pixie'));
+        $query = $this->abstractMock('\PHPixie\Database\Driver\Mongo\Query', array('collection'));
+        $this->method($this->mongoStrategy, 'setSource', null, array($query, 'pixie'), 0);
         $this->assertEquals($query, $this->planner->setSource($query, 'pixie'));
         
     }
@@ -45,20 +45,20 @@ class QueryTest extends \PHPixieTests\ORM\Planners\PlannerTest
     {
         $this->prepareStrategies();
         
-        $query = $this->quickMock('\PHPixie\Database\SQL\Query', array('table'));
-        $this->method($this->sqlStrategy, 'setBatchData', null, 0, true, array($query, array(1), array(2)));
+        $query = $this->abstractMock('\PHPixie\Database\SQL\Query', array('table'));
+        $this->method($this->sqlStrategy, 'setBatchData', null, array($query, array(1), array(2)), 0);
         $this->assertEquals($query, $this->planner->setBatchData($query, array(1), array(2)));
         
-        $query = $this->quickMock('\PHPixie\Database\Driver\Mongo\Query', array('collection'));
-        $this->method($this->mongoStrategy, 'setBatchData', null, 0, true, array($query, array(1), array(2)));
+        $query = $this->abstractMock('\PHPixie\Database\Driver\Mongo\Query', array('collection'));
+        $this->method($this->mongoStrategy, 'setBatchData', null, array($query, array(1), array(2)), 0);
         $this->assertEquals($query, $this->planner->setBatchData($query, array(1), array(2)));
         
     }
     
     protected function prepareStrategies()
     {
-        $this->method($this->strategies, 'query', $this->sqlStrategy, 0, true, array('SQL'));
-        $this->method($this->strategies, 'query', $this->mongoStrategy, 1, true, array('Mongo'));
+        $this->method($this->strategies, 'query', $this->sqlStrategy, array('SQL'), 0);
+        $this->method($this->strategies, 'query', $this->mongoStrategy, array('Mongo'), 1);
     }
     
     protected function getPlanner()

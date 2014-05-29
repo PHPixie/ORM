@@ -13,6 +13,22 @@ class ReusableStepTest extends \PHPixieTests\ORM\Loaders\Loader\RepositoryTest
     {
         $this->reusableResultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
         parent::setUp();
+        
+        $this->reusableResultStep
+                ->expects($this->any())
+                ->method('offsetExists')
+                ->will($this->returnCallBack(function($offset){
+                    return $offset < 5;
+                }));
+        $data = $this->data;
+        $this->reusableResultStep
+                ->expects($this->any())
+                ->method('getByOffset')
+                ->will($this->returnCallBack(function($offset) use($data){
+                    if($offset > 4)
+                        throw new \Exception;
+                    return $data[$offset];
+                }));
     }
     
     /**

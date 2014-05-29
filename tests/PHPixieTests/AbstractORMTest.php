@@ -2,19 +2,22 @@
 
 namespace PHPixieTests;
 
-class DatabaseResultStub extends \ArrayIterator
-{
-    public function asArray()
-    {
-        return $this->getArrayCopy();
-    }
-}
-
 abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
 {
     protected function quickMock($class, $methods = array())
     {
         return $this->getMock($class, $methods, array(), '', false);
+    }
+    
+    protected function abstractMock($class, $methods = array())
+    {
+        if(empty($methods)){
+            $reflection = new \ReflectionClass($class);
+            foreach($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method)
+                $methods[]=$method->getName();
+        }
+        
+        return $this->getMockForAbstractClass($class, array(), '', false, false, true, $methods);
     }
     
     protected function method($mock, $method, $return, $with = null, $at = null) {
@@ -34,11 +37,6 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
     protected function valueObject()
     {
         return new \stdClass;
-    }
-    
-    protected function databaseResultStub($data)
-    {
-        return new DatabaseResultStub($data);
     }
     
     protected function assertException($callback, $exceptionClass)

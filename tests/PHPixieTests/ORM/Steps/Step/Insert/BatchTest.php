@@ -23,11 +23,11 @@ abstract class BatchTest extends \PHPixieTests\ORM\Steps\Step\InsertTest
      */
     public function testExecute()
     {
-        $this->method($this->queryPlanner, 'setBatchData', null, null, true, array(
-                                                                            $this->insertQuery,
-                                                                            $this->fields,
-                                                                            $this->data)
-                                                                        );
+        $this->method($this->queryPlanner, 'setBatchData', null, array(
+                                                                        $this->insertQuery,
+                                                                        $this->fields,
+                                                                        $this->data
+                                                                    ), 0);
         $this->step->execute();
     }
 }

@@ -20,6 +20,7 @@ class SingleUseTest extends \PHPixieTests\ORM\Steps\Step\Query\ResultTest
     public function testReuse()
     {
         $this->setStepResult();
+        $this->prepareIterator();
         $iterator = $this->step->getIterator();
         $iterator->next();
         $nextIterator = $this->step->getIterator();

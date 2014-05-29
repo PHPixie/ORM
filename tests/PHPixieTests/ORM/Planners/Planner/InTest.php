@@ -42,7 +42,7 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
      */
     public function testResult()
     {
-		$query = $this->quickMock('\PHPixie\Database\Query\Items', array('getWhereBuilder'));
+		$query = $this->itemsQueryMock(array('getWhereBuilder'));
 		$resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
 		$plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Step');
 		
@@ -74,8 +74,8 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
             array(array(), array('and', false)),
             array(array('or', true), array('or', true))
         ) as $params){
-            $query = $this->quickMock('\PHPixie\Database\Query\Items', array('connection'));
-            $subquery = $this->quickMock('\PHPixie\Database\Query\Items', array('connection'));
+            $query = $this->itemsQueryMock(array('connection'));
+            $subquery = $this->itemsQueryMock(array('connection'));
             $plan = $this->quickMock('\PHPixie\ORM\Plans\Plan');
             $this->method($query, 'connection', $queryConnection);
             $this->method($subquery, 'connection', $subqueryConnection);
@@ -111,12 +111,12 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
             array(array(), array('and', false)),
             array(array('or', true), array('or', true))
         ) as $params){
-            $query = $this->quickMock('\PHPixie\Database\Query\Items', array('startWhereGroup', 'endWhereGroup', 'where', 'connection'));
+            $query = $this->itemsQueryMock(array('startWhereGroup', 'endWhereGroup', 'where', 'connection'));
             $collection = $this->quickMock('\PHPixie\ORM\Planners\Collection');
             $plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Step');
             $collectionQueries = array(
-                $this->quickMock('\PHPixie\Database\SQL\Query\Items', array('planFind')),
-                $this->quickMock('\PHPixie\Database\SQL\Query\Items', array('planFind')),
+                $this->quickMock('\PHPixie\ORM\Model', array('planFind')),
+                $this->quickMock('\PHPixie\ORM\Model', array('planFind')),
             );
 
             $this->method($this->strategies, 'in', $this->$strategy, array($strategy), 0);
@@ -135,7 +135,7 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
 
                 $this->method($collectionQuery, 'planFind', $findPlan, array(), 0);
                 $this->method($plan, 'appendPlan', null, array($requiredPlan), $key);
-                $subquery = $this->quickMock('\PHPixie\Database\SQL\Query\Items');
+                $subquery = $this->itemsQueryMock();
                 $resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
                 $this->method($resultStep, 'query', $subquery, array(), 0);
 
@@ -149,6 +149,11 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
         }
     }
 
+    protected function itemsQueryMock($methods = array())
+    {
+        return $this->abstractMock('\PHPixie\Database\Query\Items', $methods);
+    }
+    
     protected function getPlanner()
     {
         return new \PHPixie\ORM\Planners\Planner\In($this->strategies, $this->steps);

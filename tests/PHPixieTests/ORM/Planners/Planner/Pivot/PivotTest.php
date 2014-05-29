@@ -37,6 +37,6 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
      */
     public function testSource()
     {
-        $this->assertEquals('pixie', $this->side->source());
+        $this->assertEquals('pixie', $this->pivot->source());
     }
 }

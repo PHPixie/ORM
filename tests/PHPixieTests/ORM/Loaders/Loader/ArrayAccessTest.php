@@ -11,7 +11,7 @@ class ArrayAccessTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     protected $data = array('a', 'b', 'c', 'd');
     
     /**
-     * @covers ::offsetGet
+     * @covers ::getByOffset
      */
     public function testOffsetGet()
     {
@@ -28,7 +28,7 @@ class ArrayAccessTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     }
     
     /**
-     * @covers ::offsetGet
+     * @covers ::getByOffset
      */
     public function testNotFoundException()
     {

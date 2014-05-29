@@ -7,14 +7,11 @@ namespace PHPixieTests\ORM\Steps\Step\Update;
  */
 class MapTest extends \PHPixieTests\ORM\Steps\Step\UpdateTest
 {
-    protected $result;
     protected $resultStep;
     
     public function setUp()
     {
-        $this->result = $this->quickMock('\PHPixie\Database\Result', array('asArray'));
-        $this->resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Result', array('result'));
-        $this->method($this->resultStep, 'result', $this->result);
+        $this->resultStep = $this->abstractMock('\PHPixie\ORM\Steps\Step\Query\Result', array('getFields'));
         parent::setUp();        
     }
     
@@ -23,15 +20,15 @@ class MapTest extends \PHPixieTests\ORM\Steps\Step\UpdateTest
      */
     public function testExecute()
     {
-        $this->method($this->result, 'asArray', array(
-            array('pixie' => 'Trixie', 'test' => 5)
-        ));
+        $this->method($this->resultStep, 'getFields', array(
+            array('pixie' => 'Trixie', 'test' => 5, 'spell' => null)
+        ), array(array('pixie', 'test', 'spell')), 0);
         
-        $this->method($this->updateQuery, 'set', array(
+        $this->method($this->updateQuery, 'set', null, array(array(
             'fairy' => 'Trixie',    
             'test2' => 5,
             'magic' => null
-        ), null);
+        )), 0);
         
         $this->step->execute();
     }
@@ -41,7 +38,7 @@ class MapTest extends \PHPixieTests\ORM\Steps\Step\UpdateTest
      */
     public function testExecuteException()
     {
-        $this->method($this->result, 'asArray', array(
+        $this->method($this->resultStep, 'getFields', array(
             
         ));
         $this->setExpectedException('\PHPixie\ORM\Exception\Plan');

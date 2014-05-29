@@ -27,7 +27,7 @@ class IteratorTest extends \PHPixieTests\AbstractORMTest
     /**
      * @covers ::valid
      * @covers ::next
-     * @covers ::offset
+     * @covers ::key
      * @covers ::current
      * @covers ::rewind
      */
@@ -58,7 +58,7 @@ class IteratorTest extends \PHPixieTests\AbstractORMTest
     /**
      * @covers ::valid
      * @covers ::next
-     * @covers ::offset
+     * @covers ::key
      * @covers ::current
      * @covers ::rewind
      */

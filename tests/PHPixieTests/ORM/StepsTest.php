@@ -88,7 +88,7 @@ class StepsTest extends \PHPixieTests\AbstractORMTest
     public function testPivotInsert()
     {
         $queryPlanner = $this->quickMock('\PHPixie\Database\Planners\Planner\Query');
-        $this->method($this->planners, 'query', $queryPlanner, 0);
+        $this->method($this->planners, 'query', $queryPlanner, array(), 0);
         
         $query = $this->quickMock('\PHPixie\Database\Query');
         $cartesian = $this->quickMock('\PHPixie\ORM\Steps\Step\Pivot\Cartesian');

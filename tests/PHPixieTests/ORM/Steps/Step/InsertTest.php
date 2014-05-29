@@ -17,6 +17,6 @@ abstract class InsertTest extends \PHPixieTests\ORM\Steps\StepTest
     
     protected function query()
     {
-        return $this->quickMock('\PHPixie\Database\Query\Type\Insert', array('data', 'batchData'));
+        return $this->abstractMock('\PHPixie\Database\Query\Type\Insert', array('data', 'batchData'));
     }
 }

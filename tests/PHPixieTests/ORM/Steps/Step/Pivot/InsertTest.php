@@ -30,8 +30,7 @@ class InsertTest extends \PHPixieTests\ORM\Steps\Step\Insert\BatchTest
                                             $this->queryPlanner,
                                             $this->insertQuery,
                                             $this->fields,
-                                            $this->cartesianStep,
-                                            $this->selectQuery
+                                            $this->cartesianStep
                                         );
     }
 }

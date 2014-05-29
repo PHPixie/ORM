@@ -28,7 +28,7 @@ class QueryTest extends \PHPixieTests\ORM\Steps\StepTest
      */
     public function testExecute()
     {
-        $this->method($this->query, 'execute', null, 0);
+        $this->method($this->query, 'execute', null, array(), 0);
         $this->step->execute();
     }
     
@@ -37,7 +37,7 @@ class QueryTest extends \PHPixieTests\ORM\Steps\StepTest
      */
     public function testUsedConnections()
     {
-        $this->method($this->query, 'connection', $this->connections[0], 0);
+        $this->method($this->query, 'connection', $this->connections[0], array(), 0);
         $this->assertEquals(array($this->connections[0]), $this->step->usedConnections());
     }
     
@@ -48,7 +48,7 @@ class QueryTest extends \PHPixieTests\ORM\Steps\StepTest
     
     protected function query()
     {
-        return $this->quickMock('\PHPixie\Database\Query', array('connection', 'execute'));
+        return $this->abstractMock('\PHPixie\Database\Query', array('connection', 'execute'));
     }
     
     

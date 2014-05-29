@@ -8,16 +8,20 @@ namespace PHPixieTests\ORM\Steps\Step\Query;
 abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
 {
 
+    protected $result;
     protected $rows = array();
     
     public function setUp()
     {
+        for ($i = 0; $i < 3; $i++) {
+            $item = new \stdClass();
+            $item->name = 'fairy'.$i;
+            $item->magic = 'spell'.$i;
+            $this->rows[]=$item;
+        }
+        $this->result = $this->abstractMock('\PHPixie\Database\Result');
+        $this->method($this->result, 'asArray', $this->rows, array());
         parent::setUp();
-        for ($i = 0; $i < 3; $i++)
-            $this->rows[] = new \stdClass();
-        
-        $this->rows[0]->name = 'pixie';
-        $this->rows[1]->name = 'trixie';
     }
     
     /**
@@ -26,7 +30,7 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
      */
     public function testExecuteException()
     {
-        $this->method($this->query, 'execute', null, 0);
+        $this->method($this->query, 'execute', null, array(), 0);
         $this->setExpectedException('\PHPixie\ORM\Exception\Plan');
         $this->step->execute();
     }
@@ -48,8 +52,8 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
      */
     public function testExecute()
     {
-        $result = $this->setStepResult();
-        $this->assertEquals($result, $this->step->result());
+        $this->setStepResult();
+        $this->assertEquals($this->result, $this->step->result());
     }
     
     /**
@@ -58,10 +62,8 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
     public function testGetField()
     {
         $this->setStepResult();
-        $this->assertEquals(array(
-            'pixie',
-            'trixie'
-        ), $this->step->getField('name'));
+        $this->method($this->result, 'getField', array(5), array('name', true), 0);
+        $this->assertEquals(array(5), $this->step->getField('name'));
     }
     
     /**
@@ -70,8 +72,9 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
      */
     public function testIterator()
     {
-        $result = $this->setStepResult();
-        $this->method($this->query, 'execute', $result, 0);
+        $this->prepareIterator();
+        $this->setStepResult();
+        $this->method($this->query, 'execute', $this->result, array(), 0);
         $this->step->execute();
         $this->iteratorTest();
     }
@@ -87,11 +90,34 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
     
     protected function setStepResult()
     {
-
-        $result =  $this->databaseResultStub($this->rows);
-        $this->method($this->query, 'execute', $result, 0);
+        $this->method($this->query, 'execute', $this->result, array(), 0);
         $this->step->execute();
-        return $result;
+    }
+    
+    protected function prepareIterator()
+    {
+        $rows = $this->rows;
+        $pos = 0;
+        $this->result
+            ->expects($this->any())
+            ->method('valid')
+            ->will($this->returnCallback(function() use(&$pos){
+                return $pos < 3;
+            }));
+        
+        $this->result
+            ->expects($this->any())
+            ->method('next')
+            ->will($this->returnCallback(function() use(&$pos){
+                $pos++;
+            }));
+        
+        $this->result
+            ->expects($this->any())
+            ->method('current')
+            ->will($this->returnCallback(function() use(&$pos, $rows){
+                return $rows[$pos];
+            }));
     }
     
 }

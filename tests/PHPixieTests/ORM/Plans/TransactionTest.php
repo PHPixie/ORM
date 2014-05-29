@@ -23,7 +23,7 @@ class TransactionTest extends \PHPixieTests\AbstractORMTest
     protected function connection($transactable = false)
     {
         $class = $transactable ? '\PHPixie\Database\Connection\Transactable' : '\PHPixie\Database\Connection';
-        return $this->quickMock($class, array(
+        return $this->abstractMock($class, array(
             'beginTransaction',
             'commitTransaction',
             'rollbackTransaction',
@@ -60,11 +60,11 @@ class TransactionTest extends \PHPixieTests\AbstractORMTest
     protected function transactionTest($method)
     {
         $connectionMethod = $method.'Transaction';
-        $this->method($this->connections[0], $connectionMethod, null, 0);
+        $this->method($this->connections[0], $connectionMethod, null, array(), 0);
         $this->connections[1]
                 ->expects($this->never())
                 ->method($connectionMethod);
-        $this->method($this->connections[2], $connectionMethod, null, 0);
+        $this->method($this->connections[2], $connectionMethod, null, array(), 0);
         $this->transaction->$method($this->connections);
     }
 }

@@ -17,6 +17,6 @@ abstract class UpdateTest extends \PHPixieTests\ORM\Steps\StepTest
     
     protected function query()
     {
-        return $this->quickMock('\PHPixie\Database\Query\Type\Update', array('set'));
+        return $this->abstractMock('\PHPixie\Database\Query\Type\Update', array('set'));
     }
 }

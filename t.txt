@@ -1,0 +1,24 @@
+PHPUnit 4.0.3 by Sebastian Bergmann.
+
+Configuration read from C:\wamp\orm\vendor\phpixie\orm\phpunit.xml
+
+...............................................................  63 / 150 ( 42%)
+...........................F......F.EEE........................ 126 / 150 ( 84%)
+......
+Fatal error: Call to undefined method PHPixieTests\DatabaseResultStub::getField() in C:\wamp\orm\vendor\phpixie\orm\src\PHPixie\ORM\Steps\Step\Query\Result.php on line 27
+
+Call Stack:
+    0.0750     365856   1. {main}() C:\wamp\phpunit.phar:0
+    0.0810     559192   2. PHPUnit_TextUI_Command::main() C:\wamp\phpunit.phar:581
+    0.0810     562776   3. PHPUnit_TextUI_Command->run() phar://C:/wamp/phpunit.phar/phpunit/TextUI/Command.php:132
+    3.3392    6081840   4. PHPUnit_TextUI_TestRunner->doRun() phar://C:/wamp/phpunit.phar/phpunit/TextUI/Command.php:179
+    3.3522    6330080   5. PHPUnit_Framework_TestSuite->run() phar://C:/wamp/phpunit.phar/phpunit/TextUI/TestRunner.php:419
+    9.9156   20921152   6. PHPUnit_Framework_TestSuite->run() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestSuite.php:722
+    9.9646   21049184   7. PHPUnit_Framework_TestCase->run() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestSuite.php:722
+    9.9646   21049152   8. PHPUnit_Framework_TestResult->run() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:764
+    9.9646   21049888   9. PHPUnit_Framework_TestCase->runBare() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestResult.php:692
+    9.9706   21108248  10. PHPUnit_Framework_TestCase->runTest() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:824
+    9.9706   21108800  11. ReflectionMethod->invokeArgs() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:956
+    9.9706   21108816  12. PHPixieTests\ORM\Steps\Step\Query\ResultTest->testGetField() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:956
+    9.9716   21111216  13. PHPixie\ORM\Steps\Step\Query\Result->getField() C:\wamp\orm\vendor\phpixie\orm\tests\PHPixieTests\ORM\Steps\Step\Query\ResultTest.php:64
+

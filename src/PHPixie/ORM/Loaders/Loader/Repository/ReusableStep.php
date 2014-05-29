@@ -15,7 +15,7 @@ class ReusableStep extends \PHPixie\ORM\Loaders\Loader\Repository
 
     public function offsetExists($offset)
     {
-        $data = $this->reusableResultStep->offsetExists($offset);
+        return $this->reusableResultStep->offsetExists($offset);
     }
 
     public function getByOffset($offset)

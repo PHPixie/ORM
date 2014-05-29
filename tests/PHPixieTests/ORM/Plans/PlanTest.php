@@ -70,10 +70,14 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
     public function testExecute()
     {
         $this->addSteps();
-        $this->method($this->transaction, 'begin', null, 0, true, array($this->connections));
-        $this->method($this->transaction, 'commit', null, 1, true, array($this->connections));
-        foreach($this->steps as $step)
-            $this->method($step, 'execute', null, 0);
+        $this->method($this->transaction, 'begin', null, array($this->connections), 0);
+        $this->method($this->transaction, 'commit', null, array($this->connections), 1);
+        foreach($this->steps as $step) {
+            $step
+                ->expects($this->once())
+                ->method('execute')
+                ->with();
+        }
         $this->plan->execute();
     }
     
@@ -84,12 +88,13 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
     public function testExecuteRollback()
     {
         $this->addSteps();
-        $this->method($this->transaction, 'begin', null, 0, true, array($this->connections));
-        $this->method($this->transaction, 'rollback', null, 1, true, array($this->connections));
+        $this->method($this->transaction, 'begin', null, array($this->connections), 0);
+        $this->method($this->transaction, 'rollback', null, array($this->connections), 1);
         foreach($this->steps as $step)
             $this->method($step, 'execute', function() {
                 throw new \Exception("test");
             });
+        
         $this->setExpectedException('\Exception');
         $this->plan->execute();
     }
@@ -102,4 +107,5 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
     }
     
     abstract protected function getPlan();
+    abstract protected function addSteps();
 }

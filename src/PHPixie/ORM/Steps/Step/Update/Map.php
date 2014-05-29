@@ -16,14 +16,14 @@ class Map extends \PHPixie\ORM\Steps\Step\Update
     
     public function execute()
     {
-        $items = $this->resultStep->result()->asArray();
-        if(count($items) !== 1)
+        $fieldRows = $this->resultStep->getFields(array_values($this->map));
+        if(count($fieldRows) !== 1)
             throw new \PHPixie\ORM\Exception\Plan("Result used as update source must contain a single item.");
         
-        $item = current($items);
+        $fields = current($fieldRows);
         $set = array();
         foreach($this->map as $target => $source) {
-            $set[$target] = array_key_exists($source, $item) ? $item[$source] : null;
+            $set[$target] = $fields[$source];
         }
         
         $this->updateQuery->set($set);

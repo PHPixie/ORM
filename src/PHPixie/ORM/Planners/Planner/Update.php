@@ -1,32 +1,33 @@
 <?php
 
-namespace \PHPixie\ORM\Planners\Planner;
+namespace PHPixie\ORM\Planners\Planner;
 
 class Update extends \PHPixie\ORM\Planners\Planner
 {
-    protected $modifiers;
+    protected $steps;
     
-    public function modifiers()
+    public function __construct($steps)
     {
-        if(!isset($this->modifiers))
-            $this->modifiers = $this->buildModifiers();
-        
-        return $this->modifiers;
+        $this->steps = $steps;
     }
     
-    public function buildModifiers()
+    public function result($updateQuery, $map, $resultStep, $plan)
     {
-        return new Update\Modifiers($this->planners, $this->steps);
+        $mapStep = $this->steps->updateMap($updateQuery, $map, $resultStep);
+        $plan->add($mapStep);
     }
     
-    public function plan($query, $modifiers, $plan)
+    public function subquery($updateQuery, $map, $subquery, $plan)
     {
-        $updateStep = $this->steps->update($query);
-        
-        foreach($modifiers as $modifier) {
-            $modifier->plan($updateStep, $plan);
-        }
-        
-        $plan->add($updateStep);
+        $fields = $this->requiredFields($map);
+        $subquery->fields($fields);
+        $resultStep = $this->steps->result($subquery);
+        $plan->add($resultStep);
+        $this->result($updateQuery, $map, $resultStep, $plan);
     }
+    
+    protected function requiredFields($map)
+    {
+        return array_values(array_unique($map));
+    }    
 }

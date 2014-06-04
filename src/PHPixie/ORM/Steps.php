@@ -41,4 +41,9 @@ class Steps
         $queryPlanner = $this->planners->query();
         return new Steps\Step\Pivot\Insert($queryPlanner, $insertQuery, $fields, $cartesianStep);
     }
+    
+    public function updateMap($updateQuery, $map, $resultStep)
+    {
+        return new Steps\Step\Update\Map($updateQuery, $map, $resultStep);
+    }
 }

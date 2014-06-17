@@ -4,21 +4,19 @@ namespace PHPixie\ORM\Model\Data\Data\Document;
 
 abstract class Type
 {
-    protected $types;
+    protected $documentBuilder;
 
-    public function __construct($types)
+    public function __construct($documentBuilder)
     {
-        $this->types = $types;
+        $this->documentBuilder = $documentBuilder;
     }
-
-    abstract public function currentData();
 
     public function convertValue($value)
     {
         if ($value instanceof \stdClass) {
-            $value = $this->types->document($value);
+            $value = $this->documentBuilder->document($value);
         } elseif (is_array($value)) {
-            $value = $this->types->documentArray($value);
+            $value = $this->documentBuilder->documentArray($value);
         }
 
         return $value;
@@ -35,4 +33,6 @@ abstract class Type
 
         return $type;
     }
+    
+    abstract public function currentData();
 }

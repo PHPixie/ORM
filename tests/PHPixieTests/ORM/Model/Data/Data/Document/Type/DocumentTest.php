@@ -29,6 +29,7 @@ class DocumentTest extends \PHPixieTests\ORM\Model\Data\Data\Document\TypeTest
 
     /**
      * @covers ::__construct
+     * @covers \PHPixie\ORM\Model\Data\Data\Document\Type::__construct
      * @covers ::<protected>
      */
     public function testConstruct()

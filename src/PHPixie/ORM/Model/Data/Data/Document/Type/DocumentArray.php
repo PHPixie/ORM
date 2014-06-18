@@ -2,71 +2,38 @@
 
 namespace PHPixie\ORM\Model\Data\Data\Document\Type;
 
-class DocumentArray extends \PHPixie\ORM\Model\Data\Data\Document\Type implements \ArrayAccess, \Iterator, \Countable
+class DocumentArray extends \PHPixie\ORM\Model\Data\Data\Document\Type implements \ArrayAccess, \Countable, \IteratorAggregate
 {
-    protected $originalArray;
     protected $currentArray;
-    protected $reachedEnd = false;
 
     public function __construct($documentBuilder, $originalArray)
     {
         parent::__construct($documentBuilder);
-        $this->originalArray = $originalArray;
         $this->currentArray = array();
-        foreach($originalArray as $key => $value)
+        foreach($originalArray as $value)
             $this->currentArray[] = $this->convertValue($value);
     }
 
     public function offsetExists($key)
     {
-        return array_key_exists($this->currentArray, $key);
+        return array_key_exists($key, $this->currentArray);
     }
 
     public function offsetGet($key)
     {
         if (!$this->offsetExists($key))
             throw new \PHPixie\ORM\Exception\Model("Key '$key' doesn't exist");
+        return $this->currentArray[$key];
     }
 
     public function offsetSet($key, $value)
     {
-        if (!is_numeric($key))
-            throw new \PHPixie\ORM\Exception\Model("Only numeric keys are allowed.");
-
-        $this->currentArray[$key] = $this->convertValue($value);
+        $this->appendToCurrent($this->convertValue($value), $key);
     }
 
     public function offsetUnset($key)
     {
-        if ($this->offsetExists($key))
-            unset($this->currentArray[$key]);
-    }
-
-    public function current()
-    {
-        return current($this->currentArray);
-    }
-
-    public function key()
-    {
-        return key($this->currentArray);
-    }
-
-    public function next()
-    {
-        next($this->currentArray);
-        $this->reachedEnd = $this->key() === $this->count() - 1;
-    }
-
-    public function rewind()
-    {
-        reset($this->currentArray);
-        $this->reachedEnd = false;
-    }
-
-    public function valid()
-    {
-        return !$this->reachedEnd;
+        array_splice($this->currentArray, $key, 1);
     }
 
     public function count()
@@ -74,6 +41,11 @@ class DocumentArray extends \PHPixie\ORM\Model\Data\Data\Document\Type implement
         return count($this->currentArray);
     }
 
+    public function getIterator()
+    {
+        return $this->documentBuilder->arrayIterator($this);
+    }
+    
     public function clear()
     {
         $this->currentArray = array();
@@ -88,10 +60,9 @@ class DocumentArray extends \PHPixie\ORM\Model\Data\Data\Document\Type implement
         return $current;
     }
 
-    public function push($value = null, $key)
+    public function append($value = null)
     {
-        $this->pushToCurrent($this->convertValue($value), $key);
-
+        $this->appendToCurrent($this->convertValue($value));
         return $this;
     }
 
@@ -100,23 +71,33 @@ class DocumentArray extends \PHPixie\ORM\Model\Data\Data\Document\Type implement
         return $this->currentArray[$this->count()-1];
     }
 
-    public function pushArray($data = array(), $key = null)
+    public function appendArray($data = array(), $key = null)
     {
-        return $this->pushToCurrent($this->documentBuilder->documentArray($data), $key);
+        return $this->appendToCurrent($this->documentBuilder->documentArray($data), $key);
     }
 
-    public function pushDocument($data = null, $key = null)
+    public function appendDocument($data = null, $key = null)
     {
-        return $this->pushToCurrent($this->documentBuilder->document($data), $key);
+        return $this->appendToCurrent($this->documentBuilder->document($data), $key);
     }
 
-    protected function pushToCurrent($value, $key = null)
+    protected function appendToCurrent($value, $key = null)
     {
-        if ($key !== null) {
-            $this->currentArray[$key] = $value;
-        }else
+        if($key === null){
             $this->currentArray[] = $value;
-
+            
+        }else{
+            if (!is_numeric($key))
+                throw new \PHPixie\ORM\Exception\Model("Only numeric keys can be used.");
+            
+            $count = $this->count();
+            
+            if($key > $count)
+                throw new \PHPixie\ORM\Exception\Model("Only sequential keys can be used.");
+            
+            $this->currentArray[$key] = $value;
+        }
+        
         return $value;
     }
 

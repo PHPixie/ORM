@@ -16,5 +16,15 @@ abstract class TypeTest extends \PHPixieTests\AbstractORMTest
         $this->type = $this->getType();
     }
     
+    protected function document()
+    {
+        return $this->quickMock('\PHPixie\ORM\Model\Data\Data\Document\Type\Document');
+    }
+    
+    protected function documentArray()
+    {
+        return $this->quickMock('\PHPixie\ORM\Model\Data\Data\Document\Type\DocumentArray');
+    }
+    
     abstract protected function getType();
 }

@@ -19,7 +19,7 @@ class DocumentArray extends \PHPixie\ORM\Model\Data\Data\Document\Type implement
 
     public function offsetExists($key)
     {
-        return $this->handler->getEmbedded($this->model, $this->embedConfig);
+        return array_key_exists($this->currentArray, $key);
     }
 
     public function offsetGet($key)
@@ -110,7 +110,7 @@ class DocumentArray extends \PHPixie\ORM\Model\Data\Data\Document\Type implement
         return $this->pushToCurrent($this->documentBuilder->document($data), $key);
     }
 
-    protected function pushToCurrent($value, $key === null)
+    protected function pushToCurrent($value, $key = null)
     {
         if ($key !== null) {
             $this->currentArray[$key] = $value;

@@ -19,32 +19,35 @@ class Document extends \PHPixie\ORM\Model\Data\Data\Document\Type
     public function currentData()
     {
         $currentProperties = get_object_vars($this);
-        $classProperties = array_keys(get_class_vars(get_class($this->target)));
+        $classProperties = array_keys(get_class_vars(get_class($this)));
         foreach($classProperties as $property)
             unset($currentProperties[$property]);
 
         $current = new \stdClass;
-        foreach($currentData as $key => $value)
+        foreach($currentProperties as $key => $value)
             $current->$key = $this->convertType($value);
 
         return $current;
     }
 
-    public function add($key, $value = null)
+    public function set($key, $value = null)
     {
-        $this->$target->$key = $this->convertValue($value);
-
+        $this->$key = $value;
         return $this;
     }
 
     public function addArray($key, $data = array())
     {
-        return $this->$target->$key = $this->documentBuilder->documentArray($data);
+        return $this->$key = $this->documentBuilder->documentArray($data);
     }
 
     public function addDocument($key, $data = null)
     {
-        return $this->$target->$key = $this->documentBuilder->document($data);
+        return $this->$key = $this->documentBuilder->document($data);
     }
 
+    public function __set($key, $value)
+    {
+        $this->$key = $this->convertValue($value);
+    }
 }

@@ -11,7 +11,7 @@ abstract class Type
         $this->documentBuilder = $documentBuilder;
     }
 
-    public function convertValue($value)
+    protected function convertValue($value)
     {
         if ($value instanceof \stdClass) {
             $value = $this->documentBuilder->document($value);
@@ -22,14 +22,16 @@ abstract class Type
         return $value;
     }
 
-    public function convertType($type)
+    protected function convertType($type)
     {
         if ($type instanceof Type) {
             $type = $type->currentData();
         }
 
-        if (is_object($type) && !($type instanceof \stdClass))
-            throw new \PHPixie\ORM\Exception\Model("Only \stdClass instances are allowed, an instance of '{get_class($type)}' passed.");
+        if (is_object($type) && !($type instanceof \stdClass)){
+            $class = get_class($type);
+            throw new \PHPixie\ORM\Exception\Model("Only \stdClass instances are allowed, an instance of $class passed.");
+        }
 
         return $type;
     }

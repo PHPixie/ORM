@@ -4,28 +4,25 @@ namespace PHPixie\ORM\Model\Data\Data;
 
 class Document extends \PHPixie\ORM\Model\Data\Data
 
-    protected $document;
+    protected $documentBuilder;
     protected $originalData;
 
-    public function __construct($document, $originalData)
+    public function __construct($documentBuilder, $originalData)
     {
         parent::__construct($originalData);
-        $this->document = $document;
+        $this->documentBuilder = $documentBuilder;
     }
 
-    public function document()
+    public function currentModelData()
     {
-        return $this->document;
-    }
-
-    public function currentData()
-    {
+        $data = new \stdClass;
         $currentProperties = $this->model->dataProperties();
-        $current = new \stdClass;
-        foreach($currentProperties as $key => $value)
-            $current->$key = $value;
-
-        return $currentData;
+        foreach($currentProperties as $key => $value) {
+            if(is_object($value) && $value instanceof Document\Type)
+                $value = $value->currentData();
+            $data->$key = $value;
+        }
+        return $data;
     }
 
     public function properties()

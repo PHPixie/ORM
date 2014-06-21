@@ -3,16 +3,23 @@
 namespace PHPixieTests\ORM\Model\Data\Data;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Model\Data\Data\Map
+ * @coversDefaultClass \PHPixie\ORM\Model\Data\Data\Document
  */
-class MapTest extends \PHPixieTests\ORM\Model\Data\DataTest
+class DocumentTest extends \PHPixieTests\ORM\Model\Data\DataTest
 {
+    protected $documentBuilder;
+    
     public function setUp()
     {
-        $this->originalData = array(
+        $this->documentBuilder = $this->quickMock('\PHPixie\ORM\Model\Data\Data\Document\Builder');
+        $this->originalData = (object) array(
             'name'    => 'Trixie',
             'flowers' => 3,
-            'magic'   => 'air'
+            'magic'   => (object) array(
+                'type'  => 'air',
+                'spell' => 'wind'
+            ),
+            'trees' => array('Oak', 'Pine')
         );
         
         parent::setUp();
@@ -20,7 +27,7 @@ class MapTest extends \PHPixieTests\ORM\Model\Data\DataTest
     
     protected function getData()
     {
-        return new \PHPixie\ORM\Model\Data\Data\Map((object) $this->originalData);
+        return new \PHPixie\ORM\Model\Data\Data\Document($this->documentBuilder, $this->originalData);
     }
     
     /**

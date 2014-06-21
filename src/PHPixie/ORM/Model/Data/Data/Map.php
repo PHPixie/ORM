@@ -4,16 +4,10 @@ namespace PHPixie\ORM\Model\Data\Data;
 
 class Map extends \PHPixie\ORM\Model\Data\Data
 {
-    protected $model;
 
-    public function currentData()
+    protected function currentModelData()
     {
-        $currentProperties = $this->model->dataProperties();
-        $current = new \stdClass;
-        foreach($currentProperties as $key => $value)
-            $current->$key = $value;
-
-        return $currentData;
+        return (object) $this->model->dataProperties();
     }
 
     public function diff()
@@ -28,7 +22,7 @@ class Map extends \PHPixie\ORM\Model\Data\Data
 
         foreach ($currentData as $key => $value) {
             if (!array_key_exists($key, $originalData) || $value !== $originalData[$key])
-                $data[$key] => $value;
+                $data[$key] = $value;
         }
 
         return $data;

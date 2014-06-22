@@ -20,7 +20,12 @@ class Query
         $this->relationhipMap = $relationshipMap;
         $this->modelName = $modelName;
     }
-
+    
+    public function modelName()
+    {
+        return $this->modelName;
+    }
+    
     public function limit($limit)
     {
         if (!is_numeric($limit))
@@ -108,7 +113,7 @@ class Query
 
     public function endConditionGroup($logic = 'and')
     {
-        $this->conditionBuilder->->endGroup($logic);
+        $this->conditionBuilder->endGroup($logic);
 
         return $this;
     }
@@ -135,13 +140,6 @@ class Query
     }
 
     public function addCollection($logic, $negate, $collectionItems)
-    {
-        $this->conditionBuilder->addCondition($logic, $negate, $collectionItems);
-
-        return $this;
-    }
-
-    public function addRelated($logic, $negate, $collectionItems)
     {
         $this->conditionBuilder->addCondition($logic, $negate, $collectionItems);
 

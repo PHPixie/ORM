@@ -13,7 +13,12 @@ class Model
         $this->setData($data);
         $this->isNew = $isNew;
     }
-
+    
+    public function modelName()
+    {
+    
+    }
+    
     public function asObject($recursive = true)
     {
         $data = $this->repository->modelAsObject($this);

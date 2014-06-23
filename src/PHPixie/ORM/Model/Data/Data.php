@@ -22,6 +22,14 @@ abstract class Data
         $this->model = $model;
     }
     
+    public function __set($key, $value)
+    {
+        $this->$key = $value;
+        
+        if($this->model !== null)
+            $this->model->setDataProperty($key, $value);
+    }
+    
     public function currentData()
     {
         if($this->model === null)

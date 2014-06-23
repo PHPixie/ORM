@@ -56,4 +56,10 @@ abstract class Model extends \PHPixie\ORM\Model
         $this->assertNotDeleted();
         parent::relationshipProperty($name, $createMissing);
     }
+    
+    public function __set($key, $value) 
+    {
+        $this->data()->$key = $value;
+    }
+
 }

@@ -11,7 +11,7 @@ class BuilderTest extends \PHPixieTests\AbstractORMTest
 
     public function setUp()
     {
-        $this->builder = new \PHPixie\ORM\Data\Types\Document\Builder;
+        $this->builder = new \PHPixie\ORM\Data\Types\Document\Guilder;
     }
     
     /**
@@ -28,20 +28,7 @@ class BuilderTest extends \PHPixieTests\AbstractORMTest
         $this->assertInstanceOf('\PHPixie\ORM\Data\Types\Document\Node\Document', $document);
         $this->assertEquals('Trixie', $document->name);
     }
-    
-    /**
-     * @covers ::arrayNode
-     */
-    public function testArrayNode()
-    {
-        $array = $this->builder->arrayNode();
-        $this->assertInstanceOf('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode', $array);
-        
-        $array = $this->builder->arrayNode(array('Trixie'));
-        $this->assertInstanceOf('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode', $array);
-        $this->assertEquals('Trixie', $array[0]);
-    }
-    
+
     /**
      * @covers ::arrayIterator
      */
@@ -53,4 +40,18 @@ class BuilderTest extends \PHPixieTests\AbstractORMTest
         $this->method($array, 'offsetGet', 5, array(0), 0);
         $this->assertEquals(5, $iterator->current());
     }
+
+    /**
+     * @covers ::arrayNode
+     */
+    public function testArrayNode()
+    {
+        $array = $this->builder->arrayNode(array('Trixie'));
+        $this->assertInstanceOf('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode', $array);
+        $this->assertEquals('Trixie', $array[0]);
+
+        $array = $this->builder->arrayNode();
+        $this->assertInstanceOf('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode', $array);
+    }
+
 }

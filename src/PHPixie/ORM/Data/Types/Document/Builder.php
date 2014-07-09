@@ -2,20 +2,20 @@
 
 namespace PHPixie\ORM\Data\Types\Document;
 
-class Builder
+class Guilder
 {
-    public function document($dataOject = null)
+    public function arrayIterator($arrayNode)
     {
-        return new Node\Document($this, $dataOject);
+        return new Node\ArrayNode\Iterator($arrayNode);
+    }
+
+    public function document($dataObject = null)
+    {
+        return new Node\Document($this, $dataObject);
     }
 
     public function arrayNode($array = array())
     {
         return new Node\ArrayNode($this, $array);
-    }
-    
-    public function arrayIterator($documentArray)
-    {
-        return new Node\ArrayNode\Iterator($documentArray);
     }
 }

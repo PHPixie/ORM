@@ -25,16 +25,16 @@ class Group
 
         foreach ($conditions as $cond) {
 
-            if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Operator) {
+            if($cond instanceof \PHPixie\ORM\Conditions\Condition\Operator) {
                 $builder->addOperatorCondition($cond->logic, $cond->negated, $cond->field, $cond->operator, $cond->values);
 
-            } elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
-                $this->mapCollection($cond, $currentModel, $query, $plan)
+            }elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
+                $this->mapCollection($cond, $currentModel, $query, $plan);
 
-            } elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group\Relationship) {
+            }elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group\Relationship) {
                 $this->mapRelationshipGroup($group, $currentModel, $query, $plan);
 
-            } elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group) {
+            }elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group) {
                 $this->mapConditionGroup($cond, $query, $currentModel, $plan);
 
             }else

@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Model\Repository;
+namespace PHPixie\ORM\Repositories\Repository;
 
-abstract class Database extends \PHPixie\ORM\Model\Repository
+abstract class Database extends \PHPixie\ORM\Repositories\Repository
 {
     protected $connectionName;
     protected $idField;

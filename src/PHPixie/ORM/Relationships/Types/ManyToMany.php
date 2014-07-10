@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Types;
 
-class ManyToMany extends PHPixie\ORM\Relationships\Relationship\Type
+class ManyToMany extends \PHPixie\ORM\Relationships\Relationship
 {
     public function config($config)
     {

@@ -6,9 +6,12 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 {
     public function query($side, $related)
     {
-        $side = $side->config()->getSide($side-> type());
-
-        return $this->registryRepository->get($side['model'])->related($side['property'], $related);
+        $config = $side->config();
+        $side = $side->type();
+        $model = $config->get($side.'Model');
+        $property = $config->get($side.'Property');
+        $repository = $this->repositories->get($model);
+        return $repository->query()->related($property, $related);
     }
 
     public function linkPlan($config, $leftItems, $rightItems)
@@ -44,7 +47,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                 $sides[] = null;
             } else {
                 $sides[] = $pivotPlanner->side(
-                                            $items
+                                            $items,
                                             $this->repositoryRegistry->get($model),
                                             $config->get($side.'PivotKey')
                                         );
@@ -88,7 +91,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                             $pivotQuery,
                             $config->get($type.'PivotKey'),
                             $sideQuery,
-                            $sideIdField
+                            $sideIdField,
                             $plan
                         );
 
@@ -121,7 +124,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                             $pivotQuery,
                             $config->get($opposing.'PivotKey'),
                             $resultLoader,
-                            $opposingRepository->idField()
+                            $opposingRepository->idField(),
                             $plan
                         );
 
@@ -166,7 +169,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     protected function addItemsToProperty($action, $owners, $ownerProperty, $items)
     {
-        if (!is_array($owners)
+        if (!is_array($owners))
             $owners = array($owners);
 
         if (!is_array($items))

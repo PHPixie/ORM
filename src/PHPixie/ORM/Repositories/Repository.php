@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Model;
+namespace PHPixie\ORM\Repositories;
 
 abstract class Repository
 {

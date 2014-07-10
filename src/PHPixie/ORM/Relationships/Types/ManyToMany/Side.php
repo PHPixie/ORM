@@ -2,11 +2,11 @@
 
 namespace PHPixie\ORM\Relationships\Types\ManyToMany;
 
-class Side extends PHPixie\ORM\Relationships\Relationship\Side
+class Side extends \PHPixie\ORM\Relationships\Relationship\Side
 {
     public function modelName()
     {
-        if ($this->type === 'left') {
+        if ($this->type === 'left')
             return $this->config->leftModel;
 
         return $this->config->rightModel;
@@ -14,7 +14,7 @@ class Side extends PHPixie\ORM\Relationships\Relationship\Side
 
     public function propertyName()
     {
-        if ($this->type === 'left') {
+        if ($this->type === 'left')
             return $this->config->leftProperty;
 
         return $this->config->rightProperty;
@@ -23,5 +23,9 @@ class Side extends PHPixie\ORM\Relationships\Relationship\Side
     public function relationship()
     {
         return 'manyToMany';
+    }
+    
+    public function handleDeletions()
+    {//TODO
     }
 }

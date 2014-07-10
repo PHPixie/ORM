@@ -24,7 +24,7 @@ class Cascade
         $resultStep = $this->steps->reusableResult($selectQuery);
         $plan->add($resultStep);
         foreach ($sides as $side) {
-            $handler = $this->ormBuilder->relationship(side->relationship())->handler();
+            $handler = $this->ormBuilder->relationship($side->relationship())->handler();
             $handler->handleDeletion($repository->modelName(), $side, $resultStep, $plan);
         }
         $deleteQuery = $repository->databaseQuery('delete');

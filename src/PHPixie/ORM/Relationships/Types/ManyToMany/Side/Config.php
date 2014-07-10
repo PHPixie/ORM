@@ -10,7 +10,7 @@ class Config extends \PHPixie\ORM\Relationships\Relationship\Side\Config
 
     public $rightModel;
     public $rightProperty;
-    public $leftPivotKey;
+    public $rightPivotKey;
 
     public $pivot;
     public $pivotConnection;

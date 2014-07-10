@@ -49,10 +49,15 @@ class Model
         $property = $this->relationshipProperty($name);
         if ($property !== null)
             return $property;
-
-        throw new \PHPixie\Exception\Model("Property '$name' doesn't exist");
+        
+        return $this->data->get($name);
     }
 
+    public function __set($name, $value)
+    {
+        $this->data->set($name, $value);
+    }
+    
     protected function setData($data)
     {
         $data->setModel($this);
@@ -67,16 +72,7 @@ class Model
 
     public function dataProperties()
     {
-        $dataProperties = get_object_vars($this);
-        $classProperties = array_keys(get_class_vars(get_class($this)));
-        foreach($classProperties as $property)
-            unset($dataProperties[$property]);
-
-        foreach($dataProperties as $key => $value)
-            if($value instanceof \PHPixie\ORM\Relationships\Relationship\Property\Model)
-                unset($dataProperties[$key]);
-
-        return $dataProperties;
+       
     }
 
     public function relationshipProperty($name, $createMissing = true)

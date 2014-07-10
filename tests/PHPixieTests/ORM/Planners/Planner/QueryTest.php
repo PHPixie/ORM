@@ -13,7 +13,7 @@ class QueryTest extends \PHPixieTests\ORM\Planners\PlannerTest
     
     public function setUp()
     {
-        $this->sqlStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query\Strategy\PDO');
+        $this->sqlStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query\Strategy\SQL');
         $this->mongoStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query\Strategy\Mongo');
         parent::setUp();
     }

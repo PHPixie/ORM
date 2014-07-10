@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Planners\Planner\Query\Strategy;
 /**
  * @coversDefaultClass \PHPixie\ORM\Planners\Planner\Query\Strategy\SQL
  */
-class MultiqueryTest extends \PHPixieTests\ORM\Planners\Planner\Query\StrategyTest
+class SQLTest extends \PHPixieTests\ORM\Planners\Planner\Query\StrategyTest
 {
     /**
      * @covers ::setSource

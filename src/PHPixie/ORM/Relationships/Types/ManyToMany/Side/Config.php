@@ -30,7 +30,12 @@ class Config extends \PHPixie\ORM\Relationships\Relationship\Side\Config
                 $this->$property = $inflector->plural($this->get($opposing.'Model'));
         }
 
-        $this->pivot = $config->get('pivot');
+        $this->pivot = $config->get('pivot', null);
+
+        if($this->pivot === null) {
+            $this->pivot = $this->rightProperty.'_'.$this->leftProperty;
+        }
+
         $this->pivotConnection = $config->get('pivotOptions.connection', null);
 
         foreach ($sides as $side => $opposing) {

@@ -11,31 +11,31 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
     protected $inflector;
     protected $plural = array();
     protected $sets = array();
-    
+
     public function setUp()
     {
         $this->inflector = $this->quickMock('\PHPixie\ORM\Inflector');
-        
+
         $plural = $this->plural;
         $singular = array_flip($this->plural);
-        
+
         $this->inflector
             ->expects($this->any())
             ->method('plural')
             ->will($this->returnCallback(function($key) use($plural){
                 return $plural[$key];
             }));
-        
+
         $this->inflector
             ->expects($this->any())
             ->method('singular')
             ->will($this->returnCallback(function($key) use($singular){
                 return $singular[$key];
             }));
-        
+
         $this->config = $this->getConfig($this->sets[0][0]);
     }
-    
+
     /**
      * @covers ::__construct
      * @covers \PHPixie\ORM\Relationship\Side\Config::__construct
@@ -49,7 +49,7 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
                 $this->assertEquals($value, $config->$key);
         }
     }
-    
+
     /**
      * @covers ::get
      * @covers ::<protected>
@@ -58,21 +58,29 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
     {
         $data = $this->sets[0][1];
         $key = key($data);
-        $value = value($data);
+        $value = current($data);
         $this->assertEquals($value, $this->config->get($key));
     }
-    
+
     protected function slice($data)
     {
-        $slice = $this->quickMock('\PHPixie\Config\Slice');
+        $slice = $this->quickMock('\PHPixie\Config\Slice', array('get'));
         $slice
             ->expects($this->any())
             ->method('get')
             ->will($this->returnCallback(function($key) use($data){
-                return $data[$key];
+
+                if(array_key_exists($key, $data))
+                    return $data[$key];
+
+                $args = func_get_args();
+                if(count($args) == 2)
+                    return $args[1];
+
+                throw new \Exception("Key $key is not set.");
             }));
         return $slice;
     }
-    
+
     abstract protected function getConfig($slice);
 }

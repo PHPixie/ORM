@@ -5,22 +5,25 @@ namespace PHPixie\ORM\Relationships\Relationship;
 class Handler
 {
     protected $ormBuilder;
-    protected $relationship;
     protected $repositories;
     protected $planners;
+    protected $plans;
     protected $steps;
     protected $loaders;
+    protected $relationship;
     protected $groupMapper;
     protected $cascadeMapper;
 
-    public function __construct($ormBuilder, $relationship, $repositories, $planners, $steps, $loaders, $groupMapper, $cascadeMapper)
+    public function __construct($ormBuilder, $repositories, $planners, $plans, $steps,
+                                $loaders, $relationship, $groupMapper, $cascadeMapper)
     {
         $this->ormBuilder         = $ormBuilder;
-        $this->relationship       = $relationship;
-        $this->repositories = $repositories;
+        $this->repositories       = $repositories;
         $this->planners           = $planners;
+        $this->plans              = $plans;
         $this->steps              = $steps;
         $this->loaders            = $loaders;
+        $this->relationship       = $relationship;
         $this->groupMapper        = $groupMapper;
         $this->cascadeMapper      = $cascadeMapper;
     }

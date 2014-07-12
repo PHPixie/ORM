@@ -9,22 +9,24 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
 {
     protected $handler;
     protected $ormBuilder;
-    protected $relationship;
     protected $repositories;
     protected $planners;
+    protected $plans;
     protected $steps;
     protected $loaders;
+    protected $relationship;
     protected $groupMapper;
     protected $cascadeMapper;
     
     public function setUp()
     {
         $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
-        $this->relationship = $this->getRelationship();
         $this->repositories = $this->quickMock('\PHPixie\ORM\Repositories');
         $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
+        $this->plans = $this->quickMock('\PHPixie\ORM\Plans');
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
         $this->loaders = $this->quickMock('\PHPixie\ORM\Loaders');
+        $this->relationship = $this->getRelationship();
         $this->groupMapper = $this->quickMock('\PHPixie\ORM\Mapper\Group');
         $this->cascadeMapper = $this->quickMock('\PHPixie\ORM\Mapper\Cascade');
         $this->handler = $this->getHandler();
@@ -38,6 +40,16 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
     public function testConstruct()
     {
     
+    }
+    
+    protected function setRepositories($repositories)
+    {
+        $this->repositories
+                    ->expects($this->any())
+                    ->method('get')
+                    ->will($this->returnCallback(function($name) use($repositories){
+                        return $repositories[$name]; 
+                    }));
     }
     
     protected function side($type, $map = array(), $sideMethodMap = array(), $configMethodMap = array())
@@ -64,9 +76,18 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
             ->will($this->returnCallback(function($key) use($map){
                 return $map[$key];
             }));
+        
+        foreach($map as $key => $value)
+            $config->$key = $value;
+        
         foreach($methodMap as $key => $value)
             $this->method($config, $key, 'value', array());
         return $config;
+    }
+    
+    protected function getPlan()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Plans\Plan\Step');
     }
     
     protected function getModel()

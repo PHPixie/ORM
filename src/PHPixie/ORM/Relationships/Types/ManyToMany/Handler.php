@@ -16,20 +16,20 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     public function linkPlan($config, $leftItems, $rightItems)
     {
-        $plan = $this->orm->plan();
+        $plan = $this->plans->plan();
         list($leftSide, $rightSide) = $this->plannerSides($config, $leftItems, $rightItems);
         $pivot = $this->plannerPivot($config);
-        $this->planers->pivot()->link($pivot, $leftSide, $rightSide, $plan);
+        $this->planners->pivot()->link($pivot, $leftSide, $rightSide, $plan);
 
         return $plan;
     }
 
     public function unlinkPlan($config, $leftItems = null, $rightItems = null)
     {
-        $plan = $this->orm->plan();
+        $plan = $this->plans->plan();
         list($leftSide, $rightSide) = $this->plannerSides($config, $leftItems, $rightItems);
         $pivot = $this->plannerPivot($config);
-        $this->planers->pivot()->unlink($pivot, $leftSide, $rightSide, $plan);
+        $this->planners->pivot()->unlink($pivot, $leftSide, $rightSide, $plan);
 
         return $plan;
     }
@@ -48,7 +48,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             } else {
                 $sides[] = $pivotPlanner->side(
                                             $items,
-                                            $this->repositoryRegistry->get($model),
+                                            $this->repositories->get($model),
                                             $config->get($side.'PivotKey')
                                         );
             }
@@ -60,9 +60,9 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
     protected function pivotConnection($config)
     {
         if ($config->pivotConnection !== null)
-            return $this->orm->databaseConnection($config->pivotConnection);
+            return $this->ormBuilder->databaseConnection($config->pivotConnection);
 
-        return $this->repositoryRegistry->get($config->leftModel)->connection();
+        return $this->repositories->get($config->leftModel)->connection();
     }
 
     protected function plannerPivot($config)
@@ -82,7 +82,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $pivot = $this->plannerPivot($config);
         $inPlanner = $this->planners->in();
 
-        $sideRepository = $this->repositoryRegistry($config->get($type.'Model'));
+        $sideRepository = $this->repositories($config->get($type.'Model'));
         $sideQuery = $sideRepository->dbQuery()->fields(array($sideRepository->idField()));
         $this->groupMapper->mapConditions($sideQuery, $group->conditions(), $sideRepository->modelName(), $plan);
 
@@ -95,7 +95,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                             $plan
                         );
 
-        $opposingRepository = $this->repositoryRegistry($config->get($opposing.'Model'));
+        $opposingRepository = $this->repositories($config->get($opposing.'Model'));
 
         $inPlanner->subquery(
                             $query,
@@ -118,7 +118,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $pivot = $this->plannerPivot($config);
         $pivotQuery = $pivot->query();
 
-        $opposingRepository = $this->repositoryRegistry($config->get($opposing.'Model'));
+        $opposingRepository = $this->repositories($config->get($opposing.'Model'));
 
         $inPlanner->loader(
                             $pivotQuery,
@@ -131,7 +131,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $pivotStep = $this->steps->resusableResult($pivotQuery);
         $preloadPlan->push($pivotStep);
 
-        $sideRepository = $this->repositoryRegistry($config->get($side.'Model'));
+        $sideRepository = $this->repositories($config->get($side.'Model'));
         $query = $sideRepository->dbQuery();
 
         $inPlanner->result(
@@ -215,7 +215,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $query = $this->pivotConnection($config)->query('delete');
         $this->planners->query()->setSource($query, $config->pivot);
         $pivotKey = $config->get($side-> type().'PivotKey');
-        $repository = $this->repositoryRegistry->get($modelName);
+        $repository = $this->repositories->get($modelName);
         $this->planners->in()->result($query, $pivotKey, $resultStep, $repository->idField());
         $deleteStep = $this->steps->query($query);
         $plan->push($deleteStep);

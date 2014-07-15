@@ -4,14 +4,21 @@ namespace PHPixie\ORM\Relationships;
 
 class Map
 {
+    protected $ormBuilder;
     protected $propertyMap = array();
 
-    public function __construct($orm, $config)
+    public function __construct($ormBuilder, $config)
+    {
+        $this->ormBuilder = $ormBuilder;
+        $this->addSidesFromConfig($config);
+    }
+
+    public function addSidesFromConfig($config)
     {
         foreach ($config->data() as $key => $params) {
             $type = $params['type'];
-            $relationshipConfig = $this->config->slice($key);
-            $relationship = $orm->relationshipType($type);
+            $relationshipConfig = $config->slice($key);
+            $relationship = $this->ormBuilder->relationship($type);
             $sides = $relationship->getSides($relationshipConfig);
             foreach($sides as $side)
                 $this->addSide($side);
@@ -29,7 +36,7 @@ class Map
         if (isset($this->propertyMap[$modelName][$propertyName]))
             throw new \PHPixie\ORM\Exception\Mapper("Property '$propertyName' on '$modelName' model has already been defined by a different relationship.");
 
-        $this->propertyMap[$model][$property] = $side;
+        $this->propertyMap[$modelName][$propertyName] = $side;
     }
 
     public function getSide($modelName, $propertyName)
@@ -40,17 +47,17 @@ class Map
     public function modelProperty($model, $propertyName)
     {
         $side = $this->getSide($model->modelName(), $propertyName);
-        $relationshipType = $this->orm->relationshipType($side->relationshipType());
+        $relationship = $this->ormBuilder->relationship($side->relationshipType());
 
-        return $relationshipType->modelProperty($side, $model);
+        return $relationship->modelProperty($side, $model);
     }
 
-    public function queryProperty($query, $name)
+    public function queryProperty($model, $propertyName)
     {
-        $side = $this->getSide($query->modelName(), $propertyName);
-        $relationshipType = $this->orm->relationshipType($side->relationshipType());
+        $side = $this->getSide($model->modelName(), $propertyName);
+        $relationship = $this->ormBuilder->relationship($side->relationshipType());
 
-        return $relationshipType->queryProperty($side, $model);
+        return $relationship->queryProperty($side, $model);
     }
 
 }

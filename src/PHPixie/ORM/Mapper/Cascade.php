@@ -38,7 +38,7 @@ class Cascade
     {
         $sides = array();
         foreach($this->relationshipMap->modelSides($modelName) as $side)
-            if ($side-> handleDeletions())
+            if ($side->handleDeletions())
                 $sides[] = $side;
 
         return $sides;

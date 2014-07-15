@@ -20,12 +20,9 @@ class Side extends \PHPixie\ORM\Relationships\Relationship\Side
         return $this->config->rightProperty;
     }
 
-    public function relationship()
+    public function relationshipType()
     {
         return 'manyToMany';
     }
     
-    public function handleDeletions()
-    {//TODO
-    }
-}
+ }

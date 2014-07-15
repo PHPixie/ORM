@@ -22,4 +22,9 @@ class Pivot
     {
         return $this->connection;
     }
+    
+    public function selectQuery()
+    {
+        return $this->connection->selectQuery();
+    }
 }

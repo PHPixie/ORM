@@ -84,10 +84,24 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
             $this->method($config, $key, 'value', array());
         return $config;
     }
+
+    protected function getConditionGroup($logic = 'and', $negated = false, $conditions = array(5))
+    {
+        $group = $this->abstractMock('\PHPixie\ORM\Conditions\Condition\Group');
+        $this->method($group, 'logic', $logic, array());
+        $this->method($group, 'negated', $negated, array());
+        $this->method($group, 'conditions', $conditions, array());
+        
+    }
     
     protected function getPlan()
     {
         return $this->abstractMock('\PHPixie\ORM\Plans\Plan\Step');
+    }
+    
+    protected function getDatabaseQuery($type = 'select')
+    {
+        return $this->abstractMock('\PHPixie\database\Query\Type\\'.ucfirst($type));
     }
     
     protected function getModel()

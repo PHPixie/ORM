@@ -74,34 +74,36 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     public function mapRelationship($side, $group, $query, $plan)
     {
-        $type = $side->type();
-        $config = $side->config();
+        $dependencies   = $this->getMappingDependencies($side);
+        $config         = $dependencies['config'];
+        $sideRepository = $dependencies['sideRepository'];
+        $inPlanner      = $this->planners->in();
+        
+        $sideIdField = $sideRepository->idField();
+        
+        $sideQuery = $sideRepository->selectQuery()->fields(array($sideIdField));
+        $this->groupMapper->mapConditions(
+                                            $sideQuery,
+                                            $group->conditions(),
+                                            $sideRepository->modelName(),
+                                            $plan
+                                        );
 
-        $opposing = $type === 'left' ? 'right' : 'left';
-
-        $pivot = $this->plannerPivot($config);
-        $inPlanner = $this->planners->in();
-
-        $sideRepository = $this->repositories($config->get($type.'Model'));
-        $sideQuery = $sideRepository->dbQuery()->fields(array($sideRepository->idField()));
-        $this->groupMapper->mapConditions($sideQuery, $group->conditions(), $sideRepository->modelName(), $plan);
-
-        $pivotQuery = $pivot->query();
+        
+        $pivotQuery = $dependencies['pivot']->query();
         $inPlanner->subquery(
                             $pivotQuery,
-                            $config->get($type.'PivotKey'),
+                            $config->get($dependencies['type'].'PivotKey'),
                             $sideQuery,
                             $sideIdField,
                             $plan
                         );
 
-        $opposingRepository = $this->repositories($config->get($opposing.'Model'));
-
         $inPlanner->subquery(
                             $query,
-                            $opposingRepository->idField(),
+                            $dependencies['opposingRepository']->idField(),
                             $pivotQuery,
-                            $config->get($opposing.'PivotKey'),
+                            $config->get($dependencies['opposing'].'PivotKey'),
                             $plan,
                             $group->logic(),
                             $group->negated()
@@ -110,16 +112,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     public function preload($side, $resultLoader, $plan)
     {
-        $config = $side->config();
-        $side = $side->type();
-        $opposing = $side === 'left' ? 'right' : 'left';
-        $inPlanner = $this->planners->in();
-
-        $pivot = $this->plannerPivot($config);
         $pivotQuery = $pivot->query();
-
-        $opposingRepository = $this->repositories($config->get($opposing.'Model'));
-
+        
         $inPlanner->loader(
                             $pivotQuery,
                             $config->get($opposing.'PivotKey'),
@@ -130,8 +124,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         $pivotStep = $this->steps->resusableResult($pivotQuery);
         $preloadPlan->push($pivotStep);
-
-        $sideRepository = $this->repositories($config->get($side.'Model'));
+    
         $query = $sideRepository->dbQuery();
 
         $inPlanner->result(
@@ -149,6 +142,26 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         return $this->relationshipType->preloader($side, $loader, $pivotStep);
     }
 
+    protected function getMappingDependencies($side)
+    {
+        $dependencies = array();
+        
+        $type     = $side->type();
+        $config   = $side->config();
+        $opposing = $type === 'left' ? 'right' : 'left';
+        
+        return array(
+            'config'             => $config,
+            'type'               => $type,
+            'opposing'           => $opposing,
+            'pivot'              => $this->plannerPivot($config),
+            'sideRepository'     => $this->repositories($config->get($type.'Model')),
+            'opposingRepository' => $this->repositories($config->get($opposing.'Model'))
+        );
+
+        return $dependencies;
+    }
+    
     public function linkProperties($config, $left, $right)
     {
         $this->processProperties('add', $left, $config->leftProperty, $right);

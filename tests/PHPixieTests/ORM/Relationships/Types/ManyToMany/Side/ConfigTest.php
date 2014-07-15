@@ -33,6 +33,33 @@ class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\Side\Confi
             )
         );
         
+        $this->sets[] = array(
+            $this->slice(array(
+                'left'  => 'fairy',
+                'leftOptions.property' => 'favourites',
+                
+                'right' => 'flower',
+                'rightOptions.property' => 'owners',
+                
+                'pivot' => 'favouriteFlowers',
+                'pivotOptions.connection' => 'mysql',
+                'pivotOptions.leftKey' => 'fairyId',
+                'pivotOptions.rightKey' => 'flowerId',
+            )),
+            array(
+                'leftModel'       => 'fairy',
+                'leftProperty'    => 'favourites',
+                'leftPivotKey'    => 'fairyId',
+
+                'rightModel'      => 'flower',
+                'rightProperty'   => 'owners',
+                'rightPivotKey'   => 'flowerId',
+
+                'pivot'           => 'favouriteFlowers',
+                'pivotConnection' => 'mysql'
+            )
+        );
+        
         parent::setUp();
     }
     

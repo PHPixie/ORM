@@ -23,7 +23,7 @@ class Pivot
         return $this->connection;
     }
     
-    public function selectQuery()
+    public function databaseSelectQuery()
     {
         return $this->connection->selectQuery();
     }

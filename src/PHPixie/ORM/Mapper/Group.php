@@ -19,7 +19,7 @@ class Group
 
     }
 
-    protected function mapConditions($dbQuery, $conditions, $modelName, $plan)
+    public function mapConditions($dbQuery, $conditions, $modelName, $plan)
     {
         $builder = $query->getBuilder();
 

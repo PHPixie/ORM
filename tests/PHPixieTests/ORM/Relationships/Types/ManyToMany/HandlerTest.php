@@ -133,17 +133,38 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         return $m;
     }
     
-    public function testMapRelationships()
+    /**
+     * @covers ::mapQuery
+     * @covers ::<protected>
+     */
+    public function testMapLeftRelationship()
     {
-        $type = 'left';
+        $this->mapQueryTest('left');
+    }
+    
+    /**
+     * @covers ::mapQuery
+     * @covers ::<protected>
+     */
+    public function testMapRightRelationship()
+    {
+        $this->mapQueryTest('right');
+    }
+    
+    protected function mapQueryTest($type)
+    {
         $opposing = $type === 'left' ? 'right' :'left';
         $m = $this->getRelationshipMocks($type, $this->configData);
         $plan = $this->getPlan();
         
-        $sideQuery = $this->getDatabaseQuery();
-        $this->method($m[$type.'Repo'], 'selectQuery', $sideQuery, array(), 1);
+        $sideOffset = $m[$type.'Offset'];
+        $opposingOffset = $m[$opposing.'Offset'];
         
-        $this->method($m[$type.'Repo'], 'idField', $type.'Id', array(), 2);
+        $this->method($m[$type.'Repo'], 'idField', $type.'Id', array(), $sideOffset++);
+        
+        $sideQuery = $this->getDatabaseQuery();
+        $this->method($m[$type.'Repo'], 'databaseSelectQuery', $sideQuery, array(), $sideOffset++);
+        $this->method($m[$type.'Repo'], 'modelName', $this->configData[$type.'Model'], array(), $sideOffset++);
         $this->method($sideQuery, 'fields', $sideQuery, array(array($type.'Id')), 0);
         
         $this->method($this->groupMapper, 'mapConditions', null, array(
@@ -154,7 +175,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         ), 0);
         
         $pivotQuery = $this->getDatabaseQuery();
-        $this->method($m['pivotPivot'], 'selectQuery', $pivotQuery, array(), 0);
+        $this->method($m['pivotPivot'], 'databaseSelectQuery', $pivotQuery, array(), 0);
         
         $this->method($m['inPlanner'], 'subquery', null, array(
             $pivotQuery,
@@ -165,20 +186,76 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         ), 0);
         
         $query = $this->getDatabaseQuery();
+        $this->method($m[$opposing.'Repo'], 'idField', $opposing.'Id', array(), $opposingOffset++);
         $this->method($m['inPlanner'], 'subquery', null, array(
             $query,
             $opposing.'Id',
-            $pivotQuery
+            $pivotQuery,
             $this->configData[$opposing.'PivotKey'],
             $plan,
             'or',
             true
-        ), 0);
+        ), 1);
         
         $group = $this->getConditionGroup('or', true, array(5));
         
-        $this->handler->mapRelationship($m['side'], $group, $query, $plan);
+        $this->handler->mapQuery($m['side'], $group, $query, $plan);
         
+    }
+    
+    /**
+     * @covers ::mapPreload
+     * @covers ::<protected>
+     */
+    public function testMapPreloadLeft()
+    {
+        $this->mapPreloadTest('left');
+    }
+    
+    /**
+     * @covers ::mapPreload
+     * @covers ::<protected>
+     */
+    public function testMapPreloadRight()
+    {
+        $this->mapPreloadTest('right');
+    }
+    
+    protected function mapPreloadTest($type)
+    {
+        $opposing = $type === 'left' ? 'right' :'left';
+        $m = $this->getRelationshipMocks($type, $this->configData);
+        $sideOffset = $m[$type.'Offset'];
+        $opposingOffset = $m[$opposing.'Offset'];
+        
+        $preloadPlan = $this->getPlan();
+        $repoLoader = $this->getRepositoryLoader();
+        
+        $this->method($m['inPlanner'], 'loader', null, array(
+            $pivotQuery,
+            $this->configData[$opposing.'PivotKey'],
+            $repoLoader,
+            $opposing.'Id',
+            $plan
+        ), 0);
+        
+        $pivotStep = $this->getReusableResult();
+        $this->method($this->steps, 'reusableResult', $pivotStep, array($pivotQuery), 0);
+        $this->method($preloadPlan, 'push', null, array($pivotStep), array(), 0);
+        
+        $sideQuery = $this->getDatabaseQuery();
+        $this->method($m[$type.'Repo'], 'databaseSelectQuery', $sideQuery, array(), $sideOffset++);
+        $this->method($m[$type.'Repo'], 'idField', $type.'Id', array(), $sideOffset++);
+        $this->method($m[$type.'Repo'], 'modelName', $this->configData[$type.'Model'], array(), $sideOffset++);
+        
+        $this->method($m['inPlanner'], 'result', null, array(
+            $sideQuery,
+            $this->configData[$type.'PivotKey'],
+            $pivotStep,
+            $type.'Id',
+            $preloadPlan
+        ), 1);
+
     }
     
     protected function getRelationshipMocks($type, $data)
@@ -194,7 +271,10 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
             'pivotPlanner' => $this->getPivotPlanner(),
             'pivotPivot' => $this->getPivotPivot(),
             
-            'connection' => $this->getConnection()
+            'connection' => $this->getConnection(),
+            
+            'leftOffset' => 1,
+            'rightOffset' => 0
         );
         
         
@@ -206,7 +286,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         $this->method($this->planners, 'in', $m['inPlanner'], array());
         $this->method($this->planners, 'pivot', $m['pivotPlanner'], array());
         
-        $this->method($m[$type.'Repo'], 'connection', $m['connection'], array(), 0);
+        $this->method($m['leftRepo'], 'connection', $m['connection'], array(), 0);
         $this->method($m['pivotPlanner'], 'pivot', $m['pivotPivot'], array($m['connection'], $data['pivot']));
         
         return $m;

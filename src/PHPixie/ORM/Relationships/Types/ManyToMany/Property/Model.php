@@ -38,7 +38,7 @@ class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
         list($left, $right) = $this->getSides(null);
         $plan = $this->handler->unlinkPlan($this->config, $left, $right);
         $plan->execute();
-        if ($this->loaded && $this->value !== null)
+        if ($this->loaded && $this->value !== null) {
             $this->handler->unlinkProperties($this->config, $this->value->usedModels(), null);
             $this->value->removeAll();
         }
@@ -47,12 +47,12 @@ class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
     protected function getSides($opposing)
     {
         if ($this->side-> type() === 'right')
-            return ($this->model, $opposing);
+            return array($this->model, $opposing);
 
-        return ($opposing, $this->model);
+        return array($opposing, $this->model);
     }
 
-    public function asObject($recursive = true)
+    public function data($recursive = true)
     {
         $data = array();
         foreach($this->value() as $model)

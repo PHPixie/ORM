@@ -28,6 +28,9 @@ abstract class PropertyTest extends \PHPixieTests\AbstractORMTest
 
     }
 
+    protected function getModel(){
+        return $this->abstractMock('\PHPixie\ORM\Model');
+    }
 
     protected abstract function property();
     protected abstract function handler();

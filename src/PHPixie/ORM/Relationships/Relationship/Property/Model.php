@@ -2,12 +2,11 @@
 
 namespace PHPixie\ORM\Relationships\Relationship\Property;
 
-abstract class Model
+abstract class Model extends \PHPixie\ORM\Relationships\Relationship\Property
 {
     protected $model;
-
-    protected $loaded = false;
     protected $value;
+    protected $isLoaded = false;
 
     public function __construct($handler, $side, $model)
     {
@@ -22,16 +21,15 @@ abstract class Model
 
     public function reload()
     {
-        $this->loaded = true;
+        $this->isLoaded = true;
         $this->value = $this->load();
-
-        return $this->loaded;
+        return $this->value;
     }
 
     public function reset()
     {
         $this->value = null;
-        $this->loaded = false;
+        $this->isLoaded = false;
     }
 
     public function model()
@@ -41,7 +39,7 @@ abstract class Model
 
     public function value()
     {
-        if ($this->loaded)
+        if ($this->isLoaded)
             $this->reload();
 
         return $this->value;
@@ -50,12 +48,12 @@ abstract class Model
     public function setValue($value)
     {
         $this->value = $value;
-        $this->loaded = true;
+        $this->isLoaded = true;
     }
 
-    public function loaded()
+    public function isLoaded()
     {
-        return $this->loaded();
+        return $this->isLoaded;
     }
 
     abstract protected function load();

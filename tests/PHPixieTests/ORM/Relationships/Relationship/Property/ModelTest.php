@@ -13,6 +13,7 @@ abstract class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
     public function setUp()
     {
         $this->model = $this->getModel();
+        parent::setUp();
     }
 
     /**

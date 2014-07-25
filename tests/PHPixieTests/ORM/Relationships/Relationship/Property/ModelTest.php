@@ -47,37 +47,41 @@ abstract class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
      */
      public function testValue()
      {
+         $property = $this->property;
          $this->assertLoaded(false);
          $this->prepareLoad();
-         $this->assertEquals($this->value, $this->property->value());
-         $this->assertEquals($this->value, $this->property());
+         $this->assertEquals($this->value, $property->value());
+         $this->assertEquals($this->value, $property());
          $this->assertLoaded(true, $this->value);
-         $this->reset();
+         $property->reset();
 
          $this->assertLoaded(false);
          $this->prepareLoad();
-         $this->assertEquals($this->value, $this->property());
+         $this->assertEquals($this->value, $property());
          $this->assertLoaded(true, $this->value);
-         $this->reset();
+         $property->reset();
 
          $this->assertLoaded(false);
          $value = $this->getValue();
          $this->property->setValue($value);
          $this->assertLoaded(true, $value);
-         $this->assertEquals($value, $this->property());
+         $this->assertEquals($value, $property());
 
-         $this->assertEquals($this->value, $this->property->reload());
+        $this->prepareLoad();
+         $this->assertEquals($this->value, $property->reload());
          $this->assertLoaded(true, $this->value);
-         $this->reset();
+         $property->reset();
      }
 
       protected function assertLoaded($isLoaded, $value = null)
       {
           $this->assertEquals($isLoaded, $this->property->isLoaded());
-          $this->assertEquals($value, $this->property->value());
+          if($isLoaded)
+              $this->assertEquals($value, $this->property->value());
       }
 
       abstract protected function getValue();
       abstract protected function value();
+      abstract protected function prepareLoad();
 
 }

@@ -17,31 +17,38 @@ class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
 
     public function add($items)
     {
+        $config = $this->side->config();
         list($left, $right) = $this->getSides($items);
-        $plan = $this->handler->linkPlan($this->config, $left, $right);
+        $plan = $this->handler->linkPlan($config, $left, $right);
         $plan->execute();
-        $this->handler->linkProperties($this->config, $left, $right);
+        $this->handler->linkProperties($config, $left, $right);
+        return $this->model;
     }
 
     public function remove($items)
     {
         if ($items === null)
             return;
+
+        $config = $this->side->config();
         list($left, $right) = $this->getSides($items);
-        $plan = $this->handler->unlinkPlan($this->config, $left, $right);
+        $plan = $this->handler->unlinkPlan($config, $left, $right);
         $plan->execute();
-        $this->handler->unlinkProperties($this->config, $left, $right);
+        $this->handler->unlinkProperties($config, $left, $right);
+        return $this->model;
     }
 
     public function removeAll()
     {
+        $config = $this->side->config();
         list($left, $right) = $this->getSides(null);
-        $plan = $this->handler->unlinkPlan($this->config, $left, $right);
+        $plan = $this->handler->unlinkPlan($config, $left, $right);
         $plan->execute();
         if ($this->loaded && $this->value !== null) {
-            $this->handler->unlinkProperties($this->config, $this->value->usedModels(), null);
+            $this->handler->unlinkProperties($config, $this->value->usedModels(), null);
             $this->value->removeAll();
         }
+        return $this->model;
     }
 
     protected function getSides($opposing)

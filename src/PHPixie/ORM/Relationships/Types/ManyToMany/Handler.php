@@ -14,6 +14,11 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         return $repository->query()->related($property, $related);
     }
 
+    public function loadProperty($side, $model)
+    {
+        
+    }
+
     public function linkPlan($config, $leftItems, $rightItems)
     {
         $plan = $this->plans->plan();
@@ -68,7 +73,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
     protected function plannerPivot($config)
     {
         $pivotConnection = $this->pivotConnection($config);
-        
+
         return $this->planners->pivot()->pivot($pivotConnection, $config->pivot);
     }
 
@@ -78,9 +83,9 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $config         = $dependencies['config'];
         $sideRepository = $dependencies['sideRepository'];
         $inPlanner      = $this->planners->in();
-        
+
         $sideIdField = $sideRepository->idField();
-        
+
         $sideQuery = $sideRepository->databaseSelectQuery()->fields(array($sideIdField));
         $this->groupMapper->mapConditions(
                                             $sideQuery,
@@ -89,7 +94,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                                             $plan
                                         );
 
-        
+
         $pivotQuery = $dependencies['pivot']->databaseSelectQuery();
         $inPlanner->subquery(
                             $pivotQuery,
@@ -116,9 +121,9 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $config         = $dependencies['config'];
         $sideRepository = $dependencies['sideRepository'];
         $inPlanner      = $this->planners->in();
-        
+
         $pivotQuery = $dependencies['pivot']->databaseSelectQuery();
-        
+
         $inPlanner->loader(
                             $pivotQuery,
                             $config->get($opposing.'PivotKey'),
@@ -129,7 +134,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         $pivotStep = $this->steps->reusableResult($pivotQuery);
         $preloadPlan->push($pivotStep);
-    
+
         $sideQuery = $sideRepository->databaseSelectQuery();
 
         $inPlanner->result(
@@ -150,11 +155,11 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
     protected function getMappingDependencies($side)
     {
         $dependencies = array();
-        
+
         $type     = $side->type();
         $config   = $side->config();
         $opposing = $type === 'left' ? 'right' : 'left';
-        
+
         return array(
             'config'             => $config,
             'type'               => $type,
@@ -166,7 +171,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         return $dependencies;
     }
-    
+
     public function linkProperties($config, $left, $right)
     {
         $this->processProperties('add', $left, $config->leftProperty, $right);

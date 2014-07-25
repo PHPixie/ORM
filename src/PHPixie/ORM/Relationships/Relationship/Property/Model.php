@@ -39,7 +39,7 @@ abstract class Model extends \PHPixie\ORM\Relationships\Relationship\Property
 
     public function value()
     {
-        if ($this->isLoaded)
+        if (!$this->isLoaded)
             $this->reload();
 
         return $this->value;

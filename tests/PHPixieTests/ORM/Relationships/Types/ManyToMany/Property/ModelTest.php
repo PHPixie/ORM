@@ -25,7 +25,7 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
     {
         $query = $this->getQuery();
         $this->method($this->handler, 'query', $query, array($this->side, $this->model), 0);
-        $this->assertEquals($query, $this->propertty->query());
+        $this->assertEquals($query, $this->property->query());
     }
 
     /**
@@ -33,9 +33,12 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      * @covers ::remove
      * @covers ::<protected>
      */
-    public function testAddItems()
+    public function testModifyItemLink()
     {
         $this->modifyLinkTest('add', 'link', 'left');
+        $this->modifyLinkTest('add', 'link', 'right');
+        $this->modifyLinkTest('remove', 'unlink', 'left');
+        $this->modifyLinkTest('remove', 'unlink', 'right');
     }
 
 
@@ -48,10 +51,10 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
         $args = $this->reorderArgs(array($this->config, $this->model, $item), $type);
 
         $this->method($this->handler, $action.'Plan', $plan, $args, 0);
-        $this->method($this->handler, 'execute', null, array(), 0);
-        $this->method($this->handler, $action.'Properties', null, $args, 0);
+        $this->method($plan, 'execute', null, array(), 0);
+        $this->method($this->handler, $action.'Properties', null, $args, 1);
 
-        $this->assertEquals($this, $this->property->$method($item));
+        $this->assertEquals($this->model, $this->property->$method($item));
     }
 
     protected function reorderArgs($params, $type)
@@ -64,6 +67,12 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
         }
 
         return $params;
+    }
+
+    protected function prepareLoad()
+    {
+        $this->value = $this->value();
+        $this->method($this->handler, 'loadProperty', $this->value, array($this->side, $this->model), 0);
     }
 
     protected function value()

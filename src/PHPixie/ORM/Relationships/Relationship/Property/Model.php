@@ -5,12 +5,13 @@ namespace PHPixie\ORM\Relationships\Relationship\Property;
 abstract class Model extends \PHPixie\ORM\Relationships\Relationship\Property
 {
     protected $model;
+
+    protected $isLoaded = false;
     protected $value;
     protected $isLoaded = false;
 
     public function __construct($handler, $side, $model)
     {
-        parent::__construct($handler, $side);
         $this->model = $model;
     }
 

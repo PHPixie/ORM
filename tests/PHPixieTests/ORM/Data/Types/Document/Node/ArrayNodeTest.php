@@ -49,6 +49,30 @@ class ArrayNodeTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
         $this->node[]=array();
         $this->assertEquals($arrayNode, $this->node[5]);
         
+        unset($this->node[0]);
+        $this->assertEquals($arrayNode, $this->node[4]);
+        $this->assertEquals($this->items[1], $this->node[0]);
+        
+    }
+
+    /**
+     * @covers ::data
+     * @covers ::<protected>
+     */
+    public function testData()
+    {
+        $this->method($this->items[0], 'data', $this->data[0], array(), 0);
+        $this->method($this->items[1], 'data', $this->data[1], array(), 0);
+        
+        $data = $this->data;
+        $this->assertEquals($data, $this->node->data());
+        
+        $this->method($this->items[0], 'data', $this->data[0], array(), 0);
+        $this->method($this->items[1], 'data', $this->data[1], array(), 0);
+        
+        $data[]='test';
+        $this->node[]='test';
+        $this->assertEquals($data, $this->node->data());
     }
     
     /**

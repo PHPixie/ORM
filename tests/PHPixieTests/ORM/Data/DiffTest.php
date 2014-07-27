@@ -13,7 +13,6 @@ class DiffTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        echo(get_class($this));
         $this->set = (object) array(
             'name'    => 'Trixie',
             'flowers' => 5

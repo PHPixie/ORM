@@ -31,6 +31,7 @@ class IteratorTest extends \PHPixieTests\AbstractORMTest
      * @covers ::key
      * @covers ::current
      * @covers ::rewind
+     * @covers ::valid
      * @covers ::<protected>
      */
     public function testIterator()

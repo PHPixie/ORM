@@ -26,13 +26,11 @@ abstract class Node
     {
         if ($type instanceof Node) {
             $type = $type->data();
-        }
-
-        if (is_object($type) && !($type instanceof \stdClass)){
+        }elseif (is_object($type) && !($type instanceof \stdClass)){
             $class = get_class($type);
             throw new \PHPixie\ORM\Exception\Model("Only \stdClass instances are allowed, an instance of $class passed.");
         }
-
+        
         return $type;
     }
     

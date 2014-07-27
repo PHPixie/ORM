@@ -229,33 +229,119 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         $opposingOffset = $m[$opposing.'Offset'];
         
         $preloadPlan = $this->getPlan();
-        $repoLoader = $this->getRepositoryLoader();
+        $repoLoader = $this->getReusableResultLoader();
         
-        $this->method($m['inPlanner'], 'loader', null, array(
+        $pivotQuery = $this->getDatabaseQuery();
+        $this->method($m['pivotPivot'], 'databaseSelectQuery', $pivotQuery, array(), 0);
+        
+        
+        $resultStep = $this->getReusableResult();
+        $this->method($repoLoader, 'resultStep', $resultStep, array(), 0);
+        $this->method($m[$opposing.'Repo'], 'idField', $opposing.'Id', array(), $opposingOffset++);
+        
+        $this->method($m['inPlanner'], 'result', null, array(
             $pivotQuery,
             $this->configData[$opposing.'PivotKey'],
-            $repoLoader,
+            $resultStep,
             $opposing.'Id',
-            $plan
+            $preloadPlan
         ), 0);
         
         $pivotStep = $this->getReusableResult();
         $this->method($this->steps, 'reusableResult', $pivotStep, array($pivotQuery), 0);
-        $this->method($preloadPlan, 'push', null, array($pivotStep), array(), 0);
+        $this->method($preloadPlan, 'add', null, array($pivotStep), 0);
         
         $sideQuery = $this->getDatabaseQuery();
         $this->method($m[$type.'Repo'], 'databaseSelectQuery', $sideQuery, array(), $sideOffset++);
         $this->method($m[$type.'Repo'], 'idField', $type.'Id', array(), $sideOffset++);
-        $this->method($m[$type.'Repo'], 'modelName', $this->configData[$type.'Model'], array(), $sideOffset++);
         
         $this->method($m['inPlanner'], 'result', null, array(
             $sideQuery,
-            $this->configData[$type.'PivotKey'],
-            $pivotStep,
             $type.'Id',
+            $pivotStep,
+            $this->configData[$type.'PivotKey'],
             $preloadPlan
         ), 1);
+        
+        $preloadStep = $this->getReusableResult();
+        $this->method($this->steps, 'reusableResult', $preloadStep, array($sideQuery), 1);
+        $this->method($preloadPlan, 'add', null, array($preloadStep), 0);
+        $loader = $this->getReusableResultLoader();
+        $this->method($this->loaders, 'reusableResult', $loader, array($m[$type.'Repo'], $preloadStep), 0);
+        
+        $preloader = $this->getPreloader();
+        $this->method($this->relationship, 'preloader', $preloader, array($m['side'], $loader, $pivotStep), 0);
+        
+        $this->assertEquals($preloader, $this->handler->mapPreload($m['side'], $repoLoader, $preloadPlan));
 
+    }
+    
+    
+    public function testLinkProperties()
+    {
+        $this->modifyPropertyLinkTest('add');
+        $this->modifyLinkForSingleItemsTest('add');
+    }
+    
+    protected function modifyPropertyLinkTest($action)
+    {
+        $config = $this->config($this->configData);
+        
+        $left = array(
+            $this->getLinkModel('left'),
+            $this->getLinkModel('left'),
+        );
+        
+        $right = array(
+            $this->getLinkModel('right'),
+            $this->getLinkModel('right'),
+        );
+        
+        foreach($left as $model)
+            $this->assertPropertyLoaderMethod('left', $model, $action, array($right));
+        
+        foreach($right as $model)
+            $this->assertPropertyLoaderMethod('right', $model, $action, array($left));
+        
+        $this->handler->linkProperties($config, $left, $right);
+    }
+    
+    protected function modifyLinkForSingleItemsTest($action)
+    {
+        $config = $this->config($this->configData);
+        
+        $left = $this->getLinkModel('left');
+        $right = $this->getLinkModel('right');
+        $this->assertPropertyLoaderMethod('left', $left, $action, array(array($right)));
+        $this->assertPropertyLoaderMethod('right', $right, $action, array(array($left)));
+        
+        $this->handler->linkProperties($config, $left, $right);
+    }
+    
+    protected function getLinkModel($side, $propertyLoaded = true)
+    {
+        $model = $this->getModel();
+        $property = $this->quickMock('\stdClass', array('isLoaded', 'add', 'remove', 'reset', 'value'));
+        $propertyName = $this->configData[$side.'Property'];
+        
+        $this->method($model, 'relationshipProperty', $property, array($propertyName));
+        $this->method($property, 'isLoaded', $propertyLoaded, array());
+        
+        $loader = $this->quickMock('\PHPixie\ORM\Loaders\Loader\Proxy\Editable');
+        $this->method($property, 'value', $loader, array());
+        
+        return $model;
+    }
+    
+    protected function assertPropertyLoaderMethod($side, $model, $method, $with)
+    {
+        $loader = $model->relationshipProperty($this->configData[$side.'Property'])->value();
+        $this->method($loader, $method, null, $with, 0);
+    }
+    
+    protected function getModelProperty()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Types\ManyToMany\Property\Model');
     }
     
     protected function getRelationshipMocks($type, $data)
@@ -292,6 +378,10 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         return $m;
     }
     
+
+    protected function getPreloader(){
+        return $this->quickMock('\PHPixie\ORM\Relationships\Types\ManyToMany\Preloader');
+    }
     
     protected function getConnection()
     {

@@ -34,9 +34,9 @@ class Loaders
         return new Loaders\Loader\Proxy\Preloading($this, $loader);
     }
     
-    public function reusableStep($repository, $reusableResultStep)
+    public function reusableResult($repository, $reusableResultStep)
     {
-        return new Loaders\Loader\Repository\ReusableStep($this, $repository, $reusableResultStep);
+        return new Loaders\Loader\Repository\ReusableResult($this, $repository, $reusableResultStep);
     }
     
     public function dataIterator($repository, $reusableResultStep)

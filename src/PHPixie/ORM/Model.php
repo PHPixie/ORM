@@ -77,6 +77,7 @@ class Model
 
     public function relationshipProperty($name, $createMissing = true)
     {
+        return 5;
         if (!array_key_exists($name, $this->properties)) {
             if (!$createMissing)
                 return null;

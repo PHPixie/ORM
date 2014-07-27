@@ -45,7 +45,7 @@ class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
         $plan = $this->handler->unlinkPlan($config, $left, $right);
         $plan->execute();
         if ($this->loaded && $this->value !== null) {
-            $this->handler->unlinkProperties($config, $this->value->usedModels(), null);
+            $this->handler->unlinkProperties($this->config, $this->value->usedModels(), null);
             $this->value->removeAll();
         }
         return $this->model;

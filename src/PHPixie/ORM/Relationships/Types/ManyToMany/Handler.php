@@ -115,41 +115,42 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                         );
     }
 
-    public function mapPreload($side, $repositoryLoader, $preloadPlan)
+    public function mapPreload($side, $resultStepLoader, $preloadPlan)
     {
+        
         $dependencies   = $this->getMappingDependencies($side);
         $config         = $dependencies['config'];
         $sideRepository = $dependencies['sideRepository'];
         $inPlanner      = $this->planners->in();
 
         $pivotQuery = $dependencies['pivot']->databaseSelectQuery();
-
-        $inPlanner->loader(
+        
+        $inPlanner->result(
                             $pivotQuery,
-                            $config->get($opposing.'PivotKey'),
-                            $resultLoader,
-                            $opposingRepository->idField(),
+                            $config->get($dependencies['opposing'].'PivotKey'),
+                            $resultStepLoader->resultStep(),
+                            $dependencies['opposingRepository']->idField(),
                             $preloadPlan
                         );
-
+        
         $pivotStep = $this->steps->reusableResult($pivotQuery);
-        $preloadPlan->push($pivotStep);
-
+        $preloadPlan->add($pivotStep);
+    
         $sideQuery = $sideRepository->databaseSelectQuery();
 
         $inPlanner->result(
                             $sideQuery,
                             $sideRepository->idField(),
                             $pivotStep,
-                            $config->get($side.'PivotKey'),
-                            $plan
+                            $config->get($dependencies['type'].'PivotKey'),
+                            $preloadPlan
                         );
-
-        $preloadStep = $this->steps->resusableResult($sideQuery);
-        $preloadPlan->push($preloadStep);
+        
+        $preloadStep = $this->steps->reusableResult($sideQuery);
+        $preloadPlan->add($preloadStep);
         $loader = $this->loaders->reusableResult($sideRepository, $preloadStep);
-
-        return $this->relationshipType->preloader($side, $loader, $pivotStep);
+        return $this->relationship->preloader($side, $loader, $pivotStep);
+        
     }
 
     protected function getMappingDependencies($side)
@@ -190,7 +191,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $this->processProperties('reset', $items, $property, array());
     }
 
-    protected function addItemsToProperty($action, $owners, $ownerProperty, $items)
+    protected function processProperties($action, $owners, $ownerProperty, $items)
     {
         if (!is_array($owners))
             $owners = array($owners);
@@ -209,13 +210,13 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                 }
             }
         }
-
+        
         foreach ($owners as $owner) {
-            if (!($item instanceof \PHPixie\ORM\Model))
+            if (!($owner instanceof \PHPixie\ORM\Model))
                 continue;
 
             $property = $owner->relationshipProperty($ownerProperty);
-            if ($property === null || !$property->loaded())
+            if ($property === null || !$property->isLoaded())
                 continue;
 
             if ($resetOwners) {

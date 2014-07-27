@@ -94,9 +94,14 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
         return $group;
     }
 
-    protected function getRepositoryLoader()
+    protected function getReusableResult()
     {
-        return $this->abstractMock('\PHPixie\ORM\Loaders\Loader\Repository');
+        return $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
+    }
+    
+    protected function getReusableResultLoader()
+    {
+        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\ReusableResult');
     }
     
     protected function getPlan()
@@ -109,9 +114,9 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
         return $this->abstractMock('\PHPixie\Database\Query\Type\\'.ucfirst($type));
     }
     
-    protected function getModel()
+    protected function getModel($methods = array())
     {
-        return $this->abstractMock('\PHPixie\ORM\Model');
+        return $this->abstractMock('\PHPixie\ORM\Model', $methods);
     }
     
     abstract protected function getHandler();

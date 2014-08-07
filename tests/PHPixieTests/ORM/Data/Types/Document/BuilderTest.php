@@ -11,7 +11,7 @@ class BuilderTest extends \PHPixieTests\AbstractORMTest
 
     public function setUp()
     {
-        $this->builder = new \PHPixie\ORM\Data\Types\Document\Guilder;
+        $this->builder = new \PHPixie\ORM\Data\Types\Document\Builder;
     }
     
     /**

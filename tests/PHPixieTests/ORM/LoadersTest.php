@@ -75,7 +75,7 @@ class LoadersTest extends \PHPixieTests\AbstractORMTest
         $repository = $this->quickMock('\PHPixie\ORM\Loaders\Loader');
         $reusableResultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
             
-        $reusableResult = $this->loaders->reusableStep($repository, $reusableResultStep);
+        $reusableResult = $this->loaders->reusableResult($repository, $reusableResultStep);
         $this->assertAttributeEquals($this->loaders, 'loaders', $reusableResult);
         $this->assertAttributeEquals($repository, 'repository', $reusableResult);
         $this->assertAttributeEquals($reusableResultStep, 'reusableResultStep', $reusableResult);

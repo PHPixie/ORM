@@ -23,6 +23,8 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
        $strategy->unlink($pivot, $firstSide, $secondSide, $plan);
     }
 
+    public function unlinkAll($pivot, $side, $plan)
+    {}
     protected function selectStrategy($pivot, $firstSide, $secondSide)
     {
         $pivotConnection = $pivot->connection();

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Data\Types\Document;
 
-class Guilder
+class Builder
 {
     public function arrayIterator($arrayNode)
     {

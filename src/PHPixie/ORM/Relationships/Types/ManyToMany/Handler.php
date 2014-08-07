@@ -38,6 +38,17 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         return $plan;
     }
+    
+    public function unlinkAllPlan($side, $items)
+    {
+        $config = $side->config();
+        $plan = $this->plans->plan();
+        $plannerSide = $this->plannerSide($config, $side->type(), $items);
+        $pivot = $this->plannerPivot($config);
+        $this->planners->pivot()->unlinkAll($pivot, $plannerSide, $plan);
+
+        return $plan;
+    }
 
     protected function plannerSides($config, $leftItems, $rightItems)
     {
@@ -185,14 +196,43 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $this->processProperties('remove', $right, $config->rightProperty, $left);
     }
 
+    public function unlinkAllProperties($side, $owners)
+    {
+        $this->processProperties('removeAll', $owners , $side->propertyName(), array());
+    }
+    
     public function resetProperties($side, $items)
     {
-        $property = $side->config()->get($side->type().'Property');
-        $this->processProperties('reset', $items, $property, array());
+        $this->processProperties('reset', $items, $side->propertyName(), array());
     }
 
     protected function processProperties($action, $owners, $ownerProperty, $items)
     {
+        if (!is_array($owners))
+            $owners = array($owners);
+
+        if (!is_array($items))
+            $items = array($items);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         if (!is_array($owners))
             $owners = array($owners);
 
@@ -227,6 +267,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             $loader = $property->value();
             if ($action === 'remove') {
                 $loader->remove($items);
+            if ($action === 'removeAll') {
+                $loader->removeAll();
             } else {
                 $loader->add($items);
             }

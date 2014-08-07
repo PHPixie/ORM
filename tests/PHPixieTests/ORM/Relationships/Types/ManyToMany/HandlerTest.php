@@ -57,20 +57,50 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
     }
     
     /**
-     * @covers ::unlinkPlan
+     * @covers ::unlinkAllPlan
      * @covers ::<protected>
      */
-    public function testUnlinkAllPlan()
+    public function testUnlinkAllPlanLeft()
+    {
+        $this->unlinkAllPlanTest('left');
+    }
+    
+    /**
+     * @covers ::unlinkAllPlan
+     * @covers ::<protected>
+     */
+    public function testUnlinkAllPlanRight()
+    {
+        $this->unlinkAllPlanTest('right');
+    }
+    
+    protected function unlinkAllPlanTest($side)
     {
         $m = $this->getLinkMocks();
+        $this->method($this->plans, 'plan', $m['plan'], array(), 0);
+        
+        $this->setRepositories(array(
+            'fairy' => $m['leftRepo'],
+            'flower' => $m['rightRepo'],
+        ));
+        
+        $items = $this->getModel();
         $data = $this->configData;
+        $this->method($this->planners, 'pivot', $m['pivotPlanner'], array());
         
-        $m['leftItems'] = null;
-        $m['leftSide'] = null;
+        $this->method($m['pivotPlanner'], 'side', $m[$side.'Side'],
+                      array($items, $m[$side.'Repo'], $data[$side.'PivotKey']), 0);
         
-        $data['pivotConnection'] = 'forest';
+        $this->method($m['leftRepo'], 'connection', $m['connection'], array(), 0);
         
-        $this->modifyLinkPlanTest($m, 'unlink', $data);
+        $this->method($m['pivotPlanner'], 'pivot', $m['pivotPivot'],
+                      array($m['connection'], $data['pivot']), 1);
+        
+        $this->method($m['pivotPlanner'], 'unlinkAll', array(),
+                      array($m['pivotPivot'], $m[$side.'Side'], $m['plan']), 2);
+        
+        $side = $this->side($side, $this->configData);
+        $this->assertSame($m['plan'], $this->handler->unlinkAllPlan($side, $items));
     }
     
     protected function modifyLinkPlanTest($m, $type, $data)
@@ -265,7 +295,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         
         $preloadStep = $this->getReusableResult();
         $this->method($this->steps, 'reusableResult', $preloadStep, array($sideQuery), 1);
-        $this->method($preloadPlan, 'add', null, array($preloadStep), 0);
+        $this->method($preloadPlan, 'add', null, array($preloadStep), 1);
         $loader = $this->getReusableResultLoader();
         $this->method($this->loaders, 'reusableResult', $loader, array($m[$type.'Repo'], $preloadStep), 0);
         

@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship
  */
-class RelationshipTest extends \PHPixieTests\AbstractORMTest
+abstract class RelationshipTest extends \PHPixieTests\AbstractORMTest
 {
     protected $relationship;
     protected $ormBuilder;

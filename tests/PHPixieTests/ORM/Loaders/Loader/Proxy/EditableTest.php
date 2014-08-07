@@ -206,7 +206,7 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
     protected function model($id, $isDeleted = false)
     {
         $id=$this->ids[$id];
-        $model = $this->quickMock('\PHPixie\ORM\Model\Repository\Database\Model', array('id'));
+        $model = $this->quickMock('\PHPixie\ORM\Repositories\Repository\Database\Model', array('id'));
         
         $model
             ->expects($this->any())

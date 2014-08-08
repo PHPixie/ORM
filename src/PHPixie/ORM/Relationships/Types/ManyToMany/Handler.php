@@ -16,7 +16,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     public function loadProperty($side, $model)
     {
-        
+
     }
 
     public function linkPlan($config, $leftItems, $rightItems)
@@ -38,7 +38,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         return $plan;
     }
-    
+
     public function unlinkAllPlan($side, $items)
     {
         $config = $side->config();
@@ -59,10 +59,13 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             $model = $config->get($side.'Model');
             $items = $side === 'left' ? $leftItems : $rightItems;
 
-            if ($items === null) {
-                $sides[] = null;
-            } else {
-                $sides[] = $pivotPlanner->side(
+        return $sides;
+    }
+
+    protected function plannerSide($config, $side, $items)
+    {
+        $model = $config->get($side.'Model');
+        return $this->planners->pivot()->side(
                                             $items,
                                             $this->repositories->get($model),
                                             $config->get($side.'PivotKey')
@@ -128,7 +131,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     public function mapPreload($side, $resultStepLoader, $preloadPlan)
     {
-        
+
         $dependencies   = $this->getMappingDependencies($side);
         $config         = $dependencies['config'];
         $sideRepository = $dependencies['sideRepository'];
@@ -143,7 +146,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                             $dependencies['opposingRepository']->idField(),
                             $preloadPlan
                         );
-        
+
         $pivotStep = $this->steps->reusableResult($pivotQuery);
         $preloadPlan->add($pivotStep);
     
@@ -156,12 +159,12 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                             $config->get($dependencies['type'].'PivotKey'),
                             $preloadPlan
                         );
-        
+
         $preloadStep = $this->steps->reusableResult($sideQuery);
         $preloadPlan->add($preloadStep);
         $loader = $this->loaders->reusableResult($sideRepository, $preloadStep);
         return $this->relationship->preloader($side, $loader, $pivotStep);
-        
+
     }
 
     protected function getMappingDependencies($side)
@@ -198,9 +201,16 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     public function unlinkAllProperties($side, $owners)
     {
-        $this->processProperties('removeAll', $owners , $side->propertyName(), array());
+        $items = array();
+        if (!is_array($owners))
+            $owners = array($owners);
+
+        foreach($owners as $owner)
+            foreach($owner->)
+
+        $this->processProperties('removeAll', $owners, $side->propertyName(), array());
     }
-    
+
     public function resetProperties($side, $items)
     {
         $this->processProperties('reset', $items, $side->propertyName(), array());
@@ -208,31 +218,6 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     protected function processProperties($action, $owners, $ownerProperty, $items)
     {
-        if (!is_array($owners))
-            $owners = array($owners);
-
-        if (!is_array($items))
-            $items = array($items);
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         if (!is_array($owners))
             $owners = array($owners);
 
@@ -250,7 +235,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                 }
             }
         }
-        
+
         foreach ($owners as $owner) {
             if (!($owner instanceof \PHPixie\ORM\Model))
                 continue;

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Drivers\Driver\Mongo\Repository;
 
-class Database extends \PHPixie\ORM\Model\Repository\Database
+class Database extends \PHPixie\ORM\Repositories\Repository\Database
 {
 
     protected $collection;

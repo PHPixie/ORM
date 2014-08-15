@@ -52,25 +52,26 @@ class LoadersTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::editable
-     * @covers ::caching
-     * @covers ::preloading
+     * @covers ::editableProxy
+     * @covers ::cachingProxy
+     * @covers ::preloadingProxy
      */
     public function testProxies()
     {
         $loader = $this->quickMock('\PHPixie\ORM\Loaders\Loader');
-        foreach(array('editable', 'caching', 'preloading') as $method) {
+        foreach(array('editable', 'caching', 'preloading') as $type) {
+            $method = $type.'Proxy';
             $proxy = $this->loaders->$method($loader);
-            $this->assertInstanceOf('\PHPixie\ORM\Loaders\Loader\Proxy\\'.ucfirst($method), $proxy);
+            $this->assertInstanceOf('\PHPixie\ORM\Loaders\Loader\Proxy\\'.ucfirst($type), $proxy);
             $this->assertAttributeEquals($this->loaders, 'loaders', $proxy);
             $this->assertAttributeEquals($loader, 'loader', $proxy);
         }
     }
     
     /**
-     * @covers ::reusableStep
+     * @covers ::reusableResult
      */
-    public function testReusableStep()
+    public function testReusableResult()
     {
         $repository = $this->quickMock('\PHPixie\ORM\Loaders\Loader');
         $reusableResultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');

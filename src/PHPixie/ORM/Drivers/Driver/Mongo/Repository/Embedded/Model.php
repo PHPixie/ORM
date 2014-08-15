@@ -2,6 +2,6 @@
 
 namespace PHPixie\ORM\Drivers\Driver\Mongo\Repository\Embedded;
 
-class Model extends \PHPixie\ORM\Model\Repository\Embedded\Model
+class Model extends \PHPixie\ORM\Repositories\Repository\Embedded\Model
 {
 }

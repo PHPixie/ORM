@@ -4,29 +4,29 @@ namespace PHPixie\ORM\Relationships\Types\ManyToMany;
 
 class Preloader extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple
 {
-    protected $pivotStep;
+    protected $pivotResult;
 
-    public function __construct($loaders, $relationshipType, $side, $loader, $pivotStep)
+    public function __construct($loaders, $relationshipType, $side, $loader, $pivotResult)
     {
         parent::__construct($loaders, $relationshipType, $side, $loader);
-        $this->pivotStep = $pivotStep;
+        $this->pivotResult = $pivotResult;
     }
 
     protected function mapItems()
     {
-        if ($side == 'right') {
-            $ownerIdField = $config->leftPivotKey;
-            $itemIdField = $config->rightPivotKey;
-        } else {
-            $ownerIdField = $config->rightPivotKey;
-            $itemIdField = $config->leftPivotKey;
-        }
-
-        $fields = $this->pivotStep->getFields(array($ownerIdField, $itemIdField));
+        $type = $this->side->type();
+        $opposing = $type === 'left' ? 'right' : 'left';
+        
+        $config = $this->side->config();
+        
+        $ownerIdField = $config->get($opposing.'PivotKey');
+        $itemIdField = $config->get($type.'PivotKey');
+        
+        $fields = $this->pivotResult->getFields(array($ownerIdField, $itemIdField));
 
         foreach ($fields as $pivotData) {
-            $id = $itemData->$itemIdField;
-            $ownerId = $pivotData->$ownerIdField;
+            $id = $pivotData[$itemIdField];
+            $ownerId = $pivotData[$ownerIdField];
 
             if (!isset($this->map[$ownerId]))
                 $this->map[$ownerId] = array();
@@ -35,7 +35,7 @@ class Preloader extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result
         }
 
         $idField = $this->loader->repository()->idField();
-        $ids = $this->loader->resultStep->getFields(array($idField));
+        $ids = $this->loader->reusableResult()->getField($idField);
         foreach ($ids as $offset => $id) {
             $this->idOffsets[$id] = $offset;
         }

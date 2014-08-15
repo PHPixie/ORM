@@ -38,7 +38,7 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
     public function testSide()
     {
         $items = array(5);
-        $repository = $this->quickMock('\PHPixie\ORM\Model\Repository');
+        $repository = $this->quickMock('\PHPixie\ORM\Repositories\Repository');
         $side = $this->planner->side($items, $repository, 'fairy');
         $this->assertInstanceOf('\PHPixie\ORM\Planners\Planner\Pivot\Side', $side);
         $this->assertEquals($items, $side->items());

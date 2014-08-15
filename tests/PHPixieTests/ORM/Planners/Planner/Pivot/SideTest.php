@@ -12,7 +12,7 @@ class SideTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->repository = $this->quickMock('\PHPixie\ORM\Model\Repository');
+        $this->repository = $this->quickMock('\PHPixie\ORM\Repositories\Repository');
         $this->side = new \PHPixie\ORM\Planners\Planner\Pivot\Side(array(6), $this->repository, 'pixie');
     }
     

@@ -16,7 +16,9 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     public function loadProperty($side, $model)
     {
-
+        $loader = $this->query($side, $model)->find();
+        $editable = $this->loaders->editableProxy($loader);
+        return $editable;
     }
 
     public function linkPlan($config, $leftItems, $rightItems)
@@ -147,15 +149,15 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                             $preloadPlan
                         );
 
-        $pivotStep = $this->steps->reusableResult($pivotQuery);
-        $preloadPlan->add($pivotStep);
-    
+        $pivotResult = $this->steps->reusableResult($pivotQuery);
+        $preloadPlan->add($pivotResult);
+
         $sideQuery = $sideRepository->databaseSelectQuery();
 
         $inPlanner->result(
                             $sideQuery,
                             $sideRepository->idField(),
-                            $pivotStep,
+                            $pivotResult,
                             $config->get($dependencies['type'].'PivotKey'),
                             $preloadPlan
                         );
@@ -163,7 +165,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $preloadStep = $this->steps->reusableResult($sideQuery);
         $preloadPlan->add($preloadStep);
         $loader = $this->loaders->reusableResult($sideRepository, $preloadStep);
-        return $this->relationship->preloader($side, $loader, $pivotStep);
+        return $this->relationship->preloader($side, $loader, $pivotResult);
 
     }
 
@@ -173,7 +175,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         $type     = $side->type();
         $config   = $side->config();
-        $opposing = $type === 'left' ? 'right' : 'left';
+        $opposing = $this->getOpposing($type);
 
         return array(
             'config'             => $config,
@@ -186,7 +188,12 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         return $dependencies;
     }
-
+    
+    protected function getOpposing($type)
+    {
+        return $type === 'left' ? 'right' : 'left';
+    }
+    
     public function linkProperties($config, $left, $right)
     {
         $this->processProperties('add', $left, $config->leftProperty, $right);
@@ -195,25 +202,36 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     public function unlinkProperties($config, $left, $right)
     {
-        $this->processProperties('remove', $left, $config->leftPropert, $right);
+        $this->processProperties('remove', $left, $config->leftProperty, $right);
         $this->processProperties('remove', $right, $config->rightProperty, $left);
     }
 
-    public function unlinkAllProperties($side, $owners)
+    public function unlinkAllProperties($side, $model)
     {
-        $items = array();
-        if (!is_array($owners))
-            $owners = array($owners);
-
-        foreach($owners as $owner)
-            foreach($owner->)
-
-        $this->processProperties('removeAll', $owners, $side->propertyName(), array());
+        $property = $this->getPropertyIfLoaded($model, $side->propertyName());
+        if ($property !== null) {
+            $loader = $property->value();
+            $items = $loader->accessedModels();
+            $opposing = $this->getOpposing($side->type());
+            $itemsProperty = $side->config()->get($opposing.'Property');
+            $this->processProperties('remove', $items, $itemsProperty, $model);
+            $loader->removeAll();
+        }
     }
-
+    
     public function resetProperties($side, $items)
     {
-        $this->processProperties('reset', $items, $side->propertyName(), array());
+        $opposing = $this->getOpposing($side->type());
+        $itemsProperty = $side->config()->get($opposing.'Property');
+        
+        if(!is_array($items))
+            $items = array($items);
+        
+        foreach($items as $item) {
+            $property = $this->getPropertyIfLoaded($item, $itemsProperty);
+            if($property !== null)
+                $property->reset();
+        }
     }
 
     protected function processProperties($action, $owners, $ownerProperty, $items)
@@ -224,15 +242,11 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         if (!is_array($items))
             $items = array($items);
 
-        if ($action === 'reset') {
-            $resetOwners = true;
-        } else {
-            $resetOwners = false;
-            foreach ($items as $item) {
-                if (!($item instanceof \PHPixie\ORM\Model)) {
-                    $resetOwners = true;
-                    break;
-                }
+        $resetOwners = false;
+        foreach ($items as $item) {
+            if (!($item instanceof \PHPixie\ORM\Model)) {
+                $resetOwners = true;
+                break;
             }
         }
 
@@ -240,26 +254,31 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             if (!($owner instanceof \PHPixie\ORM\Model))
                 continue;
 
-            $property = $owner->relationshipProperty($ownerProperty);
-            if ($property === null || !$property->isLoaded())
+            $property = $this->getPropertyIfLoaded($owner, $ownerProperty);
+            if($property === null)
                 continue;
 
             if ($resetOwners) {
                 $property->reset();
                 continue;
             }
-
+            
             $loader = $property->value();
             if ($action === 'remove') {
                 $loader->remove($items);
-            if ($action === 'removeAll') {
-                $loader->removeAll();
             } else {
                 $loader->add($items);
             }
         }
     }
-
+        
+    protected function getPropertyIfLoaded($model, $propertyName)
+    {
+        $property = $model->relationshipProperty($propertyName);
+        if ($property === null || !$property->isLoaded())
+            return null;
+        return $property;
+    }
     public function handleDeletion($modelName, $side, $resultStep, $plan)
     {
         $config = $side->config();

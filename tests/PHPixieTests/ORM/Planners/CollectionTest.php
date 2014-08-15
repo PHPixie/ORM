@@ -27,7 +27,7 @@ class CollectionTest extends \PHPixieTests\AbstractORMTest
     
     protected function model($modelName = 'fairy', $isNew = false, $isDeleted = false)
     {
-        $model = $this->abstractMock('\PHPixie\ORM\Model\Repository\Database\Model');
+        $model = $this->abstractMock('\PHPixie\ORM\Repositories\Repository\Database\Model');
         $this->method($model, 'modelName', $modelName, array());
         $this->method($model, 'isNew', $isNew, array());
         $this->method($model, 'isDeleted', $isDeleted, array());

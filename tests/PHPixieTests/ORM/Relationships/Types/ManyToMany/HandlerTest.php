@@ -24,16 +24,42 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
     public function testQuery()
     {
         $side = $this->side('left', $this->configData);
-        
-        $repository = $this->getRepository();
-        $this->method($this->repositories, 'get', $repository, array('fairy'), 0);
-        
         $query = $this->getQuery();
-        $this->method($repository, 'query', $query, array(), 0);
-        
         $related = $this->getModel();
-        $this->method($query, 'related', $query, array('flowers', $related), 0);
+        
+        $this->prepareQuery($side, $query, $related);
         $this->assertEquals($query, $this->handler->query($side, $related));
+    }
+    
+    /**
+     * @covers ::loadProperty
+     * @covers ::<protected>
+     */
+    public function testLoadProperty()
+    {
+        $side = $this->side('left', $this->configData);
+        $query = $this->getQuery();
+        $model = $this->getModel();
+        $loader = $this->abstractMock('\PHPixie\ORM\Loaders\Loader');
+        $editable = $this->quickMock('\PHPixie\ORM\Loaders\Loader\Proxy\Editable');
+        
+        $this->prepareQuery($side, $query, $model);
+        $this->method($query, 'find', $loader, array(), 1);
+        $this->method($this->loaders, 'editableProxy', $editable, array($loader), 0);
+        
+        $this->assertEquals($editable, $this->handler->loadProperty($side, $model));
+    }
+    
+    protected function prepareQuery($side, $query, $related)
+    {
+        $type = $side->type();
+        $opposing = $type === 'left' ? 'right' : 'left';
+        
+        $data = $this->configData;
+        $repository = $this->getRepository();
+        $this->method($this->repositories, 'get', $repository, array($data[$type.'Model']), 0);
+        $this->method($repository, 'query', $query, array(), 0);
+        $this->method($query, 'related', $query, array($data[$type.'Property'], $related), 0);
     }
     
     /**
@@ -277,9 +303,9 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
             $preloadPlan
         ), 0);
         
-        $pivotStep = $this->getReusableResult();
-        $this->method($this->steps, 'reusableResult', $pivotStep, array($pivotQuery), 0);
-        $this->method($preloadPlan, 'add', null, array($pivotStep), 0);
+        $pivotResult = $this->getReusableResult();
+        $this->method($this->steps, 'reusableResult', $pivotResult, array($pivotQuery), 0);
+        $this->method($preloadPlan, 'add', null, array($pivotResult), 0);
         
         $sideQuery = $this->getDatabaseQuery();
         $this->method($m[$type.'Repo'], 'databaseSelectQuery', $sideQuery, array(), $sideOffset++);
@@ -288,7 +314,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         $this->method($m['inPlanner'], 'result', null, array(
             $sideQuery,
             $type.'Id',
-            $pivotStep,
+            $pivotResult,
             $this->configData[$type.'PivotKey'],
             $preloadPlan
         ), 1);
@@ -300,73 +326,181 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         $this->method($this->loaders, 'reusableResult', $loader, array($m[$type.'Repo'], $preloadStep), 0);
         
         $preloader = $this->getPreloader();
-        $this->method($this->relationship, 'preloader', $preloader, array($m['side'], $loader, $pivotStep), 0);
+        $this->method($this->relationship, 'preloader', $preloader, array($m['side'], $loader, $pivotResult), 0);
         
         $this->assertEquals($preloader, $this->handler->mapPreload($m['side'], $repoLoader, $preloadPlan));
 
     }
-    
-    
-    public function testLinkProperties()
+
+    /**
+     * @covers ::unlinkAllProperties
+     * @covers ::<protected>
+     */
+    public function testUnlinkAllProperties()
     {
-        $this->modifyPropertyLinkTest('add');
-        $this->modifyLinkForSingleItemsTest('add');
+        $type = 'left';
+        $opposing = $type === 'left' ? 'right' : 'left';
+        
+        $side = $this->side($type, $this->configData);
+        $this->method($side, 'propertyName', $this->configData[$type.'Property'], array());
+        
+        $owner = $this->getLinkModelMocks($type);
+        $this->handler->unlinkAllProperties($side, $owner['model']);
+        
+        $owner = $this->getLinkModelMocks($type, true);
+        $this->handler->unlinkAllProperties($side, $owner['model']);
+        
+        
+        $owner = $this->getLinkModelMocks($type, true, true);
+        
+        $items = array(
+            $this->getLinkModelMocks($opposing, true, true),
+            $this->getLinkModelMocks($opposing),
+        );
+        
+        $itemsModels = array();
+        foreach($items as $item)
+            $itemsModels[]=$item['model'];
+        $this->method($owner['loader'], 'accessedModels', $itemsModels, array(), 0);
+        $this->method($owner['loader'], 'removeAll', null, array(), 1);
+        $this->method($items[0]['loader'], 'remove', null, array(array($owner['model'])), 0);
+        
+        $this->handler->unlinkAllProperties($side, $owner['model']);
+        
+        $owner = $this->getLinkModelMocks($type);
+        $this->handler->unlinkAllProperties($side, $owner['model']);
     }
     
-    protected function modifyPropertyLinkTest($action)
+    /**
+     * @covers ::linkProperties
+     * @covers ::unlinkProperties
+     * @covers ::<protected>
+     */
+    public function testModifyLinkProperties()
+    {
+        $this->modifyPropertyLinkTest('link');
+        $this->modifyPropertyLinkTest('unlink');
+        $this->resetOwnersTest();
+    }
+    
+    /**
+     * @covers ::resetProperties
+     * @covers ::<protected>
+     */
+    public function testResetProperties()
+    {
+        $side = $this->side('left', $this->configData);
+        
+        $items = array(
+            $this->getLinkModelMocks('right', true, true),
+            $this->getLinkModelMocks('right', true),
+            $this->getLinkModelMocks('right'),
+        );
+        
+        $this->method($items[0]['property'], 'reset', null, array(), 1);
+        
+        $this->handler->resetProperties(
+                                    $side,
+                                    $this->arrayColumn($items, 'model')
+                                );
+        
+        $item = $this->getLinkModelMocks('right', true, true);
+        
+        $this->method($item['property'], 'reset', null, array(), 1);
+        
+        $this->handler->resetProperties(
+                                    $side,
+                                    $item['model']
+                                );
+    }
+    
+    protected function modifyPropertyLinkTest($method)
     {
         $config = $this->config($this->configData);
         
         $left = array(
-            $this->getLinkModel('left'),
-            $this->getLinkModel('left'),
+            $this->getLinkModelMocks('left', true, true),
+            $this->getLinkModelMocks('left', true, true),
         );
         
-        $right = array(
-            $this->getLinkModel('right'),
-            $this->getLinkModel('right'),
+        $right = $this->getLinkModelMocks('right', true, true);
+        $action = $method == 'link' ? 'add' : 'remove';
+        $this->assertPropertyLoaderMethod('left', $left, $action, array($right));
+        $this->assertPropertyLoaderMethod('right', array($right), $action, $left);
+        
+        $method = $method.'Properties';
+        $this->handler->$method(
+                                    $config,
+                                    $this->arrayColumn($left, 'model'),
+                                    $right['model']
+                                );
+    }
+    
+    protected function resetOwnersTest()
+    {
+        $config = $this->config($this->configData);
+        
+        $left = array(
+            $this->getLinkModelMocks('left', true, true),
+            $this->getLinkModelMocks('left', true, true),
         );
         
-        foreach($left as $model)
-            $this->assertPropertyLoaderMethod('left', $model, $action, array($right));
+        $right = $this->getQuery();
         
-        foreach($right as $model)
-            $this->assertPropertyLoaderMethod('right', $model, $action, array($left));
+        foreach($left as $owner)
+            $this->method($owner['property'], 'reset', null, array(), 1);
         
-        $this->handler->linkProperties($config, $left, $right);
+        $this->handler->linkProperties(
+                                    $config,
+                                    $this->arrayColumn($left, 'model'),
+                                    $right
+                                );
     }
     
     protected function modifyLinkForSingleItemsTest($action)
     {
         $config = $this->config($this->configData);
         
-        $left = $this->getLinkModel('left');
-        $right = $this->getLinkModel('right');
-        $this->assertPropertyLoaderMethod('left', $left, $action, array(array($right)));
-        $this->assertPropertyLoaderMethod('right', $right, $action, array(array($left)));
+        $left = $this->getLinkModelMocks('left', true, true);
+        $right = $this->getLinkModelMocks('right', true, true);
+        $this->assertPropertyLoaderMethod('left', array($left), $action, array($right));
+        $this->assertPropertyLoaderMethod('right', array($right), $action, array($left));
         
         $this->handler->linkProperties($config, $left, $right);
     }
     
-    protected function getLinkModel($side, $propertyLoaded = true)
+    protected function getLinkModelMocks($side, $propertyExists = false, $propertyLoaded = false)
     {
         $model = $this->getModel();
-        $property = $this->quickMock('\stdClass', array('isLoaded', 'add', 'remove', 'reset', 'value'));
+        $property = null;
+        $loader = null;
+        
+        if($propertyExists) {
+            $property = $this->quickMock('\PHPixie\ORM\Relationships\Types\ManyToMany\Property\Model');
+            $this->method($property, 'isLoaded', $propertyLoaded, array());
+            
+            if($propertyLoaded){
+                $loader = $this->quickMock('\PHPixie\ORM\Loaders\Loader\Proxy\Editable');
+                $this->method($property, 'value', $loader, array());
+            }
+        }
+        
         $propertyName = $this->configData[$side.'Property'];
-        
-        $this->method($model, 'relationshipProperty', $property, array($propertyName));
-        $this->method($property, 'isLoaded', $propertyLoaded, array());
-        
-        $loader = $this->quickMock('\PHPixie\ORM\Loaders\Loader\Proxy\Editable');
-        $this->method($property, 'value', $loader, array());
-        
-        return $model;
+        $this->method($model, 'relationshipProperty', $property, array($propertyName), null, true);
+
+        return array(
+            'model'    => $model,
+            'property' => $property,
+            'loader'   => $loader
+        );
     }
     
-    protected function assertPropertyLoaderMethod($side, $model, $method, $with)
+    protected function assertPropertyLoaderMethod($side, $owners, $method, $items)
     {
-        $loader = $model->relationshipProperty($this->configData[$side.'Property'])->value();
-        $this->method($loader, $method, null, $with, 0);
+        $itemsModels = $this->arrayColumn($items, 'model');
+        
+        foreach($owners as $owner)
+            $this->method($owner['loader'], $method, null, array($itemsModels), 0);
     }
     
     protected function getModelProperty()
@@ -408,6 +542,12 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTe
         return $m;
     }
     
+    protected function arrayColumn($array, $column){
+        $items = array();
+        foreach($array as $row)
+            $items[]=$row[$column];
+        return $items;
+    }
 
     protected function getPreloader(){
         return $this->quickMock('\PHPixie\ORM\Relationships\Types\ManyToMany\Preloader');

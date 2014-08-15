@@ -53,7 +53,7 @@ class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
 
     protected function getSides($opposing)
     {
-        if ($this->side-> type() === 'right')
+        if ($this->side->type() === 'right')
             return array($this->model, $opposing);
 
         return array($opposing, $this->model);

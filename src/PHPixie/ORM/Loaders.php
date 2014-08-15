@@ -14,22 +14,22 @@ class Loaders
         return new Loaders\Loader\ArrayAccess($this, $arrayAccess);
     }
     
-    public function resultPreloader($resultPreloader, $ids)
+    public function multiplePreloader($resultPreloader, $ids)
     {
         return new Loaders\Loader\ResultPreloader($this, $resultPreloader, $ids);
     }
     
-    public function editable($loader)
+    public function editableProxy($loader)
     {
         return new Loaders\Loader\Proxy\Editable($this, $loader);
     }
 
-    public function caching($loader)
+    public function cachingProxy($loader)
     {
         return new Loaders\Loader\Proxy\Caching($this, $loader);
     }
     
-    public function preloading($loader)
+    public function preloadingProxy($loader)
     {
         return new Loaders\Loader\Proxy\Preloading($this, $loader);
     }

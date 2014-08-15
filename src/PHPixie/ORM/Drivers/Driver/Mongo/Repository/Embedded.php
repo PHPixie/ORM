@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Drivers\Driver\Mongo\Repository;
 
-class Embedded extends \PHPixie\ORM\Model\Repository\Embedded
+class Embedded extends \PHPixie\ORM\Repositories\Repository\Embedded
 {
     public function load($document)
     {

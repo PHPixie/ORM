@@ -18,7 +18,7 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Loaders\LoaderTest
             $this->models[] = $this->quickMock('\PHPixie\ORM\Model');
         }
             
-        $this->repository = $this->quickMock('\PHPixie\ORM\Model\Repository');
+        $this->repository = $this->quickMock('\PHPixie\ORM\Repositories\Repository');
         parent::setUp();
     }    
     

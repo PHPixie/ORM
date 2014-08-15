@@ -1,15 +1,16 @@
-PHP Fatal error:  Call to undefined method PHPixieTests\DatabaseResultStub::getField() in C:\wamp\orm\vendor\phpixie\orm\src\PHPixie\ORM\Steps\Step\Query\Result.php on line 27
+PHP Fatal error:  Call to undefined method Mock_ReusableResult_656e4220::resultStep() in C:\orm\src\PHPixie\ORM\Relationships\Types\ManyToMany\Preloader.php on line 38
 PHP Stack trace:
 PHP   1. {main}() C:\wamp\phpunit.phar:0
-PHP   2. PHPUnit_TextUI_Command::main() C:\wamp\phpunit.phar:581
-PHP   3. PHPUnit_TextUI_Command->run() phar://C:/wamp/phpunit.phar/phpunit/TextUI/Command.php:132
-PHP   4. PHPUnit_TextUI_TestRunner->doRun() phar://C:/wamp/phpunit.phar/phpunit/TextUI/Command.php:179
-PHP   5. PHPUnit_Framework_TestSuite->run() phar://C:/wamp/phpunit.phar/phpunit/TextUI/TestRunner.php:419
-PHP   6. PHPUnit_Framework_TestSuite->run() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestSuite.php:722
-PHP   7. PHPUnit_Framework_TestCase->run() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestSuite.php:722
-PHP   8. PHPUnit_Framework_TestResult->run() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:764
-PHP   9. PHPUnit_Framework_TestCase->runBare() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestResult.php:692
-PHP  10. PHPUnit_Framework_TestCase->runTest() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:824
-PHP  11. ReflectionMethod->invokeArgs() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:956
-PHP  12. PHPixieTests\ORM\Steps\Step\Query\ResultTest->testGetField() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:956
-PHP  13. PHPixie\ORM\Steps\Step\Query\Result->getField() C:\wamp\orm\vendor\phpixie\orm\tests\PHPixieTests\ORM\Steps\Step\Query\ResultTest.php:64
+PHP   2. PHPUnit_TextUI_Command::main() C:\wamp\phpunit.phar:593
+PHP   3. PHPUnit_TextUI_Command->run() phar://C:/wamp/phpunit.phar/phpunit/TextUI/Command.php:138
+PHP   4. PHPUnit_TextUI_TestRunner->doRun() phar://C:/wamp/phpunit.phar/phpunit/TextUI/Command.php:186
+PHP   5. PHPUnit_Framework_TestSuite->run() phar://C:/wamp/phpunit.phar/phpunit/TextUI/TestRunner.php:423
+PHP   6. PHPUnit_Framework_TestCase->run() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestSuite.php:699
+PHP   7. PHPUnit_Framework_TestResult->run() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:767
+PHP   8. PHPUnit_Framework_TestCase->runBare() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestResult.php:654
+PHP   9. PHPUnit_Framework_TestCase->runTest() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:831
+PHP  10. ReflectionMethod->invokeArgs() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:958
+PHP  11. PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\MultipleTest->testLoadFor() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:958
+PHP  12. PHPixie\ORM\Relationships\Relationship\Preloader\Result->valueFor() C:\orm\tests\PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\MultipleTest.php:39
+PHP  13. PHPixie\ORM\Relationships\Relationship\Preloader\Result->ensureMapped() C:\orm\src\PHPixie\ORM\Relationships\Relationship\Preloader\Result.php:18
+PHP  14. PHPixie\ORM\Relationships\Types\ManyToMany\Preloader->mapItems() C:\orm\src\PHPixie\ORM\Relationships\Relationship\Preloader\Result.php:27

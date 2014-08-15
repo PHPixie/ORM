@@ -4,7 +4,7 @@ namespace PHPixie\ORM\Loaders\Loader\Proxy;
 
 class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
 {
-    protected $maxAllowedOffset = 0;
+    protected $maxAccessedOffset = -1;
     protected $idOffsets = array();
     
     protected $skippedIds = array();
@@ -43,9 +43,18 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
         $this->updateSkippedOffsets();
     }
     
+    public function accessedModels()
+    {
+        $models = array();
+        for($i=0; $i<=$this->maxAccessedOffset; $i++)
+            $models[]=$this->getByOffset($i);
+        return $models;
+    }
+    
     public function removeAll()
     {
         $this->loaderItemsCount = 0;
+        $this->maxAccessedOffset = -1;
         $this->idOffsets = array();
         $this->skippedIds = array();
         $this->deletedOffsets = array();
@@ -96,11 +105,11 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
 
     protected function assertAllowedOffset($offset)
     {
-        if ($offset > $this->maxAllowedOffset)
+        if ($offset > $this->maxAccessedOffset+1)
             throw new \PHPixie\ORM\Exception\Loader("Items can only be accessed in sequential order");
 
-        if ($offset === $this->maxAllowedOffset)
-            $this->maxAllowedOffset++;
+        if ($offset === $this->maxAccessedOffset-1)
+            $this->maxAccessedOffset++;
     }
     
     protected function getAddedByOffset($addedOffset)

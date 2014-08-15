@@ -20,7 +20,7 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
         return $this->getMockForAbstractClass($class, array(), '', false, false, true, $methods);
     }
     
-    protected function method($mock, $method, $return, $with = null, $at = null) {
+    protected function method($mock, $method, $return, $with = null, $at = null, $returnCallable = false) {
         $method = $mock
             ->expects($at === null ? $this->any() : $this->at($at))
             ->method($method);
@@ -28,7 +28,10 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
         if ($with !== null)
             $method = call_user_func_array(array($method, 'with'), $with);
         
-        if (is_callable($return) && !is_array($return)) {
+        $method
+            ->will($this->returnValue($return));
+        
+        if (is_callable($return) && !$returnCallable && !is_array($return)) {
             $method->will($this->returnCallback($return));
         }else
             $method->will($this->returnValue($return));

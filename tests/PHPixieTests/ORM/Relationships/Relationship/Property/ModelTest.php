@@ -17,9 +17,9 @@ abstract class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
     }
 
     /**
-     * @covers ::construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Property\Model::construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Property::construct
+     * @covers ::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Property\Model::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Property::__construct
      * @covers ::<protected>
      */
     public function testConstruct()

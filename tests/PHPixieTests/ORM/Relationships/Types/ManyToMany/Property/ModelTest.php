@@ -41,6 +41,36 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
         $this->modifyLinkTest('remove', 'unlink', 'right');
     }
 
+    /**
+     * @covers ::removeAll
+     * @covers ::<protected>
+     */
+    public function testRemoveAll()
+    {
+        $plan = $this->getPlan();
+        $this->method($this->handler, 'unlinkAllPlan', $plan, array($this->side, $this->model), 0);
+        $this->method($this->handler, 'unlinkAllProperties', $plan, array($this->side, $this->model), 1);
+        
+        $this->assertEquals($this->property, $this->property->removeAll());
+    }
+    
+    /**
+     * @covers ::AsData
+     * @covers ::<protected>
+     */
+    public function testAsData()
+    {
+        $this->prepareLoad(new \ArrayObject);
+        for($i=0;$i<3;$i++){
+            $model = $this->quickMock('stdClass', array('asObject'));
+            $this->value[]=$model;
+            $this->method($model, 'asObject', $i, array(true), 0);
+            $this->method($model, 'asObject', $i, array(false), 1);
+        }
+        
+        $this->assertEquals(array(0, 1, 2), $this->property->asData());
+        $this->assertEquals(array(0, 1, 2), $this->property->asData(false));
+    }
 
     public function modifyLinkTest($method, $action, $type)
     {

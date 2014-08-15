@@ -24,7 +24,7 @@ class ReusableResult extends \PHPixie\ORM\Loaders\Loader\Repository
         return $this->loadModel($data);
     }
 
-    public function resultStep()
+    public function reusableResult()
     {
         return $this->reusableResultStep;
     }

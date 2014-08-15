@@ -5,24 +5,22 @@ namespace PHPixie\ORM\Relationships\Relationship;
 abstract class Preloader
 {
     protected $loaders;
-    protected $relationshipType;
+    protected $relationship;
     protected $side;
-    protected $config;
     protected $loader;
 
-    public function __construct($loaders, $relationshipType, $side, $loader)
+    public function __construct($loaders, $relationship, $side, $loader)
     {
         $this->loaders             = $loaders;
-        $this->relationshipType    = $relationshipType;
+        $this->relationshipType    = $relationship;
         $this->side                = $side;
-        $this->config              = $side->config();
         $this->loader              = $loader;
     }
 
     public function loader()
     {
-        return $this->loader();
+        return $this->loader;
     }
 
-    abstract public function loadFor($model);
+    abstract public function valueFor($model);
 }

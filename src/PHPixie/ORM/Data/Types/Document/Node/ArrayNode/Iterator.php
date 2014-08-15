@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Data\Types\Document\Node\ArrayNode;
+namespace PHPixie\ORM\Data\Type\Document\Node\ArrayNode;
 
 class Iterator implements \Iterator
 {

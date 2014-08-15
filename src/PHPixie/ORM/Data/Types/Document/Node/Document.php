@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Data\Types\Document\Node;
+namespace PHPixie\ORM\Data\Type\Document\Node;
 
-class Document extends \PHPixie\ORM\Data\Types\Document\Node
+class Document extends \PHPixie\ORM\Data\Type\Document\Node
 {
 
     public function __construct($documentBuilder, $data = null)

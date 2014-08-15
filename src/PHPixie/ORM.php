@@ -46,7 +46,7 @@ class ORM
 
     public function buildRelationshipType($name)
     {
-        $class = '\PHPixie\ORM\Relationships\Types\\'.$name;
+        $class = '\PHPixie\ORM\Relationships\Type\\'.$name;
 
         return new $class($this);
     }

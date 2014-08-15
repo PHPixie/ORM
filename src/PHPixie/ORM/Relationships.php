@@ -35,7 +35,7 @@ class Relationships
     {
         $relationshipMap = $this->ormBuilder->relationshipMap();
 
-        return new Relationships\Types\Embedded\Mapper\Group($this->ormBuilder, $relationshipMap);
+        return new Relationships\Type\Embedded\Mapper\Group($this->ormBuilder, $relationshipMap);
     }
 
     protected function oneToOneRelationship()

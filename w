@@ -3,7 +3,7 @@ PHPUnit 4.2.0 by Sebastian Bergmann.
 Configuration read from C:\orm\phpunit.xml
 
 
-Fatal error: Call to undefined method Mock_ReusableResult_656e4220::resultStep() in C:\orm\src\PHPixie\ORM\Relationships\Types\ManyToMany\Preloader.php on line 38
+Fatal error: Call to undefined method Mock_ReusableResult_656e4220::resultStep() in C:\orm\src\PHPixie\ORM\Relationships\Type\ManyToMany\Preloader.php on line 38
 
 Call Stack:
     0.0720     372112   1. {main}() C:\wamp\phpunit.phar:0
@@ -19,5 +19,5 @@ Call Stack:
     0.4210    3453368  11. PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\MultipleTest->testLoadFor() phar://C:/wamp/phpunit.phar/phpunit/Framework/TestCase.php:958
     0.4640    3604384  12. PHPixie\ORM\Relationships\Relationship\Preloader\Result->valueFor() C:\orm\tests\PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\MultipleTest.php:39
     0.4640    3604416  13. PHPixie\ORM\Relationships\Relationship\Preloader\Result->ensureMapped() C:\orm\src\PHPixie\ORM\Relationships\Relationship\Preloader\Result.php:18
-    0.4640    3604456  14. PHPixie\ORM\Relationships\Types\ManyToMany\Preloader->mapItems() C:\orm\src\PHPixie\ORM\Relationships\Relationship\Preloader\Result.php:27
+    0.4640    3604456  14. PHPixie\ORM\Relationships\Type\ManyToMany\Preloader->mapItems() C:\orm\src\PHPixie\ORM\Relationships\Relationship\Preloader\Result.php:27
 

@@ -12,7 +12,7 @@ class ResultPreloaderTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     
     public function setUp()
     {
-        $this->preloader = $this->quickMock('\PHPixie\ORM\Relationships\Types\ManyToMany\Preloader');
+        $this->preloader = $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Preloader');
         parent::setUp();
     }
     

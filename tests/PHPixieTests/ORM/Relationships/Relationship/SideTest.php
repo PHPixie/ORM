@@ -12,10 +12,10 @@ abstract class SideTest extends \PHPixieTests\AbstractORMTest
     protected $config;
     protected $relationshipType;
     protected $sides = array();
-    
+
     public function setUp()
     {
-        $this->config = $this->getConfig();
+        $this->config = $this->config();
         $this->side = $this->getSide($this->type);
     }
 
@@ -27,7 +27,7 @@ abstract class SideTest extends \PHPixieTests\AbstractORMTest
     {
         $this->assertEquals($this->type, $this->side->type());
     }
-    
+
     /**
      * @covers ::config
      * @covers ::<protected>
@@ -36,7 +36,7 @@ abstract class SideTest extends \PHPixieTests\AbstractORMTest
     {
         $this->assertEquals($this->config, $this->side->config());
     }
-    
+
     /**
      * @covers ::relationshipType
      * @covers ::<protected>
@@ -51,11 +51,11 @@ abstract class SideTest extends \PHPixieTests\AbstractORMTest
         foreach($map as $key => $value)
             $this->assertEquals($value, $this->sides[$key]->$method());
     }
-    
+
     abstract public function testModelName();
     abstract public function testPropertyName();
-    
-    
-    abstract protected function getConfig();
+
+
+    abstract protected function config();
     abstract protected function getSide($type);
 }

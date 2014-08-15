@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Data\Types\Document;
+namespace PHPixie\ORM\Data\Type\Document;
 
 abstract class Node
 {

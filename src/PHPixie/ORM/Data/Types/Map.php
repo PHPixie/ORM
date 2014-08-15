@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Data\Types;
+namespace PHPixie\ORM\Data\Type;
 
 class Map extends \PHPixie\ORM\Data\Type\Implementation implements \PHPixie\ORM\Data\Type\Diffable
 {

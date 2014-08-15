@@ -42,7 +42,7 @@ class LoadersTest extends \PHPixieTests\AbstractORMTest
      */
     public function testReusltPreloader()
     {
-        $preloader = $this->quickMock('\PHPixie\ORM\Relationships\Types\ManyToMany\Preloader');
+        $preloader = $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Preloader');
         $ids = array(1, 2, 3);
         $resultPreloader = $this->loaders->resultPreloader($preloader, $ids);
         $this->assertInstanceOf('\PHPixie\ORM\Loaders\Loader\ResultPreloader', $resultPreloader);

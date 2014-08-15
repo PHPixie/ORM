@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Data\Types\Document\Node;
+namespace PHPixieTests\ORM\Data\Type\Document\Node;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Data\Types\Document\Node\Document
+ * @coversDefaultClass \PHPixie\ORM\Data\Type\Document\Node\Document
  */
-class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
+class DocumentTest extends \PHPixieTests\ORM\Data\Type\Document\NodeTest
 {
     protected $data;
     protected $magicDocument;
@@ -118,7 +118,7 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
      */
     public function testOriginalNull()
     {
-        $document = new \PHPixie\ORM\Data\Types\Document\Node\Document($this->documentBuilder);
+        $document = new \PHPixie\ORM\Data\Type\Document\Node\Document($this->documentBuilder);
         $document->name = 'Blum';
         $this->assertEquals('Blum', $document->get('name'));
         $this->assertEquals((object) array('name' => 'Blum'), $document->data());
@@ -132,6 +132,6 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
         $this->treesArray = $this->arrayNode();
         $this->method($this->documentBuilder, 'arrayNode', $this->treesArray, array($this->data->trees), 1);
         
-        return new \PHPixie\ORM\Data\Types\Document\Node\Document($this->documentBuilder, $this->data);
+        return new \PHPixie\ORM\Data\Type\Document\Node\Document($this->documentBuilder, $this->data);
     }
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Data\Types\Document;
+namespace PHPixieTests\ORM\Data\Type\Document;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Data\Types\Document\Diffable
+ * @coversDefaultClass \PHPixie\ORM\Data\Type\Document\Diffable
  */
-class DiffableTest extends \PHPixieTests\ORM\Data\Types\DocumentTest
+class DiffableTest extends \PHPixieTests\ORM\Data\Type\DocumentTest
 {
     protected $dataBuilder;
     protected $originalData;
@@ -92,7 +92,7 @@ class DiffableTest extends \PHPixieTests\ORM\Data\Types\DocumentTest
     protected function getType()
     {
         $this->method($this->document, 'data', $this->originalData, array(), 0);
-        return new \PHPixie\ORM\Data\Types\Document\Diffable($this->dataBuilder, $this->document);
+        return new \PHPixie\ORM\Data\Type\Document\Diffable($this->dataBuilder, $this->document);
     }
     
     protected function diff()

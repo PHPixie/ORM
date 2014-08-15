@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Data\Types\Document;
+namespace PHPixieTests\ORM\Data\Type\Document;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Data\Types\Document\Node
+ * @coversDefaultClass \PHPixie\ORM\Data\Type\Document\Node
  */
 abstract class NodeTest extends \PHPixieTests\AbstractORMTest
 {
@@ -12,13 +12,13 @@ abstract class NodeTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->documentBuilder = $this->quickMock('\PHPixie\ORM\Data\Types\Document\Builder');
+        $this->documentBuilder = $this->quickMock('\PHPixie\ORM\Data\Type\Document\Builder');
         $this->node = $this->getNode();
     }
     
     /**
      * @covers ::__construct
-     * @covers \PHPixie\ORM\Data\Types\Document\Node::__construct
+     * @covers \PHPixie\ORM\Data\Type\Document\Node::__construct
      * @covers ::<protected>
      */
     public function testConstruct()
@@ -28,12 +28,12 @@ abstract class NodeTest extends \PHPixieTests\AbstractORMTest
     
     protected function document()
     {
-        return $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\Document');
+        return $this->quickMock('\PHPixie\ORM\Data\Type\Document\Node\Document');
     }
     
     protected function arrayNode()
     {
-        return $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode');
+        return $this->quickMock('\PHPixie\ORM\Data\Type\Document\Node\ArrayNode');
     }
     
     abstract protected function getNode();

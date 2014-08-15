@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Data\Types;
+namespace PHPixieTests\ORM\Data\Type;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Data\Types\Document
+ * @coversDefaultClass \PHPixie\ORM\Data\Type\Document
  */
 class DocumentTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
 {
@@ -71,17 +71,17 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
     
     protected function arrayNode()
     {
-        return $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode');
+        return $this->quickMock('\PHPixie\ORM\Data\Type\Document\Node\ArrayNode');
     }
     
     protected function document()
     {
-        return $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\Document');
+        return $this->quickMock('\PHPixie\ORM\Data\Type\Document\Node\Document');
     }
     
     protected function getType()
     {
-        return new \PHPixie\ORM\Data\Types\Document($this->document);
+        return new \PHPixie\ORM\Data\Type\Document($this->document);
     }
     
 }

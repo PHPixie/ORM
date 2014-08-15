@@ -25,7 +25,7 @@ class PreloadingTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
         
         $this->properties = array();
         foreach(range(0, 4) as $i) {
-            $this->properties[]=$this->quickMock('\PHPixie\ORM\Relationships\Types\ManyToMany\Preloader');
+            $this->properties[]=$this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Preloader');
         }
         
         parent::setUp();

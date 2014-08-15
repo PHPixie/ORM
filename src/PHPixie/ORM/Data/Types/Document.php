@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Data\Types;
+namespace PHPixie\ORM\Data\Type;
 
 class Document extends \PHPixie\ORM\Data\Type\Implementation
 {

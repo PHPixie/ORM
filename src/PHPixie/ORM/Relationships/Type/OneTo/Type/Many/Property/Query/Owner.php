@@ -4,14 +4,34 @@ namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Query;
 
 class Owner extends \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Query
 {
+    public function query()
+    {
+        return $this->handler->query($this->side, $this->model);
+    }
+
+    protected function load()
+    {
+        return $this->handler->loadProperty($this->side, $this->model);
+    }
+    
     public function set($owner)
     {
-        if ($owner !== null) {
-            $plan = $this->handler->linkPlan($this->config, $owner, $this->query);
-        }else
-            $plan = $this->handler->unlinkPlan($this->config, null, $this->query);
-
+        $config = $this->side->config();
+        $plan = $this->handler->setOwnerPlan($config, $this->model, $owner);
         $plan->execute();
-        $this->handler->resetOwnerProperty($this->config, $owner);
+        $this->handler->setPropertyOwner($config, $this->model, $owner);
+    }
+    
+    public function remove()
+    {
+        $config = $this->side->config();
+        $plan = $this->handler->removeOwnerPlan($config, $this->model);
+        $plan->execute();
+        $this->handler->removePropertyOwner($config, $this->model, $owner);
+    }
+    
+    public function asData($recursive = true)
+    {
+        return $model->asObject($recursive);
     }
 }

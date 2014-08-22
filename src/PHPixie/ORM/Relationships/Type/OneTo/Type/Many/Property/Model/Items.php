@@ -23,7 +23,7 @@ class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Mod
 
     public function removeAll()
     {
-        $plan = $this->handler->unlinkOwnerPlan($this->config, $this->model);
+        $plan = $this->handler->unlinkPlan($this->config, $this->model, null);
         $plan->execute();
         if ($this->loaded && $this->value !== null)
             $this->handler->setItemsOwner($this->config, $this->value->usedModels(), null, $this->model);

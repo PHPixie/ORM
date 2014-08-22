@@ -19,9 +19,9 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         return $this->registryRepository->get($model)->related($property, $related);
     }
 
-            return $this->buildQuery($config->itemModel, $related->ownerProperty, $related);
-
-        return $this->buildQuery($config->ownerModel, $related->itemsProperty, $related);
+    public function loadProperty($side, $related)
+    {
+        return $this->query($side, $related)->find();
     }
 
     public function linkPlan($config, $owner, $items)

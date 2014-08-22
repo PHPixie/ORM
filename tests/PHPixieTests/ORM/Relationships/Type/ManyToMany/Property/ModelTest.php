@@ -8,11 +8,9 @@ namespace PHPixieTests\ORM\Relationships\Type\ManyToMany\Property;
 class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\ModelTest
 {
     protected $config;
-    protected $model;
 
     public function setUp()
     {
-        $this->model  = $this->getModel();
         $this->config = $this->config();
         parent::setUp();
     }
@@ -72,36 +70,36 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
         $this->assertEquals(array(0, 1, 2), $this->property->asData(false));
     }
 
-    public function modifyLinkTest($method, $action, $type)
+    protected function modifyLinkTest($method, $action, $type)
     {
-        $this->method($this->side, 'type', $type, array());
+        $this->method($this->side, 'type', $type, array(), 1);
         $item = $this->getModel();
         $plan = $this->getPlan();
-
+        
         $args = $this->reorderArgs(array($this->config, $this->model, $item), $type);
-
         $this->method($this->handler, $action.'Plan', $plan, $args, 0);
         $this->method($plan, 'execute', null, array(), 0);
         $this->method($this->handler, $action.'Properties', null, $args, 1);
 
-        $this->assertEquals($this->model, $this->property->$method($item));
+        $this->assertEquals($this->property, $this->property->$method($item));
     }
 
     protected function reorderArgs($params, $type)
     {
-        if($type === 'right') {
+        if($type === 'left') {
             $count = count($params);
             $param = $params[$count - 1];
             $params[$count - 1] = $params[$count - 2];
             $params[$count - 2] = $param;
         }
-
         return $params;
     }
 
-    protected function prepareLoad()
+    protected function prepareLoad($value = null)
     {
-        $this->value = $this->value();
+        if($value === null)
+            $value = $this->value();
+        $this->value = $value;
         $this->method($this->handler, 'loadProperty', $this->value, array($this->side, $this->model), 0);
     }
 

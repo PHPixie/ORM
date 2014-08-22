@@ -31,7 +31,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         return $plan;
     }
 
-    public function unlinkPlan($config, $leftItems = null, $rightItems = null)
+    public function unlinkPlan($config, $leftItems, $rightItems)
     {
         $plan = $this->plans->plan();
         list($leftSide, $rightSide) = $this->plannerSides($config, $leftItems, $rightItems);
@@ -55,11 +55,10 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
     protected function plannerSides($config, $leftItems, $rightItems)
     {
         $sides = array();
-        $pivotPlanner = $this->planners->pivot();
-
         foreach (array('left', 'right') as $side) {
-            $model = $config->get($side.'Model');
             $items = $side === 'left' ? $leftItems : $rightItems;
+            $sides[] = $this->plannerSide($config, $side, $items);
+        }
 
         return $sides;
     }
@@ -72,10 +71,6 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                                             $this->repositories->get($model),
                                             $config->get($side.'PivotKey')
                                         );
-            }
-        }
-
-        return $sides;
     }
 
     protected function pivotConnection($config)
@@ -140,7 +135,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $inPlanner      = $this->planners->in();
 
         $pivotQuery = $dependencies['pivot']->databaseSelectQuery();
-        
+
         $inPlanner->result(
                             $pivotQuery,
                             $config->get($dependencies['opposing'].'PivotKey'),

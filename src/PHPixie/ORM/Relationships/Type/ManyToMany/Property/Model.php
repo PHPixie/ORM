@@ -3,6 +3,7 @@
 namespace PHPixie\ORM\Relationships\Type\ManyToMany\Property;
 
 class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
+            implements \PHPixie\ORM\Relationships\Relationship\Property\Model\Data
 {
 
     public function query()
@@ -22,33 +23,25 @@ class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
         $plan = $this->handler->linkPlan($config, $left, $right);
         $plan->execute();
         $this->handler->linkProperties($config, $left, $right);
-        return $this->model;
+        return $this;
     }
 
     public function remove($items)
     {
-        if ($items === null)
-            return;
-
         $config = $this->side->config();
         list($left, $right) = $this->getSides($items);
         $plan = $this->handler->unlinkPlan($config, $left, $right);
         $plan->execute();
         $this->handler->unlinkProperties($config, $left, $right);
-        return $this->model;
+        return $this;
     }
 
     public function removeAll()
     {
-        $config = $this->side->config();
-        list($left, $right) = $this->getSides(null);
-        $plan = $this->handler->unlinkPlan($config, $left, $right);
+        $plan = $this->handler->unlinkAllPlan($this->side, $this->model);
         $plan->execute();
-        if ($this->loaded && $this->value !== null) {
-            $this->handler->unlinkProperties($this->config, $this->value->usedModels(), null);
-            $this->value->removeAll();
-        }
-        return $this->model;
+        $this->handler->unlinkAllProperties($this->side, $this->model);
+        return $this;
     }
 
     protected function getSides($opposing)
@@ -59,12 +52,11 @@ class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
         return array($opposing, $this->model);
     }
 
-    public function data($recursive = true)
+    public function asData($recursive = true)
     {
         $data = array();
         foreach($this->value() as $model)
             $data[] = $model->asObject($recursive);
-
         return $data;
     }
 

@@ -13,5 +13,4 @@ abstract class Property
         $this->side = $side;
     }
 
-    abstract public function data($recursive = true);
 }

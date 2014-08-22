@@ -28,12 +28,6 @@ class Handler
         $this->cascadeMapper      = $cascadeMapper;
     }
 
-    protected function buildRelatedQuery($modelName, $property, $related)
-    {
-        return $this->orm->query($modelName)
-                                ->related($property, $relatedModel);
-    }
-    
     protected function getLoadedProperty($model, $propertyName)
     {
         if ($model === null)

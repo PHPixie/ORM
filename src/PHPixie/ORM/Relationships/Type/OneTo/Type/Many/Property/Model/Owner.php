@@ -4,37 +4,37 @@ namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
 
 class Owner extends \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model
 {
-    public function load()
+    public function query()
     {
-        $owner = parent::load();
-        $this->handler->setItemOwner($this->config, $this->model, $owner);
+        return $this->handler->query($this->side, $this->model);
     }
 
+    protected function load()
+    {
+        return $this->handler->loadProperty($this->side, $this->model);
+    }
+    
     public function set($owner)
     {
-        if ($owner !== null) {
-            $plan = $this->handler->linkPlan($this->config, $owner, $this->model);
-        }else
-            $plan = $this->handler->unlinkPlan($this->config, null, $this->model);
+        if($owner === null && $owner->isDeleted())
+            return $this->remove();
         
+        $config = $this->side->config();
+        $plan = $this->handler->setOwnerPlan($config, $this->model, $owner);
         $plan->execute();
-        $this->handler->setItemsOwner($this->config, $this->model, $owner);
+        $this->handler->setItemOwner($config, $this->model, $owner);
     }
-
-    public function value()
+    
+    public function remove()
     {
-        if ($this->value !== null && $this->value->isDeleted())
-            $this->setValue(null);
-
-        return parent::value();
+        $config = $this->side->config();
+        $plan = $this->handler->removeOwnerPlan($config, $this->model);
+        $plan->execute();
+        $this->handler->removeItemOwner($config, $this->model, $owner);
     }
-
-    public function data($recursive = true)
+    
+    public function asData($recursive = true)
     {
-        $value = $this->value();
-        if ($value === null)
-            return null;
-
         return $model->asObject($recursive);
     }
 }

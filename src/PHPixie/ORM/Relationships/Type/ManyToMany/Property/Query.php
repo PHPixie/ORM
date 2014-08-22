@@ -11,35 +11,36 @@ class Query extends \PHPixie\ORM\Relationships\Relationship\Property\Query
 
     public function add($items)
     {
+        $config = $this->side->config();
         list($left, $right) = $this->getSides($items);
-        $plan = $this->handler->linkPlan($this->config, $left, $right);
+        $plan = $this->handler->linkPlan($config, $left, $right);
         $plan->execute();
         $this->handler->resetProperties($this->side, $items);
+        return $this;
     }
 
     public function remove($items)
     {
-        if ($items === null)
-            return;
-
+        $config = $this->side->config();
         list($left, $right) = $this->getSides($items);
-        $plan = $this->handler->unlinkPlan($this->config, $left, $right);
+        $plan = $this->handler->unlinkPlan($config, $left, $right);
         $plan->execute();
         $this->handler->resetProperties($this->side, $items);
+        return $this;
     }
 
     public function removeAll()
     {
-        list($left, $right) = $this->getSides(null);
-        $plan = $this->handler->unlinkPlan($this->config, $left, $right);
+        $plan = $this->handler->unlinkAllPlan($this->side, $this->query);
         $plan->execute();
+        return $this;
     }
 
     protected function getSides($opposing)
     {
-        if ($this->side-> type() === 'right')
-            return ($this->model, $opposing);
+        if ($this->side->type() === 'right')
+            return array($this->query, $opposing);
 
-        return ($opposing, $this->query);
+        return array($opposing, $this->query);
     }
 }

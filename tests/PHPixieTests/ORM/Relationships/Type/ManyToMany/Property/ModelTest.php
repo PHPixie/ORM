@@ -53,7 +53,7 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
     }
     
     /**
-     * @covers ::AsData
+     * @covers ::asData
      * @covers ::<protected>
      */
     public function testAsData()

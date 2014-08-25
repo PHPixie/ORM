@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type;
 
-class OneToMany extends PHPixie\ORM\Relationships\Relationship\Type
+class OneToMany extends \PHPixie\ORM\Relationships\Relationship
 {
     public function config($config)
     {

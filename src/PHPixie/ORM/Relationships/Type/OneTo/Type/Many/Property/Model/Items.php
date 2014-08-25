@@ -6,37 +6,36 @@ class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Mod
 {
     public function add($items)
     {
-        $plan = $this->handler->linkPlan($this->config, $this->model, $items);
+        $config = $this->side->config();
+        $plan = $this->handler->linkPlan($config, $this->model, $items);
         $plan->execute();
-        $this->handler->setItemsOwner($this->config, $items, $this->model);
+        $this->handler->setItemsOwner($config, $this->model, $items);
+        return $this;
     }
 
     public function remove($items)
     {
-        if ($items === null)
-            return;
-
-        $plan = $this->handler->unlinkPlan($this->config, $this->model, $items);
+        $config = $this->side->config();
+        $plan = $this->handler->unlinkPlan($config, $this->model, $items);
         $plan->execute();
-        $this->handler->setItemsOwner($this->config, $items, null, $this->model);
+        $this->handler->removeOwnerItems($config, $this->model, $items);
+        return $this;
     }
 
     public function removeAll()
     {
-        $plan = $this->handler->unlinkPlan($this->config, $this->model, null);
+        $config = $this->side->config();
+        $plan = $this->handler->unlinkOwnersPlan($config, $this->model);
         $plan->execute();
-        if ($this->loaded && $this->value !== null)
-            $this->handler->setItemsOwner($this->config, $this->value->usedModels(), null, $this->model);
-            $this->value->removeAll();
-        }
+        $this->handler->removeAllOwnerItems($config, $this->model);
+        return $this;
     }
 
-    public function data($recursive = true)
+    public function asData($recursive = true)
     {
         $data = array();
         foreach($this->value() as $model)
             $data[] = $model->asObject($recursive);
-
         return $data;
     }
 }

@@ -8,7 +8,7 @@ abstract class Owner extends \PHPixie\ORM\Relationships\Relationship\Preloader\R
     protected function mapItems()
     {
         $idField = $this->loader->repository()->idField();
-        $this->idOffsets = array_flip($this->loader->resultStep->getField($idField));
+        $this->idOffsets = array_flip($this->loader->resultStep()->getField($idField));
     }
 
     public function getMappedFor($model)

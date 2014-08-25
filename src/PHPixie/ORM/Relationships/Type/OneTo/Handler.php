@@ -130,7 +130,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         if ($config->onDelete === 'update') {
             $query = $repository->databaseQuery('update')->data(array($itemKey => null));
         } else {
-            $handledSides = $this->cascadeMapper=>deletionSides($itemModel);
+            $handledSides = $this->cascadeMapper->deletionSides($itemModel);
             $hasHandledSides = !empty($handlesSides);
             $query = $repository->databaseQuery($hasHandledSides ? 'select' : 'delete');
         }
@@ -138,9 +138,15 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $this->planners->in()->result($query, $itemKey, $resultStep, $ownerRepository->idField());
 
         if ($hasHandledSides)
-            $query = $this->cascadeMapper->deletion($query, $handledSides, $itemRepository, $plan)
+            $query = $this->cascadeMapper->deletion($query, $handledSides, $itemRepository, $plan);
 
         $deleteStep = $this->steps->query($query);
         $plan->add($deleteStep);
     }
+    
+    public function unlinkItemsPlan(){}
+    public function unlinkOwnersPlan(){}
+    public function removeItemsOwner(){}
+    public function removeOwnerItems(){}
+    public function removeAllOwnerItems(){}
 }

@@ -16,18 +16,15 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             $property = $config->ownerProperty;
         }
 
-        return $this->registryRepository->get($model)->related($property, $related);
-    }
-
-    public function loadProperty($side, $related)
-    {
-        return $this->query($side, $related)->find();
+        $repository = $this->repositories->get($model);
+        return $repository->query()->related($property, $related);
     }
 
     public function linkPlan($config, $owner, $items)
     {
-        $itemRepository = $this->registryRepository->get($config->itemModel);
-        $ownerRepository = $this->registryRepository->get($config->ownerModel);
+
+        $itemRepository = $this->repositories->get($config->itemModel);
+        $ownerRepository = $this->repositories->get($config->ownerModel);
         $ownerCollection = $this->planners->collection($config->ownerModel, $owner);
 
         $plan = $this->orm->plan();
@@ -143,7 +140,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $deleteStep = $this->steps->query($query);
         $plan->add($deleteStep);
     }
-    
+
     public function unlinkItemsPlan(){}
     public function unlinkOwnersPlan(){}
     public function removeItemsOwner(){}

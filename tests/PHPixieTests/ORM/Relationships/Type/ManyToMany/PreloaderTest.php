@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\ManyToMany;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\ManyToMany\Preloader
  */
-class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\MultipleTest
+class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\Multiple\IdMapTest
 {
     protected $pivotResult;
     
@@ -50,7 +50,7 @@ class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Preload
         
         $this->method($this->pivotResult, 'getFields', $fields, array(array($ownerKey, $itemKey)), 0);
         
-        $repository = $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database');
+        $repository = $this->getRepository();
         $this->method($this->loader, 'repository', $repository, array(), 0);
         
         $loaderResult = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
@@ -66,23 +66,19 @@ class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Preload
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany');
     }
     
-    protected function side()
-    {
-        $config = $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Side\Config');
-        $this->mapConfig($config, $this->configData);
-        $side = $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Side');
-        $this->method($side, 'config', $config, array());
-        return $side;
-    }
-    
-    protected function getModel()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database\Model');
-    }
-    
     protected function loader()
     {
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\ReusableResult');
+    }
+    
+    protected function getSide()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Side');
+    }
+    
+    protected function getConfig()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Side\Config');
     }
     
     protected function preloader()

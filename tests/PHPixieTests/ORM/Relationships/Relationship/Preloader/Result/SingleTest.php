@@ -10,8 +10,8 @@ abstract class singleTest extends \PHPixieTests\ORM\Relationships\Relationship\P
     protected $map = array(
         1 => 5,
         2 => 6,
-        3 => 5,
-        4 => 6,
+        3 => 7,
+        4 => 8,
     );
     
     public function setUp()
@@ -19,7 +19,7 @@ abstract class singleTest extends \PHPixieTests\ORM\Relationships\Relationship\P
         for($i=1; $i<5; $i++)
             $this->models[$i] = $this->getModel();
         
-        for($i=5; $i<7; $i++)
+        for($i=5; $i<9; $i++)
             $this->preloadedModels[$i] = $this->getModel();
         
         parent::setUp();
@@ -32,6 +32,7 @@ abstract class singleTest extends \PHPixieTests\ORM\Relationships\Relationship\P
     public function testLoadFor()
     {
         $this->prepareMap();
+        $this->prepareLoader();
         foreach($this->models as $modelId => $model) {
             $id = $this->map[$modelId];
             $preloaded = $this->preloadedModels[$id];

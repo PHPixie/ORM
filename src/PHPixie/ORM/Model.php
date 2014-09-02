@@ -50,6 +50,11 @@ class Model
         if ($property !== null)
             return $property;
         
+        return $this->getField($name);
+    }
+    
+    public function getField($name)
+    {
         return $this->data->get($name);
     }
 

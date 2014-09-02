@@ -6,7 +6,7 @@ abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Side\Confi
 {
     public $ownerModel;
     public $itemModel;
-    public $itemKey;
+    public $ownerKey;
     public $ownerProperty;
     public $itemProperty;
     public $onDelete;
@@ -18,11 +18,11 @@ abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Side\Confi
         $this->itemModel = $config->get($itemOptionName);
 
         $itemOptionsPrefix = $itemOptionName.'Options';
-        $this->itemProperty = $config->get($itemOptionsPrefix.'.ownerProperty', $this->ownerModel);
-        $this->itemKey = $config->get($itemOptionsPrefix.'.ownerKey', $this->itemProperty.'_id');
+        $this->itemProperty = $config->get($itemOptionsPrefix.'.property', $this->ownerModel);
+        $this->ownerKey = $config->get($itemOptionsPrefix.'.ownerKey', $this->itemProperty.'_id');
         $this->onDelete = $config->get($itemOptionsPrefix.'.onOwnerDelete', 'update');
 
-        $this->ownerProperty = $config->get('ownerOptions.'.$itemOptionName.'Property', null);
+        $this->ownerProperty = $config->get('ownerOptions.property', null);
         if ($this->ownerProperty === null)
             $this->ownerProperty = $this->defaultOwnerProperty($inflector);
     }

@@ -53,9 +53,19 @@ abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
             $config->$key = $value;
     }
     
+    protected function side()
+    {
+        $config = $this->getConfig();
+        $this->mapConfig($config, $this->configData);
+        $side = $this->getSide();
+        $this->method($side, 'config', $config, array());
+        return $side;
+    }
+    
     abstract protected function getModel();
     abstract protected function relationship();
-    abstract protected function side();
+    abstract protected function getSide();
+    abstract protected function getConfig();
     abstract protected function loader();
     abstract protected function preloader();
     

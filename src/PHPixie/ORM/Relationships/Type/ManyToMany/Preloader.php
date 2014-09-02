@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\ManyToMany;
 
-class Preloader extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple
+class Preloader extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple\IdMap
 {
     protected $pivotResult;
 
@@ -27,17 +27,9 @@ class Preloader extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result
         foreach ($fields as $pivotData) {
             $id = $pivotData[$itemIdField];
             $ownerId = $pivotData[$ownerIdField];
-
-            if (!isset($this->map[$ownerId]))
-                $this->map[$ownerId] = array();
-
-            $this->map[$ownerId][] = $id;
+            $this->pushToMap($ownerId, $id);
         }
 
-        $idField = $this->loader->repository()->idField();
-        $ids = $this->loader->reusableResult()->getField($idField);
-        foreach ($ids as $offset => $id) {
-            $this->idOffsets[$id] = $offset;
-        }
+        $this->mapIdOffsets();
     }
 }

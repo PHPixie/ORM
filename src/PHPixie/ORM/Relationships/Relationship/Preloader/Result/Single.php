@@ -6,8 +6,9 @@ abstract class Single extends \PHPixie\ORM\Relationships\Relationship\Preloader\
 {
     public function getMappedFor($model)
     {
-        $id = $this->map[$model->id()];
-
+        $id = $this->getMappedIdFor($model);
         return $this->getModel($id);
     }
+    
+    abstract protected function getMappedIdFor($model);
 }

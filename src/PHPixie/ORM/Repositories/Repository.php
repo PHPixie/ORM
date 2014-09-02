@@ -10,7 +10,7 @@ abstract class Repository
     protected $modelName;
     protected $connectionName;
 
-    public function __construct($ormBuilder, $driver, $dataBuilder, $inflector, $modelName, $config)
+    public function __construct($ormBuilder, $driver, $dataBuilder, $modelName, $config)
     {
         $this->ormBuilder = $ormBuilder;
         $this->driver = $driver;

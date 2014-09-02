@@ -20,7 +20,8 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\S
             array(
                 'ownerModel'       => 'fairy',
                 'itemModel'        => 'flower',
-                'itemKey'          => 'fairy_id',
+                
+                'ownerKey'          => 'fairy_id',
 
                 'ownerProperty'    => $this->defaultOwnerProperty,
                 'itemProperty'     => 'fairy',
@@ -44,7 +45,8 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\S
             array(
                 'ownerModel'       => 'fairy',
                 'itemModel'        => 'flower',
-                'itemKey'          => 'owner_id',
+                
+                'ownerKey'          => 'owner_id',
 
                 'ownerProperty'    => 'plants',
                 'itemProperty'     => 'pixie',

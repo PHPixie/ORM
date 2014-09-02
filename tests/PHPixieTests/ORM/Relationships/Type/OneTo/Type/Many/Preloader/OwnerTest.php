@@ -28,8 +28,7 @@ class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Preloader\Own
             $this->loaders,
             $this->relationship,
             $this->side,
-            $this->loader,
-            $this->pivotResult
+            $this->loader
         );
     }
     

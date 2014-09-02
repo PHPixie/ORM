@@ -28,6 +28,15 @@ abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Preloader
         $this->mapped = true;
 
     }
+    
+    protected function mapIdOffsets()
+    {
+        $idField = $this->loader->repository()->idField();
+        $ids = $this->loader->reusableResult()->getField($idField);
+        foreach ($ids as $offset => $id) {
+            $this->idOffsets[$id] = $offset;
+        }
+    }
 
     abstract protected function mapItems();
     abstract protected function getMappedFor($model);

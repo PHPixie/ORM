@@ -7,9 +7,9 @@ abstract class Database extends \PHPixie\ORM\Repositories\Repository
     protected $connectionName;
     protected $idField;
 
-    public function __construct($ormBuilder, $driver, $dataBuilder, $inflector, $modelName, $config)
+    public function __construct($ormBuilder, $driver, $dataBuilder, $modelName, $config)
     {
-        parent::__construct($ormBuilder, $driver, $dataBuilder, $inflector, $modelName, $config);
+        parent::__construct($ormBuilder, $driver, $dataBuilder, $modelName, $config);
         $this->connectionName = $modelConfig->get('connection', 'default');
         $this->idField = $modelConfig->get('idField', 'id');
     }

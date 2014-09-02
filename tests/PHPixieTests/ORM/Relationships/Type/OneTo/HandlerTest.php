@@ -38,8 +38,25 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
      */
     public function testLinkPlan()
     {
-        $m = $this->getLinkMocks();
-        $this->modifyLinkPlanTest($m, 'link', $this->configData);
+        $ownerRepository = $this->getRepository();
+        $itemRepository = $this->getRepository();
+        $this->setRepositories()
+
+    }
+
+    protected function prepareRepositories()
+    {
+        $repositories = array(
+            'owner' => $this->getRepository(),
+            'item'  => $this->getRepository(),
+        );
+
+        $this->setRepositories(array(
+            $this->configData['ownerModel'] => $repositories['owner'],
+            $this->configData['itemModel']  => $repositories['item'],
+        ));
+
+        return $repositories;
     }
 
     protected function prepareQuery($side, $query, $related)

@@ -23,21 +23,9 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
     public function linkPlan($config, $owner, $items)
     {
 
-        $itemRepository = $this->repositories->get($config->itemModel);
-        $ownerRepository = $this->repositories->get($config->ownerModel);
-        $ownerCollection = $this->planners->collection($config->ownerModel, $owner);
-
-        $plan = $this->orm->plan();
-        $itemQuery = $itemRepository->query()->in($items);
-        $updatePlanner = $this->planners->update();
-        $ownerField = $updatePlanner->field($owner, $ownerRepository->idField());
-        $updatePlanner->plan(
-                                $itemQuery,
-                                array($config->itemKey => $ownerField),
-                                $plan
-                            );
-
-        return $plan;
+        $query = $this->repositories->get($config->itemModel)->query();
+        $query->in($items);
+        return $query->planUpdate(array($config->itemKey => null))
     }
 
     public function unlinkPlan($config, $owner = null, $items = null)

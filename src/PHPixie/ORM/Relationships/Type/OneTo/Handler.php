@@ -22,33 +22,64 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     public function linkPlan($config, $owner, $items)
     {
+        $plan = $this->plans->plan();
 
-        $query = $this->repositories->get($config->itemModel)->query();
-        $query->in($items);
-        return $query->planUpdate(array($config->itemKey => null))
+        $ownerRepository = $this->repositories->get($config->ownerModel);
+        $ownerQuery = $onwerRepository->selectQuery();
+        $this->addCollectionCondition($ownerQuery, $ownerRepository, $owner, $plan);
+
+        $itemRepository = $this->repositories->get($config->itemModel);
+        $updateQuery = $itemRepository->updateQuery();
+        $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
+
+        $this->planners->update()->subquery(
+                                                $updateQuery,
+                                                array(
+                                                    $config->ownerKey => $ownerRepository->idField()
+                                                ),
+                                                $ownerQuery,
+                                                $plan
+                                            );
+        return $plan;
+    }
+
+    protected function addCollectionCondition($query, $repository, $plan, $items, $queryField = null)
+    {
+        $idField = $repository->idField();
+
+        if($queryField === null)
+            $queryField = $idField;
+
+        $collection = $this->planners->collection($repository->modelName(), $items);
+        $this->planners->in()->collection($query, $queryField, $collection, $idField, $plan);
     }
 
     public function unlinkPlan($config, $owner = null, $items = null)
     {
-        $query = $this->registryRepository->get($config->itemModel)->query();
+        $plan = $this->plans->plan();
+        $itemRepository = $this->repositories->get($config->itemModel);
+        $updateQuery = $itemRepository->updateQuery();
 
         if ($items !== null)
-            $query->in($items);
+            $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
 
-        if ($owner !== null)
-            $query->related($config->itemProperty, $owner);
+        if ($owner !== null) {
+            $ownerRepository = $this->repositories->get($config->ownerModel);
+            $ownerQuery = $ownerRepository->selectQuery();
+            $this->addCollectionCondition($updateQuery, $ownerRepository, $owner, $plan, $config->ownerKey);
+        }
 
-        return $query->planUpdate(array($config->itemKey => null));
+        $updateQuery->set($config->ownerKey, null);
+        return $plan;
     }
 
-    public function mapRelationship($side, $group, $query, $plan)
+    public function mapQuery($side, $group, $query, $plan)
     {
         $config = $side->config();
         $itemRepository = $this->registryRepository->get($config->itemModel);
         $ownerRepository = $this->registryRepository->get($config->ownerModel);
-        $conditions = $group->conditions();
 
-        if ($side-> type() !== 'owner') {
+        if ($side->type() !== 'owner') {
             $subqueryRepository = $ownerRepository;
             $queryField = $config->itemKey;
             $subqueryField = $ownerRepository->idField();
@@ -58,8 +89,14 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             $subqueryField = $config->itemKey;
         }
 
-        $subquery = $subqueryRepository->query();
-        $this->groupMapper->mapConditions($subquery, $conditions, $subqueryRepository->modelName(), $plan);
+        $subquery = $subqueryRepository->databaseSelectQuery();
+        $this->groupMapper->mapConditions(
+                                            $subquery,
+                                            $group->conditions(),
+                                            $subqueryRepository->modelName(),
+                                            $plan
+                                        );
+
         $this->planners->in()->subquery(
                                         $query,
                                         $queryField,
@@ -69,6 +106,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                                         $group->logic(),
                                         $group->negated()
                                     );
+        return $plan;
     }
 
     public function preload($side, $resultLoader, $plan)

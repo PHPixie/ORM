@@ -183,12 +183,12 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         return $dependencies;
     }
-    
+
     protected function getOpposing($type)
     {
         return $type === 'left' ? 'right' : 'left';
     }
-    
+
     public function linkProperties($config, $left, $right)
     {
         $this->processProperties('add', $left, $config->leftProperty, $right);
@@ -213,15 +213,15 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             $loader->removeAll();
         }
     }
-    
+
     public function resetProperties($side, $items)
     {
         $opposing = $this->getOpposing($side->type());
         $itemsProperty = $side->config()->get($opposing.'Property');
-        
+
         if(!is_array($items))
             $items = array($items);
-        
+
         foreach($items as $item) {
             $property = $this->getPropertyIfLoaded($item, $itemsProperty);
             if($property !== null)
@@ -257,7 +257,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                 $property->reset();
                 continue;
             }
-            
+
             $loader = $property->value();
             if ($action === 'remove') {
                 $loader->remove($items);
@@ -266,7 +266,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             }
         }
     }
-        
+
     protected function getPropertyIfLoaded($model, $propertyName)
     {
         $property = $model->relationshipProperty($propertyName);

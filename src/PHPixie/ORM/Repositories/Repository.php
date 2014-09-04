@@ -38,11 +38,6 @@ abstract class Repository
         $this->ormBuilder->databaseConnection($this->connectionName);
     }
     
-    public function databaseSelectQuery()
-    {
-        return $this->connection->selectQuery();
-    }
-    
     abstract public function save($model);
     abstract public function delete($model);
     abstract public function load($data);

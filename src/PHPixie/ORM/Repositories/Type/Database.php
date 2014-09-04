@@ -72,4 +72,6 @@ abstract class Database extends \PHPixie\ORM\Repositories\Repository
     abstract protected function processSave($model);
     abstract protected function buildModel($data = null);
     abstract public function databaseQuery($type = 'select');
+    abstract public function databaseSelectQuery();
+    abstract public function databaseUpdateQuery();
 }

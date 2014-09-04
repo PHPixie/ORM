@@ -119,6 +119,20 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
         return $this->abstractMock('\PHPixie\ORM\Model', $methods);
     }
     
+    protected function getPlanners($types)
+    {
+        $planners = array();
+        foreach($types as $type) {
+            $planners[$type] = $this->getPlanner($type);
+        }
+        return $planners;
+    }
+    
+    protected function getPlanner($type)
+    {
+        return $this->quickMock('\PHPixie\ORM\Planners\Planner\\'.ucfirst($type));
+    }
+    
     abstract protected function getHandler();
     abstract protected function getRelationship();
     abstract protected function getSide();

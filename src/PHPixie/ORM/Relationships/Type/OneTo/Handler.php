@@ -25,11 +25,11 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $plan = $this->plans->plan();
 
         $ownerRepository = $this->repositories->get($config->ownerModel);
-        $ownerQuery = $onwerRepository->selectQuery();
+        $ownerQuery = $ownerRepository->databaseSelectQuery();
         $this->addCollectionCondition($ownerQuery, $ownerRepository, $owner, $plan);
 
         $itemRepository = $this->repositories->get($config->itemModel);
-        $updateQuery = $itemRepository->updateQuery();
+        $updateQuery = $itemRepository->databaseUpdateQuery();
         $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
 
         $this->planners->update()->subquery(
@@ -43,7 +43,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         return $plan;
     }
 
-    protected function addCollectionCondition($query, $repository, $plan, $items, $queryField = null)
+    protected function addCollectionCondition($query, $repository, $items, $plan, $queryField = null)
     {
         $idField = $repository->idField();
 
@@ -54,7 +54,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $this->planners->in()->collection($query, $queryField, $collection, $idField, $plan);
     }
 
-    public function unlinkPlan($config, $owner = null, $items = null)
+    protected function unlinkPlan($config, $owner = null, $items = null)
     {
         $plan = $this->plans->plan();
         $itemRepository = $this->repositories->get($config->itemModel);
@@ -76,17 +76,17 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
     public function mapQuery($side, $group, $query, $plan)
     {
         $config = $side->config();
-        $itemRepository = $this->registryRepository->get($config->itemModel);
-        $ownerRepository = $this->registryRepository->get($config->ownerModel);
+        $itemRepository = $this->repositories->get($config->itemModel);
+        $ownerRepository = $this->repositories->get($config->ownerModel);
 
         if ($side->type() !== 'owner') {
             $subqueryRepository = $ownerRepository;
-            $queryField = $config->itemKey;
+            $queryField = $config->ownerKey;
             $subqueryField = $ownerRepository->idField();
         } else {
             $subqueryRepository = $itemRepository;
             $queryField = $ownerRepository->idField();
-            $subqueryField = $config->itemKey;
+            $subqueryField = $config->ownerKey;
         }
 
         $subquery = $subqueryRepository->databaseSelectQuery();
@@ -106,7 +106,6 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                                         $group->logic(),
                                         $group->negated()
                                     );
-        return $plan;
     }
 
     public function preload($side, $resultLoader, $plan)

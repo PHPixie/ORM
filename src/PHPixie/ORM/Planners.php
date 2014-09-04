@@ -26,6 +26,11 @@ class Planners
     {
         return $this->plannerInstance('in');
     }
+    
+    public function update()
+    {
+        return $this->plannerInstance('update');
+    }
 
     public function plannerInstance($name)
     {
@@ -37,6 +42,11 @@ class Planners
         return $this->planners[$name];
     }
 
+    public function collection($modelName, $items)
+    {
+    
+    }
+    
     protected function buildPlanner($name, $steps)
     {
         $class = '\PHPixie\ORM\Planners\Planner\\'.ucfirst($name);

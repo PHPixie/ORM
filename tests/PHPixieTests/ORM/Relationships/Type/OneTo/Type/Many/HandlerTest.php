@@ -9,8 +9,12 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
 {
     protected $itemSide = 'items';
 
-    protected function getPreloader(){
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader');
+    protected function getPreloader($type)
+    {
+        if($type !== 'owner')
+            $type = 'items';
+        
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\\'.ucfirst($type));
     }
 
     protected function getConfig()
@@ -25,7 +29,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
 
     protected function getRelationship()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneToMany');
     }
 
     protected function getHandler()

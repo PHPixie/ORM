@@ -101,10 +101,10 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $query = $this->getDatabaseQuery();
             $plan = $this->getPlan();     
 
-            $subqueryRepository = $repositories[$type == 'owner' ? 'item' : 'owner'];
+            $subqueryRepository = $repositories[$type == 'owner' ? 'owner' : 'item'];
             $this->method($repositories['owner'], 'idField', 'id', array(), 0);
 
-            if ($type !== 'owner') {
+            if ($type === 'owner') {
                 $queryField = $this->configData['ownerKey'];
                 $subqueryField = 'id';
             } else {
@@ -114,7 +114,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             
             $subquery = $this->getDatabaseQuery();
             
-            $subqueryRepoOffset = $type == 'owner' ? 0 : 1;
+            $subqueryRepoOffset = $type == 'owner' ? 1 : 0;
             
             $this->method($subqueryRepository, 'databaseSelectQuery', $subquery, array(), $subqueryRepoOffset++);
 
@@ -145,6 +145,85 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
 
             $this->handler->mapQuery($side, $group, $query, $plan);
         }
+    }
+    
+    public function testMapPreload()
+    {
+        $repositories = $this->prepareRepositories();
+        
+        foreach(array('owner', 'item') as $type) {
+            $side = $this->side($type, $this->configData);
+            $query = $this->getDatabaseQuery();
+            $preloadPlan = $this->getPlan();     
+
+            $preloadRepository = $repositories[$type == 'owner' ? 'owner' : 'item'];
+            $this->method($repositories['owner'], 'idField', 'id', array(), 0);
+
+            if ($type === 'owner') {
+                $queryField = 'id';
+                $resultField = $this->configData['ownerKey'];
+            } else {
+                $queryField = $this->configData['ownerKey'];
+                $resultField = 'id';
+            }
+            
+            $query = $this->getDatabaseQuery();
+            
+            $preloadRepoOffset = $type == 'owner' ? 1 : 0;
+            
+            $this->method($preloadRepository, 'databaseSelectQuery', $query, array(), $preloadRepoOffset++);
+
+            $inPlanner = $this->getPlanner('in');
+            $this->method($this->planners, 'in', $inPlanner, array(), 0);
+            
+            $repoLoader = $this->getReusableResultLoader();
+            $resultStep = $this->getReusableResult();
+            $this->method($repoLoader, 'reusableResult', $resultStep, array(), 0);
+            
+            $this->method($inPlanner, 'result', null, array(
+                $query,
+                $queryField,
+                $resultStep,
+                $resultField,
+                $preloadPlan
+            ), 0);
+            
+            $preloadStep = $this->getReusableResult();
+            $this->method($this->steps, 'reusableResult', $preloadStep, array($query), 0);
+            $this->method($preloadPlan, 'add', null, array($preloadStep), 0);
+            $loader = $this->getReusableResultLoader();
+            $this->method($this->loaders, 'reusableResult', $loader, array($preloadRepository, $preloadStep), 0);
+
+            $preloader = $this->getPreloader($type);
+            $this->method($this->relationship, 'preloader', $preloader, array($side, $loader), 0);
+
+            $this->assertEquals($preloader, $this->handler->mapPreload($side, $repoLoader, $preloadPlan));
+        }
+    }
+    
+    protected function prepareUnlinkTest($constrainOwners, $owners, $constrainItems, $items)
+    {
+        $repositories = $this->prepareRepositories();
+        $plan = $this->getPlan();
+        $this->method($this->plans, 'steps', $plan, array(), 0);
+        
+        $ownerKey = $this->configData['ownerKey'];
+        $updateQuery = $this->getDatabaseQuery('update');
+        $this->method($updateQuery, 'set', null, array($ownerKey, null), 0);
+        
+        $inPlanner = $his->getPlanner('in');
+        $inPlannerOffset = 0;
+        $plannersOffset = 0;
+        
+        if ($constrainItems) {
+            $this->prepareAddCollectionQuery($updateQuery, 'item', $items, $plan, $inPlanner, null, $inPlannerOffset++, $plannersOffset++, 0);
+        }
+        
+        if ($constrainOwners) {
+            $this->prepareAddCollectionQuery($updateQuery, 'owner', $owners, $plan, $inPlanner, $ownerKey, $inPlannerOffset++, $plannersOffset++, 0);
+        }
+        
+        return $plan;
     }
     
 
@@ -185,5 +264,6 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     {
         return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database');
     }
-
+    
+    abstract protected function getPreloader($type);
 }

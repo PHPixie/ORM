@@ -17,4 +17,5 @@ class ConfigTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Side\ConfigT
     {
         return new \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Side\Config($this->inflector, $slice);
     }
+    
 }

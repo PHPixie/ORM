@@ -57,27 +57,21 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
     protected function getUnlinkPlan($config, $constrainOwners, $owners, $constrainItems, $items)
     {
         $plan = $this->plans->plan();
-        
+
         $itemRepository = $this->repositories->get($config->itemModel);
-        $updateQuery = $itemRepository->updateQuery();
+        $updateQuery = $itemRepository->databaseUpdateQuery();
         $updateQuery->set($config->ownerKey, null);
-        
+
         if ($constrainItems)
             $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
 
         if ($constrainOwners) {
             $ownerRepository = $this->repositories->get($config->ownerModel);
-            $ownerQuery = $ownerRepository->selectQuery();
-            $this->addCollectionCondition($updateQuery, $ownerRepository, $owner, $plan, $config->ownerKey);
+            $this->addCollectionCondition($updateQuery, $ownerRepository, $owners, $plan, $config->ownerKey);
         }
 
-        
+
         return $plan;
-    }
-    
-    protected function getUnlinkQuery()
-    {
-    
     }
 
     public function mapQuery($side, $group, $query, $plan)
@@ -115,38 +109,6 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
                                     );
     }
 
-    public function mapPreload($side, $resultStepLoader, $preloadPlan)
-    {
-        $config = $side->config();
-        
-        $itemRepository = $this->repositories->get($config->itemModel);
-        $ownerRepository = $this->repositories->get($config->ownerModel);
-
-        if ($side->type() === 'owner') {
-            $preloadRepository = $ownerRepository;
-            $queryField = $ownerRepository->idField();
-            $resultField = $config->ownerKey;
-        } else {
-            $preloadRepository = $itemRepository;
-            $queryField = $config->ownerKey;
-            $resultField = $ownerRepository->idField();
-        }
-
-        $query = $preloadRepository->databaseSelectQuery();
-        $this->planners->in()->result(
-                                        $query,
-                                        $queryField,
-                                        $resultStepLoader->reusableResult(),
-                                        $resultField,
-                                        $preloadPlan
-                                    );
-
-        $preloadStep = $this->steps->reusableResult($query);
-        $preloadPlan->add($preloadStep);
-        $loader = $this->loaders->reusableResult($preloadRepository, $preloadStep);
-        return $this->relationship->preloader($side, $loader);
-    }
-
     public function handleDeletion($modelName, $side, $resultStep, $plan)
     {
         if ($side->type() === 'owner')
@@ -182,19 +144,71 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
     {
         return $this->getUnlinkPlan($config, true, $owners, true, $items);
     }
-    
+
     public function unlinkItemsPlan($config, $items)
     {
         return $this->getUnlinkPlan($config, false, null, true, $items);
     }
-    
+
     public function unlinkOwnersPlan($config, $owners)
     {
         return $this->getUnlinkPlan($config, true, $owners, false, null);
     }
-        
-    
-    public function removeItemsOwner(){}
+
+    public function mapPreload($side, $resultStepLoader, $preloadPlan)
+    {
+        $config = $side->config();
+
+        $itemRepository = $this->repositories->get($config->itemModel);
+        $ownerRepository = $this->repositories->get($config->ownerModel);
+
+        if ($side->type() === 'owner') {
+            $preloadRepository = $ownerRepository;
+            $queryField = $ownerRepository->idField();
+            $resultField = $config->ownerKey;
+        } else {
+            $preloadRepository = $itemRepository;
+            $queryField = $config->ownerKey;
+            $resultField = $ownerRepository->idField();
+        }
+
+        $query = $preloadRepository->databaseSelectQuery();
+        $this->planners->in()->result(
+                                        $query,
+                                        $queryField,
+                                        $resultStepLoader->reusableResult(),
+                                        $resultField,
+                                        $preloadPlan
+                                    );
+
+        $preloadStep = $this->steps->reusableResult($query);
+        $preloadPlan->add($preloadStep);
+        $loader = $this->loaders->reusableResult($preloadRepository, $preloadStep);
+        return $this->relationship->preloader($side, $loader);
+    }
+
+    public function removeItemsOwner($config, $items) {
+
+        if (!is_array($items)) {
+            $items = array($items);
+        }
+
+        foreach ($items as $item)
+        {
+            $property = $this->getPropertyIfLoaded($item, $config->itemProperty);
+
+            if ($property === null)
+                continue;
+
+            $owner = $property->value();
+
+            if ($owner !== null) {
+                $property->setValue(null);
+            }
+
+        }
+
+    }
     public function removeOwnerItems(){}
     public function removeAllOwnerItems(){}
 }

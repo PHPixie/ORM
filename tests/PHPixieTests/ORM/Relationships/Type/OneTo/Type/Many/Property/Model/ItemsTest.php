@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model\Items
  */
-class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Property\ModelTest
+class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\ModelTest
 {
     /**
      * @covers ::add
@@ -74,5 +74,23 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Pro
     protected function getValue()
     {
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Proxy\Editable');
+    }
+    
+    
+    protected function handler()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Handler');
+    }
+
+    protected function side()
+    {
+        $side = $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Side');
+        $this->method($side, 'config', $this->config, array());
+        return $side;
+    }
+    
+    protected function config()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Side\Config');
     }
 }

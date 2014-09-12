@@ -2,31 +2,25 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
 
-class Owner extends \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model
+class Owner extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model\Single
 {
-    public function set($owner)
+    protected function linkPlan($owner)
     {
-        if($owner === null || $owner->isDeleted())
-            return $this->remove();
-        
-        $config = $this->side->config();
-        $plan = $this->handler->linkPlan($config, $owner, $this->model);
-        $plan->execute();
-        $this->handler->setItemsOwner($config, $owner, $this->model);
-        return $this;
+        return $this->handler->linkPlan($this->side->config(), $owner, $this->model);
     }
     
-    public function remove()
+    protected function setProperties($owner)
     {
-        $config = $this->side->config();
-        $plan = $this->handler->unlinkItemsPlan($config, $this->model);
-        $plan->execute();
-        $this->handler->removeItemsOwner($config, $this->model);
-        return $this;
+        return $this->handler->addOwnerItems($this->side->config(), $owner, $this->model);
     }
     
-    public function asData($recursive = true)
+    protected function unlinkPlan()
     {
-        return $this->model->asObject($recursive);
+        return $this->handler->unlinkItemsPlan($this->side->config(), $this->model);
+    }
+    
+    protected function unsetProperties()
+    {
+        return $this->handler->removeItemOwner($this->side->config(), $this->model);
     }
 }

@@ -9,21 +9,21 @@ class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Que
         $plan = $this->handler->linkPlan($this->config, $this->query, $items);
         $plan->execute();
         $this->handler->resetItemsProperties($this->config, $items);
+        return $this;
     }
 
     public function remove($items)
     {
-        if ($items === null)
-            return;
-
         $plan = $this->handler->unlinkPlan($this->config, $this->query, $items);
         $plan->execute();
         $this->handler->resetItemsProperties($this->config, $items);
+        return $this;
     }
 
     public function removeAll()
     {
-        $plan = $this->handler->unlinkPlan($this->config, $this->query, null);
+        $plan = $this->handler->unlinkItemsPlan($this->config, $this->query, null);
         $plan->execute();
+        return $this;
     }
 }

@@ -187,28 +187,5 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         return $this->relationship->preloader($side, $loader);
     }
 
-    public function removeItemsOwner($config, $items) {
-
-        if (!is_array($items)) {
-            $items = array($items);
-        }
-
-        foreach ($items as $item)
-        {
-            $property = $this->getPropertyIfLoaded($item, $config->itemProperty);
-
-            if ($property === null)
-                continue;
-
-            $owner = $property->value();
-
-            if ($owner !== null) {
-                $property->setValue(null);
-            }
-
-        }
-
-    }
-    public function removeOwnerItems(){}
-    public function removeAllOwnerItems(){}
+  
 }

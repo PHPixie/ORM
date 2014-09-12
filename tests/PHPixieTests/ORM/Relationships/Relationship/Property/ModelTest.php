@@ -67,7 +67,7 @@ abstract class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
          $this->assertLoaded(true, $value);
          $this->assertEquals($value, $property());
 
-        $this->prepareLoad();
+         $this->prepareLoad();
          $this->assertEquals($this->value, $property->reload());
          $this->assertLoaded(true, $this->value);
          $property->reset();

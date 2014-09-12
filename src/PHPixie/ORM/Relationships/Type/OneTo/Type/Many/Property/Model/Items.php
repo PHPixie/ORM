@@ -2,14 +2,14 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
 
-class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model
+class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model
 {
     public function add($items)
     {
         $config = $this->side->config();
         $plan = $this->handler->linkPlan($config, $this->model, $items);
         $plan->execute();
-        $this->handler->setItemsOwner($config, $this->model, $items);
+        $this->handler->addOwnerItems($config, $this->model, $items);
         return $this;
     }
 

@@ -56,10 +56,21 @@ class Handler
 
         return $resultStep;
     }
-
+    
+    protected function getPropertyIfLoaded($model, $propertyName)
+    {
+        $property = $model->relationshipProperty($propertyName);
+        if ($property === null || !$property->isLoaded())
+            return null;
+        return $property;
+    }
+    
+    
     public function handleDeletion($modelName, $side, $resultStep, $plan)
     {
 
     }
+    
+
 
 }

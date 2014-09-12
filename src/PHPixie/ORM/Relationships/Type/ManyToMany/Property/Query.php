@@ -6,7 +6,7 @@ class Query extends \PHPixie\ORM\Relationships\Relationship\Property\Query
 {
     public function query()
     {
-        return $this->handler->query($this->side, $this->query);
+        return $this->handler->query($this->side, $this->model);
     }
 
     public function add($items)

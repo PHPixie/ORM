@@ -223,6 +223,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             $items = array($items);
 
         foreach($items as $item) {
+            if($item instanceof \PHPixie\ORM\Query)
+                continue;
             $property = $this->getPropertyIfLoaded($item, $itemsProperty);
             if($property !== null)
                 $property->reset();
@@ -267,13 +269,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         }
     }
 
-    protected function getPropertyIfLoaded($model, $propertyName)
-    {
-        $property = $model->relationshipProperty($propertyName);
-        if ($property === null || !$property->isLoaded())
-            return null;
-        return $property;
-    }
+
     public function handleDeletion($modelName, $side, $resultStep, $plan)
     {
         $config = $side->config();

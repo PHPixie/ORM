@@ -8,7 +8,7 @@ class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Que
     {
         $plan = $this->handler->linkPlan($this->config, $this->query, $items);
         $plan->execute();
-        $this->handler->resetItemsProperties($this->config, $items);
+        $this->handler->resetProperties($this->side, $items);
         return $this;
     }
 
@@ -16,7 +16,7 @@ class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Que
     {
         $plan = $this->handler->unlinkPlan($this->config, $this->query, $items);
         $plan->execute();
-        $this->handler->resetItemsProperties($this->config, $items);
+        $this->handler->resetProperties($this->side, $items);
         return $this;
     }
 

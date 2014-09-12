@@ -16,143 +16,127 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
 
         return $this->loaders->editable($loader);
     }
-    
+
     public function addOwnerItems($config, $owner, $items)
     {
         $this->processOwner('add', $config, $owner, $items);
         $this->processItems('set', $config, $items, $owner);
     }
-    
+
     public function removeOwnerItems($config, $owner, $items)
     {
         $this->processOwner('remove', $config, $owner, $items);
-        $this->processItems('remove', $config, $items, $owner);
+        $this->processItems('remove', $config, $items);
     }
-    
-    public function removeAllOwnerItems($config, $owner)
-    {
-        $this->processAllOwnerItems('remove', $config, $owner);
-    }
-    
-    public function resetProperties($side, $items)
-    {
-        if($side->type() === 'owner') {
-            $this->processOwner('reset', $config, $items);
-        }else{
-            $this->processItems('reset', $config, $items);
-        }
-        
-        foreach($
-    }
-    
+
     public function removeItemOwner($config, $item)
     {
         $this->processItems('remove', $config, $item);
     }
-        
-    public function resetItemsProperties($config, $items)
-    {
-        $this->processItems('reset', $config, $items);
-    }
-    
-    protected function processAllOwnerItems($action, $owner)
+
+    public function removeAllOwnerItems($config, $owner)
     {
         $property = $this->getLoadedProperty($owner, $config->ownerProperty);
         if($property === null)
             return;
-        
+
         $loader = $property->value();
         $items = $loader->usedModels();
-        
-        if($action === 'remove') {
-            $loader->removeAll();
-        }else {
-            $property->reset();
-        }
-        
+
+        $loader->removeAll();
         $this->processItems($action, $config, $items, null, false);
     }
-    
-    protected function processOwner($action, $config, $owner, $items)
+
+    public function resetProperties($side, $items)
     {
-        if(!is_array($items))
-            $items = array($items);
-        
-        if($owner instanceof \PHPixie\ORM\Query)
-            return;
-        
-        $property = $this->getLoadedProperty($owner, $config->ownerProperty);
-        if($property === null)
-            return;
-        
-        foreach($items as $item) {
-            if($item instanceof \PHPixie\ORM\Query) {
-                $property->reset();
-                return;
-            }
-        }
-        
-        $loader = $property->value();
-        
-        if($action === 'add') {
-            $property->add($items);
+        if($side->type() === 'owner') {
+            $this->resetOwnerProperties($config, $items);
         }else{
-            $property->remove($items);
+            $this->processItems('reset', $config, $items);
         }
-        
     }
-    
-    protected function processItems($action, $config, $items, $owner = null, $processOldOwner = true)
+
+    protected function resetOwnerProperties ($config, $owners)
+    {
+        if(!is_array($owners))
+            $owners = array($owners);
+
+        foreach($owners as $owner) {
+            $this->processOwner('reset', $config, $owner)
+
+        }
+
+    }
+
+    protected function processItems($action, $config, $items, $owner = null)
     {
         if(!is_array($items))
             $items = array($items);
-        
-        if ($owner !== null && $owner instanceof \PHPixie\ORM\Query)
+
+        if($action == 'set' && $owner instanceof \PHPixie\ORM\Query)
             $action = 'reset';
-        
+
+        $property = $item->relationshipProperty($config->itemProperty);
+
         foreach($items as $item) {
             if($item instanceof \PHPixie\ORM\Query)
                 continue;
-            
-            $property = $item->relationshipProperty($config->itemProperty);
-            
-            $oldOwner = null;
-            
-            if($pocessOldOwner && $property->isLoaded()) {
+
+            if($property->isLoaded()) {
                 $oldOwner = $property->value();
-                if($oldOwner && $oldOwner === $owner){
-                    $this->processOldOwner($action, $config, $oldOwner, $owner);
+
+                if($oldOwner !==null ) {
+
+                    if( !($action === 'set' && $owner->id() === $oldOwner->id()) )
+                        $this->processOwner('remove', $config, $oldOwner, $item);
                 }
             }
-            
+
             if($action === 'reset') {
                 $property->reset();
-                
-            }elseif($action == 'set') {
+
+            }elseif($action === 'set') {
                 $property->setValue($owner);
-                
-            }elseif($action = 'remove') {
-                $propety->setValue(null);
-                
+
+            }else{
+                $property->setValue(null);
+
             }
-            
         }
     }
-    
-    protected function processOldOwner($itemAction, $config, $oldOwner, $owner)
+
+    protected function processOwner($action, $config, $owner, $items = array())
     {
-        $remove = true;
-        
-        if($owner !== null) {
-            
-            $sameId = $oldOwner->id() === $owner->id();
-        
-            $remove = $itemAction === 'set' && !$sameId;
-            $remove = $remove || ( $itemAction === 'remove' && $sameId );
+        if(!is_array($items))
+            $items = array($items);
+
+        if($owner instanceof \PHPixie\ORM\Query)
+            return;
+
+        $property = $this->getLoadedProperty($owner, $config->ownerProperty);
+        if($property === null)
+            return;
+
+        foreach($items as $item) {
+            if($item instanceof \PHPixie\ORM\Query) {
+                $action = 'reset'
+                return;
+            }
         }
-        
-        if($remove)
-            $this->processOwner('remove', $config, $oldOwner, $item);
+
+        $loader = $property->value();
+
+        if($action === 'reset') {
+            $property->reset();
+
+        if($action === 'add') {
+            $loader->add($items);
+
+        }else{
+            $loader->remove($items);
+
+        }
+
     }
-    
+
 }

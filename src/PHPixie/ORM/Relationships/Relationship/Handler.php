@@ -34,7 +34,7 @@ class Handler
             return null;
 
         $property = $model->relationshipProperty($propertyName, false);
-        if ($property === null || !$property->loaded())
+        if ($property === null || !$property->isLoaded())
             return null;
 
         return $property;

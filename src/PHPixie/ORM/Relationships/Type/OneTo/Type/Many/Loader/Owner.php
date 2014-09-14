@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Loader;
 
-class Owner extends \PHPixie\ORM\Loaders\Loader
+class Owner extends \PHPixie\ORM\Loaders\Loader\Proxy
 {
     protected $loader;
     protected $itemPropertyName;
@@ -11,9 +11,8 @@ class Owner extends \PHPixie\ORM\Loaders\Loader
 
     public function __construct($loaders, $loader, $itemPropertyName, $owner)
     {
-        parent::__construct($loaders);
-        $this->loader = $loader;
-        $this->ownerPropertyName = $ownerPropertyName;
+        parent::__construct($loaders, $loader);
+        $this->itemPropertyName = $itemPropertyName;
         $this->owner = $owner;
     }
 

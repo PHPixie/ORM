@@ -14,7 +14,6 @@ class Preloading extends \PHPixie\ORM\Loaders\Loader\Proxy
     public function getPreloader($relationship)
     {
         if(array_key_exists($relationship, $this->preloaders))
-
             return $this->preloaders[$relationship];
 
         return null;

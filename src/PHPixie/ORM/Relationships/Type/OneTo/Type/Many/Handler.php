@@ -4,16 +4,18 @@ namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many;
 
 class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
 {
-    public function loadProperty($side, $related)
+    public function loadOwnerProperty($side, $related)
     {
-        if($side === 'owner')
-
-            return  parent::loadProperty($side, $related);
-
+        if($side->type() === 'owner')
+            return parent::loadSingleProperty($side, $related);
+    }
+    
+    public function loadItemsProperty($side, $related)
+    {
         $loader = $this->query($side, $related)->findAll();
-        if ($related instanceof \PHPixie\ORM\Model)
-            $loader = $this->relationshipType->ownerLoader($loader, $side->config()->itemProperty, $related);
-
+        $loader = $this->ensurePreloadingLoader($loader);
+        $preloader = $this->relationshipType->ownerPropertyPrloader($loader, $related);
+        $loader->addPreloader($side->config()->itemProperty, $preloader);
         return $this->loaders->editable($loader);
     }
 
@@ -41,14 +43,16 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
             return;
 
         $loader = $property->value();
-        $items = $loader->usedModels();
+        $items = $loader->accessedModels();
 
         $loader->removeAll();
-        $this->processItems($action, $config, $items, null, false);
+        $this->processItems('remove', $config, $items, null, false);
     }
 
     public function resetProperties($side, $items)
     {
+        $config = $side->config();
+        
         if($side->type() === 'owner') {
             $this->resetOwnerProperties($config, $items);
         }else{
@@ -62,13 +66,13 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
             $owners = array($owners);
 
         foreach($owners as $owner) {
-            $this->processOwner('reset', $config, $owner)
+            $this->processOwner('reset', $config, $owner);
 
         }
 
     }
 
-    protected function processItems($action, $config, $items, $owner = null)
+    protected function processItems($action, $config, $items, $owner = null, $processOldOwner = true)
     {
         if(!is_array($items))
             $items = array($items);
@@ -76,15 +80,16 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
         if($action == 'set' && $owner instanceof \PHPixie\ORM\Query)
             $action = 'reset';
 
-        $property = $item->relationshipProperty($config->itemProperty);
-
         foreach($items as $item) {
             if($item instanceof \PHPixie\ORM\Query)
                 continue;
-
-            if($property->isLoaded()) {
+            
+            $property = $item->relationshipProperty($config->itemProperty, $action !== 'reset');
+            if($property === null)
+                continue;
+            
+            if($processOldOwner && $property->isLoaded()) {
                 $oldOwner = $property->value();
-
                 if($oldOwner !==null ) {
 
                     if( !($action === 'set' && $owner->id() === $oldOwner->id()) )
@@ -119,8 +124,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
 
         foreach($items as $item) {
             if($item instanceof \PHPixie\ORM\Query) {
-                $action = 'reset'
-                return;
+                $action = 'reset';
+                break;
             }
         }
 
@@ -129,7 +134,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
         if($action === 'reset') {
             $property->reset();
 
-        if($action === 'add') {
+        }elseif($action === 'add') {
             $loader->add($items);
 
         }else{

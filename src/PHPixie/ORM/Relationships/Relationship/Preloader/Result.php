@@ -6,7 +6,14 @@ abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Preloader
 {
     protected $idOffsets;
     protected $mapped = false;
-
+    protected $side;
+    
+    public function __construct($side, $loader)
+    {
+        parent::__construct($loader);
+        $this->side = $side;
+    }
+    
     public function getModel($id)
     {
         $this->ensureMapped();

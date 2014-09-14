@@ -16,7 +16,14 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     );
 
     protected $itemSide;
+    protected $propertyConfig;
 
+    public function setUp()
+    {
+        $this->propertyConfig = $this->config($this->configData);
+        parent::setUp();
+    }
+    
     /**
      * @covers ::query
      * @covers ::<protected>
@@ -306,7 +313,17 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $this->method($repository, 'query', $query, array(), 0);
         $this->method($query, 'related', $query, array($data[$type.'Property'], $related), 0);
     }
-
+    
+    protected function prepareLoadSingleProperty($side, $related)
+    {
+        $model = $this->getDatabaseModel();
+        $query = $this->getQuery();
+        
+        $this->prepareQuery($side, $query, $related);
+        $this->method($query, 'findOne', $model, array());
+        return $model;
+    }
+    
     protected function getQuery()
     {
         return $this->quickMock('\PHPixie\ORM\Query');
@@ -316,6 +333,38 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     {
         return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database');
     }
-
+    
+    protected function addSingleProperty($model, $type, $propertyExists = true, $loaded = false, $owner = null, $expectCreateMissing = null)
+    {
+        $property = null;
+        if($propertyExists) {
+            $property = $this->getSingleProperty($type);
+            $this->method($property, 'isLoaded', $loaded, array());
+        
+            if($loaded) {
+                $this->method($property, 'value', $owner, array());
+            }
+        }
+        $propertyName = $this->configData[$type.'Property'];
+        
+        $with = array($propertyName);
+        if($expectCreateMissing !== null)
+            $with[]=$expectCreateMissing;
+        
+        $this->method($model, 'relationshipProperty', $property, array($propertyName), null, true);
+        return array(
+            'model'    => $model,
+            'property' => $property,
+            'owner'    => $owner
+        );
+    }
+    
+    protected function getDatabaseModel()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database\Model');
+    }
+    
+    abstract protected function getSingleProperty($type);
+    
     abstract protected function getPreloader($type);
 }

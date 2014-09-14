@@ -186,6 +186,10 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $loader = $this->loaders->reusableResult($preloadRepository, $preloadStep);
         return $this->relationship->preloader($side, $loader);
     }
-
+    
+    protected function loadSingleProperty($side, $related)
+    {
+        return $this->query($side, $related)->findOne();
+    }
   
 }

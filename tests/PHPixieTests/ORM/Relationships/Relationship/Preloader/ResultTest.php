@@ -9,6 +9,14 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\P
 {
     protected $models = array();
     protected $preloadedModels = array();
+    protected $side;
+    protected $loaders;
+    
+    public function setUp()
+    {
+        $this->side = $this->side();
+        parent::setUp();
+    }
     
     /**
      * @covers ::getModel
@@ -37,6 +45,27 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\P
                 }));
     }
     
+    protected function mapConfig($config, $data)
+    {
+        $config
+            ->expects($this->any())
+            ->method('get')
+            ->will($this->returnCallback(function($key) use($data){
+                return $data[$key];
+            }));
+        foreach($data as $key => $value)
+            $config->$key = $value;
+    }
+    
+    protected function side()
+    {
+        $config = $this->getConfig();
+        $this->mapConfig($config, $this->configData);
+        $side = $this->getSide();
+        $this->method($side, 'config', $config, array());
+        return $side;
+    }
+    
     protected function getReusableResult()
     {
         return $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
@@ -52,5 +81,7 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\P
         return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database');
     }
     
+    abstract protected function getSide();
+    abstract protected function getConfig();
     abstract protected function prepareMap();
 }

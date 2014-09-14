@@ -7,6 +7,14 @@ namespace PHPixieTests\ORM\Relationships\Relationship\Preloader\Result;
  */
 abstract class singleTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\ResultTest
 {
+    protected $loaders;
+    
+    public function setUp()
+    {
+        $this->loaders = $this->quickMock('\PHPixie\ORM\Loaders');
+        parent::setUp();
+    }
+    
     protected $map = array(
         1 => 5,
         2 => 6,

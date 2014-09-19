@@ -8,7 +8,7 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo;
 abstract class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\SideTest
 {
     protected $type = 'owner';
-    protected $relationshipType = 'oneToMany';
+    protected $relationshipType;
     protected $itemSideName;
     protected $ownerProperty;
 
@@ -53,8 +53,8 @@ abstract class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Sid
         $config->ownerModel = 'fairy';
         $config->itemModel  = 'flower';
 
-        $config->ownerProperty = $this->ownerProperty;
-        $config->itemProperty  = 'pixie';
+        $this->method($config, 'ownerProperty', $this->ownerProperty, array());
+        $config->itemOwnerProperty  = 'pixie';
 
         return $config;
     }

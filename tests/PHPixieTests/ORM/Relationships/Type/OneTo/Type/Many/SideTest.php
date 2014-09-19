@@ -9,10 +9,11 @@ class SideTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\SideTest
 {
     protected $itemSideName = 'items';
     protected $ownerProperty = 'flowers';
+    protected $relationshipType = 'oneToMany';
 
     protected function getConfig()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Config');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Side\Config');
     }
 
     protected function getSide($type)

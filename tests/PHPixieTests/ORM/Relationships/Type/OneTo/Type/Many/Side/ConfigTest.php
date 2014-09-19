@@ -8,7 +8,9 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Side;
 class ConfigTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Side\ConfigTest
 {
     protected $itemOptionName = 'items';
+    protected $ownerProperty  = 'ownerItemsProperty';
     protected $defaultOwnerProperty = 'flowers';
+    
     protected $plural = array(
         'flower' => 'flowers'
     );

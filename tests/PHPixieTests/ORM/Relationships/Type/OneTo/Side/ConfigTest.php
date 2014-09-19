@@ -8,6 +8,7 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Side;
 abstract class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\Side\ConfigTest
 {
     protected $itemOptionName;
+    protected $ownerProperty;
     protected $defaultOwnerProperty;
 
     public function setUp()
@@ -21,11 +22,11 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\S
                 'ownerModel'       => 'fairy',
                 'itemModel'        => 'flower',
                 
-                'ownerKey'          => 'fairy_id',
-
-                'ownerProperty'    => $this->defaultOwnerProperty,
-                'itemProperty'     => 'fairy',
+                'ownerKey'         => 'fairy_id',
                 'onDelete'         => 'update',
+                
+                $this->ownerProperty    => $this->defaultOwnerProperty,
+                'itemOwnerProperty'     => 'fairy'
             )
         );
 
@@ -47,13 +48,20 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\S
                 'itemModel'        => 'flower',
                 
                 'ownerKey'          => 'owner_id',
-
-                'ownerProperty'    => 'plants',
-                'itemProperty'     => 'pixie',
                 'onDelete'         => 'delete',
+                
+                $this->ownerProperty    => 'plants',
+                'itemOwnerProperty'     => 'pixie'
+                
             )
         );
 
         parent::setUp();
+    }
+    
+    public function testOwnerProperty()
+    {
+        $data = $this->sets[0][1];
+        $this->assertEquals($data[$this->ownerProperty], $this->config->ownerProperty());
     }
 }

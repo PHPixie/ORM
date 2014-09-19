@@ -8,7 +8,14 @@ abstract class IdMap extends \PHPixie\ORM\Relationships\Relationship\Preloader\R
 
     protected function getMappedFor($model)
     {
-        $ids = $this->idMap[$model->id()];
+        $modelId = $model->id();
+        
+        if(array_key_exists($modelId, $this->idMap)) {
+            $ids = $this->idMap[$model->id()];
+        }else{
+            $ids = array();
+        }
+        
         $loader = $this->buildLoader($ids);
         return $this->loaders->editableProxy($loader);
     }

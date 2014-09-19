@@ -11,7 +11,7 @@ class Owner extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model\Single
     
     protected function setProperties($owner)
     {
-        return $this->handler->addOwnerItems($this->side->config(), $owner, $this->model);
+        $this->handler->addOwnerItems($this->side->config(), $owner, $this->model);
     }
     
     protected function unlinkPlan()
@@ -21,6 +21,6 @@ class Owner extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model\Single
     
     protected function unsetProperties()
     {
-        return $this->handler->removeItemOwner($this->side->config(), $this->model);
+        $this->handler->removeItemOwner($this->side->config(), $this->model);
     }
 }

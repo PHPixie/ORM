@@ -2,18 +2,38 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Type\One\Property;
 
-abstract class Model extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model
+class Model extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model\Single
 {
-    protected function processSet($owner, $item)
+    
+    protected function linkPlan($value)
     {
-        if ($owner !== null && $item !== null) {
-            $plan = $this->handler->linkPlan($this->config, $owner, $item);
-        }else
-            $plan = $this->handler->unlinkPlan($this->config, $owner, null);
-
-        $plan->execute();
-        $this->handler->setItemOwner($this->config, $item, $owner);
+        $config = $this->side->config();
+        list($owner, $item) = $this->getSides($value);
+        return $this->handler->linkPlan($config, $owner, $item);
     }
+    
+    protected function setProperties($value)
+    {
+        $config = $this->side->config();
+        list($owner, $item) = $this->getSides($value);
+        $this->handler->linkProperties($config, $owner, $item);
+    }
+    
+    protected function unlinkPlan()
+    {
+        return $this->handler->unlinkPlan($this->side, $this->model);
+    }
+    
+    protected function unsetProperties()
+    {
+        $this->handler->unlinkProperties($this->side, $this->model);
+    }
+    
+    protected function getSides($opposing)
+    {
+        if ($this->side->type() === 'item')
+            return array($this->model, $opposing);
 
-
+        return array($opposing, $this->model);
+    }
 }

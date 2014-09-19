@@ -16,10 +16,19 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     );
 
     protected $itemSide;
+    protected $ownerPropertyName;
     protected $propertyConfig;
 
     public function setUp()
     {
+        $this->configData = array(
+            'ownerModel'        => 'fairy',
+            'itemModel'         => 'flower',
+            'ownerKey'          => 'fairy_id',
+            'itemOwnerProperty' => 'fairy',
+            $this->ownerPropertyName => 'items',
+        );
+        
         $this->propertyConfig = $this->config($this->configData);
         parent::setUp();
     }
@@ -199,46 +208,6 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     }
 
 
-    /**
-     * @covers ::unlinkPlan
-     * @covers ::<protected>
-     */
-    public function testUnlinkPlan()
-    {
-        $config = $this->config($this->configData);
-        $owners = $this->getModel();
-        $items = $this->getModel();
-
-        $plan = $this->prepareUnlinkTest(true, $owners, true, $items);
-        $this->assertsame($plan, $this->handler->unlinkPlan($config, $owners, $items));
-    }
-
-    /**
-     * @covers ::unlinkItemsPlan
-     * @covers ::<protected>
-     */
-    public function testUnlinkItemsPlan()
-    {
-        $config = $this->config($this->configData);
-        $items = $this->getModel();
-
-        $plan = $this->prepareUnlinkTest(false, null, true, $items);
-        $this->assertsame($plan, $this->handler->unlinkItemsPlan($config, $items));
-    }
-
-    /**
-     * @covers ::unlinkOwnersPlan
-     * @covers ::<protected>
-     */
-    public function testUnlinkOwnersPlan()
-    {
-        $config = $this->config($this->configData);
-        $owners = $this->getModel();
-
-        $plan = $this->prepareUnlinkTest(true, $owners, false, null);
-        $this->assertsame($plan, $this->handler->unlinkOwnersPlan($config, $owners));
-    }
-
     protected function prepareAddCollectionQuery($query, $type, $items, $plan, $inPlanner, $queryField = null, $inPlannerOffset = 0, $plannersOffset = 0, $repositoryOffset = 1)
     {
         if($queryField === null)
@@ -311,7 +280,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $repository = $this->getRepository();
         $this->method($this->repositories, 'get', $repository, array($data[$type.'Model']), 0);
         $this->method($repository, 'query', $query, array(), 0);
-        $this->method($query, 'related', $query, array($data[$type.'Property'], $related), 0);
+        $this->method($query, 'related', $query, array($this->propertyName($type), $related), 0);
     }
     
     protected function prepareLoadSingleProperty($side, $related)
@@ -345,7 +314,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
                 $this->method($property, 'value', $owner, array());
             }
         }
-        $propertyName = $this->configData[$type.'Property'];
+        $propertyName = $this->propertyName($type);
         
         $with = array($propertyName);
         if($expectCreateMissing !== null)
@@ -357,6 +326,39 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             'property' => $property,
             'owner'    => $owner
         );
+    }
+    
+    protected function expectSetValue($itemMock, $valueMock = null)
+    {
+        $value = null;
+        if($valueMock !== null)
+            $value = $valueMock['model'];
+        $itemMock['property']
+            ->expects($this->once())
+            ->method('setValue')
+            ->with($this->identicalTo($value));
+    }
+    
+    protected function expectsExactly($mock, $method, $exactly)
+    {
+        $mock
+            ->expects($this->exactly($exactly))
+            ->method($method)
+            ->with();
+    }
+    
+    protected function config($map, $methodMap = array())
+    {
+        $methodMap['ownerProperty'] = $this->configData[$this->ownerPropertyName];
+        return parent::config($map, $methodMap);
+    }
+    
+    protected function propertyName($type)
+    {
+        if($type === 'owner')
+            return $this->configData[$this->ownerPropertyName];
+        
+        return $this->configData['itemOwnerProperty'];    
     }
     
     protected function getDatabaseModel()

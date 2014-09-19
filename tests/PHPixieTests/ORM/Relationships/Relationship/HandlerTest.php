@@ -81,7 +81,7 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
             $config->$key = $value;
         
         foreach($methodMap as $key => $value)
-            $this->method($config, $key, 'value', array());
+            $this->method($config, $key, $value, array());
         return $config;
     }
 

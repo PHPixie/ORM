@@ -10,10 +10,10 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $config = $side->config();
         if ($side->type() !== 'owner') {
             $model = $config->itemModel;
-            $property = $config->itemProperty;
+            $property = $config->itemOwnerProperty;
         } else {
             $model = $config->ownerModel;
-            $property = $config->ownerProperty;
+            $property = $config->ownerProperty();
         }
 
         $repository = $this->repositories->get($model);
@@ -138,21 +138,6 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         $deleteStep = $this->steps->query($query);
         $plan->add($deleteStep);
-    }
-
-    public function unlinkPlan($config, $owners, $items)
-    {
-        return $this->getUnlinkPlan($config, true, $owners, true, $items);
-    }
-
-    public function unlinkItemsPlan($config, $items)
-    {
-        return $this->getUnlinkPlan($config, false, null, true, $items);
-    }
-
-    public function unlinkOwnersPlan($config, $owners)
-    {
-        return $this->getUnlinkPlan($config, true, $owners, false, null);
     }
 
     public function mapPreload($side, $resultStepLoader, $preloadPlan)

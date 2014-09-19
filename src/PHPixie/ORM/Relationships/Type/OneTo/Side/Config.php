@@ -7,26 +7,36 @@ abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Side\Confi
     public $ownerModel;
     public $itemModel;
     public $ownerKey;
-    public $ownerProperty;
-    public $itemProperty;
+    public $itemOwnerProperty;
     public $onDelete;
 
     protected function processConfig($config, $inflector)
     {
         $itemOptionName = $this->itemOptionName();
+        $itemPropertyName = $this->ownerPropertyName();
+        
         $this->ownerModel = $config->get('owner');
         $this->itemModel = $config->get($itemOptionName);
 
         $itemOptionsPrefix = $itemOptionName.'Options';
-        $this->itemProperty = $config->get($itemOptionsPrefix.'.property', $this->ownerModel);
-        $this->ownerKey = $config->get($itemOptionsPrefix.'.ownerKey', $this->itemProperty.'_id');
+        $this->itemOwnerProperty = $config->get($itemOptionsPrefix.'.ownerProperty', $this->ownerModel);
+        $this->ownerKey = $config->get($itemOptionsPrefix.'.ownerKey', $this->itemOwnerProperty.'_id');
         $this->onDelete = $config->get($itemOptionsPrefix.'.onOwnerDelete', 'update');
 
-        $this->ownerProperty = $config->get('ownerOptions.property', null);
-        if ($this->ownerProperty === null)
-            $this->ownerProperty = $this->defaultOwnerProperty($inflector);
+        $itemProperty = $config->get('ownerOptions.'.$itemOptionName.'Property', null);
+        if ($itemProperty === null)
+            $itemProperty = $this->defaultOwnerProperty($inflector);
+        
+        $this->$itemPropertyName = $itemProperty;
     }
-
+    
+    public function ownerProperty()
+    {
+        $property = $this->ownerPropertyName();
+        return $this->$property;
+    }
+    
     abstract protected function itemOptionName();
+    abstract protected function ownerPropertyName();
     abstract protected function defaultOwnerProperty($inflector);
 }

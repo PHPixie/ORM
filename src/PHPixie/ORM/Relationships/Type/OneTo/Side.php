@@ -15,9 +15,9 @@ abstract class Side extends \PHPixie\ORM\Relationships\Relationship\Side
     public function propertyName()
     {
         if ($this->type === 'owner')
-            return $this->config->ownerProperty;
+            return $this->config->ownerProperty();
 
-        return $this->config->itemProperty;
+        return $this->config->itemOwnerProperty;
     }
 
     public function handleDeletions()

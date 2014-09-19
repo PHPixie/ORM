@@ -7,11 +7,6 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Preloader;
  */
 class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Preloader\OwnerTest
 {
-    protected function relationship()
-    {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneToMany');
-    }
-    
     protected function getConfig()
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Side\Config');
@@ -25,8 +20,6 @@ class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Preloader\Own
     protected function preloader()
     {
         return new \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\Owner(
-            $this->loaders,
-            $this->relationship,
             $this->side,
             $this->loader
         );

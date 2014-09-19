@@ -13,6 +13,11 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Pro
      */
     public function testSet()
     {
+        $this->setTest();
+    }
+    
+    protected function setTest()
+    {
         $value = $this->getValue();
         $this->method($value, 'isDeleted', false, array(), 0);
         $plan = $this->prepareLinkPlan($value);

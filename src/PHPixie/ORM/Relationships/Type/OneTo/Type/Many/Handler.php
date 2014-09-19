@@ -6,8 +6,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
 {
     public function loadOwnerProperty($side, $related)
     {
-        if($side->type() === 'owner')
-            return parent::loadSingleProperty($side, $related);
+        return parent::loadSingleProperty($side, $related);
     }
     
     public function loadItemsProperty($side, $related)
@@ -38,7 +37,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
 
     public function removeAllOwnerItems($config, $owner)
     {
-        $property = $this->getLoadedProperty($owner, $config->ownerProperty);
+        $property = $this->getLoadedProperty($owner, $config->ownerProperty());
         if($property === null)
             return;
 
@@ -59,7 +58,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
             $this->processItems('reset', $config, $items);
         }
     }
-
+    
     protected function resetOwnerProperties ($config, $owners)
     {
         if(!is_array($owners))
@@ -84,7 +83,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
             if($item instanceof \PHPixie\ORM\Query)
                 continue;
             
-            $property = $item->relationshipProperty($config->itemProperty, $action !== 'reset');
+            $property = $item->relationshipProperty($config->itemOwnerProperty, $action !== 'reset');
             if($property === null)
                 continue;
             
@@ -118,7 +117,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
         if($owner instanceof \PHPixie\ORM\Query)
             return;
 
-        $property = $this->getLoadedProperty($owner, $config->ownerProperty);
+        $property = $this->getLoadedProperty($owner, $config->ownerProperty());
         if($property === null)
             return;
 
@@ -142,6 +141,21 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
 
         }
 
+    }
+    
+    public function unlinkPlan($config, $owners, $items)
+    {
+        return $this->getUnlinkPlan($config, true, $owners, true, $items);
+    }
+
+    public function unlinkItemsPlan($config, $items)
+    {
+        return $this->getUnlinkPlan($config, false, null, true, $items);
+    }
+
+    public function unlinkOwnersPlan($config, $owners)
+    {
+        return $this->getUnlinkPlan($config, true, $owners, false, null);
     }
 
 }

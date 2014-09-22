@@ -11,22 +11,28 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
     
     public function linkPlan($config, $owner, $item)
     {
-        $plan = $this->unlinkPlan($config, $owner);
+        $plan = $this->getUnlinkPlan($config, true, $owner, true, $item, 'or');
         $linkPlan = parent::linkPlan($config, $owner, $item);
         $plan->appendPlan($linkPlan);
 
         return $plan;
     }
     
-    public function unlinkPlan($side, $model)
+    public function unlinkPlan($side, $items)
     {
-        //return $this->getUnlinkPlan($config, true, $owners, false, null);
+        $config = $side->config();
+        
+        if($side->type() === 'owner') {
+            return $this->getUnlinkPlan($config, false, null, true, $items);
+        }else{
+            return $this->getUnlinkPlan($config, true, $items, false, null);
+        }
     }
 
-    public function setItemOwner($config, $item, $owner)
+    public function linkProperties($config, $owner, $item)
     {
-        $this->linkProperty($item, $config->itemProperty, $config->ownerProperty, $owner);
-        $this->linkProperty($owner, $config->ownerProperty, $config->itemProperty, $item);
+        $this->processProperty('item', $config, $owner, 'set', $item);
+        $this->processProperty('owner', $config, $item, 'set', $owner);
     }
 
     
@@ -45,15 +51,17 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
         
         $property = $model->relationshipProperty($propertyName);
         
-        if($unlinkRelated)) {
+        if($unsetRelated) {
             
             if($property->isLoaded() && $property->value() !== null) {
-                $this->unlinkSideProperty($opposing, $config, $property->value(), 'set', null, false);
+                $this->processProperty($opposing, $config, $property->value(), 'set', null, false);
             }
         }
+        if($action === 'set' && $value instanceof \PHPixie\ORM\Query)
+            $action = 'reset';
         
         if($action === 'reset') {
-            $propery->reset();
+            $property->reset();
         }else{
             $property->setValue($value);
         }

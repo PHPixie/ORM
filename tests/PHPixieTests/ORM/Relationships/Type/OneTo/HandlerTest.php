@@ -7,18 +7,10 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo;
  */
 abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTest
 {
-    protected $configData = array(
-        'ownerModel'       => 'fairy',
-        'itemModel'        => 'flower',
-        'ownerKey'         => 'fairy_id',
-        'ownerProperty'    => 'items',
-        'itemProperty'     => 'fairy',
-    );
-
     protected $itemSide;
     protected $ownerPropertyName;
     protected $propertyConfig;
-
+    protected $configOnwerProperty;
     public function setUp()
     {
         $this->configData = array(
@@ -26,7 +18,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             'itemModel'         => 'flower',
             'ownerKey'          => 'fairy_id',
             'itemOwnerProperty' => 'fairy',
-            $this->ownerPropertyName => 'items',
+            $this->ownerPropertyName => $this->configOnwerProperty,
         );
         
         $this->propertyConfig = $this->config($this->configData);
@@ -54,40 +46,8 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
      */
     public function testLinkPlan()
     {
-
-        $items = $this->getModel();
-        $owner = $this->getModel();
-
-        $data = $this->configData;
-        $config = $this->config($data);
-
-        $repositories = $this->prepareRepositories();
-        $planners = $this->getPlanners(array('in', 'update'));
-
-        $plan = $this->getPlan();
-        $this->method($this->plans, 'plan', $plan, array(), 0);
-
-        $ownerQuery = $this->getDatabaseQuery();
-        $this->method($repositories['owner'], 'databaseSelectQuery', $ownerQuery, array(), 0);
-        $this->prepareAddCollectionQuery($ownerQuery, 'owner', $owner, $plan, $planners['in']);
-
-        $updateQuery = $this->getDatabaseQuery('update');
-        $this->method($repositories['item'], 'databaseUpdateQuery', $updateQuery, array());
-        $this->prepareAddCollectionQuery($updateQuery, 'item', $items, $plan, $planners['in'], null, 1, 2);
-
-        $this->method($this->planners, 'update', $planners['update'], array(), 4);
-        $this->method($repositories['owner'], 'idField', 'id', array(), 3);
-
-        $this->method($planners['update'], 'subquery', null, array(
-                                                                $updateQuery,
-                                                                array(
-                                                                    $data['ownerKey'] => 'id'
-                                                                ),
-                                                                $ownerQuery,
-                                                                $plan
-                                                            ), 0);
+        $plan = $this->prepareLinkPlan();
         $this->assertSame($plan, $this->handler->linkPlan($config, $owner, $items));
-
     }
 
     /**
@@ -207,8 +167,41 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         }
     }
 
+    protected function prepareLinkPlan($owner, $items, $plansOffset = 0, $ownerRepoOffset = 0, $itemRepoOffset= 0, $plannersOffset = 0)
+    {
+        $ownerRepository = $this->repositories->get($this->configData['ownerModel']);
+        $itemRepository = $this->repositories->get($this->configData['itemModel']);
+        $data = $this->configData;
+        $config = $this->config($data);
 
-    protected function prepareAddCollectionQuery($query, $type, $items, $plan, $inPlanner, $queryField = null, $inPlannerOffset = 0, $plannersOffset = 0, $repositoryOffset = 1)
+        $planners = $this->getPlanners(array('in', 'update'));
+        
+        $plan = $this->getPlan();
+        $this->method($this->plans, 'plan', $plan, array(), $plansOffset);
+
+        $ownerQuery = $this->getDatabaseQuery();
+        $this->method($ownerRepository, 'databaseSelectQuery', $ownerQuery, array(), $ownerRepoOffset++);
+        $this->prepareAddCollectionQuery($ownerQuery, 'owner', $owner, $plan, $planners['in'], null, 'and', 0, $plannersOffset, $ownerRepoOffset);
+
+        $updateQuery = $this->getDatabaseQuery('update');
+        $this->method($itemRepository, 'databaseUpdateQuery', $updateQuery, array(), $itemRepoOffset++);
+        $this->prepareAddCollectionQuery($updateQuery, 'item', $items, $plan, $planners['in'], null, 'and', 1, $plannersOffset + 2, $itemRepoOffset++);
+
+        $this->method($this->planners, 'update', $planners['update'], array(), $plannersOffset + 4);
+        $this->method($ownerRepository, 'idField', 'id', array(), $ownerRepoOffset + 2);
+
+        $this->method($planners['update'], 'subquery', null, array(
+                                                                $updateQuery,
+                                                                array(
+                                                                    $data['ownerKey'] => 'id'
+                                                                ),
+                                                                $ownerQuery,
+                                                                $plan
+                                                            ), 0);
+        return $plan;
+    }
+    
+    protected function prepareAddCollectionQuery($query, $type, $items, $plan, $inPlanner, $queryField = null, $logic = 'and', $inPlannerOffset = 0, $plannersOffset = 0, $repositoryOffset = 1)
     {
         if($queryField === null)
             $queryField = 'id';
@@ -223,18 +216,19 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $this->method($this->planners, 'collection', $collection, array($modelName, $items), $plannersOffset++);
         $this->method($this->planners, 'in', $inPlanner, array(), $plannersOffset++);
 
-        $this->method($inPlanner, 'collection', null, array($query, $queryField, $collection, 'id', $plan), $inPlannerOffset);
+        $this->method($inPlanner, 'collection', null, array($query, $queryField, $collection, 'id', $plan, $logic), $inPlannerOffset);
     }
 
-    protected function prepareUnlinkTest($constrainOwners, $owners, $constrainItems, $items)
+    protected function prepareUnlinkTest($constrainOwners, $owners, $constrainItems, $items, $logic = 'and')
     {
-        $repositories = $this->prepareRepositories();
+        $itemRepository = $this->repositories->get($this->configData['itemModel']);
+        
         $plan = $this->getPlan();
         $this->method($this->plans, 'plan', $plan, array(), 0);
 
         $ownerKey = $this->configData['ownerKey'];
         $updateQuery = $this->getDatabaseQuery('update');
-        $this->method($repositories['item'], 'databaseUpdateQuery', $updateQuery, array(), 0);
+        $this->method($itemRepository, 'databaseUpdateQuery', $updateQuery, array(), 0);
 
         $this->method($updateQuery, 'set', null, array($ownerKey, null), 0);
 
@@ -243,12 +237,12 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $plannersOffset = 0;
 
         if ($constrainItems) {
-            $this->prepareAddCollectionQuery($updateQuery, 'item', $items, $plan, $inPlanner, null, $inPlannerOffset++, $plannersOffset, 1);
+            $this->prepareAddCollectionQuery($updateQuery, 'item', $items, $plan, $inPlanner, null, 'and', $inPlannerOffset++, $plannersOffset, 1);
             $plannersOffset+=2;
         }
 
         if ($constrainOwners) {
-            $this->prepareAddCollectionQuery($updateQuery, 'owner', $owners, $plan, $inPlanner, $ownerKey, $inPlannerOffset++, $plannersOffset, 0);
+            $this->prepareAddCollectionQuery($updateQuery, 'owner', $owners, $plan, $inPlanner, $ownerKey, $logic, $inPlannerOffset++, $plannersOffset, 0);
         }
 
         return $plan;

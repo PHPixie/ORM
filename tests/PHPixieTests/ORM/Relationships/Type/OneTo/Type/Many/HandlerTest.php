@@ -9,6 +9,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
 {
     protected $itemSide = 'items';
     protected $ownerPropertyName = 'ownerItemsProperty';
+    protected $configOnwerProperty = 'flowers';
     
     /**
      * @covers ::loadOwnerProperty
@@ -315,7 +316,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     
     protected function getItem($hasProperty = true, $ownerLoaded = false, $owner = null) {
         $model = $this->getDatabaseModel();
-        return $this->addSingleProperty($model, 'item', $hasProperty, $ownerLoaded, $owner['model']);
+        return $this->addSingleProperty($model, 'owner', $hasProperty, $ownerLoaded, $owner['model']);
     }
     
     protected function getOwner($hasProperty = true, $loaded = true, $id = 1)

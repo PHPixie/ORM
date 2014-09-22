@@ -26,10 +26,12 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         $ownerRepository = $this->repositories->get($config->ownerModel);
         $ownerQuery = $ownerRepository->databaseSelectQuery();
+        
         $this->addCollectionCondition($ownerQuery, $ownerRepository, $owner, $plan);
 
         $itemRepository = $this->repositories->get($config->itemModel);
         $updateQuery = $itemRepository->databaseUpdateQuery();
+        
         $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
 
         $this->planners->update()->subquery(
@@ -43,18 +45,17 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         return $plan;
     }
 
-    protected function addCollectionCondition($query, $repository, $items, $plan, $queryField = null)
+    protected function addCollectionCondition($query, $repository, $items, $plan, $queryField = null, $logic = 'and')
     {
         $idField = $repository->idField();
-
         if($queryField === null)
             $queryField = $idField;
-
+        
         $collection = $this->planners->collection($repository->modelName(), $items);
-        $this->planners->in()->collection($query, $queryField, $collection, $idField, $plan);
+        $this->planners->in()->collection($query, $queryField, $collection, $idField, $plan, $logic);
     }
 
-    protected function getUnlinkPlan($config, $constrainOwners, $owners, $constrainItems, $items)
+    protected function getUnlinkPlan($config, $constrainOwners, $owners, $constrainItems, $items, $logic = 'and')
     {
         $plan = $this->plans->plan();
 
@@ -67,7 +68,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
         if ($constrainOwners) {
             $ownerRepository = $this->repositories->get($config->ownerModel);
-            $this->addCollectionCondition($updateQuery, $ownerRepository, $owners, $plan, $config->ownerKey);
+            $this->addCollectionCondition($updateQuery, $ownerRepository, $owners, $plan, $config->ownerKey, $logic);
         }
 
 

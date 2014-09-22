@@ -2,28 +2,37 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Side;
 
-class Config extends PHPixie\ORM\Relationships\Relationship\Side\Config
+abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Side\Config
 {
     public $ownerModel;
-    public $ownerProperty;
     public $itemModel;
     public $path;
 
     protected function processConfig($config, $inflector)
     {
         $itemOptionName = $this->itemOptionName();
+        $itemPropertyName = $this->ownerPropertyName();
+        
         $this->ownerModel = $config->get('owner');
         $this->itemModel = $config->get($itemOptionName);
+        
+        $itemProperty = $config->get('ownerOptions.'.$itemOptionName.'Property', null);
+        if ($itemProperty === null)
+            $itemProperty = $this->defaultOwnerProperty($inflector);
+        $this->$itemPropertyName = $itemProperty;
+        
 
-        $itemOptionsPrefix = $itemOptionsName.'Options';
-
-        $this->ownerProperty = $config->get('ownerOptions.'.$itemOptionName.'Property', null);
-        if ($this->ownerProperty === null)
-            $this->ownerProperty = $this->defaultOwnerProperty($inflector);
-
-        $this->path = $config->get('path', $this->ownerProperty.'_data');
+        $itemOptionsPrefix = $itemOptionName.'Options';
+        $this->path = $config->get($itemOptionsPrefix.'.path', $itemProperty);
     }
 
+    public function ownerProperty()
+    {
+        $property = $this->ownerPropertyName();
+        return $this->$property;
+    }
+    
     abstract protected function itemOptionName();
+    abstract protected function ownerPropertyName();
     abstract protected function defaultOwnerProperty($inflector);
 }

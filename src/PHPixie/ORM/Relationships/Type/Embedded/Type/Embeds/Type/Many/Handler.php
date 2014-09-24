@@ -4,6 +4,13 @@ namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many;
 
 class Handler extends PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handler
 {
+    public function loadProperty($config, $model)
+    {
+        $arrayNode = $this->getArray($model, $config->path, true);
+        $loader = $this->loaders->embeddedArrayAcces($model, $arrayNode);
+        return $this->loaders->cachingProxy($loader);
+    }
+
     public function add($config, $owner, $key = null)
     {
         $array = $this->getArray($owner, $config->path, true);

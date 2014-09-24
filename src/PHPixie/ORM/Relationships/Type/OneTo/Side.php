@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\OneTo;
+namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds;
 
 abstract class Side extends \PHPixie\ORM\Relationships\Relationship\Side
 {

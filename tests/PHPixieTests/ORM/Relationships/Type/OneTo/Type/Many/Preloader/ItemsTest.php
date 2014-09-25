@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Type\OneTo\Many\Preloader;
+namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Preloader;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Many\Preloader\Items
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\Items
  */
 class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\Multiple\IdMapTest
 {

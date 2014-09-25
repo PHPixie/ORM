@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Loaders\Loader\Repository\Embedded;
 
-class ArrayAccess extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
+class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
 {
     protected $arrayNode;
     protected $models;

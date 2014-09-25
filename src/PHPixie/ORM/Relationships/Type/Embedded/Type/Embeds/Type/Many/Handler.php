@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many;
 
-class Handler extends PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handler
+class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handler
 {
     public function loadProperty($config, $model)
     {
@@ -46,7 +46,7 @@ class Handler extends PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handle
         $this->planners->document()->arraySet($array, $key, $item->data()->document());
     }
 
-    public function unset($config, $owner, $key)
+    public function unsetOffset($config, $owner, $key)
     {
         $documentPlanner = $this->planners->document();
         $array = $this->getArray($owner, $config->path, true);

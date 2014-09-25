@@ -4,6 +4,24 @@ namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many;
 
 class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handler
 {
+    public function offsetSet($model, $config, $key, $item)
+    {
+        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $arrayNodeLoader = $property->value();
+        $arrayNodeLoader->cacheModel($key, $item);
+
+        $arrayNode = $this->getArrayNode($model, $config->path);
+        $document  = $item->data()->document();
+        $arrayNode->offsetSet($key, $item);
+
+        $item->setOwner($model);
+
+
+    }
+    public function offsetUnset(){}
+    public function offsetCreate(){}
+    public function removeItems(){}
+    public function removeAllItems(){}
     public function loadProperty($config, $model)
     {
         $arrayNode = $this->getArray($model, $config->path, true);

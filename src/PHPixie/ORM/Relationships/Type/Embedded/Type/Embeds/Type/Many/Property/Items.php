@@ -26,22 +26,23 @@ class Items extends \PHPixie\ORM\Relationships\Relationship\Property\Model imple
     {
         return $this->value()->count();
     }
-    
+
     public function offsetSet($key, $item)
     {
         $config = $this->side->config();
-        $this->handler->propertyOffsetSet($this->model, $config, $key, $item);
+        $this->handler->offsetSet($this->model, $config, $key, $item);
     }
 
     public function offsetUnset($key)
     {
         $config = $this->side->config();
-        $this->handler->propertyOffsetUnset($this->model, $config, $key);
+        $this->handler->offsetUnset($this->model, $config, $key);
     }
 
     public function create($key = null)
     {
-        $this->handler->propertyOffsetCreate($this->model, $config, $key);
+        $config = $this->side->config();
+        return $this->handler->offsetCreate($this->model, $config, $key);
     }
 
     public function add($item, $key = null)
@@ -51,12 +52,14 @@ class Items extends \PHPixie\ORM\Relationships\Relationship\Property\Model imple
 
     public function remove($items)
     {
-        $this->handler->propertyRemoveItems($this->model, $config, $items);
+        $config = $this->side->config();
+        $this->handler->removeItems($this->model, $config, $items);
     }
 
     public function removeAll()
     {
-        return $this->handler->propertyRemoveAllItems($this->model, $this->config());
+        $config = $this->side->config();
+        return $this->handler->removeAllItems($this->model, $config);
     }
 
 }

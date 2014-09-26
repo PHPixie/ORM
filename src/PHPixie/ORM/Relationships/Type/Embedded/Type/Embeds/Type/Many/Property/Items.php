@@ -39,10 +39,10 @@ class Items extends \PHPixie\ORM\Relationships\Relationship\Property\Model imple
         $this->handler->offsetUnset($this->model, $config, $key);
     }
 
-    public function create($key = null)
+    public function create($key = null, $data = null)
     {
         $config = $this->side->config();
-        return $this->handler->offsetCreate($this->model, $config, $key);
+        return $this->handler->offsetCreate($this->model, $config, $key, $data);
     }
 
     public function add($item, $key = null)

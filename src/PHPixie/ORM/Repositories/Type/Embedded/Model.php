@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 namespace PHPixie\ORM\Model\Repository\Embedded;
 

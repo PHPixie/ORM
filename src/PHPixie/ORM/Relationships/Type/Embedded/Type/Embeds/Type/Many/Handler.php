@@ -6,22 +6,80 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
 {
     public function offsetSet($model, $config, $key, $item)
     {
+        $this->assertModelName($model, $config->itemModel);
+        $this->removeOwner($item);
+        $this->setItem($model, $config, $key, $item);
+    }
+
+    public function offsetUnset($model, $config, $key){
+        $this->assertModelName($model, $config->itemModel);
+        $this->unsetItems($model, $config, array($key));
+    }
+
+    public function offsetCreate($model, $config, $key, $data){
+        $repository = $this->repositories->get($config->itemModel);
+        $item = $repository->create($data);
+        $this->setItem($model, $config, $key, $item);
+    }
+
+    public function removeItems($model, $config, $items) {
+        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $arrayNodeLoader = $property->value();
+        $cachedItems = $this->arrayNodeLoader->getCachedModels();
+
+        $offsets = array();
+        foreach($items as $item) {
+            $offset = array_search($item, $cachedItems);
+            if($offset === false)
+                throw new \PHPixie\ORM\Exception\Relationship("Item specified for removal was not found on the model");
+            $offsets[]=$offset;
+        }
+
+        $this->unsetItems($model, $config, $offsets);
+    }
+
+
+    protected function setItem($model, $config, $key, $item)
+    {
         $property = $model->relationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
         $arrayNodeLoader->cacheModel($key, $item);
 
         $arrayNode = $this->getArrayNode($model, $config->path);
         $document  = $item->data()->document();
-        $arrayNode->offsetSet($key, $item);
+        $arrayNode->offsetSet($key, $document);
 
-        $item->setOwner($model);
-
-
+        $item->setOwnerRelationship($model, $config->ownerItemsProperty);
     }
-    public function offsetUnset(){}
-    public function offsetCreate(){}
-    public function removeItems(){}
-    public function removeAllItems(){}
+
+    protected function unsetItems($model, $config, $offsets)
+    {
+        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $arrayNodeLoader = $property->value();
+        $cachedModels = $arrayNodeLoader->getCachedModels();
+
+        $arrayNode = $this->getArrayNode($model, $config->path);
+
+        sort($offsets, SORT_NUMERIC);
+
+        foreach($offsets as $key => $offset) {
+            $cachedModels[$offset]->setOwnerRelationship(null);
+
+            $adjustedOffset = $offset - $key;
+            $arrayNode->offsetUnset($adjustedOffset);
+            $arrayNodeLoader->offsetGet();
+            $arrayNodeLoader->shiftCachedModels($adjustedOffset);
+        }
+    }
+
+    public function removeAllItems($model, $config) {
+        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $arrayNodeLoader = $property->value();
+        $arrayNodeLoader->clearCachedModels();
+        $arrayNode = $this->getArrayNode($model, $config->path);
+        $arrayNode->empty();
+    }
+
     public function loadProperty($config, $model)
     {
         $arrayNode = $this->getArray($model, $config->path, true);
@@ -29,90 +87,4 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
         return $this->loaders->cachingProxy($loader);
     }
 
-    public function add($config, $owner, $key = null)
-    {
-        $array = $this->getArray($owner, $config->path, true);
-        $document = $this->planners->document()->arrayAddDocument($array, $key);
-
-        return $this->embeddedModel($config, $document);
-    }
-
-    public function get($config, $owner, $key)
-    {
-        $array = $this->getArray($owner, $config->path);
-        if ($array === null)
-            return null;
-
-        $document = $this->planners->document()->arrayGetDocument($array, $key);
-
-        return $this->embeddedModel($config, $document, $owner);
-    }
-
-    public function exists($config, $owner, $key)
-    {
-        $array = $this->getArray($owner, $config->path);
-        if ($array === null)
-            return false;
-
-        return $this->planners->document()->arrayExists($array, $key);
-    }
-
-    public function set($config, $owner, $item, $key)
-    {
-        $this->assertModelName($item, $config->itemModel);
-        $array = $this->getArray($owner, $config->path, true);
-        $this->planners->document()->arraySet($array, $key, $item->data()->document());
-    }
-
-    public function unsetOffset($config, $owner, $key)
-    {
-        $documentPlanner = $this->planners->document();
-        $array = $this->getArray($owner, $config->path, true);
-        if($array === null && $documentPlanner->arrayExists($array, $key))
-            $documentPlanner->arrayUnset($array, $key);
-    }
-
-    public function count($config, $owner)
-    {
-        $array = $this->getArray($owner, $config->path);
-        if ($array === null)
-            return 0;
-
-        return $this->planners->document()->arrayCount($array);
-    }
-
-    public function clear($config, $owner)
-    {
-        $array = $this->getArray($owner, $config->path);
-        if ($array !== null)
-            $this->planners->document()->arrayClear($array);
-    }
-
-    protected function getArray($model, $path, $createMissing = false)
-    {
-        $documentPlanner = $this->planners->document();
-        list($parent, $key) = $this->getParentAndKey($model, $path, $createMissing);
-        if ($parent === null)
-            return null;
-
-        $array = $documentPlanner->getArray($parent, $key);
-        if ($array === null) {
-            if(!$createMissing)
-
-                return null;
-            $array = $documentPlanner->addArray($parent, $key);
-        }
-
-        return $array;
-    }
-
-    public function propertyLoader($property)
-    {
-        return $this->loaders->arrayAccess($property);
-    }
-
-    protected function fieldPrefix($oldPrefix, $path)
-    {
-        return parent::fieldPrefix($oldPrefix, $path).'.$';
-    }
 }

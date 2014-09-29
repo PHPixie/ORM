@@ -7,7 +7,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
     public function offsetSet($model, $config, $key, $item)
     {
         $this->assertModelName($model, $config->itemModel);
-        $this->removeOwner($item);
+        $this->removeItemFromOwner($item);
         $this->setItem($model, $config, $key, $item);
     }
 

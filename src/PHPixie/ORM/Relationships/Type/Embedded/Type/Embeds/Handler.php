@@ -14,15 +14,15 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Handler
 
     protected function removeItemFromOwner($item)
     {
-        $oldOwner = $item->owner();
-        if ($oldOwner !== null) {
-            $oldOwnerPropertyName = $item->ownerPropertyName();
-            $oldOwnerProperty = $oldOwner->$oldOwnerPropertyName;
+        $owner = $item->owner();
+        if ($owner !== null) {
+            $propertyName = $item->ownerPropertyName();
+            $property = $owner->relationshipProperty($propertyName);
 
-            if ($oldOwnerProperty instanceof \PHPixie\ORM\Relationships\Type\Embedded\Type\Embedsded\Embeds\Type\One\Property\Item) {
-                $oldOwnerProperty->remove();
+            if ($property instanceof \PHPixie\ORM\Relationships\Type\Embedded\Type\Embedsded\Embeds\Type\One\Property\Item) {
+                $property->remove();
             } else {
-                $oldOwnerProperty->remove($item);
+                $property->remove($item);
             }
         }
 

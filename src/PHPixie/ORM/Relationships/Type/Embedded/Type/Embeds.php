@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embedded\Type;
 
-abstract class Embeds extends \PHPixie\ORM\Relationships\Relationship\Type
+abstract class Embeds extends \PHPixie\ORM\Relationships\Relationship
 {
     protected $embeddedGroupMapper;
 

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type;
 
-class EmbedsMany extends PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds
+class EmbedsMany extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds
 {
 
     public function config($config)

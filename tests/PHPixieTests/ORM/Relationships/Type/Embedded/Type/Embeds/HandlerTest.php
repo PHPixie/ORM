@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Type\Embeds;
+namespace PHPixieTests\ORM\Relationships\Type\Embedded\Type\Embeds;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Handler
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handler
  */
-abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTest
+abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\HandlerTest
 {
     protected $ownerPropertyName;
     protected $propertyConfig;
@@ -82,21 +82,6 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\Embedded\ArrayNode');
     }
     
-    
-    protected function getData()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Data\Type\Document');
-    }
-    
-    protected function getArrayNode()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Data\Type\Document\Node\ArrayNode');
-    }
-    
-    protected function getDocument()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Data\Type\Document\Node\Document');
-    }
     
     protected function getDatabaseModel()
     {

@@ -34,13 +34,23 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
         return $this->arrayNode;
     }
 
+    public function cachedModels()
+    {
+        return $this->models;
+    }
+    
     public function cacheModel($offset, $model)
     {
         $this->models[$offset] = $model;
     }
 
-    public function spliceModelCache($offset, $length = 1, $replacement = array())
+    public function shiftCachedModels($offset, $length = 1, $replacement = array())
     {
-        array_splice($this->models, $offset, $length, $replacement);
+        
+    }
+    
+    public function clearCachedModels()
+    {
+        $this->models = array();
     }
 }

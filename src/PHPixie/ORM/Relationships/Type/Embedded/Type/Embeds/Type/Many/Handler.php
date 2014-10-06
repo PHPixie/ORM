@@ -6,30 +6,29 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
 {
     public function offsetSet($model, $config, $key, $item)
     {
-        $this->assertModelName($model, $config->itemModel);
+        $this->assertModelName($item, $config->itemModel);
         $this->removeItemFromOwner($item);
         $this->setItem($model, $config, $key, $item);
     }
 
     public function offsetUnset($model, $config, $key){
-        $this->assertModelName($model, $config->itemModel);
         $this->unsetItems($model, $config, array($key));
     }
 
     public function offsetCreate($model, $config, $key, $data){
         $repository = $this->repositories->get($config->itemModel);
-        $item = $repository->create($data);
+        $item = $repository->load($data);
         $this->setItem($model, $config, $key, $item);
     }
 
     public function removeItems($model, $config, $items) {
         $property = $model->relationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
-        $cachedItems = $this->arrayNodeLoader->getCachedModels();
+        $cachedItems = $arrayNodeLoader->cachedModels();
 
         $offsets = array();
         foreach($items as $item) {
-            $offset = array_search($item, $cachedItems);
+            $offset = array_search($item, $cachedItems, true);
             if($offset === false)
                 throw new \PHPixie\ORM\Exception\Relationship("Item specified for removal was not found on the model");
             $offsets[]=$offset;
@@ -56,18 +55,17 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
     {
         $property = $model->relationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
-        $cachedModels = $arrayNodeLoader->getCachedModels();
-
+        $cachedModels = $arrayNodeLoader->cachedModels();
         $arrayNode = $this->getArrayNode($model, $config->path);
-
+        
         sort($offsets, SORT_NUMERIC);
 
         foreach($offsets as $key => $offset) {
-            $cachedModels[$offset]->setOwnerRelationship(null);
+            echo($offset);
+            $cachedModels[$offset]->unsetOwnerRelationship();
 
             $adjustedOffset = $offset - $key;
             $arrayNode->offsetUnset($adjustedOffset);
-            $arrayNodeLoader->offsetGet();
             $arrayNodeLoader->shiftCachedModels($adjustedOffset);
         }
     }
@@ -75,16 +73,22 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
     public function removeAllItems($model, $config) {
         $property = $model->relationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
+        $cachedModels = $arrayNodeLoader->cachedModels();
+        
+        foreach($cachedModels as $item) {
+            $item->unsetOwnerRelationship();
+        }
+        
         $arrayNodeLoader->clearCachedModels();
         $arrayNode = $this->getArrayNode($model, $config->path);
-        $arrayNode->empty();
+        $arrayNode->clear();
     }
 
     public function loadProperty($config, $model)
     {
-        $arrayNode = $this->getArray($model, $config->path, true);
-        $loader = $this->loaders->embeddedArrayAcces($model, $arrayNode);
-        return $this->loaders->cachingProxy($loader);
+        $itemRepository = $this->repositories->get($config->itemModel);
+        $arrayNode = $this->getArrayNode($model, $config->path);
+        return $this->loaders->arrayNode($itemRepository, $model, $arrayNode);
     }
 
 }

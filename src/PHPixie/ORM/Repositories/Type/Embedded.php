@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Model\Repository;
+namespace PHPixie\ORM\Repositories\Type;
 
 abstract class Embedded extends \PHPixie\ORM\Repositories\Repository
 {

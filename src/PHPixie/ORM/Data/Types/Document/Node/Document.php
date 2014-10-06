@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Data\Type\Document\Node;
+namespace PHPixie\ORM\Data\Types\Document\Node;
 
-class Document extends \PHPixie\ORM\Data\Type\Document\Node
+class Document extends \PHPixie\ORM\Data\Types\Document\Node
 {
 
     public function __construct($documentBuilder, $data = null)
@@ -34,8 +34,10 @@ class Document extends \PHPixie\ORM\Data\Type\Document\Node
         return $this;
     }
 
-    public function get($key)
+    public function get($key, $default = null)
     {
+        if(!property_exists($this, $key))
+            return $default;
         return $this->$key;
     }
     

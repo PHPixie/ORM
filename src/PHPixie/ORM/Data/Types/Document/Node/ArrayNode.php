@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Data\Type\Document\Node;
+namespace PHPixie\ORM\Data\Types\Document\Node;
 
-class ArrayNode extends \PHPixie\ORM\Data\Type\Document\Node implements \ArrayAccess, \Countable, \IteratorAggregate
+class ArrayNode extends \PHPixie\ORM\Data\Types\Document\Node implements \ArrayAccess, \Countable, \IteratorAggregate
 {
     protected $currentArray;
 

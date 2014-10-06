@@ -43,5 +43,10 @@ class Loaders
     {
         return new Loaders\Loader\Repository\DataIterator($this, $repository, $reusableResultStep);
     }
+    
+    public function arrayNode($repository, $owner, $arrayNode)
+    {
+        return new Loaders\Loader\Repository\Embedded\ArrayNode($this, $repository, $owner, $arrayNode);
+    }
 
 }

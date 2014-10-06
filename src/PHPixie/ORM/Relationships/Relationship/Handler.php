@@ -43,7 +43,7 @@ class Handler
     protected function assertModelName($model, $requiredModel)
     {
         if ($model->modelName() !== $requiredModel)
-            throw new \PHPixie\ORM\Exception\Mappper("Only '$requiredModel' models can be used for this relationship.");
+            throw new \PHPixie\ORM\Exception\Mapper("Only '$requiredModel' models can be used for this relationship.");
     }
 
     protected function deletePlanResultStep($plan)

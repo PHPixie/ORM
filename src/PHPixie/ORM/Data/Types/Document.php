@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Data\Type;
+namespace PHPixie\ORM\Data\Types;
 
 class Document extends \PHPixie\ORM\Data\Type\Implementation
 {
@@ -34,5 +34,10 @@ class Document extends \PHPixie\ORM\Data\Type\Implementation
     public function addDocument($key, $data = null)
     {
         return $this->document->addDocument($key, $data);
+    }
+    
+    public function document()
+    {
+        return $this->document;
     }
 }

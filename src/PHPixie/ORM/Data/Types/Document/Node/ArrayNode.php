@@ -28,6 +28,9 @@ class ArrayNode extends \PHPixie\ORM\Data\Types\Document\Node implements \ArrayA
 
     public function offsetSet($key, $value)
     {
+        if($key > $this->count()) {
+            throw new \PHPixie\ORM\Exception\Data("Document arrays may not have gaps. Key $key is larger than array count {$this->count()}.");
+        }
         $this->appendToCurrent($this->convertValue($value), $key);
     }
 
@@ -45,7 +48,7 @@ class ArrayNode extends \PHPixie\ORM\Data\Types\Document\Node implements \ArrayA
     {
         return $this->documentBuilder->arrayIterator($this);
     }
-    
+
     public function clear()
     {
         $this->currentArray = array();
@@ -85,19 +88,19 @@ class ArrayNode extends \PHPixie\ORM\Data\Types\Document\Node implements \ArrayA
     {
         if($key === null){
             $this->currentArray[] = $value;
-            
+
         }else{
             if (!is_numeric($key))
                 throw new \PHPixie\ORM\Exception\Model("Only numeric keys can be used.");
-            
+
             $count = $this->count();
-            
+
             if($key > $count)
                 throw new \PHPixie\ORM\Exception\Model("Only sequential keys can be used.");
-            
+
             $this->currentArray[$key] = $value;
         }
-        
+
         return $value;
     }
 

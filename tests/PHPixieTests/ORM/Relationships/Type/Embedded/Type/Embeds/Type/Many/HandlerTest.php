@@ -9,19 +9,29 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
 {
     protected $ownerPropertyName = 'ownerItemsProperty';
     protected $configOwnerProperty = 'flowers';
-    
+
     /**
      * @covers ::offsetSet
      * @covers ::<protected>
      */
     public function testOffsetSet() {
-        $oldOwner = $this->getOwner('many', $this->oldOwnerProperty);
-        $item = $this->getItem($oldOwner);
-        $owner = $this->getOwner();
-        $this->prepareSetItem($owner, $item, 0);
-        $this->handler->offsetSet($owner['model'], $this->propertyConfig, 0, $item['model']);
+        $this->offsetSetTest(1);
+        $this->offsetSetTest(1, 5, true);
+        $this->offsetSetTest(6, 5);
+        $this->offsetSetTest(5, 5);
+        $this->offsetSetTest(null);
     }
-    
+
+    /**
+     * @covers ::offsetSet
+     * @covers ::<protected>
+     */
+    public function testOffsetSetWrongModel() {
+        $owner = $this->getOwner();
+        $item = $this->prepareWrongItem();
+        $this->handler->offsetSet($owner['model'], $this->propertyConfig, 1, $item);
+    }
+
     /**
      * @covers ::offsetUnset
      * @covers ::<protected>
@@ -32,41 +42,35 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
         $this->prepareUnsetItems($owner, array(1), $loaderOffset);
         $this->handler->offsetUnset($owner['model'], $this->propertyConfig, 1);
     }
-    
+
     /**
      * @covers ::removeItems
      * @covers ::<protected>
      */
     public function testRemoveItems() {
-        $owner = $this->getOwner('many', null, true);
-        $remove = array(
-            $owner['cachedModels'][3],
-            $owner['cachedModels'][1],
-        );
-        $loaderOffset = 1;
-        $this->prepareUnsetItems($owner, array(1, 3), $loaderOffset);
-        $this->handler->removeItems($owner['model'], $this->propertyConfig, $remove);
+        $this->removeItemsTest(array(1, 3));
+        $this->removeItemsTest(array(1));
     }
-    
+
+    /**
+     * @covers ::removeItems
+     * @covers ::<protected>
+     */
+    public function testOffsetRemoveWrongModel() {
+        $owner = $this->getOwner();
+        $item = $this->prepareWrongItem();
+        $this->handler->removeItems($owner['model'], $this->propertyConfig, $item);
+    }
+
     /**
      * @covers ::offsetCreate
      * @covers ::<protected>
      */
     public function testOffsetCreate() {
-        $item = $this->getItem();
-        $owner = $this->getOwner();
-        $data = array('name' => 'pixie');
-        
-        $itemRepository = $this->getEmbeddedRepository();
-        $this->setRepositories(array(
-            $this->configData['itemModel'] => $itemRepository
-        ));
-        
-        $this->method($itemRepository, 'load', $item['model'], array($data), 0);
-        $this->prepareSetItem($owner, $item, 1);
-        $this->handler->offsetCreate($owner['model'], $this->propertyConfig, 1, $data);
+        $this->offsetCreateTest(3);
+        $this->offsetCreateTest(6, 5);
     }
-    
+
     /**
      * @covers ::removeAllItems
      * @covers ::<protected>
@@ -82,48 +86,111 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
         $this->method($arrayNode, 'clear', null, array(), 0);
         $this->handler->removeAllItems($owner['model'], $this->propertyConfig);
     }
-    
+
+    /**
+     * @covers ::loadProperty
+     * @covers ::<protected>
+     */
     public function testLoadProperty()
     {
         $owner = $this->getOwner();
-        
+
         $itemRepository = $this->getEmbeddedRepository();
         $this->setRepositories(array(
             $this->configData['itemModel'] => $itemRepository
         ));
-        
+
         $arrayNode = $this->prepareGetArrayNode($owner['document'], $this->configData['path']);
         $loader = $this->getArrayNodeLoader();
         $this->method($this->loaders, 'arrayNode', $loader, array($itemRepository, $owner['model'], $arrayNode), 0);
         $this->assertSame($loader, $this->handler->loadProperty($this->propertyConfig, $owner['model']));
     }
-    
-    protected function prepareSetItem($owner, $item, $key)
+
+    protected function offsetSetTest($key, $count = 5, $withOldOwner = false)
     {
-        $this->method($owner['loader'], 'cacheModel', null, array($key, $item['model']), 0);
-        $arrayNode = $this->prepareGetArrayNode($owner['document'], $this->configData['path']);
-        $this->method($arrayNode, 'offsetSet', null, array($key, $item['document']), 0);
+        $oldOwner = null;
+        if($withOldOwner) {
+            $oldOwner = $this->getOwner('many', $this->oldOwnerProperty);
+        }
+
+        $item = $this->getItem($oldOwner);
+        $owner = $this->getOwner();
+        $this->prepareSetItem($owner, $item, $key, $count);
+        $this->handler->offsetSet($owner['model'], $this->propertyConfig, $key, $item['model']);
     }
-    
-    protected function prepareUnsetItems($owner, $offsets, &$loaderOffset)
+
+    protected function prepareSetItem($owner, $item, $key, $count)
     {
-        
+        if($key === null) {
+            $key = $count;
+        }
+
+        $arrayNode = $this->prepareGetArrayNode($owner['document'], $this->configData['path']);
+        $this->method($arrayNode, 'count', $count, array(), 0);
+
+        if($key <= $count) {
+            $this->method($owner['loader'], 'cacheModel', null, array($key, $item['model']), 0);
+            $this->method($arrayNode, 'offsetSet', null, array($key, $item['document']), 1);
+        }else{
+            $this->setExpectedException('\PHPixie\ORM\Exception\Relationship');
+        }
+    }
+
+    protected function removeItemsTest($keys)
+    {
+        $owner = $this->getOwner('many', null, true);
+
+        $remove = array();
+        foreach($keys as $key) {
+            $remove[] = $owner['cachedModels'][$key];
+        }
+
+        if(count($remove) == 1) {
+            $remove = current($remove);
+        }
+
+        $loaderOffset = 1;
+        $this->prepareUnsetItems($owner, $keys, $loaderOffset, 1);
+        $this->handler->removeItems($owner['model'], $this->propertyConfig, $remove);
+    }
+
+    protected function prepareUnsetItems($owner, $offsets, &$loaderOffset, $modelOffset = 0)
+    {
+
         $arrayNode = $this->prepareGetArrayNode($owner['document'], $this->configData['path']);
         $loaderOffset++;
-        
+
         foreach($offsets as $key => $offset) {
-            echo($offset);
-            $this->method($owner['cachedModels'][$offset], 'unsetOwnerRelationship', null, array(), 0);
+            $this->method($owner['cachedModels'][$offset], 'unsetOwnerRelationship', null, array(), $modelOffset);
             $adjustedOffset = $offset - $key;
             $this->method($arrayNode, 'offsetUnset', null, array($adjustedOffset), $key);
             $this->method($owner['loader'], 'shiftCachedModels', null, array($adjustedOffset), $loaderOffset++);
         }
     }
 
+    protected function offsetCreateTest($key, $count = 5)
+    {
+        $item = $this->getItem();
+        $owner = $this->getOwner();
+        $data = array('name' => 'pixie');
+
+        $itemRepository = $this->getEmbeddedRepository();
+        $this->setRepositories(array(
+            $this->configData['itemModel'] => $itemRepository
+        ));
+
+        if($key <= $count) {
+            $this->method($itemRepository, 'load', $item['model'], array($data), 0);
+        }
+        
+        $this->prepareSetItem($owner, $item, $key, $count);
+        $this->handler->offsetCreate($owner['model'], $this->propertyConfig, $key, $data);
+    }
+
     protected function getPreloader() {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many\Preloader');
     }
-    
+
     protected function getConfig()
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many\Config');

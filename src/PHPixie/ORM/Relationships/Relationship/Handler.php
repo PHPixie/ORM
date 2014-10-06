@@ -43,7 +43,7 @@ class Handler
     protected function assertModelName($model, $requiredModel)
     {
         if ($model->modelName() !== $requiredModel)
-            throw new \PHPixie\ORM\Exception\Mapper("Only '$requiredModel' models can be used for this relationship.");
+            throw new \PHPixie\ORM\Exception\Relationship("Only '$requiredModel' models can be used for this relationship.");
     }
 
     protected function deletePlanResultStep($plan)
@@ -56,7 +56,7 @@ class Handler
 
         return $resultStep;
     }
-    
+
     protected function getPropertyIfLoaded($model, $propertyName)
     {
         $property = $model->relationshipProperty($propertyName);
@@ -64,13 +64,13 @@ class Handler
             return null;
         return $property;
     }
-    
-    
+
+
     public function handleDeletion($modelName, $side, $resultStep, $plan)
     {
 
     }
-    
+
 
 
 }

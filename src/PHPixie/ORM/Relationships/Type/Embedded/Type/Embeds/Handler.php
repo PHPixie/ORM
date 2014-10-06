@@ -18,7 +18,6 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Handler
         if ($owner !== null) {
             $propertyName = $item->ownerPropertyName();
             $property = $owner->relationshipProperty($propertyName);
-            var_dump([$owner,$propertyName]);
             if ($property instanceof \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\One\Property\Item) {
                 $property->remove();
             } else {

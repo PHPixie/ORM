@@ -11,8 +11,12 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
     protected $propertyConfig;
     protected $configOnwerProperty;
     protected $oldOwnerProperty = 'plants';
+<<<<<<< HEAD
     protected $itemSideName;
     
+=======
+
+>>>>>>> d3820d9adc557927b19ab53af83c6e2405202b77
     public function setUp()
     {
         $this->configData = array(

@@ -4,6 +4,14 @@ namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many;
 
 class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handler
 {
+    public function mapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix = null)
+    {
+        $config = $side->config();
+        $subdocument = $this->ormBuilder->subdocumentCondition();
+        $this->groupMapper->mapConditions($config->itemModel, $subdocument, $group->conditions(), $plan);
+        $builder->addOperatorCondition($group->logic(), $group->negated(), $config->path, 'elemMatch', $subdocument);
+    }
+
     public function offsetSet($model, $config, $key, $item)
     {
         $this->assertModelName($item, $config->itemModel);
@@ -46,7 +54,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
     {
         $arrayNode = $this->getArrayNode($model, $config->path);
         $count = $arrayNode->count();
-        
+
         if($key === null) {
             $key = $count;
         }elseif($key > $count) {

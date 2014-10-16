@@ -7,8 +7,8 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Handler
 
     public function mapRelationship($side, $query, $group, $plan)
     {
-        $this->ormBuilder->
-        $this->embedsGroupMapper->mapConditions($query, $group->conditions(), $side->itemModel, $plan, $this->getFieldPrefix($fieldPrefix, $side->path));
+        $builder = $query->getWhereBuilder();
+        $this->mapRelationshipBuilder($side, $builder, $group, $plan);
     }
 
     protected function removeItemFromOwner($item)
@@ -44,4 +44,6 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Handler
 
         return $this->relationshipType->preloader($side, $loader);
     }
+
+    public abstract function mapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix = '');
 }

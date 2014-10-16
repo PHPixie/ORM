@@ -15,12 +15,11 @@ class Group
 
     protected function mapConditions($dbQuery, $conditions, $modelName, $plan)
     {
-
         foreach ($conditions as $cond) {
 
             if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Operator) {
                 $prefix = $fieldPrefix === null ? '' : $fieldPrefix.'.';
-                $dbQuery->getWhereBuilder()->addOperatorCondition($cond->logic, $cond->negated, $prefix.$cond->field, $cond->operator, $cond->values);
+                $builder->addOperatorCondition($cond->logic, $cond->negated, $prefix.$cond->field, $cond->operator, $cond->values);
 
             } elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
                 throw new \PHPixie\ORM\Exception\Mapper("Embedded relationships do ot support collection conditions");
@@ -34,16 +33,17 @@ class Group
             }else
                 throw new \PHPixie\ORM\Exception\Mapper("Unexpected condition encountered");
         }
+
     }
 
-    protected function mapConditionGroup($group, $query, $modelName, $plan, $fieldPrefix)
+    protected function mapConditionGroup($group, $builder, $modelName, $plan, $fieldPrefix)
     {
         $query->startWhereGroup($group->logic, $group->negated());
-        $this->mapConditions($query, $group->conditions(), $modelName, $plan, $fieldPrefix);
+        $this->mapConditions($builder, $group->conditions(), $modelName, $plan, $fieldPrefix);
         $builder->endWhereGroup();
     }
 
-    protected function mapRelationshipGroup($group, $query, $modelName, $plan, $fieldPrefix)
+    protected function mapRelationshipGroup($group, $builder, $modelName, $plan, $fieldPrefix)
     {
         $side = $this->relationshipMap->getSide($modelName, $group->relationship);
         $handler = $this->ormBuilder->relationshipType($side-> relationshipType())->handler();

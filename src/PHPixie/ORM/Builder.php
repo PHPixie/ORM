@@ -225,7 +225,11 @@ class Builder
         return $this->database->connection($name);
     }
 
-    
+    public function subdocumentCondition()
+    {
+        return $this->database->subdocumentCondition();
+    }
+
     public function query($modelName)
     {
         $conditions = $this->conditions();

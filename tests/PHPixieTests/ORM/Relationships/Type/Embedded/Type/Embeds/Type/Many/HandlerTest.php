@@ -106,6 +106,30 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
         $this->assertSame($loader, $this->handler->loadProperty($this->propertyConfig, $owner['model']));
     }
 
+    /**
+     * @covers ::mapRelationshipBuilder
+     * @covers ::<protected>
+     */
+    public function testRelationshipBuilder()
+    {
+        $builder = $this->quickMock('\PHPixie\Database\Conditions\Builder');
+
+        $side = $this->side('item', $this->configData);
+        $group = $this->getConditionGroup('or', true, array(5));
+        $plan = $this->getPlan();
+
+        $this->prepareMapRelationshipBuilder($side, $builder, $group, $plan, null);
+        $this->handler->mapRelationshipBuilder($side, $builder, $group, $plan);
+    }
+
+    protected function prepareMapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix)
+    {
+        $subdocument = $this->quickMock('\PHPixie\Database\Document\Conditions\Subdocument');
+        $this->method($this->ormBuilder, 'subdocumentCondition', $subdocument, array(), 0);
+        $this->method($this->groupMapper, 'mapConditions', null, array($this->configData['itemModel'], $subdocument, array(5), $plan), 0);
+        $this->method($builder, 'addOperatorCondition', null, array('or', true, $this->configData['path'], 'elemMatch', $subdocument), 0);
+    }
+
     protected function offsetSetTest($key, $count = 5, $withOldOwner = false)
     {
         $oldOwner = null;
@@ -182,7 +206,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
         if($key <= $count) {
             $this->method($itemRepository, 'load', $item['model'], array($data), 0);
         }
-        
+
         $this->prepareSetItem($owner, $item, $key, $count);
         $this->handler->offsetCreate($owner['model'], $this->propertyConfig, $key, $data);
     }

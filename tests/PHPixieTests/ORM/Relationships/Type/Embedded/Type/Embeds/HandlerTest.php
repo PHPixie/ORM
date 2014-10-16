@@ -25,45 +25,25 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
         $this->propertyConfig = $this->config($this->configData);
         parent::setUp();
     }
-    
+
     /**
      * @covers ::mapRelationship
      * @covers ::<protected>
      */
-    public function testMapRelationship()
+    public function testMapRelationship ( )
     {
-        $side = $this->side($this->itemSideName, $this->configData);
         $query = $this->getDatabaseQuery();
-        $group = $group = $this->getConditionGroup('and', true, array(5));
+        $builder = $this->quickMock('\PHPixie\Database\Conditions\Builder');
+        $this->method($query, 'getWhereBuilder', $builder, array(), 0);
+
+        $side = $this->side('item', $this->configData);
+        $group = $this->getConditionGroup('or', true, array(5));
         $plan = $this->getPlan();
-        
-        $map = array(
-            'test' => 'test.'.$this->configData['path'],
-            null => $this->configData['path'],
-        );
-        
-        foreach($map as $fieldPrefix => $groupFieldPrefix) {
-            $fieldPrefix = 'test';
 
-            $this->method($query, 'startWhereGroup', null, array('and', true), 0);
-            $this->method(
-                $this->embeddedGroupMapper,
-                'mapConditions',
-                null,
-                array($query, array(5), $this->configData['itemModel'], $plan, $groupFieldPrefix),
-                0
-            );
-            $this->method($query, 'endWhereGroup', null, array('and', true), 0);
-
-            if ($fieldPrefix === null) {
-                $this->mapRelationship($side, $query, $group, $plan);
-            }else{
-                $this->mapRelationship($side, $query, $group, $plan, $fieldPrefix);
-            }
-        }
+        $this->prepareMapRelationshipBuilder($side, $builder, $group, $plan, null);
+        $this->handler->mapRelationship($side, $query, $group, $plan);
     }
-    
-    
+
     protected function prepareRemoveItemFromOwner($item, $owner, &$propertyOffset = 0)
     {
         $params = array();
@@ -165,5 +145,6 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many\Property');
     }
 
+    abstract protected function prepareMapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix);
     abstract protected function getPreloader();
 }

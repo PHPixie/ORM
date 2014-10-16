@@ -5,11 +5,10 @@ namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds;
 abstract class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Handler
 {
 
-    public function mapRelationship($side, $query, $group, $plan, $fieldPrefix = null)
+    public function mapRelationship($side, $query, $group, $plan)
     {
-        $query->startWhereGroup($group->logic, $group->negated());
+        $this->ormBuilder->
         $this->embedsGroupMapper->mapConditions($query, $group->conditions(), $side->itemModel, $plan, $this->getFieldPrefix($fieldPrefix, $side->path));
-        $query->endWhereGroup();
     }
 
     protected function removeItemFromOwner($item)
@@ -27,13 +26,6 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Handler
 
     }
 
-    protected function embeddedModel($config, $document, $owner)
-    {
-        $model = $this->repositoryRegistry($config->itemModel)->loadModel($document);
-        $model->setOwnerProperty($owner, $config->ownerProperty);
-
-        return $model;
-    }
 
     protected function fieldPrefix($oldPrefix, $path)
     {

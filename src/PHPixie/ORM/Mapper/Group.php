@@ -21,7 +21,7 @@ class Group
 
     public function mapConditions($dbQuery, $conditions, $modelName, $plan)
     {
-        $builder = $query->getBuilder();
+        $builder = $query->getWhereBuilder();
 
         foreach ($conditions as $cond) {
 

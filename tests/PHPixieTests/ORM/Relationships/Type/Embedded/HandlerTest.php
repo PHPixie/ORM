@@ -7,6 +7,13 @@ namespace PHPixieTests\ORM\Relationships\Type\Embedded;
  */
 abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTest
 {
+    protected $embeddedGroupMapper;
+    
+    public function setUp()
+    {
+        $this->embeddedGroupMapper = $this->quickMock( 'PHPixie\ORM\Relationships\Type\Embedded\Mapper\Group' );
+    }
+    
     protected function prepareGetDocument($document, $path)
     {
         $path = explode('.', $path);

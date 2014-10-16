@@ -13,7 +13,7 @@ class Group
         $this->relationshipMap = $relationshipMap;
     }
 
-    protected function mapConditions($dbQuery, $conditions, $modelName, $plan, $fieldPrefix = null)
+    protected function mapConditions($dbQuery, $conditions, $modelName, $plan)
     {
 
         foreach ($conditions as $cond) {

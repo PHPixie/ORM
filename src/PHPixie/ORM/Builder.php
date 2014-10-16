@@ -225,6 +225,7 @@ class Builder
         return $this->database->connection($name);
     }
 
+    
     public function query($modelName)
     {
         $conditions = $this->conditions();

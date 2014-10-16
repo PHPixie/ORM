@@ -217,7 +217,8 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
             $this->loaders,
             $this->relationship,
             $this->groupMapper,
-            $this->cascadeMapper
+            $this->cascadeMapper,
+            $this->embeddedGroupMapper
         );
     }
 }

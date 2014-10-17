@@ -2,45 +2,36 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\One\Property;
 
-class Item extends \PHPixie\ORM\Relationships\Relationship\Property\Model
+class Item extends \PHPixie\ORM\Relationships\Relationship\Property\Model implements \PHPixie\ORM\Relationships\Relationship\Property\Model\Data
 {
-    public function __invoke($createMissing = false)
+
+    public function load()
     {
-        if (!$this->loaded)
-            $this->reload();
-
-        if ($createMissing && $this->value === null)
-            $this->create();
-
-        return $this->value;
+        $config = $this->side->config();
+        return $this->handler->loadProperty($config, $this->model);
     }
 
-    protected function load()
+    public function create($data = null)
     {
-        return $this->handler->getEmbeddedModel($this->config(), $this->model);
+        $config = $this->side->config();
+        return $this->handler->offsetCreate($this->model, $config, $key, $data);
     }
 
-    public function create()
+    public function add($item, $key = null)
     {
-        $config = $this->config();
-        $this->loaded = true;
-        $this->value = $this->handler->createEmbeddedModel($config, $this->model);
-        $this->handler->setOwnerProperty($config, $this->value, null);
+        $this->offsetSet($key, $item);
     }
 
-    public function remove()
+    public function remove($items)
     {
-        $config = $this->config();
-        $this->loaded = true;
-        $this->handler->removeEmbeddedModel($config, $this->model);
-        $this->handler->setOwnerProperty($config, $this->value, null);
+        $config = $this->side->config();
+        $this->handler->removeItems($this->model, $config, $items);
     }
 
-    public function set($model)
+    public function removeAll()
     {
-        $config = $this->config();
-        $this->loaded = true;
-        $this->handler->setEmbeddedModel($config, $this->model, $model);
-        $this->handler->setOwnerProperty($config, $model, $this->model);
+        $config = $this->side->config();
+        return $this->handler->removeAllItems($this->model, $config);
     }
+
 }

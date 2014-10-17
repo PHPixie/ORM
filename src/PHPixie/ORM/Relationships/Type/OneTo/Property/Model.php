@@ -11,7 +11,7 @@ abstract class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Mo
         return $this->handler->query($this->side, $this->model);
     }
 
-    public function load()
+    protected function load()
     {
         return $this->handler->loadProperty($this->side, $this->model);
     }

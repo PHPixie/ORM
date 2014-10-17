@@ -2,11 +2,13 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many\Property;
 
-class Items extends \PHPixie\ORM\Relationships\Relationship\Property\Model implements \ArrayAccess, \Countable
+class Items extends \PHPixie\ORM\Relationships\Relationship\Property\Model implements 
+    \ArrayAccess,
+    \Countable,
+    \PHPixie\ORM\Relationships\Relationship\Property\Model\Data
 {
-    protected $models = array();
 
-    public function load()
+    protected function load()
     {
         $config = $this->side->config();
         return $this->handler->loadProperty($config, $this->model);

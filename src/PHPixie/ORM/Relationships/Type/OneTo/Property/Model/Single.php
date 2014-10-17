@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Property\Model;
 
-abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model implements \PHPixie\ORM\Relationships\Relationship\Property\Model\Data
+abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model
 {
     public function value()
     {
@@ -20,21 +20,21 @@ abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Mod
         $value = $this->value();
         if ($value === null)
             return null;
-        
+
         return $value->asObject($recursive);
     }
-    
+
     public function set($value)
     {
         if($value === null || $value->isDeleted())
             return $this->remove();
-        
+
         $plan = $this->linkPlan($value);
         $plan->execute();
         $this->setProperties($value);
         return $this;
     }
-    
+
     public function remove()
     {
         $plan = $this->unlinkPlan();
@@ -42,7 +42,7 @@ abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Mod
         $this->unsetProperties();
         return $this;
     }
-    
+
     abstract protected function linkPlan($value);
     abstract protected function setProperties($value);
     abstract protected function unlinkPlan();

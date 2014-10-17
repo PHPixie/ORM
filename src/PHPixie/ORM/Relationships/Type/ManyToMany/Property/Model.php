@@ -3,7 +3,8 @@
 namespace PHPixie\ORM\Relationships\Type\ManyToMany\Property;
 
 class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
-            implements \PHPixie\ORM\Relationships\Relationship\Property\Model\Data
+            implements \PHPixie\ORM\Relationships\Relationship\Property\Model\Data,
+                       \PHPixie\ORM\Relationships\Relationship\Property\Model\Query
 {
 
     public function query()

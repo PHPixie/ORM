@@ -20,7 +20,7 @@ class Query extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Query\Single
     {
         return $this->handler->unlinkPlan($this->side, $this->query);
     }
-    
+
     protected function getSides($opposing)
     {
         if ($this->side->type() === 'item')

@@ -12,13 +12,10 @@ abstract class Query
         $this->query = $query;
     }
 
-    protected function propertyOwner()
-    {
-        return $this->query;
-    }
-
     public function __invoke()
     {
         return $this->query();
     }
+
+    abstract public function query();
 }

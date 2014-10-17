@@ -4,6 +4,11 @@ namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
 
 class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model
 {
+    protected function load()
+    {
+        return $this->handler->loadItemsProperty($this->side, $this->model);
+    }
+
     public function add($items)
     {
         $config = $this->side->config();

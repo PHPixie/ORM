@@ -1,10 +1,11 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\OneTo\Property;
+namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Property;
 
 abstract class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
                     implements \PHPixie\ORM\Relationships\Relationship\Property\Model\Data,
-                                \PHPixie\ORM\Relationships\Relationship\Property\Model\Query
+                                \PHPixie\ORM\Relationships\Relationship\Property\Model\Query,
+
 {
     protected $handler;
 
@@ -13,5 +14,5 @@ abstract class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Mo
         return $this->handler->query($this->side, $this->model);
     }
 
-    abstract public function asData($recursive = true);
+    abstract public function asData();
 }

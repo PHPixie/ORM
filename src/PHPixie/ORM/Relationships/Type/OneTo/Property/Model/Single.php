@@ -15,7 +15,7 @@ abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Mod
         return $value;
     }
 
-    public function asData($recursive = true)
+    public function asData($recursive = false)
     {
         $value = $this->value();
         if ($value === null)

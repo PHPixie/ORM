@@ -36,7 +36,7 @@ class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model
         return $this;
     }
 
-    public function asData($recursive = true)
+    public function asData($recursive = false)
     {
         $data = array();
         foreach($this->value() as $model)

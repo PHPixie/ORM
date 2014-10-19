@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many\Property\Model;
+namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\One\Property\Model;
 
-class Items extends PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Property\Model implements \ArrayAccess, \Countable,
+class Item extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Property\Model
 {
 
     protected function load()
@@ -19,13 +19,27 @@ class Items extends PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Property
 
     public function set($item)
     {
-        $this->setItem($item);
+        if($item === null)
+            return $this->remove();
+
+        $config = $this->side->config();
+        $this->handler->setItem($this->model, $config, $item);
+        return $this;
     }
 
     public function remove()
     {
         $config = $this->side->config();
         $this->handler->removeItem($this->model, $config);
+        return $this;
     }
 
+    public function asData($recursive = false)
+    {
+        $value = $this->value();
+        if ($value === null)
+            return null;
+
+        return $value->asObject($recursive);
+    }
 }

@@ -6,7 +6,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 {
 
     protected $embeddedGroupMapper;
-    
+
     public function __construct(
         $ormBuilder,
         $repositories,
@@ -28,23 +28,23 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             $loaders,
             $relationship,
             $groupMapper,
-            $cascadeMapper,
+            $cascadeMapper
         );
-        
+
         $this->embeddedGroupMapper = $embeddedGroupMapper;
     }
-    
+
     protected function explodePath($path)
     {
         return explode('.', $path);
     }
-    
+
     protected function getDocument($model, $path, $createMissing = true)
     {
         $explodedPath = $this->explodePath();
         return $this->getDocumentByExplodedPath($model, $explodedPath, $createMissing);
     }
-    
+
     protected function getArrayNode($model, $path, $createMissing = true)
     {
         $explodedPath = $this->explodePath($path);
@@ -61,10 +61,10 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         }else{
             return null;
         }
-        
+
         return $document->get($key);
     }
-    
+
     protected function getDocumentByExplodedPath($model, $explodedPath, $createMissing = true)
     {
         $document = $model->data()->document();
@@ -81,10 +81,10 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             }else{
                 return null;
             }
-            
+
             $document = $document->get($key);
         }
-        
+
         return $document;
     }
 

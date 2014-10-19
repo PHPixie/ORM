@@ -13,5 +13,5 @@ abstract class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Mo
         return $this->handler->query($this->side, $this->model);
     }
 
-    abstract public function asData($recursive = true);
+    abstract public function asData($recursive = false);
 }

@@ -19,7 +19,7 @@ class Model
     
     }
     
-    public function asObject($recursive = true)
+    public function asObject($recursive = false)
     {
         $data = $this->repository->modelAsObject($this);
 

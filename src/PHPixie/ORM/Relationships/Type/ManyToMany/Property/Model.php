@@ -53,7 +53,7 @@ class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
         return array($opposing, $this->model);
     }
 
-    public function asData($recursive = true)
+    public function asData($recursive = false)
     {
         $data = array();
         foreach($this->value() as $model)

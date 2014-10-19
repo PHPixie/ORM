@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many;
+namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\One;
 
 class Side extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Side
 {

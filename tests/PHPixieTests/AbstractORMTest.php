@@ -8,7 +8,7 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getMock($class, $methods, array(), '', false);
     }
-    
+
     protected function abstractMock($class, $methods = array())
     {
         if(empty($methods)){
@@ -16,21 +16,24 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
             foreach($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method)
                 $methods[]=$method->getName();
         }
-        
+
         return $this->getMockForAbstractClass($class, array(), '', false, false, true, $methods);
     }
-    
+
     protected function method($mock, $method, $return, $with = null, $at = null, $returnCallable = false) {
         $method = $mock
             ->expects($at === null ? $this->any() : $this->at($at))
             ->method($method);
-        
-        if ($with !== null)
+
+        if ($with !== null) {
+            foreach($with as $key => $value)
+                $with[$key] = $this->identicalTo($value);
             $method = call_user_func_array(array($method, 'with'), $with);
-        
+        }
+
         $method
             ->will($this->returnValue($return));
-        
+
         if (is_callable($return) && !$returnCallable && !is_array($return)) {
             $method->will($this->returnCallback($return));
         }else
@@ -41,7 +44,7 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
     {
         return new \stdClass;
     }
-    
+
     protected function assertException($callback, $exceptionClass)
     {
         $except = false;
@@ -50,7 +53,7 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
         }catch(\Exception $e){
             $except = $e instanceof $exceptionClass;
         }
-        
+
         $this->assertEquals(true, $except);
     }
 }

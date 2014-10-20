@@ -12,33 +12,33 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
         }else{
             $pathPrefix = $pathPrefix.'.'.$config->path;
         }
-
-        $this->groupMapper->mapConditionGroup($config->itemModel, $builder, $group, $plan, $pathPrefix);
+        $this->embeddedGroupMapper->mapConditionGroup($config->itemModel, $builder, $group, $plan, $pathPrefix);
     }
 
     public function loadProperty($config, $model)
     {
+        $repository = $this->repositories->get($config->itemModel);
         $document = $this->getDocument($model, $config->path);
-        $model = $this->repository->loadFromDocument($data);
-        $model->setOwnerRelationship($this->owner, $this->ownerPropertyName);
-        return $model;
+        $item = $repository->loadFromDocument($document);
+        $item->setOwnerRelationship($model, $config->ownerItemProperty);
+        return $item;
     }
 
     public function setItem($model, $config, $item)
     {
-        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $property = $model->relationshipProperty($config->ownerItemProperty);
         $this->unsetCurrentItemOwner($property);
 
         list($document, $key) = $this->getParentDocumentAndKey($model, $config->path);
         $document->set($key, $item->data()->document());
+        $item->setOwnerRelationship($model, $config->ownerItemProperty);
         $property->setValue($item);
     }
 
-    public function removeItem()
+    public function removeItem($model, $config)
     {
-        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $property = $model->relationshipProperty($config->ownerItemProperty);
         $this->unsetCurrentItemOwner($property);
-
         list($document, $key) = $this->getParentDocumentAndKey($model, $config->path);
         $document->remove($key);
         $property->setValue(null);
@@ -51,8 +51,11 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
         $this->setItem($model, $config, $item);
     }
 
-    protected function unsetCurrentItemOwner($peoperty)
+    protected function unsetCurrentItemOwner($property)
     {
+        if(!$property->isLoaded())
+            return;
+
         $oldItem = $property->value();
         if($oldItem !== null) {
             $oldItem->unsetOwnerRelationship();

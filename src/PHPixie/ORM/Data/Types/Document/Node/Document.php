@@ -34,13 +34,20 @@ class Document extends \PHPixie\ORM\Data\Types\Document\Node
         return $this;
     }
 
+    public function remove($key)
+    {
+        if(property_exists($this, $key))
+            unset($this->$key);
+        return $this;
+    }
+
     public function get($key, $default = null)
     {
         if(!property_exists($this, $key))
             return $default;
         return $this->$key;
     }
-    
+
     public function addArray($key, $data = array())
     {
         return $this->$key = $this->documentBuilder->arrayNode($data);

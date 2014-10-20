@@ -47,9 +47,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     protected function getArrayNode($model, $path, $createMissing = true)
     {
-        $explodedPath = $this->explodePath($path);
-        $key = array_pop($explodedPath);
-        $document = $this->getDocumentByExplodedPath($model, $explodedPath, $createMissing);
+        list($document, $key) = $this->getParentDocumentAndKey($model, $path);
         if($document === null)
             return null;
         $property = $document->get($key);
@@ -65,7 +63,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         return $document->get($key);
     }
 
-    protected function getParentDocumentAndKey($model, $explodedPath, $createMissing = true)
+    protected function getParentDocumentAndKey($model, $path, $createMissing = true)
     {
         $explodedPath = $this->explodePath($path);
         $key = array_pop($explodedPath);

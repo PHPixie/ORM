@@ -18,4 +18,6 @@ abstract class Embedded extends \PHPixie\ORM\Repositories\Repository
     {
         throw new \PHPixie\ORM\Exception\Mapper("Embedded models cannot be queried directly.");
     }
+
+    public function loadFromDocument(){}
 }

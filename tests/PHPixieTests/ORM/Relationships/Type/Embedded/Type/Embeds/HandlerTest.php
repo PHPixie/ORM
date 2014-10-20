@@ -11,18 +11,14 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
     protected $propertyConfig;
     protected $configOnwerProperty;
     protected $oldOwnerProperty = 'plants';
-<<<<<<< HEAD
     protected $itemSideName;
-    
-=======
 
->>>>>>> d3820d9adc557927b19ab53af83c6e2405202b77
     public function setUp()
     {
         $this->configData = array(
             'ownerModel'        => 'fairy',
             'itemModel'         => 'flower',
-            'path'              => 'favorites.'.$this->configOnwerProperty,
+            'path'              => 'favorites.'.$this->configOwnerProperty,
             $this->ownerPropertyName => $this->configOwnerProperty,
         );
 
@@ -71,34 +67,6 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
         return $item;
     }
 
-    protected function getOwner($relationshipType = 'many', $propertyName = null, $addCachedModels = false)
-    {
-        if($propertyName == null) {
-            $propertyName = $this->configOwnerProperty;
-        }
-
-        $owner = $this->getRelationshipModel('owner');
-        if($relationshipType === 'many') {
-            $property = $this->getManyProperty();
-            $loader = $this->getArrayNodeLoader();
-            $this->method($property, 'value', $loader, array());
-            $owner['loader'] = $loader;
-            if($addCachedModels) {
-                $cached = array();
-                for($i=0; $i<5; $i++) {
-                    $item = $this->getItem();
-                    $cached[]=$item['model'];
-                }
-                $owner['cachedModels'] = $cached;
-                $this->method($owner['loader'], 'cachedModels', $cached, array());
-            }
-        }else {
-            $property = $this->getOneProperty();
-        }
-        $this->method($owner['model'], 'relationshipProperty', $property, array($propertyName), null, true);
-        $owner['property'] = $property;
-        return $owner;
-    }
 
     protected function getRelationshipModel($type)
     {
@@ -137,16 +105,6 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
     protected function getEmbeddedModel()
     {
         return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Embedded\Model');
-    }
-
-    protected function getOneProperty()
-    {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\One\Property');
-    }
-
-    protected function getManyProperty()
-    {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many\Property');
     }
 
     abstract protected function prepareMapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix);

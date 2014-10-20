@@ -48,18 +48,28 @@ class Items extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Propert
     public function add($item, $key = null)
     {
         $this->offsetSet($key, $item);
+        return $this;
     }
 
     public function remove($items)
     {
         $config = $this->side->config();
         $this->handler->removeItems($this->model, $config, $items);
+        return $this;
     }
 
     public function removeAll()
     {
         $config = $this->side->config();
-        return $this->handler->removeAllItems($this->model, $config);
+        $this->handler->removeAllItems($this->model, $config);
+        return $this;
     }
 
+    public function asData($recursive = false)
+    {
+        $data = array();
+        foreach($this->value() as $model)
+            $data[] = $model->asObject($recursive);
+        return $data;
+    }
 }

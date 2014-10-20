@@ -14,6 +14,8 @@ abstract class Embedded extends \PHPixie\ORM\Loaders\Loader\Repository
 
     protected function loadModel($data)
     {
-        return $this->repository->load($owner, $data);
+        $model = $this->repository->loadFromDocument($data);
+        $model->setOwnerRelationship($this->owner, $this->ownerPropertyName);
+        return $model;
     }
 }

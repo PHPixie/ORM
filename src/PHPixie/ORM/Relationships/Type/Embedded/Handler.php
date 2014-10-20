@@ -41,7 +41,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     protected function getDocument($model, $path, $createMissing = true)
     {
-        $explodedPath = $this->explodePath();
+        $explodedPath = $this->explodePath($path);
         return $this->getDocumentByExplodedPath($model, $explodedPath, $createMissing);
     }
 
@@ -63,6 +63,14 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         }
 
         return $document->get($key);
+    }
+
+    protected function getParentDocumentAndKey($model, $explodedPath, $createMissing = true)
+    {
+        $explodedPath = $this->explodePath($path);
+        $key = array_pop($explodedPath);
+        $document = $this->getDocumentByExplodedPath($model, $explodedPath, $createMissing);
+        return array($document, $key);
     }
 
     protected function getDocumentByExplodedPath($model, $explodedPath, $createMissing = true)

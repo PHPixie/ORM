@@ -51,6 +51,22 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Embed
         $this->assertSame($this->property, $this->property->remove());
     }
 
+    /**
+     * @covers ::asData
+     * @covers ::<protected>
+     */
+    public function testAsData()
+    {
+        $data = new \stdClass;
+
+        $this->prepareLoad();
+        $this->method($this->value, 'asObject', $data, array(false), 0);
+        $this->assertSame($data, $this->property->asData());
+
+        $this->method($this->value, 'asObject', $data, array(true), 0);
+        $this->assertSame($data, $this->property->asData(true));
+    }
+
     protected function prepareLoad()
     {
         $this->value = $this->value();

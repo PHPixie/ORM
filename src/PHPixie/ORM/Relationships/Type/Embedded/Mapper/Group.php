@@ -36,7 +36,7 @@ class Group
 
     }
 
-    protected function mapConditionGroup($group, $builder, $modelName, $plan, $fieldPrefix)
+    public function mapConditionGroup($group, $builder, $modelName, $plan, $fieldPrefix)
     {
         $query->startWhereGroup($group->logic, $group->negated());
         $this->mapConditions($builder, $group->conditions(), $modelName, $plan, $fieldPrefix);

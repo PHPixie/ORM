@@ -38,7 +38,7 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
     {
         return $this->models;
     }
-    
+
     public function cacheModel($offset, $model)
     {
         $this->models[$offset] = $model;
@@ -46,9 +46,17 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
 
     public function shiftCachedModels($offset, $length = 1, $replacement = array())
     {
-        
+
     }
-    
+
+    public function getCachedModel($offset)
+    {
+            if(array_key_exists($key, $this->models))
+                return $this->models[$offset];
+                
+            return null;
+    }
+
     public function clearCachedModels()
     {
         $this->models = array();

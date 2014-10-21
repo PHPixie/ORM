@@ -19,6 +19,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
         $this->offsetSetTest(1, 5, true);
         $this->offsetSetTest(6, 5);
         $this->offsetSetTest(5, 5);
+        $this->offsetSetTest(1, 5, false, true);
         $this->offsetSetTest(null);
     }
 
@@ -126,11 +127,11 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
     {
         $subdocument = $this->quickMock('\PHPixie\Database\Document\Conditions\Subdocument');
         $this->method($this->ormBuilder, 'subdocumentCondition', $subdocument, array(), 0);
-        $this->method($this->groupMapper, 'mapConditions', null, array($this->configData['itemModel'], $subdocument, array(5), $plan), 0);
+        $this->method($this->embeddedGroupMapper, 'mapConditions', null, array($this->configData['itemModel'], $subdocument, array(5), $plan), 0);
         $this->method($builder, 'addOperatorCondition', null, array('or', true, $this->configData['path'], 'elemMatch', $subdocument), 0);
     }
 
-    protected function offsetSetTest($key, $count = 5, $withOldOwner = false)
+    protected function offsetSetTest($key, $count = 5, $withOldOwner = false, $withOldItem = false)
     {
         $oldOwner = null;
         if($withOldOwner) {
@@ -143,7 +144,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
         $this->handler->offsetSet($owner['model'], $this->propertyConfig, $key, $item['model']);
     }
 
-    protected function prepareSetItem($owner, $item, $key, $count)
+    protected function prepareSetItem($owner, $item, $key, $count, $withOldItem = false)
     {
         if($key === null) {
             $key = $count;
@@ -153,7 +154,14 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
         $this->method($arrayNode, 'count', $count, array(), 0);
 
         if($key <= $count) {
-            $this->method($owner['loader'], 'cacheModel', null, array($key, $item['model']), 0);
+            $loaderOffset = 0;
+            if($key < $count) {
+                $cachedModel = $withOldItem ? $owner['cachedModels'][$key] :null;
+                $this->method($owner['loader'], 'getCachedModel', $cachedModel, array($key), $loaderOffset++);
+                if($withOldItem)
+                    $this->method($owner['cachedModels'][$offset], 'unsetOwnerRelationship', null, array(), 0);
+            }
+            $this->method($owner['loader'], 'cacheModel', null, array($key, $item['model']), $loaderOffset);
             $this->method($arrayNode, 'offsetSet', null, array($key, $item['document']), 1);
         }else{
             $this->setExpectedException('\PHPixie\ORM\Exception\Relationship');

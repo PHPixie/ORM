@@ -4,18 +4,9 @@ namespace PHPixie\ORM\Loaders\Loader\Repository;
 
 abstract class Embedded extends \PHPixie\ORM\Loaders\Loader\Repository
 {
-    protected $owner;
-
-    public function __construct($loaders, $repository, $owner)
+    protected function loadModel($document)
     {
-        parent::__construct($loaders, $repository);
-        $this->owner = $owner;
-    }
-
-    protected function loadModel($data)
-    {
-        $model = $this->repository->loadFromDocument($data);
-        $model->setOwnerRelationship($this->owner, $this->ownerPropertyName);
+        $model = $this->repository->loadFromDocument($document);
         return $model;
     }
 }

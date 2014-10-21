@@ -12,21 +12,21 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
         $builder->addOperatorCondition($group->logic(), $group->negated(), $config->path, 'elemMatch', $subdocument);
     }
 
-    public function offsetSet($model, $config, $key, $item)
+    public function offsetSet($model, $config, $offset, $item)
     {
         $this->assertModelName($item, $config->itemModel);
         $this->removeItemFromOwner($item);
-        $this->setItem($model, $config, $key, $item);
+        $this->setItem($model, $config, $offset, $item);
     }
 
-    public function offsetUnset($model, $config, $key){
-        $this->unsetItems($model, $config, array($key));
+    public function offsetUnset($model, $config, $offset){
+        $this->unsetItems($model, $config, array($offset));
     }
 
-    public function offsetCreate($model, $config, $key, $data){
+    public function offsetCreate($model, $config, $offset, $data){
         $repository = $this->repositories->get($config->itemModel);
         $item = $repository->load($data);
-        $this->setItem($model, $config, $key, $item);
+        $this->setItem($model, $config, $offset, $item);
     }
 
     public function removeItems($model, $config, $items) {
@@ -50,23 +50,28 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
     }
 
 
-    protected function setItem($model, $config, $key, $item)
+    protected function setItem($model, $config, $offset, $item)
     {
         $arrayNode = $this->getArrayNode($model, $config->path);
         $count = $arrayNode->count();
 
-        if($key === null) {
-            $key = $count;
-        }elseif($key > $count) {
-            throw new \PHPixie\ORM\Exception\Relationship("There may be no gaps in items array. Key $key is larger than item count $count");
+        if($offset === null) {
+            $offset = $count;
+        }elseif($offset > $count) {
+            throw new \PHPixie\ORM\Exception\Relationship("There may be no gaps in items array. Key $offset is larger than item count $count");
         }
 
         $property = $model->relationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
-        $arrayNodeLoader->cacheModel($key, $item);
+
+        if($offset < $count) {
+            $this->unsetCachedItemOwner($arrayNodeLoader, $offset);
+        }
+
+        $arrayNodeLoader->cacheModel($offset, $item);
 
         $document  = $item->data()->document();
-        $arrayNode->offsetSet($key, $document);
+        $arrayNode->offsetSet($offset, $document);
 
         $item->setOwnerRelationship($model, $config->ownerItemsProperty);
     }
@@ -111,4 +116,11 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handl
         return $this->loaders->arrayNode($itemRepository, $model, $arrayNode);
     }
 
+    protected function unsetCachedItemOwner($arrayNodeLoader, $offset)
+    {
+        $oldItem = $arrayNodeLoader->getCachedModel($offset);
+        if($oldItem !== null) {
+            $oldItem->unsetOwnerRelationship();
+        }
+    }
 }

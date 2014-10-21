@@ -21,6 +21,16 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
     }
 
     /**
+     * @covers ::offsetSet
+     * @covers ::<protected>
+     */
+    public function testOffsetSetWrongModel() {
+        $owner = $this->getOwner();
+        $item = $this->prepareWrongItem();
+        $this->handler->setItem($owner['model'], $this->propertyConfig, $item);
+    }
+
+    /**
      * @covers ::setItem
      * @covers ::<protected>
      */
@@ -75,7 +85,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
             $this->method($owner['item']['model'], 'unsetOwnerRelationship', null, array(), 0);
         }
         $item = $this->getItem();
-        $this->prepareSetItem($owner, $item);
+        $this->prepareSetItemModel($owner, $item);
         $this->handler->setItem($owner['model'], $this->propertyConfig, $item['model']);
     }
 
@@ -97,16 +107,16 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\Type\Emb
         $data = array('name' => 'pixie');
 
         $this->method($itemRepository, 'load', $item['model'], array(), 0);
-        $this->prepareSetItem($owner, $item);
+        $this->prepareSetItemModel($owner, $item, 1);
         $this->handler->createItem($owner['model'], $this->propertyConfig, $data);
     }
 
 
-    protected function prepareSetItem($owner, $item)
+    protected function prepareSetItemModel($owner, $item, $itemOffset = 2)
     {
         list($document, $key) = $this->prepareGetParentDocumentAndKey($owner['document'], $this->configData['path']);
         $this->method($document, 'set', null, array($key, $item['document']), 0);
-        $this->method($item['model'], 'setOwnerRelationship',null , array($owner['model'], $this->configData['ownerItemProperty']), 1);
+        $this->method($item['model'], 'setOwnerRelationship',null , array($owner['model'], $this->configData['ownerItemProperty']), $itemOffset);
         $this->preparePopertySetValue($owner['property'], $item['model']);
     }
 

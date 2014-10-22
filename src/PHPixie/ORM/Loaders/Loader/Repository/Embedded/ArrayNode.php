@@ -5,12 +5,17 @@ namespace PHPixie\ORM\Loaders\Loader\Repository\Embedded;
 class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
 {
     protected $arrayNode;
-    protected $models;
+    protected $owner;
+    protected $ownerPropertyName;
+    protected $cachedModels = array();
 
-    public function __construct($loaders, $repository, $owner, $arrayNode)
+
+    public function __construct($loaders, $repository, $arrayNode, $owner, $ownerPropertyName)
     {
-        parent::__construct($loaders, $repository, $owner);
+        parent::__construct($loaders, $repository);
         $this->arrayNode = $arrayNode;
+        $this->owner = $owner;
+        $this->ownerPropertyName = $ownerPropertyName;
     }
 
     public function offsetExists($offset)
@@ -20,23 +25,16 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
 
     public function getByOffset($offset)
     {
-        $data = $this->arrayNode->offsetGet($offset);
-        return $this->loadModel($data);
-    }
+        if(!array_key_exists($offset, $this->cachedModels)) {
+            
+            if(!$this->offsetExists($offset))
+                throw new \PHPixie\ORM\Exception\Loader("Offset $offset does not exist.");
 
-    public function count()
-    {
-        return $this->arrayNode->count();
-    }
+            $document = $this->arrayNode->offsetGet($offset);
+            $this->cachedModels[$offset] = $this->loadModel($document);
+        }
 
-    public function arrayNode()
-    {
-        return $this->arrayNode;
-    }
-
-    public function cachedModels()
-    {
-        return $this->models;
+        return $this->cachedModels[$offset];
     }
 
     public function cacheModel($offset, $model)
@@ -53,12 +51,27 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
     {
             if(array_key_exists($key, $this->models))
                 return $this->models[$offset];
-                
+
             return null;
     }
 
     public function clearCachedModels()
     {
         $this->models = array();
+    }
+
+    public function count()
+    {
+        return $this->arrayNode->count();
+    }
+
+    public function arrayNode()
+    {
+        return $this->arrayNode;
+    }
+
+    public function cachedModels()
+    {
+        return $this->models;
     }
 }

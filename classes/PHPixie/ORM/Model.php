@@ -673,14 +673,15 @@ class Model
 	/*
 	* Init properties for model if not loaded and fill it with default values
 	*
-	* @param array $defaults An associative array with default values for columns
+	* @param array $defaults      An associative array with default values for columns
+	* @param mixed $default_value Value to use by default
 	* @return \PHPixie\ORM\Model Returns itself
 	*/
-	public function init_columns($defaults = array())
+	public function init_columns($defaults = array(), $default_value = null)
 	{
 		if (!$this->loaded())
 			foreach ($this->columns() as $column)
-				$this->$column = isset($defaults[$column]) ? $defaults[$column] : null;
+				$this->$column = isset($defaults[$column]) ? $defaults[$column] : $default_value;
 		return $this;
 	}
 

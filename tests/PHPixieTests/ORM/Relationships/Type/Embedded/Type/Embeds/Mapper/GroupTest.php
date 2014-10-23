@@ -80,12 +80,12 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
         $plan = $this->getPlan();
         $group = $this->getRelationshipGroup(null, 'flower');
 
-        $relationship = $this->getRelationship();
-        $this->prepareRelationship($relationship, 'fairy', 'flower');
+        $handler = $this->getEmbedsHandler();
+        $side = $this->prepareRelationship($handler, 'fairy', 'flower');
 
         $prefix = 'pixie';
 
-        $this->method($relationship, 'mapRelationship', null, array($side, $builder, $group, $plan, $prefix), 0);
+        $this->method($handler, 'mapRelationship', null, array($side, $builder, $group, $plan, $prefix), 0);
         $this->embedsGroupMapper->mapConditions($builder, array($group), 'fairy', $plan, $prefix);
     }
 
@@ -99,18 +99,21 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
         $plan = $this->getPlan();
         $group = $this->getRelationshipGroup(null, 'flower');
 
-        $relationship = $this->getRelationship();
-        $this->prepareRelationship($relationship, 'fairy', 'flower');
+        $handler = $this->getHandler();
+        $this->prepareRelationship($handler, 'fairy', 'flower');
 
         $this->setExpectedException('\PHPixie\ORM\Exception\Mapper');
         $this->embedsGroupMapper->mapConditions($builder, array($group), 'fairy', $plan, 'pixie');
     }
 
-    protected function prepareRelationship($relationship, $modelName, $relationsipName)
+    protected function prepareRelationship($handler, $modelName, $relationsipName)
     {
         $side = $this->getSide('embedsOne');
+        $relationship = $this->getRelationship();
         $this->method($this->relationshipMap, 'getSide', $side, array($modelName, $relationsipName), 0);
         $this->method($this->relationships, 'get', $relationship, array('embedsOne'), 0);
+        $this->method($relationship, 'handler', $handler, array(), 0);
+        return $side;
     }
 
     /**
@@ -136,18 +139,26 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
         $builder = $this->getBuilder();
         $plan = $this->getPlan();
         $field = 'name';
-        $operator = $this->getOperator($field, '=', array('Pixie'), 'or', false);
-        $group = $this->getGroup(array($operator), 'or', 'false');
+        $operator = $this->getOperator($field, '=', array('Pixie'), 'or', true);
+        $group = $this->getGroup(array($operator), 'or', true);
         foreach(array('fairy', null) as $prefix)
         {
             $prefixedField = $this->getPrefixedField($field, $prefix);
-            $this->method($builder, 'startGroup', null, array('or', false), 0);
-            $this->method($builder, 'addOperatorCondition', null, array('or', false, $prefixedField, '=', array('Pixie')), 1);
-            $this->method($builder, 'endGroup', null, array('or', false), 2);
+            $this->method($builder, 'startGroup', null, array('or', true), 0);
+            $this->method($builder, 'addOperatorCondition', null, array('or', true, $prefixedField, '=', array('Pixie')), 1);
+            $this->method($builder, 'endGroup', null, array(), 2);
             if($useMethod) {
-                $this->embedsGroupMapper->mapConditionGroup($builder, $group, 'test', $plan, $prefix);
+                if($prefix === null) {
+                    $this->embedsGroupMapper->mapConditionGroup($builder, $group, 'test', $plan);
+                }else{
+                    $this->embedsGroupMapper->mapConditionGroup($builder, $group, 'test', $plan, $prefix);
+                }
             }else {
-                $this->embedsGroupMapper->mapConditions($builder, array($group), 'test', $plan, $prefix);
+                if($prefix === null) {
+                    $this->embedsGroupMapper->mapConditions($builder, array($group), 'test', $plan);
+                }else{
+                    $this->embedsGroupMapper->mapConditions($builder, array($group), 'test', $plan, $prefix);
+                }
             }
         }
 
@@ -208,14 +219,19 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
         return $side;
     }
 
-    protected function getEmbedsRelationship()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds');
-    }
-
     protected function getRelationship()
     {
         return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship');
+    }
+
+    protected function getEmbedsHandler()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handler');
+    }
+
+    protected function getHandler()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Handler');
     }
 
 }

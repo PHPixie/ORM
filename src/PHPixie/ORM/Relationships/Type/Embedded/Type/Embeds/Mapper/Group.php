@@ -9,7 +9,7 @@ class Group
 
     public function __construct($relationships, $relationshipMap)
     {
-        $this->ormBuilder = $relationships;
+        $this->relationships = $relationships;
         $this->relationshipMap = $relationshipMap;
     }
 
@@ -19,16 +19,16 @@ class Group
 
             if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Operator) {
                 $prefix = $fieldPrefix === null ? '' : $fieldPrefix.'.';
-                $builder->addOperatorCondition($cond->logic, $cond->negated(), $prefix.$cond->field, $cond->operator, $cond->values);
+                $builder->addOperatorCondition($cond->logic(), $cond->negated(), $prefix.$cond->field, $cond->operator, $cond->values);
 
             } elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
-                throw new \PHPixie\ORM\Exception\Mapper("Embedded relationships do ot support collection conditions");
+                throw new \PHPixie\ORM\Exception\Mapper("Embedded relationships do not support collection conditions");
 
             } elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group\Relationship) {
-                $this->mapRelationshipGroup($group, $currentModel, $query, $plan, $fieldPrefix);
+                $this->mapRelationshipGroup($builder, $cond, $modelName, $plan, $fieldPrefix);
 
             } elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group) {
-                $this->mapConditionGroup($cond, $query, $currentModel, $plan, $fieldPrefix);
+                $this->mapConditionGroup($builder, $cond, $modelName, $plan, $fieldPrefix);
 
             }else
                 throw new \PHPixie\ORM\Exception\Mapper("Unexpected condition encountered");
@@ -36,22 +36,23 @@ class Group
 
     }
 
-    public function mapConditionGroup($group, $builder, $modelName, $plan, $fieldPrefix)
+    public function mapConditionGroup($builder, $group, $modelName, $plan, $fieldPrefix = null)
     {
-        $query->startGroup($group->logic, $group->negated());
+        $builder->startGroup($group->logic(), $group->negated());
         $this->mapConditions($builder, $group->conditions(), $modelName, $plan, $fieldPrefix);
         $builder->endGroup();
     }
 
-    protected function mapRelationshipGroup($group, $builder, $modelName, $plan, $fieldPrefix)
+    protected function mapRelationshipGroup($builder, $group, $modelName, $plan, $fieldPrefix)
     {
-        $side = $this->relationshipMap->getSide($modelName, $group->relationship);
-        $handler = $this->relationships->relationshipType($side-> relationshipType())->handler();
+        $side = $this->relationshipMap->getSide($modelName, $group->relationship());
+        $relationshipType = $side->relationshipType();
+        $handler = $this->relationships->get($relationshipType)->handler();
 
-        if (!($handler instanceof \PHPixie\ORM\Relationships\Type\Embedded\Type\Embedsded\Handler))
-            throw new \PHPixie\ORM\Exception\Mapper("Embedded models can only hve embedded reltionships.");
+        if (!($handler instanceof \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handler))
+            throw new \PHPixie\ORM\Exception\Mapper("Embedded models can only have embedded reltionships.");
 
-        $handler->mapRelationship($side, $query, $group, $plan, $fieldPrefix);
+        $handler->mapRelationship($side, $builder, $group, $plan, $fieldPrefix);
     }
 
 }

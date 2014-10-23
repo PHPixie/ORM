@@ -21,12 +21,13 @@ abstract class EmbeddedTest extends \PHPixieTests\ORM\Loaders\Loader\RepositoryT
 
     protected function prepareLoad($document, $at = 0)
     {
-        $model = $this->abstractMethod('\PHPixie\ORM\Repositories\Type\Embedded\Model');
+        $model = $this->abstractMock('\PHPixie\ORM\Repositories\Type\Embedded\Model');
         $this->method($this->repository, 'loadFromDocument', $model, array($document), $at);
+        return $model;
     }
 
     protected function getRepository()
     {
-        return $this->abstractMethod('\PHPixie\ORM\Repositories\Type\Embedded');
+        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Embedded');
     }
 }

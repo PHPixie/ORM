@@ -26,7 +26,7 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
     public function getByOffset($offset)
     {
         if(!array_key_exists($offset, $this->cachedModels)) {
-            
+
             if(!$this->offsetExists($offset))
                 throw new \PHPixie\ORM\Exception\Loader("Offset $offset does not exist.");
 
@@ -39,25 +39,35 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
 
     public function cacheModel($offset, $model)
     {
-        $this->models[$offset] = $model;
+        $this->cachedModels[$offset] = $model;
     }
 
-    public function shiftCachedModels($offset, $length = 1, $replacement = array())
+    public function shiftCachedModels($offset)
     {
+        if(array_key_exists($offset, $this->cachedModels))
+            unset($this->cachedModels[$offset]);
 
+        $keys = array_keys($this->cachedModels);
+        foreach($keys as $key) {
+            if($key <= $offset)
+                continue;
+
+            $this->cachedModels[$key-1] = $this->cachedModels[$key];
+            unset($this->cachedModels[$key]);
+        }
     }
 
     public function getCachedModel($offset)
     {
-            if(array_key_exists($key, $this->models))
-                return $this->models[$offset];
+        if(array_key_exists($offset, $this->cachedModels))
+            return $this->cachedModels[$offset];
 
-            return null;
+        return null;
     }
 
     public function clearCachedModels()
     {
-        $this->models = array();
+        $this->cachedModels = array();
     }
 
     public function count()
@@ -70,8 +80,18 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
         return $this->arrayNode;
     }
 
+    public function owner()
+    {
+        return $this->owner;
+    }
+
+    public function ownerPropertyName()
+    {
+        return $this->ownerPropertyName;
+    }
+
     public function cachedModels()
     {
-        return $this->models;
+        return $this->cachedModels;
     }
 }

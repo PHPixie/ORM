@@ -29,7 +29,7 @@ class ORM_Result_Test extends PHPUnit_Framework_TestCase
 				->disableOriginalConstructor()
 				->getMock();
 		$this->pixie->orm = new \PHPixie\ORM($this->pixie);
-		$this->object = new \PHPixie\ORM\Result($this->pixie,'Stub_Orm', $this->stub);
+		$this->object = new \PHPixie\ORM\Result($this->pixie,'stub', $this->stub);
 	}
 
 	/**
@@ -118,9 +118,9 @@ class ORM_Result_Test extends PHPUnit_Framework_TestCase
 			(object) array('id' => 1, 'name' => 'Tinkerbell', 'id1' => 11, 'name1' => 'Tinkerbell1', 'id2' => 12, 'name2' => 'Tinkerbell2')
 		);
 
-		$this->object = new \PHPixie\ORM\Result($this->pixie, 'Stub_Orm', $this->stub, array(
-			'tester' => array('model' => new \Model\Stub_Orm),
-			'tester.another' => array('model' => new \Model\Stub_Orm)
+		$this->object = new \PHPixie\ORM\Result($this->pixie, 'Stub', $this->stub, array(
+			'tester' => array('model' => new \Model\Stub),
+			'tester.another' => array('model' => new \Model\Stub)
 		));
 		foreach (array('Trixie', 'Tinkerbell') as $name)
 		{
@@ -142,9 +142,9 @@ class ORM_Result_Test extends PHPUnit_Framework_TestCase
 			(object) array('id' => 1, 'name' => 'Tinkerbell', 'id1' => 11, 'name1' => 'Tinkerbell1', 'id2' => 12, 'name2' => 'Tinkerbell2')
 		);
 
-		$this->object = new \PHPixie\ORM\Result($this->pixie, 'Stub_Orm', $this->stub, array(
-			'tester' => array('model' => new \Model\Stub_Orm),
-			'tester.another' => array('model' => new \Model\Stub_Orm)
+		$this->object = new \PHPixie\ORM\Result($this->pixie, 'Stub', $this->stub, array(
+			'tester' => array('model' => new \Model\Stub),
+			'tester.another' => array('model' => new \Model\Stub)
 		));
 		
 		$arr = $this->object->as_array();
@@ -167,9 +167,9 @@ class ORM_Result_Test extends PHPUnit_Framework_TestCase
 			(object) array('id' => 1, 'name' => 'Trixie', 'id1' => 11, 'name1' => 'Trixie1', 'id2' => 12, 'name2' => 'Trixie2'),
 			(object) array('id' => 1, 'name' => 'Tinkerbell', 'id1' => 11, 'name1' => 'Tinkerbell1', 'id2' => 12, 'name2' => 'Tinkerbell2')
 		);
-		$this->object = new \PHPixie\ORM\Result($this->pixie,'Stub_Orm', $this->stub, array(
-			'tester' => array('model' => $this->pixie->orm->get('Stub_Orm')),
-			'tester.another' => array('model' => $this->pixie->orm->get('Stub_Orm'))
+		$this->object = new \PHPixie\ORM\Result($this->pixie,'Stub', $this->stub, array(
+			'tester' => array('model' => $this->pixie->orm->get('Stub')),
+			'tester.another' => array('model' => $this->pixie->orm->get('Stub'))
 		));
 		$arr = $this->object->as_array(true);
 		foreach (array('Trixie', 'Tinkerbell') as $key => $name)

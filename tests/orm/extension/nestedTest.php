@@ -22,7 +22,7 @@ class ORM_Extension_Nested_Test extends PHPUnit_Framework_TestCase
 		$this->pixie->orm = new \PHPixie\ORM($this->pixie);
 				 
 		$this->pixie->config->set('db.orm.connection', 'sqlite:'.$this->db_file);
-		$this->pixie->config->set('db.orm.driver', 'pdo');
+		$this->pixie->config->set('db.orm.driver', 'PDO');
 	}
 	
 	protected function tearDown()

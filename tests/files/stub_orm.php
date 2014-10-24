@@ -1,12 +1,12 @@
 <?php
 namespace Model{
-	class Stub_ORM
+	class Stub
 	{
 
 		public $row;
 		public $loaded;
 		public $cached = array();
-		public $model_name = 'Stub_Orm';
+		public $model_name = 'stub';
 
 		public function values($row, $loaded)
 		{

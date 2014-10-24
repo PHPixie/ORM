@@ -8,13 +8,13 @@ namespace PHPixieTests\ORM\Loaders\Loader;
 abstract class ProxyTest extends \PHPixieTests\ORM\Loaders\LoaderTest
 {
     protected $subloader;
-    
+
     public function setUp()
     {
         $this->subloader = $this->quickMock('\PHPixie\ORM\Loaders\Loader');
         parent::setUp();
     }
-    
+
     /**
      * @covers ::loader
      */
@@ -22,7 +22,7 @@ abstract class ProxyTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     {
         $this->assertEquals($this->subloader, $this->loader->loader());
     }
-    
+
     /**
      * @covers ::getByOffset
      */
@@ -33,7 +33,7 @@ abstract class ProxyTest extends \PHPixieTests\ORM\Loaders\LoaderTest
             ->will($this->returnCallback(function(){
                 throw new \PHPixie\ORM\Exception\Loader();
             }));
-        
+
         $this->setExpectedException('\PHPixie\ORM\Exception\Loader');
         $this->loader->getbyOffset(4);
     }

@@ -6,7 +6,7 @@ class Relationships
 {
     protected $ormBuilder;
     protected $relationships = array();
-    protected $embeddedGroupMapper;
+    protected $embedsGroupMapper;
 
     public function __construct($ormBuilder)
     {
@@ -16,51 +16,29 @@ class Relationships
     public function get($name)
     {
         if (!array_key_exists($name, $this->relationships)) {
-            $methodName = $name.'Relationship';
-            $this->relationships[$name] = $this->$methodName();
+            $this->relationships[$name] = $this->buildRelationship($name);
         }
 
         return $this->relationships[$name];
     }
 
-    protected function embeddedGroupMapper()
+    protected function buildRelationship($name)
     {
-        if ($this->embeddedGroupMapper === null)
-            $this->embeddedGroupMapper = $this->buildEmbeddedGroupMapper();
-
-        return $this->embeddedGroupMapper;
+        $class = '\PHPixie\ORM\Relationships\Type\\'.ucfirst($name);
+        return new $class($this->ormBuilder);
     }
 
-    protected function buildEmbeddedGroupMapper()
+    public function embedsGroupMapper()
+    {
+        if ($this->embedsGroupMapper === null)
+            $this->embedsGroupMapper = $this->buildEmbedsGroupMapper();
+
+        return $this->embedsGroupMapper;
+    }
+
+    protected function buildEmbedsGroupMapper()
     {
         $relationshipMap = $this->ormBuilder->relationshipMap();
-
-        return new Relationships\Type\Embedded\Mapper\Group($this->ormBuilder, $relationshipMap);
+        return new Relationships\Type\Embedded\Type\Embeds\Mapper\Group($this, $relationshipMap);
     }
-
-    protected function oneToOneRelationship()
-    {
-        return new Relationships\Relationship\OneToOne($this->ormBuilder);
-    }
-
-    protected function oneToManyRelationship()
-    {
-        return new Relationships\Relationship\OneToMany($this->ormBuilder);
-    }
-
-    protected function manyToManyRelationship()
-    {
-        return new Relationships\Relationship\ManyToMany($this->ormBuilder);
-    }
-
-    protected function embedsOneRelationship()
-    {
-        return new Relationships\Relationship\EmbedsOne($this->ormBuilder, $this->embeddedGroupMapper());
-    }
-
-    protected function embedsManyRelationship()
-    {
-        return new Relationships\Relationship\EmbedsMany($this->ormBuilder, $this->embeddedGroupMapper());
-    }
-
 }

@@ -6,10 +6,9 @@ abstract class Embeds extends \PHPixie\ORM\Relationships\Relationship
 {
     protected $embeddedGroupMapper;
 
-    public function __construct($ormBuilder, $embeddedGroupMapper)
+    public function __construct($ormBuilder)
     {
         parent::__construct($ormBuilder);
-        $this->embeddedGroupMapper = $embeddedGroupMapper;
     }
 
     public function queryProperty($side, $query)

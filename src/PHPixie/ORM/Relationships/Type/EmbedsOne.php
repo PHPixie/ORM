@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type;
 
-class EmbedsOne extends PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds
+class EmbedsOne extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds
 {
 
     public function config($config)

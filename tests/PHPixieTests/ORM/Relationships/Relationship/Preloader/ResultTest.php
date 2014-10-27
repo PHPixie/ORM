@@ -9,8 +9,8 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\P
 {
     protected $models = array();
     protected $preloadedModels = array();
-    protected $side;
     protected $loaders;
+    protected $side;
     
     public function setUp()
     {

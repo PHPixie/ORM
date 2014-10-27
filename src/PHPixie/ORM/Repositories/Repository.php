@@ -4,16 +4,11 @@ namespace PHPixie\ORM\Repositories;
 
 abstract class Repository
 {
-    protected $ormBuilder;
-    protected $driver;
     protected $dataBuilder;
     protected $modelName;
-    protected $connectionName;
-
-    public function __construct($ormBuilder, $driver, $dataBuilder, $modelName, $config)
+    
+    public function __construct($dataBuilder, $modelName)
     {
-        $this->ormBuilder = $ormBuilder;
-        $this->driver = $driver;
         $this->dataBuilder = $dataBuilder;
         $this->modelName = $modelName;
     }
@@ -23,21 +18,6 @@ abstract class Repository
         return $this->modelName;
     }
 
-    public function query()
-    {
-        $this->ormBuilder->query($this->modelName());
-    }
-
-    public function modelDataAsObject($model)
-    {
-        return $model->data()->currentData();
-    }
-    
-    public function connection()
-    {
-        $this->ormBuilder->databaseConnection($this->connectionName);
-    }
-    
     abstract public function save($model);
     abstract public function delete($model);
     abstract public function load($data);

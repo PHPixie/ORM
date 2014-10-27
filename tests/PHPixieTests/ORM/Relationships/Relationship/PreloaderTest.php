@@ -12,7 +12,6 @@ abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
 
     public function setUp()
     {
-        $this->loaders   = $this->quickMock('\PHPixie\ORM\Loaders');
         $this->loader    = $this->loader();
         $this->preloader = $this->preloader();
     }
@@ -34,6 +33,22 @@ abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
     public function testLoader()
     {
         $this->assertEquals($this->loader, $this->preloader->loader());
+    }
+    
+    protected function property($model, $expectedValue)
+    {
+        $property = $this->getProperty();
+        $this->method($property, 'model', $model, array());
+        $property
+            ->expects($this->once())
+            ->method('setValue')
+            ->with($this->identicalTo($expectedValue));
+        return $property;
+    }
+    
+    protected function getProperty()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Model');
     }
     
     abstract protected function getModel();

@@ -50,7 +50,7 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\R
     
     protected function loader()
     {
-        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\ReusableResult');
+        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\Database\ReusableResult');
     }
     
     protected function getSide()
@@ -67,7 +67,6 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\R
     {
         return new \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\Items(
             $this->loaders,
-            $this->relationship,
             $this->side,
             $this->loader
         );

@@ -7,7 +7,7 @@ class Model
     protected $relationshipMap;
     protected $properties = array();
 
-    public function __construct($relationshipMap, $data, $isNew = true)
+    public function __construct($relationshipMap, $modelName, $data, $isNew = true)
     {
         $this->relationshipMap = $relationshipMap;
         $this->setData($data);

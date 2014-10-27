@@ -7,6 +7,8 @@ namespace PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\Multiple;
  */
 abstract class IdMapTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\MultipleTest
 {
+    protected $loaders;
+        
     protected $map = array(
         '1' => array(3, 4, 5),
         '2' => array(6, 7),
@@ -14,6 +16,7 @@ abstract class IdMapTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
     
     public function setUp()
     {
+        $this->loaders = $this->quickMock('\PHPixie\ORM\Loaders');
         for($i=1; $i<3; $i++)
             $this->models[$i] = $this->getModel();
         
@@ -24,10 +27,10 @@ abstract class IdMapTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
     }
     
     /**
-     * @covers ::loadFor
+     * @covers ::loadProperty
      * @covers ::<protected>
      */
-    public function testLoadFor()
+    public function testLoadProperty()
     {
         $this->prepareMap();
         foreach($this->models as $modelId => $model) {
@@ -37,7 +40,8 @@ abstract class IdMapTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
             $editable = $this->quickMock('\PHPixie\ORM\Loaders\Loader\Proxy\Editable');
             $this->method($this->loaders, 'editableProxy', $editable, array($loader), 1);
             
-            $this->assertEquals($editable, $this->preloader->valueFor($model));
+            $property = $this->property($model, $editable);
+            $this->preloader->loadProperty($property);
         }
     }
     

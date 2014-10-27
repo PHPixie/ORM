@@ -71,6 +71,9 @@ class Handler
 
     }
 
+    abstract public function mapPreload();
+    abstract public function mapQuery();
+
 
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Repository;
+namespace PHPixie\ORM\Loaders\Loader\Repository\Database;
 
 class ReusableResult extends \PHPixie\ORM\Loaders\Loader\Repository
 {

@@ -27,6 +27,11 @@ class Item extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Property
         return $this;
     }
 
+    public function exists()
+    {
+        
+    }
+
     public function remove()
     {
         $config = $this->side->config();

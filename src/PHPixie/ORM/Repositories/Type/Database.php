@@ -4,14 +4,17 @@ namespace PHPixie\ORM\Repositories\Type;
 
 abstract class Database extends \PHPixie\ORM\Repositories\Repository
 {
+    protected $database;
     protected $connectionName;
     protected $idField;
+    protected $defaultIdField = 'id';
 
-    public function __construct($ormBuilder, $driver, $dataBuilder, $modelName, $config)
+    public function __construct($database, $dataBuilder, $modelName, $config)
     {
-        parent::__construct($ormBuilder, $driver, $dataBuilder, $modelName, $config);
+        $this->database = $database;
+        parent::__construct($dataBuilder, $modelName);
         $this->connectionName = $modelConfig->get('connection', 'default');
-        $this->idField = $modelConfig->get('idField', 'id');
+        $this->idField = $modelConfig->get('idField', $this->defaultIdField);
     }
 
     public function connectionName()
@@ -21,12 +24,17 @@ abstract class Database extends \PHPixie\ORM\Repositories\Repository
 
     public function connection()
     {
-        return $this->ormBuilder->databaseConnection($this->connectionName);
+        return $this->database->connection($this->connectionName);
     }
 
     public function idField()
     {
         return $this->idField;
+    }
+    
+    public function query()
+    {
+        $this->ormBuilder->query($this->modelName());
     }
 
     public function delete($model)
@@ -48,6 +56,7 @@ abstract class Database extends \PHPixie\ORM\Repositories\Repository
 
     public function load($data)
     {
+        $
         return $this->buildModel($data);
     }
 
@@ -71,7 +80,29 @@ abstract class Database extends \PHPixie\ORM\Repositories\Repository
 
     abstract protected function processSave($model);
     abstract protected function buildModel($data = null);
-    abstract public function databaseQuery($type = 'select');
-    abstract public function databaseSelectQuery();
-    abstract public function databaseUpdateQuery();
+    
+    public function databaseSelectQuery()
+    {
+        return $this->connection()->select();
+    }
+    
+    public function databaseUpdateQuery()
+    {
+        return $this->connection()->update();
+    }
+    
+    public function databaseDeleteQuery()
+    {
+        return $this->connection()->delete();
+    }
+    
+    public function databaseInsertQuery()
+    {
+        return $this->connection()->insert();
+    }
+    
+    public function databaseCountQuery()
+    {
+        return $this->connection()->count();
+    }
 }

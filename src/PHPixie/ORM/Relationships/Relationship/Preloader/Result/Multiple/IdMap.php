@@ -5,7 +5,7 @@ namespace PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple;
 abstract class IdMap extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple
 {
     protected $idMap = array();
-
+    
     protected function getMappedFor($model)
     {
         $modelId = $model->id();

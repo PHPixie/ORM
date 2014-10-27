@@ -220,16 +220,6 @@ class Builder
         return new \PHPixie\ORM\Plans();
     }
 
-    public function databaseConnection($name)
-    {
-        return $this->database->connection($name);
-    }
-
-    public function subdocumentCondition()
-    {
-        return $this->database->subdocumentCondition();
-    }
-
     public function query($modelName)
     {
         $conditions = $this->conditions();

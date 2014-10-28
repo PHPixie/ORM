@@ -1,8 +1,8 @@
 
-Repository.php
+RepositoryInterface.php
 Repository
-    Query.php
-    Entity.php
+    QueryInterface.php
+    EntityInterface.php
 Wrapper.php
 Wrapper
     Repository.php
@@ -17,10 +17,10 @@ Repositories.php
             Query.php
         Type
             Database
-                Query.php
-                Entity.php
+                QueryInterface.php
+                EntityInterface.php
             Embedded
-                Entity.php
+                EntityInterface.php
             Implementation
                 Database
                     Query.php
@@ -29,8 +29,8 @@ Repositories.php
                     Entity.php
                 Database.php
                 Embedded.php
-            Database.php
-            Embedded.php
+            DatabaseInterface.php
+            EmbeddedInterface.php
 Drivers.php
 Drivers
     Driver.php
@@ -55,3 +55,60 @@ Drivers
             Database.php
         Mongo.php
         PDO.php
+        
+        
+
+Storage
+    RepositoryInterface.php
+    QueryInterface.php
+    EntityInterface.php
+    Implementation
+        Repository.php
+        Query.php
+        Entity.php
+    Type
+        Database
+            RepositoryInterface.php
+            QueryInterface.php
+            EntityInterface.php
+            Implementation
+                Repository.php
+                Query.php
+                Entity.php
+        Embedded
+            RepositoryInterface.php
+            QueryInterface.php
+            EntityInterface.php
+            Implementation
+                Repository.php
+                Query.php
+                Entity.php
+Drivers.php
+Drivers
+    Driver.php
+    Driver
+        SQL
+            Repository.php
+            Entity.php
+            Query.php
+        PDO
+            Repository.php
+            Entity.php
+            Query.php
+        Mongo
+            Database
+                Repository.php
+                Entity.php
+                Query.php
+            Embedded
+                Repository.php
+                Entity.php
+        Mongo.php
+        PDO.php
+Wrapper.php
+Wrapper
+    Repository.php
+    Model.php
+    Query.php
+
+Repositories.php

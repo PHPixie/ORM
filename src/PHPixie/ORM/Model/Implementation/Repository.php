@@ -1,12 +1,12 @@
 <?php
 
-namespace PHPixie\ORM\Repositories;
+namespace PHPixie\ORM\Repositories\Repository;
 
-abstract class Repository
+abstract class Implementation implements \PHPixie\ORM\Repositories\Repository
 {
     protected $dataBuilder;
     protected $modelName;
-    
+
     public function __construct($dataBuilder, $modelName)
     {
         $this->dataBuilder = $dataBuilder;

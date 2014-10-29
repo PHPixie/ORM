@@ -21,8 +21,18 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
     }
 
     protected function method($mock, $method, $return, $with = null, $at = null, $returnCallable = false) {
+        
+        if($at === null) {
+            $at = $this->any();
+        }elseif($at === 'once')
+        {
+            $at = $this->once();
+        }else{
+            $at = $this->at($at);
+        }
+        
         $method = $mock
-            ->expects($at === null ? $this->any() : $this->at($at))
+            ->expects($at)
             ->method($method);
 
         if ($with !== null) {

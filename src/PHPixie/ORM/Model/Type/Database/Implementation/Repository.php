@@ -32,21 +32,16 @@ abstract class Database extends \PHPixie\ORM\Repositories\Repository
         return $this->idField;
     }
     
-    public function query()
+    public function delete($entity)
     {
-        $this->ormBuilder->query($this->modelName());
-    }
+        if ($entity->isDeleted())
+            throw new \PHPixie\ORM\Exception\Entity("This model has already been deleted.");
 
-    public function delete($model)
-    {
-        if ($model->isDeleted())
-            throw new \PHPixie\ORM\Exception\Model("This model has already been deleted.");
-
-        if (!$model->isNew()) {
+        if (!$entity->isNew()) {
             $this->query()->in($model)->delete();
         }
 
-        $model->setDeleted(true);
+        $entity->setDeleted(true);
     }
 
     public function model()
@@ -105,4 +100,6 @@ abstract class Database extends \PHPixie\ORM\Repositories\Repository
     {
         return $this->connection()->count();
     }
+    
+
 }

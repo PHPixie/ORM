@@ -1,114 +1,14 @@
-
-RepositoryInterface.php
-Repository
-    QueryInterface.php
-    EntityInterface.php
-Wrapper.php
-Wrapper
-    Repository.php
-    Model.php
-    Query.php
+Models
+    WrapperInterface
 
 Repositories.php
-    Repositories
-        Repository.php
-        Repository
-            Enity.php
-            Query.php
-        Type
-            Database
-                QueryInterface.php
-                EntityInterface.php
-            Embedded
-                EntityInterface.php
-            Implementation
-                Database
-                    Query.php
-                    Entity.php
-                Embedded
-                    Entity.php
-                Database.php
-                Embedded.php
-            DatabaseInterface.php
-            EmbeddedInterface.php
-Drivers.php
-Drivers
-    Driver.php
-    Driver
-        SQL
-            Database.php
-            Database
-                Entity.php
-                Query.php
-        PDO
-            Database.php
-            Database
-                Entity.php
-                Query.php
-        Mongo
-            Database
-                Entity.php
-                Query.php
-            Embedded
-                Entity.php
-            Embedded.php
-            Database.php
-        Mongo.php
-        PDO.php
+    Models->repository($modelName);
+    
+===
 
-
-
-Storage
-    RepositoryInterface.php
-    QueryInterface.php
-    EntityInterface.php
-    Implementation
-        Repository.php
-        Query.php
-        Entity.php
-    Type
-        Database
-            RepositoryInterface.php
-            QueryInterface.php
-            EntityInterface.php
-            Implementation
-                Repository.php
-                Query.php
-                Entity.php
-        Embedded
-            RepositoryInterface.php
-            QueryInterface.php
-            EntityInterface.php
-            Implementation
-                Repository.php
-                Query.php
-                Entity.php
-Drivers.php
-Drivers
-    Driver.php
-    Driver
-        SQL
-            Repository.php
-            Entity.php
-            Query.php
-        PDO
-            Repository.php
-            Entity.php
-            Query.php
-        Mongo
-            Database
-                Repository.php
-                Entity.php
-                Query.php
-            Embedded
-                Repository.php
-                Entity.php
-        Mongo.php
-        PDO.php
-Wrapper.php
 Wrapper
-    Repository.php
-    Model.php
-    Query.php
-
+    Models
+    
 Repositories.php
+    $rep = $driver->repository();
+    $rep = $wrapper->repository($modelName, $rep);

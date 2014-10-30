@@ -75,6 +75,26 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Model\Implementation\Rep
         $this->repository->save($entity);
     }
     
+    /**
+     * @covers ::databaseSelectQuery
+     * @covers ::databaseUpdateQuery
+     * @covers ::databaseDeleteQuery
+     * @covers ::databaseInsertQuery
+     * @covers ::databaseCountQuery
+     * @covers ::<protected>
+     */
+    public function testQueries()
+    {
+        $types = array('select', 'update', 'delete', 'insert', 'count');
+        $connection = $this->prepareConnection();
+        foreach($types as $type) {
+            $query = $this->abstractMock('\PHPixie\Database\Query');
+            $this->method($connection, $type.'Query', $query, array(), null);
+            $method = 'database'.ucfirst($type).'Query';
+            $this->assertSame($query, $this->repository->$method());
+        }
+    }
+    
     protected function deleteTest($isNew = false)
     {
         $entity = $this->getEntity();

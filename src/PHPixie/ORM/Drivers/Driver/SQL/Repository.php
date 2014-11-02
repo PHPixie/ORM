@@ -1,44 +1,57 @@
 <?php
 
-namespace PHPixie\ORM\Repositories\Driver\SQL;
+namespace PHPixie\ORM\Drivers\Driver\SQL;
 
-class Repository extends \PHPixie\ORM\Repositories\Type\Database
+class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Repository
 {
-    protected $table;
+    protected $tableName;
+    protected $dataBuilder;
 
-    public function __construct($dataBuilder, $inflector, $modelName, $config)
+    public function __construct($models, $database, $dataBuilder, $inflector, $modelName, $config)
     {
-        parent::__construct($dataBuilder, $inflector, $modelName, $config);
-        if (($this->table = $config->get('table', null)) === null)
-            $this->table = $inflector->plural($modelName);
+        parent::__construct($models, $database, $modelName, $config);
+        $this->dataBuilder = $dataBuilder;
+        
+        if (($this->tableName = $config->get('table', null)) === null)
+            $this->tableName = $inflector->plural($modelName);
     }
 
     public function processSave($model)
     {
         $data = $model->data();
-        $data = $data->getDataDiff();
         $idField = $this->idField;
 
         if ($model->isNew()) {
-            $this->dbQuery('insert')
-                        ->data($data)
-                        ->execute();
+            $this->databaseInsertQuery()
+                ->data($data)
+                ->execute();
+            
+            $model->setField($idField, $this->connection()->insertId());
             $model->setIsNew(false);
         } else {
-            $this->dbQuery('update')
-                ->data($data)
+            $set = $data->diff()->set();
+            $this->databaseUpdateQuery()
+                ->set($set)
                 ->where($idField, $model->id())
                 ->execute();
-            $model->$idField => $this->connection()->insertId();
         }
 
         $data->setCurrentAsOriginal();
     }
-
-    protected function buildModel($data = null)
+    
+    public function tableName()
     {
-        $data = $this->dataBuilder->map($data);
+        return $this->tableName;
+    }
 
-        return $this->driver->model($data, $data !== null);
+    protected function buildData($data = null)
+    {
+        return $this->dataBuilder->map($data);
+    }
+    
+    protected function prepareDatabaseQuery($query)
+    {
+        $query->table($this->tableName);
+        return $query;
     }
 }

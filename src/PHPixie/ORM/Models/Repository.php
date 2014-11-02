@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Repositories;
+namespace PHPixie\ORM\Models;
 
 interface Repository
 {

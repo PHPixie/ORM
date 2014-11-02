@@ -11,7 +11,7 @@ class Database
         $this->database = $database;
     }
     
-    public function databaseConnection($name)
+    public function connection($name)
     {
         return $this->database->connection($name);
     }

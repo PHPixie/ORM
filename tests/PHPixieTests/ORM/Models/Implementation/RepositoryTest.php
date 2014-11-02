@@ -1,22 +1,33 @@
 <?php
 
-namespace PHPixieTests\ORM\Model\Implementation;
+namespace PHPixieTests\ORM\Models\Implementation;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Model\Implementation\Repository
+ * @coversDefaultClass \PHPixie\ORM\Models\Implementation\Repository
  */
 abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
 {
     protected $models;
-    protected $dataBuilder;
+    
     protected $repository;
+    
     protected $modelName = 'fairy';
-
+    protected $loadData;
+    
     public function setUp()
     {
-        $this->driver = $this->quickMock('\PHPixie\ORM\Models');
-        $this->dataBuilder = $this->quickMock('\PHPixie\ORM\Data');
+        $this->loadData = new \stdClass;
+        $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->repository = $this->repository();
+    }
+    
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
     }
     
     /**
@@ -48,7 +59,16 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
         $this->assertEquals($entity, $this->repository->create());
     }
     
-
+    /**
+     * @covers ::load
+     * @covers ::<protected>
+     */
+    public function testLoad()
+    {
+        $entity = $this->prepareEntity(false, $this->loadData);
+        $this->assertEquals($entity, $this->repository->load(false, $data));
+    }
+    
     protected function prepareQuery($modelsOffset = 0)
     {
         $query = $this->getQuery();
@@ -56,15 +76,16 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
         return $query;
     }
     
-    protected function prepareEntity($isNew = true, $modelsOffset = 0)
+    protected function prepareEntity($isNew = true, $data = null, $modelsOffset = 0)
     {
         $entity = $this->getEntity();
-        $this->method($this->models, 'entity', $entity, array($this->modelName, $isNew), $modelsOffset);
+        $data = $this->prepareBuildData($data);
+        $this->method($this->models, 'entity', $entity, array($this->modelName, $isNew, $data), $modelsOffset);
         return $entity;
     }
     
     abstract protected function repository();
-    abstract protected function driver();
     abstract protected function getQuery();
     abstract protected function getEntity();
+    abstract protected function prepareBuildData();
 }

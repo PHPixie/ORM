@@ -18,4 +18,14 @@ class Data {
     {
         return new \PHPixie\ORM\Data\Types\Map($data);
     }
+    
+    public function document($data = null)
+    {
+        return new \PHPixie\ORM\Data\Types\Document($data);
+    }
+    
+    public function diffableDocument($data = null)
+    {
+        return new \PHPixie\ORM\Data\Types\Document\Diffable($data);
+    }
 }

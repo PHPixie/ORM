@@ -16,30 +16,13 @@ abstract class Repository extends \PHPixie\ORM\Models\Type\Database\Implementati
             $this->tableName = $inflector->plural($modelName);
     }
 
-    protected function processSave($model)
+    protected function updateEntityData($id, $data)
     {
-        $data = $model->data();
-        $idField = $this->idField;
-
-        if ($model->isNew()) {
-            $values = (array) $data->data();
-            $this->databaseInsertQuery()
-                ->data($values)
-                ->execute();
-            
-            $id = $this->connection()->insertId();
-            $model->setField($idField, $id);
-            $model->setId($id);
-            $model->setIsNew(false);
-        } else {
-            $set = (array) $data->diff()->set();
-            $this->databaseUpdateQuery()
-                ->set($set)
-                ->where($idField, $model->id())
-                ->execute();
-        }
-
-        $data->setCurrentAsOriginal();
+        $set = (array) $data->diff()->set();
+        $this->databaseUpdateQuery()
+            ->set($set)
+            ->where($this->idField, $id)
+            ->execute();
     }
     
     public function tableName()

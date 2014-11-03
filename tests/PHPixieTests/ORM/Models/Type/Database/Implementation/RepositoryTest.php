@@ -70,6 +70,17 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
     }
     
     /**
+     * @covers ::save
+     * @covers ::<protected>
+     */
+    public function testSave()
+    {
+        $connection = $this->prepareConnection();
+        $this->saveTest($connection, true);
+        $this->saveTest($connection, false);
+    }
+    
+    /**
      * @covers ::delete
      * @covers ::<protected>
      */
@@ -112,13 +123,13 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
         }
     }
     
-    protected function prepareDatabaseQuery($type, $connection = null)
+    protected function prepareDatabaseQuery($type, $connection = null, $connectionOffset = 0)
     {
         if($connection === null) {
             $connection = $this->prepareConnection();
         }
         $query = $this->getDatabaseQuery($type);
-        $this->method($connection, $type.'Query', $query, array(), 0);
+        $this->method($connection, $type.'Query', $query, array(), $connectionOffset);
         $this->prepareSetQuerySource($query);
         return $query;
     }
@@ -139,6 +150,45 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
         $this->repository->delete($entity);
     }
     
+   protected function saveTest($connection, $isNew = false)
+    {
+        $entity = $this->getEntity();
+        $data = $this->getData();
+        $this->method($entity, 'isDeleted', false, array(), 0);
+        $this->method($entity, 'data', $data, array(), 1);
+        $this->method($entity, 'isNew', $isNew, array(), 2);
+
+        $dataOffset = 0;
+        $connectionOffset = 0;
+
+        if($isNew) {
+            $this->prepareInsertEntityData($connection, $data, $dataOffset, $connectionOffset);
+
+            $this->method($connection, 'insertId', 4, array(), $connectionOffset);
+            $this->method($entity, 'setField', null, array($this->idField, 4), 3);
+            $this->method($entity, 'setId', null, array(4), 4);
+            $this->method($entity, 'setIsNew', null, array(false), 5);
+
+        }else{
+            $this->method($entity, 'id', 3, array(), 3);
+            $this->prepareUpdateEntityData($connection, 3, $data, $dataOffset, $connectionOffset);
+
+        }
+
+        $this->method($data, 'setCurrentAsOriginal', null, array(), $dataOffset);
+        $this->repository->save($entity);
+    }
+    
+    protected function prepareInsertEntityData($connection, $data, &$dataOffset = 0, &$connectionOffset = 0)
+    {
+        $query = $this->prepareDatabaseQuery('insert', $connection, $connectionOffset++);
+            
+        $dataArray = array(5);
+        $this->method($data, 'data', (object) $dataArray, array(), $dataOffset++);
+        $this->method($query, 'data', $query, array($dataArray), 1);
+        $this->method($query, 'execute', null, array(), 2);
+    }
+    
     public function prepareConnection()
     {
         $connection = $this->getConnection();
@@ -154,7 +204,9 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
         return $config;
     }
     
+    abstract protected function prepareUpdateEntityData($connection, $id, $data, &$dataOffset = 0, &$connectionOffset = 0);
     abstract protected function getConnection();
     abstract protected function getDatabaseQuery($type);
     abstract protected function prepareSetQuerySource($query);
+    
 }

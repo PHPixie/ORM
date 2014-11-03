@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Data\Type\Document;
+namespace PHPixie\ORM\Data\Types\Document;
 
-class Diffable extends \PHPixie\ORM\Data\Type\Document implements \PHPixie\ORM\Data\Type\Diffable
+class Diffable extends \PHPixie\ORM\Data\Types\Document implements \PHPixie\ORM\Data\Type\Diffable
 {
     protected $dataBuilder;
     protected $originalData;

@@ -48,8 +48,23 @@ abstract class Repository extends \PHPixie\ORM\Models\Implementation\Repository
     {
         if ($entity->isDeleted())
             throw new \PHPixie\ORM\Exception\Entity("Deleted models cannot be saved.");
+        
+        $data = $entity->data();
+        $idField = $this->idField;
+        
+        if($entity->isNew()){
+            
+            $this->insertEntityData($data);
+            
+            $id = $this->connection()->insertId();
+            $entity->setField($idField, $id);
+            $entity->setId($id);
+            $entity->setIsNew(false);
+        } else {
+            $this->updateEntityData($entity->id(), $data);
+        }
 
-        $this->processSave($entity);
+        $data->setCurrentAsOriginal();
     }
 
     public function databaseSelectQuery()
@@ -77,8 +92,15 @@ abstract class Repository extends \PHPixie\ORM\Models\Implementation\Repository
         return $this->setQuerySource($this->connection()->countQuery());
     }
     
+    protected function insertEntityData($data)
+    {
+        $this->databaseInsertQuery()
+            ->data((array) $data->data())
+            ->execute();
+    }
+    
     abstract protected function defaultIdField();
     abstract protected function setQuerySource($query);
-    abstract protected function processSave($model);
+    abstract protected function updateEntityData($id, $data);
 
 }

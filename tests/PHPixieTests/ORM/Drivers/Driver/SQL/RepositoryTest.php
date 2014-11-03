@@ -35,7 +35,7 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Imp
      * @covers ::__construct
      * @covers ::<protected>
      */
-    public function testSetTableName()
+    public function testConfiguredTableName()
     {
         $this->config = parent::config();
         $this->method($this->config, 'get', 'pixies', array('table', null), 2);
@@ -50,60 +50,6 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Imp
     public function testTableName()
     {
         $this->assertSame($this->tableName, $this->repository->tableName());
-    }
-    
-    /**
-     * @covers ::save
-     * @covers ::<protected>
-     */
-    public function testSave()
-    {
-        $connection = $this->prepareConnection();
-        $this->saveTest($connection, true);
-        $this->saveTest($connection, false);
-    }
-    
-    protected function saveTest($connection, $isNew = true)
-    {
-        $entity = $this->getEntity();
-        $data = $this->getData();
-        $this->method($entity, 'isDeleted', false, array(), 0);
-        $this->method($entity, 'data', $data, array(), 1);
-        
-        $this->method($entity, 'isNew', $isNew, array(), 2);
-        
-        if($isNew) {
-            $query = $this->prepareDatabaseQuery('insert', $connection);
-            
-            $dataArray = array(5);
-            $this->method($data, 'data', (object) $dataArray, array(), 0);
-            $this->method($query, 'data', $query, array($dataArray), 1);
-            
-            $this->method($query, 'execute', null, array(), 2);
-            
-            $this->method($connection, 'insertId', 4, array(), 1);
-            $this->method($entity, 'setField', null, array($this->idField, 4), 3);
-            $this->method($entity, 'setId', null, array(4), 4);
-            $this->method($entity, 'setIsNew', null, array(false), 5);
-
-        }else{
-            $query = $this->prepareDatabaseQuery('update', $connection);
-            
-            $diff = $this->getDiff();
-            $this->method($data, 'diff', $diff, array(), 0);
-            
-            $set = array(5);
-            $this->method($diff, 'set', (object) $set, array(), 0);
-            $this->method($query, 'set', $query, array($set), 1);
-            
-            $this->method($entity, 'id', 3, array(), 3);
-            
-            $this->method($query, 'where', $query, array($this->idField, 3), 2);
-            $this->method($query, 'execute', null, array(), 3);
-        }
-        
-        $this->method($data, 'setCurrentAsOriginal', null, array(), 1);
-        $this->repository->save($entity);
     }
     
     protected function prepareBuildData($data)
@@ -127,6 +73,26 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Imp
         return $config;
     }
     
+    protected function prepareSetQuerySource($query)
+    {
+        $this->method($query, 'table', $query, array($this->tableName), 0);
+    }
+    
+    protected function prepareUpdateEntityData($connection, $id, $data, &$dataOffset = 0, &$connectionOffset = 0)
+    {
+        $query = $this->prepareDatabaseQuery('update', $connection, $connectionOffset++);
+
+        $diff = $this->getDiff();
+        $this->method($data, 'diff', $diff, array(), $dataOffset++);
+
+        $set = array(5);
+        $this->method($diff, 'set', (object) $set, array(), 0);
+        $this->method($query, 'set', $query, array($set), 1);
+
+        $this->method($query, 'where', $query, array($this->idField, $id), 2);
+        $this->method($query, 'execute', null, array(), 3);
+    }
+    
     protected function getData()
     {
         return $this->quickMock('\PHPixie\ORM\Data\Types\Map');
@@ -136,9 +102,5 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Imp
     {
         return $this->quickMock('\PHPixie\ORM\Data\Diff');
     }
-    
-    protected function prepareSetQuerySource($query)
-    {
-        $this->method($query, 'table', $query, array($this->tableName), 0);
-    }
+
 }

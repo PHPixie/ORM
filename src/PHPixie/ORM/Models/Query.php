@@ -1,5 +1,5 @@
 <?php
-namespace PHPixie\ORM\Model;
+namespace PHPixie\ORM\Models;
 
 interface Query
 {

@@ -11,12 +11,36 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Imp
     protected $inflector;
     
     protected $tableName = 'fairies';
+    protected $defaultIdField = 'id';
     
     public function setUp()
     {
         $this->dataBuilder = $this->quickMock('\PHPixie\ORM\Data');
         $this->inflector = $this->inflector();
         parent::setUp();
+    }
+    
+    /**
+     * @covers ::__construct
+     * @covers PHPixie\ORM\Models\Type\Database\Implementation\Repository::__construct
+     * @covers PHPixie\ORM\Models\Implementation\Repository::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testSetTableName()
+    {
+        $this->config = parent::config();
+        $this->method($this->config, 'get', 'pixies', array('table', null), 2);
+        $repository = $this->repository();
+        $this->assertSame('pixies', $repository->tableName());
     }
     
     /**
@@ -34,20 +58,12 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Imp
      */
     public function testSave()
     {
-        $this->saveTest(true);
-        $this->saveTest(false);
+        $connection = $this->prepareConnection();
+        $this->saveTest($connection, true);
+        $this->saveTest($connection, false);
     }
     
-    /**
-     * @covers ::tableName
-     * @covers ::<protected>
-     */
-    public function testTableName()
-    {
-        $this->assertSame($this->tableName, $this->repository->tableName());;
-    }
-    
-    protected function saveTest($isNew = true)
+    protected function saveTest($connection, $isNew = true)
     {
         $entity = $this->getEntity();
         $data = $this->getData();
@@ -57,23 +73,27 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Imp
         $this->method($entity, 'isNew', $isNew, array(), 2);
         
         if($isNew) {
-            $query = $this->prepareDatabaseQuery('insert');
+            $query = $this->prepareDatabaseQuery('insert', $connection);
             
             $dataArray = array(5);
-            $this->method($data, 'data', (stdObject) $dataArray, array(), 0);
+            $this->method($data, 'data', (object) $dataArray, array(), 0);
             $this->method($query, 'data', $query, array($dataArray), 1);
             
             $this->method($query, 'execute', null, array(), 2);
             
+            $this->method($connection, 'insertId', 4, array(), 1);
             $this->method($entity, 'setField', null, array($this->idField, 4), 3);
-            $this->method($entity, 'setIsNew', null, array(false), 4);
+            $this->method($entity, 'setId', null, array(4), 4);
+            $this->method($entity, 'setIsNew', null, array(false), 5);
 
         }else{
+            $query = $this->prepareDatabaseQuery('update', $connection);
+            
             $diff = $this->getDiff();
             $this->method($data, 'diff', $diff, array(), 0);
             
             $set = array(5);
-            $this->method($diff, 'set', (stdObject) $set, array(), 0);
+            $this->method($diff, 'set', (object) $set, array(), 0);
             $this->method($query, 'set', $query, array($set), 1);
             
             $this->method($entity, 'id', 3, array(), 3);
@@ -97,6 +117,7 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Imp
     {
         $inflector = $this->quickMock('\PHPixie\ORM\Inflector');
         $this->method($inflector, 'plural', $this->tableName, array($this->modelName));
+        return $inflector;
     }
     
     protected function config()

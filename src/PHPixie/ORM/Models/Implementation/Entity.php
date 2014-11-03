@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM;
+namespace PHPixie\ORM\Models\Implementation;
 
-class Model
+class Entity implements \PHPixie\ORM\Models\Entity
 {
     protected $relationshipMap;
     protected $properties = array();
@@ -57,6 +57,11 @@ class Model
     {
         return $this->data->get($name);
     }
+    
+    public function setField($name, $value)
+    {
+        $this->data->set($name, $value);
+    }
 
     public function __set($name, $value)
     {
@@ -80,7 +85,7 @@ class Model
        
     }
 
-    public function relationshipProperty($name, $createMissing = true)
+    public function getRelationshipProperty($name, $createMissing = true)
     {
         return 5;
         if (!array_key_exists($name, $this->properties)) {

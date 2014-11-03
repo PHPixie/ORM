@@ -2,4 +2,4 @@
 
 namespace PHPixie\ORM\Exception;
 
-class Model extends \PHPixie\ORM\Exception{}
+class Entity extends \PHPixie\ORM\Exception{}

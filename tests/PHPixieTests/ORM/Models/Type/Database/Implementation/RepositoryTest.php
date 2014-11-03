@@ -106,14 +106,17 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
         $types = array('select', 'update', 'delete', 'insert', 'count');
         $connection = $this->prepareConnection();
         foreach($types as $type) {
-            $query = prepareDatabaseQuery($type);
+            $query = $this->prepareDatabaseQuery($type, $connection);
             $method = 'database'.ucfirst($type).'Query';
             $this->assertSame($query, $this->repository->$method());
         }
     }
     
-    protected function prepareDatabaseQuery($type)
+    protected function prepareDatabaseQuery($type, $connection = null)
     {
+        if($connection === null) {
+            $connection = $this->prepareConnection();
+        }
         $query = $this->getDatabaseQuery($type);
         $this->method($connection, $type.'Query', $query, array(), 0);
         $this->prepareSetQuerySource($query);
@@ -147,7 +150,7 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
     {
         $config = $this->quickMock('\PHPixie\Config\Slice');
         $this->method($config, 'get', $this->connectionName, array('connection', 'default'), 0);
-        $this->method($config, 'get', $this->idField, array('idField', $this->defaultIdField), 1);
+        $this->method($config, 'get', $this->idField, array('id', $this->defaultIdField), 1);
         return $config;
     }
     

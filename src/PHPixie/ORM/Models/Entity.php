@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Storage;
+namespace PHPixie\ORM\Models;
 
 interface Entity
 {
@@ -9,6 +9,7 @@ interface Entity
     public function getRelationshipProperty($relationship, $property);
     public function data();
     public function getField($name);
+    public function setField($key, $value);
     public function __get($name);
-    public function __set($name, $value)
+    public function __set($name, $value);
 }

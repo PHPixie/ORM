@@ -18,4 +18,24 @@ class RepositoryTest extends \PHPixieTests\ORM\Drivers\Driver\SQL\RepositoryTest
             $this->config
         );
     }
+    
+    protected function getConnection()
+    {
+        return $this->quickMock('\PHPixie\Database\Driver\PDO\Connection');
+    }
+    
+    protected function getDatabaseQuery($type)
+    {
+        return $this->quickMock('\PHPixie\Database\Driver\PDO\Query\Type\\'.ucfirst($type));
+    }
+    
+    protected function getQuery()
+    {
+        return $this->quickMock('\PHPixie\ORM\Drivers\Driver\PDO\Query');
+    }
+    
+    protected function getEntity()
+    {
+        return $this->quickMock('\PHPixie\ORM\Drivers\Driver\PDO\Entity');
+    }
 }

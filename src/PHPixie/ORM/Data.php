@@ -13,4 +13,9 @@ class Data {
     {
         return new \PHPixie\ORM\Data\Diff\Removing($set, $unset);
     }
+    
+    public function map($data = null)
+    {
+        return new \PHPixie\ORM\Data\Types\Map($data);
+    }
 }

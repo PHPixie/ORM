@@ -4,13 +4,11 @@ namespace PHPixie\ORM\Data\Types;
 
 class Map extends \PHPixie\ORM\Data\Type\Implementation implements \PHPixie\ORM\Data\Type\Diffable
 {
-    protected $dataBuilder;
     protected $data;
     protected $originalData;
     
-    public function __construct($dataBuilder, $data)
+    public function __construct($data = null)
     {
-        $this->dataBuilder = $dataBuilder;
         $this->data = (array) $data;
         $this->originalData = $data;
     }

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Drivers\Driver\SQL;
 
-class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Repository
+abstract class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Repository
 {
     protected $tableName;
     protected $dataBuilder;
@@ -16,20 +16,23 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
             $this->tableName = $inflector->plural($modelName);
     }
 
-    public function processSave($model)
+    protected function processSave($model)
     {
         $data = $model->data();
         $idField = $this->idField;
 
         if ($model->isNew()) {
+            $values = (array) $data->data();
             $this->databaseInsertQuery()
-                ->data($data)
+                ->data($values)
                 ->execute();
             
-            $model->setField($idField, $this->connection()->insertId());
+            $id = $this->connection()->insertId();
+            $model->setField($idField, $id);
+            $model->setId($id);
             $model->setIsNew(false);
         } else {
-            $set = $data->diff()->set();
+            $set = (array) $data->diff()->set();
             $this->databaseUpdateQuery()
                 ->set($set)
                 ->where($idField, $model->id())
@@ -49,9 +52,14 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
         return $this->dataBuilder->map($data);
     }
     
-    protected function prepareDatabaseQuery($query)
+    protected function setQuerySource($query)
     {
         $query->table($this->tableName);
         return $query;
+    }
+    
+    protected function defaultIdField()
+    {
+        return 'id';
     }
 }

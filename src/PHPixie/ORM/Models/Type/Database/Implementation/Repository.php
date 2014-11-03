@@ -8,14 +8,13 @@ abstract class Repository extends \PHPixie\ORM\Models\Implementation\Repository
     protected $database;
     protected $connectionName;
     protected $idField;
-    protected $defaultIdField = 'id';
 
     public function __construct($models, $database, $modelName, $config)
     {
         parent::__construct($models, $modelName);
         $this->database = $database;
-        $this->connectionName = $modelConfig->get('connection', 'default');
-        $this->idField = $modelConfig->get('idField', $this->defaultIdField);
+        $this->connectionName = $config->get('connection', 'default');
+        $this->idField = $config->get('id', $this->defaultIdField());
     }
 
     public function connectionName()
@@ -39,18 +38,18 @@ abstract class Repository extends \PHPixie\ORM\Models\Implementation\Repository
             throw new \PHPixie\ORM\Exception\Entity("This model has already been deleted.");
 
         if (!$entity->isNew()) {
-            $this->query()->in($model)->delete();
+            $this->query()->in($entity)->delete();
         }
 
-        $entity->setDeleted(true);
+        $entity->setIsDeleted(true);
     }
 
-    public function save($model)
+    public function save($entity)
     {
-        if ($model->isDeleted())
-            throw new \PHPixie\ORM\Exception\Model("Deleted models cannot be saved.");
+        if ($entity->isDeleted())
+            throw new \PHPixie\ORM\Exception\Entity("Deleted models cannot be saved.");
 
-        $this->processSave($model);
+        $this->processSave($entity);
     }
 
     public function databaseSelectQuery()
@@ -75,11 +74,11 @@ abstract class Repository extends \PHPixie\ORM\Models\Implementation\Repository
     
     public function databaseCountQuery()
     {
-        return $this->setQuerySource($this->connection()->countQuery()));
+        return $this->setQuerySource($this->connection()->countQuery());
     }
     
+    abstract protected function defaultIdField();
     abstract protected function setQuerySource($query);
     abstract protected function processSave($model);
-    abstract protected function buildModel($data = null);
 
 }

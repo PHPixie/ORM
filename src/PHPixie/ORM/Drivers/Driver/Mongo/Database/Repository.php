@@ -1,52 +1,66 @@
 <?php
 
-namespace PHPixie\ORM\Drivers\Driver\Mongo\Repository;
+namespace PHPixie\ORM\Drivers\Driver\Mongo\Database;
 
-class Database extends \PHPixie\ORM\Repositories\Repository\Database
+class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Repository
 {
+    protected $tableName;
+    protected $dataBuilder;
 
-    protected $collection;
-
-    public function __construct($ormBuilder, $driver, $dataBuilder, $inflector, $modelName, $config)
+    public function __construct($models, $database, $dataBuilder, $inflector, $modelName, $config)
     {
-        parent::__construct($ormBuilder, $driver, $dataBuilder, $inflector, $modelName, $config);
-        if (($this->collection = $config->get('table', null)) === null)
-            $this->collection = $inflector->plural($modelName);
+        parent::__construct($models, $database, $modelName, $config);
+        $this->dataBuilder = $dataBuilder;
+        
+        if (($this->collectionName = $config->get('collection', null)) === null)
+            $this->collectionName = $inflector->plural($modelName);
     }
 
-    public function databaseQuery($type = 'select')
-    {
-        return $this->connection()
-                    ->query($type)
-                    ->collection($this->collection);
-    }
-
-    public function processSave($model)
+    protected function processSave($model)
     {
         $data = $model->data();
-        $diff = $data->getDataDiff();
+        $idField = $this->idField;
 
         if ($model->isNew()) {
-            $this->databaseQuery('insert')
-                        ->data($diff->set())
-                        ->execute();
-            $model->setId($this->connection()->insertId());
+            $object = $data->data();
+            $this->databaseInsertQuery()
+                ->data($object)
+                ->execute();
+            
+            $id = $this->connection()->insertId();
+            $model->setField($idField, $id);
+            $model->setId($id);
             $model->setIsNew(false);
         } else {
-            $this->dbQuery('update')
-                ->data($diff->set())
-                ->unset($diff->unset())
+            $diff = $data->diff();
+            $this->databaseUpdateQuery()
+                ->set($diff->set())
+                ->_unset($diff->unset())
                 ->where($idField, $model->id())
                 ->execute();
         }
 
         $data->setCurrentAsOriginal();
     }
-
-    protected function buildModel($data = null)
+    
+    public function collectionName()
     {
-        $data = $this->dataBuilder->document($data);
+        return $this->collectionName;
+    }
 
-        return $this->driver->databaseModel($data, $data !== null);
+    protected function buildData($data = null)
+    {
+        return $this->dataBuilder->document($data);
+    }
+    
+    protected function setQuerySource($query)
+    {
+        $query->collection($this->collectionName);
+        return $query;
+    }
+    
+    protected function defaultIdField()
+    {
+        return '_id';
     }
 }

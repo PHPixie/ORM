@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM;
+namespace PHPixie\ORM\Models\Implementation;
 
-class Query
+class Query implements \PHPixie\ORM\Models\Query
 {
     protected $conditions;
     protected $mapper;
@@ -272,4 +272,6 @@ class Query
     {
         return $this->addRelated('xor', true, $relationship, $condition);
     }
+    public function __get($field){}
+    public function __call($field, $f){}
 }

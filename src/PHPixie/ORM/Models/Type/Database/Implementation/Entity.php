@@ -1,11 +1,13 @@
 <?php
 
-namespace PHPixie\ORM\Repositories\Type\Database;
+namespace PHPixie\ORM\Models\Type\Database\Implementation;
 
-abstract class Model extends \PHPixie\ORM\Model
+abstract class Entity extends \PHPixie\ORM\Models\Implementation\Entity
+                      implements \PHPixie\ORM\Models\Type\Database\Entity
 {
     protected $isDeleted = false;
     protected $isNew;
+    protected $id;
 
     public function __construct($isNew = true)
     {
@@ -24,6 +26,8 @@ abstract class Model extends \PHPixie\ORM\Model
 
         return null;
     }
+    
+    public function setId($id){}
 
     protected function assertNotDeleted()
     {
@@ -51,7 +55,7 @@ abstract class Model extends \PHPixie\ORM\Model
         $this->isNew = $isNew;
     }
 
-    public function relationshipProperty($name, $createMissing = true)
+    public function getRelationshipProperty($name, $createMissing = true)
     {
         $this->assertNotDeleted();
         parent::relationshipProperty($name, $createMissing);

@@ -66,7 +66,7 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
     public function testLoad()
     {
         $entity = $this->prepareEntity(false, $this->loadData);
-        $this->assertEquals($entity, $this->repository->load(false, $data));
+        $this->assertEquals($entity, $this->repository->load($this->loadData));
     }
     
     protected function prepareQuery($modelsOffset = 0)
@@ -87,5 +87,5 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
     abstract protected function repository();
     abstract protected function getQuery();
     abstract protected function getEntity();
-    abstract protected function prepareBuildData();
+    abstract protected function prepareBuildData($data);
 }

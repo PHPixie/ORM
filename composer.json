@@ -13,7 +13,8 @@
         }
     ],
     "require": {
-        "phpixie/database": "3.*@dev"
+        "phpixie/database": "3.*@dev",
+        "phpixie/config": "3.*@dev"
     },
     "autoload": {
         "psr-0": {"PHPixie": "classes/"}

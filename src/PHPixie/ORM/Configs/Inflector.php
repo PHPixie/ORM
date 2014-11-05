@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM;
+namespace PHPixie\ORM\Configs;
 
 class Inflector
 {

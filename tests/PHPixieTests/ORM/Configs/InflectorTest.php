@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM;
+namespace PHPixieTests\ORM\Configs;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Inflector
+ * @coversDefaultClass \PHPixie\ORM\Configs\Inflector
  */
 class InflectorTest extends \PHPixieTests\AbstractORMTest
 {
@@ -16,7 +16,7 @@ class InflectorTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->inflector = new \PHPixie\ORM\Inflector;
+        $this->inflector = new \PHPixie\ORM\Configs\Inflector;
     }
 
     /**

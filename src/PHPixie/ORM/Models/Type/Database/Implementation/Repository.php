@@ -2,34 +2,54 @@
 
 namespace PHPixie\ORM\Models\Type\Database\Implementation;
 
-abstract class Repository extends \PHPixie\ORM\Models\Implementation\Repository
-                          implements \PHPixie\ORM\Models\Type\Database\Repository
+abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repository
 {
+    protected $model;
     protected $database;
-    protected $connectionName;
-    protected $idField;
-
-    public function __construct($models, $database, $modelName, $config)
+    protected $config;
+    
+    public function __construct($model, $database, $config)
     {
-        parent::__construct($models, $modelName);
+        $this->model = $model;
         $this->database = $database;
-        $this->connectionName = $config->get('connection', 'default');
-        $this->idField = $config->get('id', $this->defaultIdField());
+        $this->config = $config;
     }
-
-    public function connectionName()
+    
+    public function config()
     {
-        return $this->connectionName;
+        return $this->config;
+    }
+    
+    public function modelName()
+    {
+        return $this->config->modelName;
+    }
+    
+    public function query()
+    {
+        return $this->model->query($this->modelName());
+    }
+    
+    public function create()
+    {
+        return $this->entity();
+    }
+    
+    public function load($data)
+    {
+        return $this->entity(false, $data);
+    }
+    
+    protected function entity($isNew = true, $data = null)
+    {
+        $modelName = $this->modelName();
+        $data = $this->buildData($data);
+        return $this->model->entity($modelName, $isNew, $data);
     }
 
     public function connection()
     {
-        return $this->database->connection($this->connectionName);
-    }
-
-    public function idField()
-    {
-        return $this->idField;
+        return $this->database->connection($this->config->connection);
     }
     
     public function delete($entity)
@@ -50,7 +70,7 @@ abstract class Repository extends \PHPixie\ORM\Models\Implementation\Repository
             throw new \PHPixie\ORM\Exception\Entity("Deleted models cannot be saved.");
         
         $data = $entity->data();
-        $idField = $this->idField;
+        $idField = $this->config->idField;
         
         if($entity->isNew()){
             
@@ -65,6 +85,13 @@ abstract class Repository extends \PHPixie\ORM\Models\Implementation\Repository
         }
 
         $data->setCurrentAsOriginal();
+    }
+    
+    protected function insertEntityData($data)
+    {
+        $this->databaseInsertQuery()
+            ->data((array) $data->data())
+            ->execute();
     }
 
     public function databaseSelectQuery()
@@ -92,14 +119,6 @@ abstract class Repository extends \PHPixie\ORM\Models\Implementation\Repository
         return $this->setQuerySource($this->connection()->countQuery());
     }
     
-    protected function insertEntityData($data)
-    {
-        $this->databaseInsertQuery()
-            ->data((array) $data->data())
-            ->execute();
-    }
-    
-    abstract protected function defaultIdField();
     abstract protected function setQuerySource($query);
     abstract protected function updateEntityData($id, $data);
 

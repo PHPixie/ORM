@@ -1,19 +1,16 @@
 <?php
 
-namespace PHPixie\ORM\Drivers\Driver\Mongo\Database;
+namespace PHPixie\ORM\Drivers\Driver\Mongo;
 
 class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Repository
 {
     protected $collectionName;
     protected $dataBuilder;
 
-    public function __construct($models, $database, $dataBuilder, $inflector, $modelName, $config)
+    public function __construct($model, $database, $dataBuilder, $config)
     {
-        parent::__construct($models, $database, $modelName, $config);
+        parent::__construct($models, $database, $config);
         $this->dataBuilder = $dataBuilder;
-        
-        if (($this->collectionName = $config->get('collection', null)) === null)
-            $this->collectionName = $inflector->plural($modelName);
     }
 
     protected function updateEntityData($id, $data)
@@ -25,11 +22,6 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
             ->where($this->idField, $id)
             ->execute();
     }
-    
-    public function collectionName()
-    {
-        return $this->collectionName;
-    }
 
     protected function buildData($data = null)
     {
@@ -38,12 +30,7 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
     
     protected function setQuerySource($query)
     {
-        $query->collection($this->collectionName);
+        $query->collection($this->config->collection);
         return $query;
-    }
-    
-    protected function defaultIdField()
-    {
-        return '_id';
     }
 }

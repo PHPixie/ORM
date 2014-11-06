@@ -4,9 +4,14 @@ namespace PHPixie\ORM\Models\Type\Database;
 
 interface Repository extends \PHPixie\ORM\Models\Repository
 {
-    public function connectionName();
+    public function config();
+    public function modelName();
+    public function save($entity);
+    public function delete($entity);
+    public function load($data);
+    public function create();
+    public function query();
     public function connection();
-    public function idField();
     
     public function databaseSelectQuery();
     public function databaseUpdateQuery();

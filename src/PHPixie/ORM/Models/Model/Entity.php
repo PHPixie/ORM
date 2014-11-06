@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Models;
+namespace PHPixie\ORM\Models\Model;
 
 interface Entity
 {

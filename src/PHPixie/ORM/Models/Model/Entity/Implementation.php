@@ -1,13 +1,13 @@
 <?php
 
-namespace PHPixie\ORM\Models\Implementation;
+namespace PHPixie\ORM\Models\Model\Entity;
 
-class Entity implements \PHPixie\ORM\Models\Entity
+abstract class Implementation implements \PHPixie\ORM\Models\Model\Entity
 {
     protected $relationshipMap;
-    protected $properties = array();
+    protected $relationshipProperties = array();
 
-    public function __construct($relationshipMap, $modelName, $data, $isNew = true)
+    public function __construct($relationshipMap, $config, $data)
     {
         $this->relationshipMap = $relationshipMap;
         $this->setData($data);
@@ -16,41 +16,7 @@ class Entity implements \PHPixie\ORM\Models\Entity
     
     public function modelName()
     {
-    
-    }
-    
-    public function asObject($recursive = false)
-    {
-        $data = $this->repository->modelAsObject($this);
-
-        if($recursive && !$this->isDeleted())
-            foreach($this->properties as $name => $property)
-                if($property->isLoaded())
-                    $data->$name = $property->data();
-
-        return $data;
-    }
-
-    public function save()
-    {
-        $this->repository->save($this);
-
-        return $this;
-    }
-
-    public function setRelationshipProperty($relationship, $property)
-    {
-        $this->relationship = $property;
-    }
-    
-    public function __get($name)
-    {
-
-        $property = $this->relationshipProperty($name);
-        if ($property !== null)
-            return $property;
-        
-        return $this->getField($name);
+        return $this->config->modelName;
     }
     
     public function getField($name)
@@ -62,46 +28,60 @@ class Entity implements \PHPixie\ORM\Models\Entity
     {
         $this->data->set($name, $value);
     }
+    
+    public function asObject($recursive = false)
+    {
+        $data = $this->data->data();
 
+        if($recursive) {
+            foreach($this->relationshipProperties as $name => $property) {
+                if($property->isLoaded()) {
+                    $data->$name = $property->data(true);
+                }
+            }
+        }
+        return $data;
+    }
+
+    public function setRelationshipProperty($name, $property)
+    {
+        $this->relationshipProperties[$name] = $property;
+    }
+
+    public function __get($name)
+    {
+        $property = $this->getRelationshipProperty($name);
+        if ($property !== null)
+            return $property;
+        
+        return $this->getField($name);
+    }
+    
     public function __set($name, $value)
     {
         $this->data->set($name, $value);
     }
     
-    protected function setData($data)
-    {
-        $data->setModel($this);
-        foreach($data->properties() as $key => $value)
-            $this->$key = $value;
-    }
-
     public function data()
     {
         return $this->data;
     }
 
-    public function dataProperties()
-    {
-       
-    }
-
     public function getRelationshipProperty($name, $createMissing = true)
     {
-        return 5;
-        if (!array_key_exists($name, $this->properties)) {
+        if (!array_key_exists($name, $this->relationshipProperties)) {
             if (!$createMissing)
                 return null;
 
-            $property = $this->relationshipMap->modelProperty($this, $name);
+            $property = $this->relationshipMap->entityProperty($this, $name);
 
             if ($property === null)
                 return null;
 
-            $this->properties[$name] = $property;
-            $this->$name = $property;
+            $this->relationshipProperties[$name] = $property;
         }
 
-        return $this->properties[$name];
+        return $this->relationshipProperties[$name];
     }
     
 }

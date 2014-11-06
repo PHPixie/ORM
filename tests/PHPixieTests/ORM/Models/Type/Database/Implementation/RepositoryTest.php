@@ -5,20 +5,28 @@ namespace PHPixieTests\ORM\Models\Type\Database\Implementation;
 /**
  * @coversDefaultClass \PHPixie\ORM\Model\Type\Database\Implementation\Repository
  */
-abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\RepositoryTest
+abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $models;
     protected $database;
+    protected $configData = array(
+        'idField' => 'fairy_id',
+        'connection' => 'test',
+        'modelName'  => 'fairy'
+    );
     protected $config;
     
-    protected $defaultIdField;
-    protected $idField = 'id';
-    protected $connectionName = 'test';
+    protected $repository;
+    protected $loadData;
     
     public function setUp()
     {
+        $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->database = $this->quickMock('\PHPixie\ORM\Database');
         $this->config = $this->config();
-        parent::setUp();
+        $this->loadData = new \stdClass;
+        
+        $this->repository = $this->repository();
     }
     
     /**
@@ -32,13 +40,14 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
     }
     
     /**
-     * @covers ::connectionName
+     * @covers ::modelName
      * @covers ::<protected>
      */
-    public function testConnectionName()
+    public function testModelName()
     {
-        $this->assertSame($this->connectionName, $this->repository->connectionName());
+        $this->assertEquals($this->configData['modelName'], $this->repository->modelName());
     }
+    
     
     /**
      * @covers ::connection
@@ -48,15 +57,6 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
     {
         $connection = $this->prepareConnection();
         $this->assertSame($connection, $this->repository->connection());
-    }
-    
-    /**
-     * @covers ::idField
-     * @covers ::<protected>
-     */
-    public function testIdField()
-    {
-        $this->assertSame($this->idField, $this->repository->idField());
     }
     
     /**
@@ -123,6 +123,21 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
         }
     }
     
+    protected function prepareQuery($modelsOffset = 0)
+    {
+        $query = $this->getQuery();
+        $this->method($this->models, 'query', $query, array($this->configData['modelName']), $modelsOffset);
+        return $query;
+    }
+    
+    protected function prepareEntity($isNew = true, $data = null, $modelsOffset = 0)
+    {
+        $entity = $this->getEntity();
+        $data = $this->prepareBuildData($data);
+        $this->method($this->models, 'entity', $entity, array($this->modelName, $isNew, $data), $modelsOffset);
+        return $entity;
+    }
+    
     protected function prepareDatabaseQuery($type, $connection = null, $connectionOffset = 0)
     {
         if($connection === null) {
@@ -165,7 +180,7 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
             $this->prepareInsertEntityData($connection, $data, $dataOffset, $connectionOffset);
 
             $this->method($connection, 'insertId', 4, array(), $connectionOffset);
-            $this->method($entity, 'setField', null, array($this->idField, 4), 3);
+            $this->method($entity, 'setField', null, array($this->configData['idField'], 4), 3);
             $this->method($entity, 'setId', null, array(4), 4);
             $this->method($entity, 'setIsNew', null, array(false), 5);
 
@@ -192,15 +207,16 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Models\Implementation\Re
     public function prepareConnection()
     {
         $connection = $this->getConnection();
-        $this->method($this->database, 'connection', $connection, array($this->connectionName));
+        $this->method($this->database, 'connection', $connection, array($this->configData['connection']));
         return $connection;
     }
     
     protected function config()
     {
-        $config = $this->quickMock('\PHPixie\Config\Slice');
-        $this->method($config, 'get', $this->connectionName, array('connection', 'default'), 0);
-        $this->method($config, 'get', $this->idField, array('id', $this->defaultIdField), 1);
+        $config = $this->getConfig();
+        foreach($this->configData as $key => $value) {
+            $config->$key = $value;
+        }
         return $config;
     }
     

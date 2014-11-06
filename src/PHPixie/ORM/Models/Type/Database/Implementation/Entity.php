@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Models\Type\Database\Implementation;
 
-abstract class Entity extends \PHPixie\ORM\Models\Implementation\Entity
+abstract class Entity extends \PHPixie\ORM\Models\Model\Entity\Implementation
                       implements \PHPixie\ORM\Models\Type\Database\Entity
 {
     protected $isDeleted = false;

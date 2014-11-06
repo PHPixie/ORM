@@ -1,8 +1,9 @@
 <?php
 
-namespace PHPixie\ORM\Repositories\Type\Embedded;
+namespace PHPixie\ORM\Models\Type\Embedded\Implementation;
 
-abstract class Model extends \PHPixie\ORM\Model
+abstract class Entity extends \PHPixie\ORM\Models\Model\Entity\Implementation
+                      implements \PHPixie\ORM\Models\Type\Embedded\Entity
 {
     protected $owner;
     protected $ownerPropertyName;

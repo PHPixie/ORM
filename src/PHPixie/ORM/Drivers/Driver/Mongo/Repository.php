@@ -7,7 +7,7 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
     protected $collectionName;
     protected $dataBuilder;
 
-    public function __construct($model, $database, $dataBuilder, $config)
+    public function __construct($models, $database, $dataBuilder, $config)
     {
         parent::__construct($models, $database, $config);
         $this->dataBuilder = $dataBuilder;
@@ -19,7 +19,7 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
         $this->databaseUpdateQuery()
             ->set((array) $diff->set())
             ->_unset((array) $diff->remove())
-            ->where($this->idField, $id)
+            ->where($this->config->idField, $id)
             ->execute();
     }
 
@@ -33,4 +33,5 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
         $query->collection($this->config->collection);
         return $query;
     }
+    
 }

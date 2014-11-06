@@ -14,7 +14,7 @@ abstract class Config extends \PHPixie\ORM\Models\Model\Config
     
     protected function processConfig($config, $inflector)
     {
-        $this->connectionName = $config->get('connection', 'default');
+        $this->connection = $config->get('connection', 'default');
         $this->idField = $config->get('id', $this->defaultIdField());
     }
     

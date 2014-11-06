@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Models\Type\Database;
 
-interface Repository extends \PHPixie\ORM\Models\Repository
+interface Repository
 {
     public function config();
     public function modelName();
@@ -12,7 +12,6 @@ interface Repository extends \PHPixie\ORM\Models\Repository
     public function create();
     public function query();
     public function connection();
-    
     public function databaseSelectQuery();
     public function databaseUpdateQuery();
     public function databaseDeleteQuery();

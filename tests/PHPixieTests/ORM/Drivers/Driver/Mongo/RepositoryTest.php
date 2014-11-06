@@ -1,55 +1,30 @@
 <?php
 
-namespace PHPixieTests\ORM\Drivers\Driver\Mongo\Database;
+namespace PHPixieTests\ORM\Drivers\Driver\Mongo;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Drivers\Driver\Mongo\database\Repository
+ * @coversDefaultClass \PHPixie\ORM\Drivers\Driver\Mongo\Repository
  */
 class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementation\RepositoryTest
 {
-    protected $dataBuider;
-    protected $inflector;
-    
+    protected $dataBuilder;
     protected $collectionName = 'fairies';
-    protected $defaultIdField = '_id';
     
     public function setUp()
     {
         $this->dataBuilder = $this->quickMock('\PHPixie\ORM\Data');
-        $this->inflector = $this->inflector();
+        $this->configData['collection'] = 'fairies';
         parent::setUp();
     }
     
     /**
      * @covers ::__construct
      * @covers PHPixie\ORM\Models\Type\Database\Implementation\Repository::__construct
-     * @covers PHPixie\ORM\Models\Implementation\Repository::__construct
      * @covers ::<protected>
      */
     public function testConstruct()
     {
     
-    }
-    
-    /**
-     * @covers ::__construct
-     * @covers ::<protected>
-     */
-    public function testConfiguredCollectionName()
-    {
-        $this->config = parent::config();
-        $this->method($this->config, 'get', 'pixies', array('collection', null), 2);
-        $repository = $this->repository();
-        $this->assertSame('pixies', $repository->collectionName());
-    }
-    
-    /**
-     * @covers ::collectionName
-     * @covers ::<protected>
-     */
-    public function testCollectionName()
-    {
-        $this->assertSame($this->collectionName, $this->repository->collectionName());
     }
     
     protected function prepareUpdateEntityData($connection, $id, $data, &$dataOffset = 0, &$connectionOffset = 0)
@@ -67,7 +42,7 @@ class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementati
         $this->method($diff, 'remove', (object) $remove, array(), 1);
         $this->method($query, '_unset', $query, array($remove), 2);
 
-        $this->method($query, 'where', $query, array($this->idField, $id), 3);
+        $this->method($query, 'where', $query, array($this->configData['idField'], $id), 3);
         $this->method($query, 'execute', null, array(), 4);
     }
     
@@ -83,20 +58,6 @@ class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementati
         return $entityData;
     }
     
-    protected function inflector()
-    {
-        $inflector = $this->quickMock('\PHPixie\ORM\Inflector');
-        $this->method($inflector, 'plural', $this->collectionName, array($this->modelName));
-        return $inflector;
-    }
-    
-    protected function config()
-    {
-        $config = parent::config();
-        $this->method($config, 'get', NULL, array('collection', null), 2);
-        return $config;
-    }
-    
     protected function getData()
     {
         return $this->quickMock('\PHPixie\ORM\Data\Types\Document\Diffable');
@@ -109,12 +70,10 @@ class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementati
     
     protected function repository()
     {
-        return new \PHPixie\ORM\Drivers\Driver\Mongo\Database\Repository(
+        return new \PHPixie\ORM\Drivers\Driver\Mongo\Repository(
             $this->models,
             $this->database,
             $this->dataBuilder,
-            $this->inflector,
-            $this->modelName,
             $this->config
         );
     }
@@ -131,11 +90,16 @@ class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementati
     
     protected function getQuery()
     {
-        return $this->quickMock('\PHPixie\ORM\Drivers\Driver\Mongo\Database\Query');
+        return $this->quickMock('\PHPixie\ORM\Drivers\Driver\Mongo\Query');
     }
     
     protected function getEntity()
     {
-        return $this->quickMock('\PHPixie\ORM\Drivers\Driver\Mongo\Database\Entity');
+        return $this->quickMock('\PHPixie\ORM\Drivers\Driver\Mongo\Entity');
+    }
+    
+    protected function getConfig()
+    {
+        return $this->quickMock('\PHPixie\ORM\Drivers\Driver\Mongo\Config');
     }
 }

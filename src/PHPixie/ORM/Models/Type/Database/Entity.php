@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Models\Type\Database;
 
-interface Entity extends \PHPixie\ORM\Models\Entity
+interface Entity extends \PHPixie\ORM\Models\Model\Entity
 {
     public function id();
     public function setId($id);

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Models\Type\Embedded\Implementation;
 
-abstract class Entity extends \PHPixie\ORM\Models\Model\Entity\Implementation
+class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
                       implements \PHPixie\ORM\Models\Type\Embedded\Entity
 {
     protected $owner;

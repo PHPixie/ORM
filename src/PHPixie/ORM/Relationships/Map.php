@@ -44,7 +44,7 @@ class Map
         return $this->propertyMap[$modelName][$propertyName];
     }
 
-    public function modelProperty($model, $propertyName)
+    public function entityProperty($model, $propertyName)
     {
         $side = $this->getSide($model->modelName(), $propertyName);
         $relationship = $this->ormBuilder->relationship($side->relationshipType());

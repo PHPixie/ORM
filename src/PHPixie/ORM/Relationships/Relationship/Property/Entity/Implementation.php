@@ -2,7 +2,8 @@
 
 namespace PHPixie\ORM\Relationships\Relationship\Property\Entity;
 
-abstract class Entity extends \PHPixie\ORM\Relationships\Relationship\Property\Entity
+abstract class Implementation extends \PHPixie\ORM\Relationships\Relationship\Property\Implementation
+                              implements \PHPixie\ORM\Relationships\Relationship\Property\Entity
 {
     protected $model;
     protected $value;

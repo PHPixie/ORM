@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship\Property;
+namespace PHPixieTests\ORM\Relationships\Relationship\Property\Query;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Property\Query
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Property\Query\Implementation
  */
 abstract class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\PropertyTest
 {

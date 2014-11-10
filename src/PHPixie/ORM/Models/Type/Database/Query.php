@@ -5,10 +5,20 @@ namespace PHPixie\ORM\Models\Type\Database;
 interface Query
 {
     public function modelName();
+    
     public function limit($limit);
     public function getLimit();
+    public function clearLimit();
+    
     public function offset($offset);
     public function getOffset();
+    public function clearOffset();
+    
+    public function orderAscendingBy($field);
+    public function orderDescendingBy($field);
+    public function getOrderBy();
+    public function clearOrderBy();
+    
     public function orderBy($field, $dir = 'asc');
     public function getOrderBy();
     public function planDelete();

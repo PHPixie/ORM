@@ -2,47 +2,18 @@
 
 namespace PHPixie\ORM\Models\Type\Database\Implementation;
 
-abstract class Entity extends \PHPixie\ORM\Models\Model\Entity\Implementation
+abstract class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
                       implements \PHPixie\ORM\Models\Type\Database\Entity
 {
+    protected $repository;
     protected $isDeleted = false;
     protected $isNew;
-    protected $id;
 
-    public function __construct($isNew = true)
+    public function __construct($relationshipMap, $repository, $config, $data, $isNew = false)
     {
-        parent::__construct($relationshipMap, $data);
+        parent::__construct($relationshipMap, $config, $data);
+        $this->repository = $repository;
         $this->isNew = $isNew;
-    }
-    
-    public function id()
-    {
-        $this->assertNotDeleted();
-        $idField = $this->repository->idField();
-
-        if(isset($this->$idField))
-
-            return $this->$idField;
-
-        return null;
-    }
-    
-    public function setId($id){}
-
-    protected function assertNotDeleted()
-    {
-        if ($this->isDeleted())
-            throw new \PHPixie\ORM\Exception\Model("This model has been deleted.");
-    }
-
-    public function isDeleted()
-    {
-        return $this->isDeleted;
-    }
-
-    public function setIsDeleted($isDeleted)
-    {
-        $this->isDeleted = $isDeleted;
     }
 
     public function isNew()
@@ -54,16 +25,48 @@ abstract class Entity extends \PHPixie\ORM\Models\Model\Entity\Implementation
     {
         $this->isNew = $isNew;
     }
+    
+    public function isDeleted()
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted($isDeleted)
+    {
+        $this->isDeleted = $isDeleted;
+    }
+    
+    public function id()
+    {
+        $this->assertNotDeleted();
+        return $this->getField($this->config->idField);
+    }
+    
+    public function setId($id) {
+        $this->assertNotDeleted();
+        return $this->setField($this->config->idField, $id);
+    }
+    
+    public function save()
+    {
+        $this->repository->save($this);
+    }
+    
+    public function delete()
+    {
+        $this->repository->delete($this);
+    }
 
     public function getRelationshipProperty($name, $createMissing = true)
     {
         $this->assertNotDeleted();
-        parent::relationshipProperty($name, $createMissing);
+        return parent::getRelationshipProperty($name, $createMissing);
     }
     
-    public function __set($key, $value) 
+    protected function assertNotDeleted()
     {
-        $this->data()->$key = $value;
+        if ($this->isDeleted())
+            throw new \PHPixie\ORM\Exception\Entity("This entity has been deleted.");
     }
 
 }

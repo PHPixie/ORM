@@ -59,5 +59,9 @@ class Map
 
         return $relationship->queryProperty($side, $model);
     }
+    
+    public function entityPropertyNames($name){
+    
+    }
 
 }

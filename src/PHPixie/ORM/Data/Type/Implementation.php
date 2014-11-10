@@ -11,6 +11,6 @@ abstract class Implementation implements \PHPixie\ORM\Data\Type
     }
     
     protected abstract function setValue($key, $value);
-    public abstract function get($key);
+    public abstract function get($key, $default = null);
     public abstract function data();
 }

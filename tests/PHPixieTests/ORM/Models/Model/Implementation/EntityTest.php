@@ -17,13 +17,29 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
         'modelName' => 'fairy'
     );
     
+    protected $propertyNames = array();
+    
     public function setUp()
     {
         $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
         $this->config = $this->config();
         $this->data = $this->getData();
         
+        for($i=0; $i<4; $i++) {
+            $this->propertyNames[] = 'test'.$i;
+        }
+        
+        $this->method($this->relationshipMap, 'entityPropertyNames', $this->propertyNames, array($this->configData['modelName']));
         $this->entity = $this->entity();
+    }
+    
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
     }
     
     /**
@@ -45,6 +61,19 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::getField
+     * @covers ::<protected>
+     */
+    public function testGetField()
+    {
+        $this->prepareGetDataField('name', 'Trixie', 'Blum');
+        $this->assertEquals('Blum', $this->entity->getField('name', 'Trixie'));
+        
+        $this->prepareGetDataField('name', null, null);
+        $this->assertEquals(null, $this->entity->getField('name'));
+    }
+    
+    /**
      * @covers ::setField
      * @covers ::<protected>
      */
@@ -60,7 +89,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
      */
     public function testGetRelationshipProperty()
     {
-        $this->assertSame(null, $this->entity->getRelationshipProperty('test', false));
+        $this->assertSame(null, $this->entity->getRelationshipProperty('test1', false));
         
         foreach(array(true, false) as $key => $exists) {
             $name = 'test'.$key;
@@ -70,6 +99,8 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
             $this->assertSame($property, $this->entity->getRelationshipProperty($name));
         }
         
+        $this->setExpectedException('\PHPixie\ORM\Exception\Entity');
+        $this->entity->getRelationshipProperty('test5');
     }
     
     /**
@@ -78,28 +109,81 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
      */
     public function testAsObject()
     {
-        $data = (object) array('name' => 'Trixie');
+        $this->asObjectTest();
+    }
+    
+    /**
+     * @covers ::asObject
+     * @covers ::<protected>
+     */
+    public function testAsObjectRecursive()
+    {
+        $this->asObjectTest(true);
+    }
+    
+    /**
+     * @covers ::__get
+     * @covers ::<protected>
+     */
+    public function testGet()
+    {
+        $property = $this->prepareProperty('test1');
+        $this->assertSame($property, $this->entity->test1);
+        
+        $this->prepareGetDataField('name', null, 'Blum');
+        $this->assertSame('Blum', $this->entity->name);
+    }
+    
+    /**
+     * @covers ::__set
+     * @covers ::<protected>
+     */
+    public function testSet()
+    {
+        $this->prepareSetDataField('test', 5);
+        $this->entity->test = 5;
+    }
+    
+    protected function asObjectTest($recursive = false)
+    {
+        $expected = array('name' => 'Trixie');
+        $data = (object) $expected;
+
         $this->method($this->data, 'data', $data, array(), 0);
-        
-        $this->prepareProperty('test1', true, false);
-        $this->entity->getRelationshipProperty('test1');
-        
-        $this->prepareProperty('test2', false, false);
-        $this->entity->getRelationshipProperty('test2');
-        
-        $property = $this->prepareProperty('test3', true, true);
-        $this->entity->getRelationshipProperty('test3');
-        
-        $propertyData = (object) array('name' => 'Blum');
-        $this->method($property, 'asData', $propertyData, array(true), 0);
-        
-        $object = (array) $this->entity->asObject(true);
-        $object['test3'] = (array) $object['test3'];
-        
-        $this->assertEquals(array(
-            'name' => 'Trixie',
-            'test3' => array('name' => 'Blum')
-        ), $object);
+
+        $propertyParams = array(
+            array(false, false),
+            array(true, false),
+            array(true, true),
+        );
+
+        $properties = array();
+
+        foreach($propertyParams as $key => $params) {
+            $name = 'test'.$key;
+            $properties[$key] = $this->prepareProperty($name, $params[0], $params[1]);
+            $this->entity->getRelationshipProperty($name);
+        }
+
+        if($recursive) {
+            $propertyData = array('name' => 'Blum');
+            $expected['test2'] = $propertyData;
+
+            $this->method($properties[2], 'asData', (object) $propertyData, array(true), 1);
+            
+            $object = (array) $this->entity->asObject(true);
+            $object['test2'] = (array) $object['test2'];
+            
+        }else{
+            $object = (array) $this->entity->asObject();
+        }
+
+        $this->assertEquals($expected, $object);
+    }
+    
+    protected function prepareGetDataField($name, $default, $return)
+    {
+        $this->method($this->data, 'get', $return, array($name, $default), 0);
     }
     
     protected function prepareSetDataField($name, $value, $at = 0)
@@ -107,17 +191,15 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
         $this->method($this->data, 'set', null, array($name, $value), 0);
     }
     
-    protected function prepareProperty($name, $exists = true, $withAsData = false, $at = 0)
+    protected function prepareProperty($name, $withAsData = false, $isLoaded = true, $at = 0)
     {
-        $property = null;
-        
-        if($exists) {
-            if($withAsData) {
-                $property = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity\Data');
-            }else{
-                $property = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity');
-            }
+        if($withAsData) {
+            $property = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity\Data');
+        }else{
+            $property = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity');
         }
+        
+        $this->method($property, 'isLoaded', $isLoaded, array());
         
         $this->method($this->relationshipMap, 'entityProperty', $property, array($this->entity, $name), $at, true);
         return $property;

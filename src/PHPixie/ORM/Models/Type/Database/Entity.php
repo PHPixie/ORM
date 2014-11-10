@@ -10,4 +10,6 @@ interface Entity extends \PHPixie\ORM\Models\Model\Entity
     public function setIsDeleted($isDeleted);
     public function isNew();
     public function setIsNew($isNew);
+    public function save();
+    public function delete();
 }

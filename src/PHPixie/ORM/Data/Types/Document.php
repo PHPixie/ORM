@@ -11,9 +11,9 @@ class Document extends \PHPixie\ORM\Data\Type\Implementation
         $this->document = $document;
     }
 
-    public function get($key)
+    public function get($key, $default = null)
     {
-        return $this->document->get($key);
+        return $this->document->get($key, $default);
     }
 
     protected function setValue($key, $value)

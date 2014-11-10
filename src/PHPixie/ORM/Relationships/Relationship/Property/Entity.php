@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Relationship\Property;
 
-interface Entity extends \PHPixie\ORM\Relationships\Relationship\Propertry
+interface Entity extends \PHPixie\ORM\Relationships\Relationship\Property
 {
     public function __invoke();
     public function reload();

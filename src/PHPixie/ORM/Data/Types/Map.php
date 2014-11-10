@@ -13,9 +13,12 @@ class Map extends \PHPixie\ORM\Data\Type\Implementation implements \PHPixie\ORM\
         $this->originalData = $data;
     }
     
-    public function get($key)
+    public function get($key, $default = null)
     {
-        return $this->data[$key];
+        if(array_key_exists($key, $this->data))
+            return $this->data[$key];
+        
+        return $default;
     }
     
     protected function setValue($key, $value)

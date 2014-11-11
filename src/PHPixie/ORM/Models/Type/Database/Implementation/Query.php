@@ -4,21 +4,26 @@ namespace PHPixie\ORM\Models\Type\Database\Implementation;
 
 class Query implements \PHPixie\ORM\Models\Type\Database\Query
 {
-    protected $conditions;
+    protected $conditionsBuilder;
+    protected $values;
     protected $mapper;
     protected $relationshipMap;
-    protected $modelName;
+    protected $config;
+    
+    protected $relationshipProperties = array();
 
     protected $limit;
     protected $offset;
+    
     protected $orderBy = array();
 
-    public function __construct($conditions, $mapper, $relationhipMap, $modelName)
+    public function __construct($conditionsBuilder, $values, $mapper, $relationshipMap, $config)
     {
-        $this->conditionBuilder = $conditions;
-        $this->mapper = $mapper;
-        $this->relationhipMap = $relationshipMap;
-        $this->modelName = $modelName;
+        $this->conditionBuilder = $conditionsBuilder;
+        $this->values           = $values;
+        $this->mapper           = $mapper;
+        $this->relationhipMap   = $relationshipMap;
+        $this->config           = $config;
     }
     
     public function modelName()
@@ -29,10 +34,9 @@ class Query implements \PHPixie\ORM\Models\Type\Database\Query
     public function limit($limit)
     {
         if (!is_numeric($limit))
-            throw new \PHPixie\DB\Exception\Builder("Limit must be a number");
+            throw new \PHPixie\ORM\Exception\Query("Limit must be a number");
 
         $this->limit = $limit;
-
         return $this;
     }
 
@@ -40,20 +44,31 @@ class Query implements \PHPixie\ORM\Models\Type\Database\Query
     {
         return $this->limit;
     }
+    
+    public function clearLimit()
+    {
+        $this->limit = null;
+        return $this;
+    }
 
     public function offset($offset)
     {
         if (!is_numeric($offset))
-            throw new \PHPixie\DB\Exception\Builder("Offset must be a number");
+            throw new \PHPixie\ORM\Exception\Query("Offset must be a number");
 
         $this->offset = $offset;
-
         return $this;
     }
 
     public function getOffset()
     {
         return $this->offset;
+    }
+    
+    public function clearOffset()
+    {
+        $this->offset = null;
+        return $this;
     }
 
     public function orderAscendingBy($field)
@@ -72,117 +87,213 @@ class Query implements \PHPixie\ORM\Models\Type\Database\Query
     {
         return $this->orderBy;
     }
-
-    public function planDelete()
+    
+    public function clearOrderBy()
     {
-        return $this->mapper->mapDelete($this);
+        $this->orderBy = array();
+        return $this;
     }
 
-    public function planUpdate($type, $data)
+    public function find($preload = array())
     {
-        return $this->mapper->mapUpdate($this, $data);
+        return $this->planFind($preload);
     }
+    
+    public function findOne($preload = array())
+    {
+        $oldLimit = $this->getLimit();
+        $this->limit(1);
+        
+        $loader = $this->find($preload);
+        
+        if($oldLimit !== null)
+        {
+            $this->limit($oldLimit);
+        }else{
+            $this->clearLimit();
+        }
+        
+        if(!$loader->offsetExists(0))
+            return null;
 
+        return $loader->getByOffset(0);
+    }
+    
     public function planFind($preload = array())
     {
         return $this->mapper->mapFind($this, $preload);
     }
 
-    public function delete()
-    {
-        $this->planDelete()->execute();
-    }
 
+    
     public function update($data)
     {
         $this->updatePlan($data)->execute();
+        return $this;
+    }
+    
+    public function planUpdate($type, $data)
+    {
+        return $this->mapper->mapUpdate($this, $data);
+    }
+    
+    
+    
+    public function delete()
+    {
+        $this->planDelete()->execute();
+        return $this;
+    }
+    
+    public function planDelete()
+    {
+        return $this->mapper->mapDelete($this);
+    }
+    
+    public function count()
+    {
+        $this->planCount()->execute();
+        return $this;
+    }
+    
+    public function planCount()
+    {
+        return $this->mapper->mapCount($this);
     }
 
-    public function find($preload = array())
+    public function getRelationshipProperty($name)
     {
-        return $this->planFind($this, $preload);
+        if(!array_key_exists($name, $this->relationshipProperties))
+            $property = $this->relationshipMap->queryProperty($this, $name);
+            $this->relationshipProperties[$name] = $property;
+        }
+        
+        return $this->relationshipProperties[$name];
     }
-
-    public function findOne($preload = array())
+    
+    public function __get($name)
     {
-        $oldLimit = $this->getLimit();
-        $this->limit(1);
-        $iterator = $this->findPlan($preload)->execute();
-        $this->limit($oldLimit);
-
-        return $iterator->current();
+        return $this->getRelationshipProperty($name);
     }
-
-    public function endConditionGroup($logic = 'and')
+    ////////////////////////////
+    protected function addCondition($args, $logic, $negate)
     {
-        $this->conditionBuilder->endGroup($logic);
-
+        $this->builder->addCondition($logic, $negate, $args);
+        return $this;
+    }
+    
+    protected function startBuilderGroup($logic, $negate)
+    {
+        $this->builder->startConditionGroup($logic, $negate);
+        return $this;
+    }
+    
+    protected function addCollectionCondition($items, $logic, $negate)
+    {
+        $this->builder->addCollection($logic, $negate, $items);
         return $this;
     }
 
-    public function addCondition($logic, $negate, $args)
+    protected function addRelationshipCondition($relationship, $items, $logic, $negate)
     {
-        $this->conditionBuilder->addCondition($logic, $negate, $args);
-
+        $this->builder->startRelationshipCondition($logic, $negate, $relationship, $items);
         return $this;
     }
-
-    public function startGroup($logic='and', $negate = false)
+    
+    protected function startRelationshipGroup($logic, $negate)
     {
-        $this->conditionBuilder->startGroup($logic, $negate);
-
+        $this->builder->startRelationshipGroup($logic, $negate);
         return $this;
     }
 
     public function endGroup()
     {
-        $this->conditionBuilder->endGroup();
-
-        return $this;
+        $this->builder->endGroup
     }
-
-    public function addCollection($logic, $negate, $collectionItems)
-    {
-        $this->conditionBuilder->addCondition($logic, $negate, $collectionItems);
-
-        return $this;
-    }
-
-    public function addRelated($logic, $negate, $relationship, $condition)
-    {
-        $this->conditionBuilder->addRelated($logic, $negate, $relationship, $condition);
-
-        return $this;
-    }
-
+////////////////
     public function where()
     {
-        return $this->addCondition('and', false, func_get_args());
+        return $this->addCondition(func_get_args(), 'and', false);
+    }
+
+    public function andWhere()
+    {
+        return $this->addCondition(func_get_args(), 'and', false);
     }
 
     public function orWhere()
     {
-        return $this->addCondition('or', false, func_get_args());
+        return $this->addCondition(func_get_args(), 'or', false);
     }
 
     public function xorWhere()
     {
-        return $this->addCondition('xor', false, func_get_args());
+        return $this->addCondition(func_get_args(), 'xor', false);
+    }
+
+    public function whereNot()
+    {
+        return $this->addCondition(func_get_args(), 'and', true);
     }
 
     public function andWhereNot()
     {
-        return $this->addCondition('and', true, func_get_args());
+        return $this->addCondition(func_get_args(), 'and', true);
     }
 
     public function orWhereNot()
     {
-        return $this->addCondition('or', true, func_get_args());
+        return $this->addCondition(func_get_args(), 'or', true);
     }
 
     public function xorWhereNot()
     {
-        return $this->addCondition('xor', true, func_get_args());
+        return $this->addCondition(func_get_args(), 'xor', true);
+    }
+
+    public function startWhereGroup()
+    {
+        return $this->startConditionGroup('and', false);
+    }
+
+    public function startAndWhereGroup()
+    {
+        return $this->startConditionGroup('and', false);
+    }
+
+    public function startOrWhereGroup()
+    {
+        return $this->startConditionGroup('or', false);
+    }
+
+    public function startXorWhereGroup()
+    {
+        return $this->startConditionGroup('xor', false);
+    }
+
+    public function startWhereNotGroup()
+    {
+        return $this->startConditionGroup('and', true);
+    }
+
+    public function startAndWhereNotGroup()
+    {
+        return $this->startConditionGroup('and', true);
+    }
+
+    public function startOrWhereNotGroup()
+    {
+        return $this->startConditionGroup('or', true);
+    }
+
+    public function startXorWhereNotGroup()
+    {
+        return $this->startConditionGroup('xor', true);
+    }
+
+    public function endWhereGroup()
+    {
+        return $this->endGroup();
     }
 
     public function _and()
@@ -200,80 +311,190 @@ class Query implements \PHPixie\ORM\Models\Type\Database\Query
         return $this->addCondition(func_get_args(), 'xor', false);
     }
 
-    public function _andNot()
+    public function _not()
     {
         return $this->addCondition(func_get_args(), 'and', true);
     }
 
-    public function _orNot()
+    public function andNot()
+    {
+        return $this->addCondition(func_get_args(), 'and', true);
+    }
+
+    public function orNot()
     {
         return $this->addCondition(func_get_args(), 'or', true);
     }
 
-    public function _xorNot()
+    public function xorNot()
     {
         return $this->addCondition(func_get_args(), 'xor', true);
     }
 
-    public function in($collectionItems)
+    public function startGroup()
     {
-        return $this->addCollection('and', false, $collectionItems);
+        return $this->startConditionGroup('and', false);
     }
 
-    public function orIn($collectionItems)
+    public function startAndGroup()
     {
-        return $this->addCollection('or', false, $collectionItems);
+        return $this->startConditionGroup('and', false);
     }
 
-    public function xorIn($collectionItems)
+    public function startOrGroup()
     {
-        return $this->addCollection('xor', false, $collectionItems);
+        return $this->startConditionGroup('or', false);
     }
 
-    public function andInNot($collectionItems)
+    public function startXorGroup()
     {
-        return $this->addCollection('and', true, $collectionItems);
+        return $this->startConditionGroup('xor', false);
     }
 
-    public function orInNot($collectionItems)
+    public function startNotGroup()
     {
-        return $this->addCollection('or', true, $collectionItems);
+        return $this->startConditionGroup('and', true);
     }
 
-    public function xorInNot($collectionItems)
+    public function startAndNotGroup()
     {
-        return $this->addCollection('xor', true, $collectionItems);
+        return $this->startConditionGroup('and', true);
     }
 
-    public function related($relationship, $condition)
+    public function startOrNotGroup()
     {
-        return $this->addRelated('and', false, $relationship, $condition);
+        return $this->startConditionGroup('or', true);
     }
 
-    public function orRelated($relationship, $condition)
+    public function startXorNotGroup()
     {
-        return $this->addRelated('or', false, $relationship, $condition);
+        return $this->startConditionGroup('xor', true);
     }
 
-    public function xorRelated($relationship, $condition)
+    public function endGroup()
     {
-        return $this->addRelated('xor', false, $relationship, $condition);
+        return $this->endConditionGroup();
     }
 
-    public function andRelatedNot($relationship, $condition)
+    public function in($items)
     {
-        return $this->addRelated('and', true, $relationship, $condition);
+        return $this->addCollectionCondition($items, 'and', false);
+    }
+    
+    public function andIn($items)
+    {
+        return $this->addCollectionCondition($items, 'and', false);
+    }
+    
+    public function orIn($items)
+    {
+        return $this->addCollectionCondition($items, 'or', false);
+    }
+    
+    public function xorIn($items)
+    {
+        return $this->addCollectionCondition($items, 'xor', false);
+    }
+    
+    public function notIn($items)
+    {
+        return $this->addCollectionCondition($items, 'and', true);
+    }
+    
+    public function andNotIn()
+    {
+        return $this->addCollectionCondition($items, 'and', true);
+    }
+    
+    public function orNotIn($items)
+    {
+        return $this->addCollectionCondition($items, 'or', true);
+    }
+    
+    public function xorNotIn($items)
+    {
+        return $this->addCollectionCondition($items, 'xor', true);
+    }
+    
+    public function relatedTo($relationship, $items)
+    {
+        return $this->addRelationshipCondition($relationship, $items, 'and', false);
     }
 
-    public function orRelatedNot($relationship, $condition)
+    public function andRelatedTo($relationship, $items)
     {
-        return $this->addRelated('or', true, $relationship, $condition);
+        return $this->addRelationshipCondition($relationship, $items, 'and', false);
     }
 
-    public function xorRelatedNot($relationship, $condition)
+    public function orRelatedTo($relationship, $items)
     {
-        return $this->addRelated('xor', true, $relationship, $condition);
+        return $this->addRelationshipCondition($relationship, $items, 'or', false);
     }
-    public function __get($field){}
-    public function __call($field, $f){}
+    
+    public function xorRelatedTo($relationship, $items)
+    {
+        return $this->addRelationshipCondition($relationship, $items, 'xor', false);
+    }
+    
+    public function notRelatedTo($relationship, $items)
+    {
+        return $this->addRelationshipCondition($relationship, $items, 'and', true);
+    }
+    
+    public function andNotRelatedTo($relationship, $items)
+    {
+        return $this->addRelationshipCondition($relationship, $items, 'and', true);
+    }
+    
+    public function orNotRelatedTo($relationship, $items)
+    {
+        return $this->addRelationshipCondition($relationship, $items, 'or', true);
+    }
+    
+    public function xorNotRelatedTo($relationship, $items)
+    {
+        return $this->addRelationshipCondition($relationship, $items, 'xor', true);
+    }
+    
+    public function startRelatedToGroup($relationship)
+    {
+        return $this->startRelationshipGroup($relationship, 'and', false);
+    }
+    
+    public function startAndRelatedToGroup($relationship)
+    {
+         return $this->startRelationshipGroup($relationship, 'and', false);
+    }
+    
+    public function startOrRelatedToGroup($relationship)
+    {
+         return $this->startRelationshipGroup($relationship, 'or', false);
+    }
+    
+    public function startXorRelatedToGroup($relationship)
+    {
+         return $this->startRelationshipGroup($relationship, 'xor', false);
+    }
+    
+    public function startNotRelatedToGroup($relationship)
+    {
+         return $this->startRelationshipGroup($relationship, 'and', true);
+    }
+    
+    public function startAndNotRelatedToGroup($relationship)
+    {
+         return $this->startRelationshipGroup($relationship, 'and', true);
+    }
+    
+    public function startOrNotRelatedToGroup($relationship)
+    {
+         return $this->startRelationshipGroup($relationship, 'or', true);
+    }
+    
+    public function startXorNotRelatedToGroup($relationship)
+    {
+         return $this->startRelationshipGroup($relationship, 'xor', true);
+    }
+    
+    
 }

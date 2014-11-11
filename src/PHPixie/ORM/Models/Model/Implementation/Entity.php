@@ -42,7 +42,7 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
     public function getRelationshipProperty($name, $createMissing = true)
     {
         if (!array_key_exists($name, $this->relationshipProperties)) {
-            throw new \PHPixie\ORM\Exception\Entity("Relationship property '$name' is not defined for '{$this->modelName()}'");
+            throw new \PHPixie\ORM\Exception\Relationship("Relationship property '$name' is not defined for '{$this->modelName()}'");
         }
         
         return $this->relationshipProperty($name, $createMissing);

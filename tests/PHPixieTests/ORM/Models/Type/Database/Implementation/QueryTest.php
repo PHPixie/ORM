@@ -106,6 +106,51 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::findOne
+     * @covers ::<protected>
+     */
+    public function testFindOne()
+    {
+        $this->findOneTest(null, true, false);
+        $this->findOneTest(5, false, true);
+    }
+    
+    protected function findOneTest($limit = null, $exists = true, $preload = false)
+    {
+        $this->method($this->query, 'getLimit', $limit, array(0), 0);
+        $this->method($this->query, 'limit', null, array(1), 1);
+        
+        $loader = $this->getLoader();
+        
+        $preloadParams = $preload ? array() : array('test');
+        $plan = $this->preparePlanFind($preloadParams);
+        
+        $this->method($plan, 'execute', $loader, array(), 0);
+        $this->method($loader, 'offsetExists', $exists, array(0), 0);
+        
+        $entity = null;
+        if($exists) {
+            $entity = $this->getEntity();
+            $this->method($loader, 'getByOffset', $entity, array(0), 1);
+        }
+        
+        if($limit === null) {
+            $this->method($this->query, 'clearLimit', null, array(), 2);
+        }else{
+            $this->method($this->query, 'limit', null, array($limit), 2);
+        }
+        
+        if($preload)
+        {
+            $res = $this->query->findOne($preload);
+        }else{
+            $res = $this->query->findOne();
+        }
+        
+        $this->assertSame($entity, $res);
+    }
+    
+    /**
      * @covers ::planUpdate
      * @covers ::<protected>
      */
@@ -120,7 +165,7 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
      * @covers ::update
      * @covers ::<protected>
      */
-    public function testUopdate()
+    public function testUpdate()
     {
         $data = array('name' => 'Pixie');
         $plan = $this->preparePlanDelete($data);
@@ -178,13 +223,10 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
         return $orderBy;
     }
                               
-    protected function preparePlanFind($preload = null)
+    protected function preparePlanFind($preload = array())
     {
         $plan = $this->getPlan();
-        
-        $params = $preload === null ? array() : array($preload);
-        
-        $this->method($this->mapper, 'mapFind', $plan, $params, 0);
+        $this->method($this->mapper, 'mapFind', $plan, array($preload), 0);
         return $plan;
     }
     

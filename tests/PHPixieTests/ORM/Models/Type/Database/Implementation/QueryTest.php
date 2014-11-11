@@ -17,10 +17,10 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
     {
         $this->assertSame(null, $this->query->getLimit());
         
-        $this->query->limit(10);
+        $this->assertSame($this->query, $this->query->limit(10));
         $this->assertSame(10, $this->query->getLimit());
         
-        $this->query->clearLimit();
+        $this->assertSame($this->query, $this->query->clearLimit());
         $this->assertSame(null, $this->query->getLimit());
         
         $this->invalidArgumentsTest(array($this->query, 'limit'), array(
@@ -39,10 +39,10 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
     {
         $this->assertSame(null, $this->query->getOffset());
         
-        $this->query->offset(10);
+        $this->assertSame($this->query, $this->query->offset(10));
         $this->assertSame(10, $this->query->getOffset());
         
-        $this->query->clearOffset();
+        $this->assertSame($this->query, $this->query->clearOffset());
         $this->assertSame(null, $this->query->getOffset());
         
         $this->invalidArgumentsTest(array($this->query, 'offset'), array(
@@ -58,13 +58,97 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
      * @covers ::clearOrderBy
      * @covers ::<protected>
      */
-    public function testGroupBy()
+    public function testOrderBy()
     {
         $this->assertSame(array(), $this->query->getOrderBy());
         
-        $this->query->orderAscendingBy('id');
-        $this->query->orderDescendingBy('id');
+        $expected = array(
+            $this->addOrderBy('test', 'asc'),
+            $this->addOrderBy('pixie', 'asc'),
+            $this->addOrderBy('trixie', 'desc'),
+            $this->addOrderBy('test', 'desc'),
+        );
+        
+        $this->assertEquals($expected, $this->query->getOrderBy());
+        
+        $this->assertSame($this->query, $this->clearOrderBy());
+        $this->assertSame(array(), $this->query->getOrderBy());
     }
+    
+    /**
+     * @covers ::planFind
+     * @covers ::<protected>
+     */
+    public function testPlanFind()
+    {
+        $plan = $this->preparePlanFind();
+        $this->assertSame($plan, $this->query->planDelete());
+        
+        $plan = $this->preparePlanFind(array('test'));
+            $this->assertSame($plan, $this->query->planFind(array('test')));
+    }
+    
+    /**
+     * @covers ::find
+     * @covers ::<protected>
+     */
+    public function testFind()
+    {
+        $loader = $this->getLoader();
+        
+        $plan = $this->preparePlanFind();
+        $this->method($plan, 'execute', $loader, array(), 0);
+        $this->assertSame($loader, $this->query->find());
+        
+        $plan = $this->preparePlanFind(array('test'));
+        $this->method($plan, 'execute', $loader, array(), 0);
+        $this->assertSame($loader, $this->query->find(array('test')));
+    }
+    
+    /**
+     * @covers ::planUpdate
+     * @covers ::<protected>
+     */
+    public function testPlanUpdate()
+    {
+        $data = array('name' => 'Pixie');
+        $plan = $this->preparePlanDelete($data);
+        $this->assertSame($plan, $this->query->planUpdate($data));
+    }
+    
+    /**
+     * @covers ::update
+     * @covers ::<protected>
+     */
+    public function testUopdate()
+    {
+        $data = array('name' => 'Pixie');
+        $plan = $this->preparePlanDelete($data);
+        $this->method($plan, 'execute', $loader, array(), 0);
+        $this->query->update($data)
+    }
+    
+    /**
+     * @covers ::planDelete
+     * @covers ::<protected>
+     */
+    public function testPlanDelete()
+    {
+        $plan = $this->preparePlanDelete();
+        $this->assertSame($plan, $this->query->planDelete());
+    }
+    
+    /**
+     * @covers ::delete
+     * @covers ::<protected>
+     */
+    public function testDelete()
+    {
+        $plan = $this->preparePlanDelete();
+        $this->method($plan, 'execute', null, array(), 0);
+        $this->query->delete();
+    }
+    
     
     protected function invalidArgumentsTest($callback, $paramSets)
     {
@@ -77,5 +161,56 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
             }
             $this->assertSame(true, $except);
         }
+    }
+    
+    protected function addOrderBy($field, $dir)
+    {
+        $orderBy = $this->quickMock('\PHPixie\ORM\Values\OrderBy', array());
+        $this->method($this->values, 'orderBy', $orderBy, array($field, $dir), 0);
+        
+        if($dir === 'asc') {
+            $query = $this->query->addOrderAscendingBy($field);
+        }else{
+            $query = $this->query->addOrderDescendingBy($field);
+        }
+        
+        $this->assertSame($this->query, $query);
+        return $orderBy;
+    }
+                              
+    protected function preparePlanFind($preload = null)
+    {
+        $plan = $this->getPlan();
+        
+        $params = $preload === null ? array() : array($preload);
+        
+        $this->method($this->mapper, 'mapFind', $plan, $params, 0);
+        return $plan;
+    }
+    
+    protected function preparePlanUpdate($data)
+    {
+        $plan = $this->getPlan();
+        $this->method($this->mapper, 'mapUpdate', $plan, array($data), 0);
+        return $plan;
+    }
+    
+    protected function preparePlanDelete()
+    {
+        $plan = $this->getPlan();
+        $this->method($this->mapper, 'mapDelete', $plan, array(), 0);
+        return $plan;
+    }
+    
+    
+    
+    protected function getPlan()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Plans\Plan');
+    }
+    
+    protected function getLoader()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Loaders\Loader');
     }
 }

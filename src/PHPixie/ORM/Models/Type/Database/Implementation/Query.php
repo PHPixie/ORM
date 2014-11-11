@@ -56,13 +56,15 @@ class Query implements \PHPixie\ORM\Models\Type\Database\Query
         return $this->offset;
     }
 
-    public function orderBy($field, $dir = 'asc')
+    public function orderAscendingBy($field)
     {
-        if ($dir !== 'asc' && $dir !== 'desc')
-            throw new \PHPixie\DB\Exception\Builder("Order direction must be either 'asc' or  'desc'");
-
-        $this->orderBy[] = array($field, $dir);
-
+        $this->orderBy[] = $this->values->orderBy($field, 'asc');
+        return $this;
+    }
+    
+    public function orderDescendingBy($field)
+    {
+        $this->orderBy[] = $this->values->orderBy($field, 'desc');
         return $this;
     }
 
@@ -81,7 +83,7 @@ class Query implements \PHPixie\ORM\Models\Type\Database\Query
         return $this->mapper->mapUpdate($this, $data);
     }
 
-    public function planFind($type, $preload = array())
+    public function planFind($preload = array())
     {
         return $this->mapper->mapFind($this, $preload);
     }

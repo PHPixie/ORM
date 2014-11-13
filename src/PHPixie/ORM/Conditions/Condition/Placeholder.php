@@ -2,6 +2,6 @@
 
 namespace PHPixie\ORM\Conditions\Condition;
 
-class Placeholder extends \PHPixie\ORM\Conditions\Condition\Operator
+class Placeholder extends \PHPixie\Database\Conditions\Condition\Placeholder
 {
 }

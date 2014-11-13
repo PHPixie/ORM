@@ -4,9 +4,9 @@ namespace PHPixie\ORM;
 
 class Conditions
 {
-    public function placeholder()
+    public function placeholder($defaultOperator = '=', $allowEmpty = true)
     {
-        return new \PHPixie\ORM\Conditions\Condition\Placeholder();
+        return new \PHPixie\ORM\Conditions\Condition\Placeholder($this, $defaultOperator, $allowEmpty);
     }
 
     public function operator($field, $operator, $values)

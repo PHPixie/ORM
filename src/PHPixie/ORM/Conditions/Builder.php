@@ -27,20 +27,19 @@ interface Builder extends \PHPixie\Database\Conditions\Builder
     public function endWhereGroup();
     
     
-    public function addInCondition($logic, $negate, $items);
+    public function addInCondition($logic, $negate, $items, $relationship = null);
     
     public function in($items);
     public function andIn($items);
     public function orIn($items);
     public function xorIn($items);
     public function notIn($items);
-    public function andNotIn();
+    public function andNotIn($items);
     public function orNotIn($items);
     public function xorNotIn($items);
     
     
-
-    public function addRelatedToCondition($logic, $negate, $items, $relationship = null);
+    public function addRelatedToCondition($logic, $negate, $relationship, $items);
     public function startRelatedToConditionGroup($relationship, $logic = 'and', $negate = false);
     
     public function relatedTo($relationship, $items);
@@ -51,6 +50,7 @@ interface Builder extends \PHPixie\Database\Conditions\Builder
     public function andNotRelatedTo($relationship, $items);
     public function orNotRelatedTo($relationship, $items);
     public function xorNotRelatedTo($relationship, $items);
+    
     public function startRelatedToGroup($relationship);
     public function startAndRelatedToGroup($relationship);
     public function startOrRelatedToGroup($relationship);
@@ -59,4 +59,5 @@ interface Builder extends \PHPixie\Database\Conditions\Builder
     public function startAndNotRelatedToGroup($relationship);
     public function startOrNotRelatedToGroup($relationship);
     public function startXorNotRelatedToGroup($relationship);
+    public function endRelatedToGroup();
 }

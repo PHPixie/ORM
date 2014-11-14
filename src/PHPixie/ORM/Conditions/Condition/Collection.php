@@ -4,10 +4,15 @@ namespace PHPixie\ORM\Conditions\Condition;
 
 class Collection extends \PHPixie\ORM\Conditions\Condition
 {
-    public $collectionItems;
+    protected $items;
 
-    public function __construct($collectionItems)
+    public function __construct($items)
     {
-        $this->collectionItems = $collectionItems;
+        $this->items = $items;
+    }
+    
+    public function items()
+    {
+        return $this->items;
     }
 }

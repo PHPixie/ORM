@@ -21,7 +21,7 @@ class Conditions
 
     public function relationshipGroup($relationship)
     {
-        return $this->orm->relationshipGroup($relationship);
+        return new \PHPixie\ORM\Conditions\Condition\Group\Relationship($relationship);
     }
 
     public function collection($collectionItems)

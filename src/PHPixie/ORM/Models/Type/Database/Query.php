@@ -2,7 +2,8 @@
 
 namespace PHPixie\ORM\Models\Type\Database;
 
-interface Query extends \PHPixie\ORM\Conditions\Condition\Collection\Item
+interface Query extends \PHPixie\ORM\Conditions\Condition\Collection\Item,
+\PHPixie\ORM\Conditions\Builder
 {
     public function modelName();
     
@@ -33,7 +34,7 @@ interface Query extends \PHPixie\ORM\Conditions\Condition\Collection\Item
     public function planCount();
     public function count();
     
-
+    public function getRelationshipProperty($name);
     
     
     public function __get($name);

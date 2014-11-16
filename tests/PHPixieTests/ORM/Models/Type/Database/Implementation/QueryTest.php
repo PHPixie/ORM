@@ -5,8 +5,50 @@ namespace PHPixieTests\ORM\Models\Type\Database\Implementation;
 /**
  * @coversDefaultClass \PHPixie\ORM\Model\Type\Database\Implementation\Query
  */
-abstract class QueryTest extends \PHPixieTests\AbstractORMTest
+abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
 {
+    protected $values;
+    protected $mapper;
+    protected $relationshipMap;
+    protected $config;
+    
+    protected $configData = array(
+        'modelName' => 'fairies'
+    );
+    
+    protected $query;
+    
+    public function setUp()
+    {
+        $this->values = $this->quickMock('\PHPixie\ORM\Values');
+        $this->mapper = $this->quickMock('\PHPixie\ORM\Mapper');
+        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
+        $this->config = $this->config();
+        
+        parent::setUp();
+        
+        $this->query = $this->proxy;
+    }
+    
+    /**
+     * @covers \PHPixie\ORM\Conditions\Builder\Proxy::__construct
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
+    /**
+     * @covers ::modelName
+     * @covers ::<protected>
+     */
+    public function testModelName()
+    {
+        $this->assertSame($this->configData['modelName'], $this->query->modelName());
+    }
+    
     /**
      * @covers ::limit
      * @covers ::getLimit
@@ -28,7 +70,7 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
             array(null)
         ));
     }
-    
+
     /**
      * @covers ::offset
      * @covers ::getOffset
@@ -71,7 +113,7 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
         
         $this->assertEquals($expected, $this->query->getOrderBy());
         
-        $this->assertSame($this->query, $this->clearOrderBy());
+        $this->assertSame($this->query, $this->query->clearOrderBy());
         $this->assertSame(array(), $this->query->getOrderBy());
     }
     
@@ -82,7 +124,7 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
     public function testPlanFind()
     {
         $plan = $this->preparePlanFind();
-        $this->assertSame($plan, $this->query->planDelete());
+        $this->assertSame($plan, $this->query->planFind());
         
         $plan = $this->preparePlanFind(array('test'));
             $this->assertSame($plan, $this->query->planFind(array('test')));
@@ -111,19 +153,20 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
      */
     public function testFindOne()
     {
-        $this->findOneTest(null, true, false);
-        $this->findOneTest(5, false, true);
+        $queryMock = $this->queryMock(array('limit', 'getLimit', 'clearLimit'));
+        $this->findOneTest($queryMock, null, true, false);
+        $this->findOneTest($queryMock, 5, false, true);
     }
     
-    protected function findOneTest($limit = null, $exists = true, $preload = false)
+    protected function findOneTest($queryMock, $limit = null, $exists = true, $preload = false)
     {
-        $this->method($this->query, 'getLimit', $limit, array(0), 0);
-        $this->method($this->query, 'limit', null, array(1), 1);
+        $this->method($queryMock, 'getLimit', $limit, array(), 0);
+        $this->method($queryMock, 'limit', null, array(1), 1);
         
         $loader = $this->getLoader();
         
-        $preloadParams = $preload ? array() : array('test');
-        $plan = $this->preparePlanFind($preloadParams);
+        $preloadParams = $preload ? array('test') : array();
+        $plan = $this->preparePlanFind($preloadParams, $queryMock);
         
         $this->method($plan, 'execute', $loader, array(), 0);
         $this->method($loader, 'offsetExists', $exists, array(0), 0);
@@ -135,16 +178,16 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
         }
         
         if($limit === null) {
-            $this->method($this->query, 'clearLimit', null, array(), 2);
+            $this->method($queryMock, 'clearLimit', null, array(), 2);
         }else{
-            $this->method($this->query, 'limit', null, array($limit), 2);
+            $this->method($queryMock, 'limit', null, array($limit), 2);
         }
         
         if($preload)
         {
-            $res = $this->query->findOne($preload);
+            $res = $queryMock->findOne($preloadParams);
         }else{
-            $res = $this->query->findOne();
+            $res = $queryMock->findOne();
         }
         
         $this->assertSame($entity, $res);
@@ -157,7 +200,7 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
     public function testPlanUpdate()
     {
         $data = array('name' => 'Pixie');
-        $plan = $this->preparePlanDelete($data);
+        $plan = $this->preparePlanUpdate($data);
         $this->assertSame($plan, $this->query->planUpdate($data));
     }
     
@@ -168,9 +211,9 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
     public function testUpdate()
     {
         $data = array('name' => 'Pixie');
-        $plan = $this->preparePlanDelete($data);
-        $this->method($plan, 'execute', $loader, array(), 0);
-        $this->query->update($data)
+        $plan = $this->preparePlanUpdate($data);
+        $this->method($plan, 'execute', null, array(), 0);
+        $this->assertSame($this->query, $this->query->update($data));
     }
     
     /**
@@ -191,7 +234,28 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
     {
         $plan = $this->preparePlanDelete();
         $this->method($plan, 'execute', null, array(), 0);
-        $this->query->delete();
+        $this->assertSame($this->query, $this->query->delete());
+    }
+    
+    /**
+     * @covers ::planCount
+     * @covers ::<protected>
+     */
+    public function testPlanCount()
+    {
+        $plan = $this->preparePlanCount();
+        $this->assertSame($plan, $this->query->planCount());
+    }
+    
+    /**
+     * @covers ::count
+     * @covers ::<protected>
+     */
+    public function testCount()
+    {
+        $plan = $this->preparePlanCount();
+        $this->method($plan, 'execute', 5, array(), 0);
+        $this->assertSame(5, $this->query->count());
     }
     
     
@@ -201,7 +265,7 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
             $except = false;
             try {
                 call_user_func_array($callback, $params);
-            } catch('\PHPixie\ORM\Exception\Query') {
+            } catch(\PHPixie\ORM\Exception\Query $e) {
                 $except = true;
             }
             $this->assertSame(true, $except);
@@ -213,27 +277,32 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
         $orderBy = $this->quickMock('\PHPixie\ORM\Values\OrderBy', array());
         $this->method($this->values, 'orderBy', $orderBy, array($field, $dir), 0);
         
+        $query = null;
+        
         if($dir === 'asc') {
-            $query = $this->query->addOrderAscendingBy($field);
+            $query = $this->query->orderAscendingBy($field);
         }else{
-            $query = $this->query->addOrderDescendingBy($field);
+            $query = $this->query->orderDescendingBy($field);
         }
         
         $this->assertSame($this->query, $query);
         return $orderBy;
     }
                               
-    protected function preparePlanFind($preload = array())
+    protected function preparePlanFind($preload = array(), $query = null)
     {
+        if($query === null)
+            $query = $this->query;
+        
         $plan = $this->getPlan();
-        $this->method($this->mapper, 'mapFind', $plan, array($preload), 0);
+        $this->method($this->mapper, 'mapFind', $plan, array($query, $preload), 0);
         return $plan;
     }
     
     protected function preparePlanUpdate($data)
     {
         $plan = $this->getPlan();
-        $this->method($this->mapper, 'mapUpdate', $plan, array($data), 0);
+        $this->method($this->mapper, 'mapUpdate', $plan, array($this->query, $data), 0);
         return $plan;
     }
     
@@ -244,7 +313,50 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
         return $plan;
     }
     
+    protected function preparePlanCount()
+    {
+        $plan = $this->getPlan();
+        $this->method($this->mapper, 'mapCount', $plan, array(), 0);
+        return $plan;
+    }
     
+    /**
+     * @covers ::getRelationshipProperty
+     * @covers ::<protected>
+     */
+    public function testGetRelationshipProperty()
+    {
+        $this->prepareProperty('test');
+        $property = $this->query->getRelationshipProperty('test');
+        $this->assertSame($property, $this->query->getRelationshipProperty('test'));
+    }
+    
+    /**
+     * @covers ::__get
+     * @covers ::<protected>
+     */
+    public function testGet()
+    {
+        $this->prepareProperty('test');
+        $property = $this->query->test;
+        $this->assertSame($property, $this->query->test);
+    }
+    
+    protected function prepareProperty($name, $at = 0)
+    {
+        $property = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Query');
+        $this->method($this->relationshipMap, 'queryProperty', $property, array($this->query, $name), $at, true);
+        return $property;
+    }
+    
+    protected function config()
+    {
+        $config = $this->getConfig();
+        foreach($this->configData as $key => $value) {
+            $config->$key = $value;
+        }
+        return $config;
+    }
     
     protected function getPlan()
     {
@@ -255,4 +367,14 @@ abstract class QueryTest extends \PHPixieTests\AbstractORMTest
     {
         return $this->abstractMock('\PHPixie\ORM\Loaders\Loader');
     }
+    
+    protected function proxy()
+    {
+        return $this->query();
+    }
+    
+    abstract protected function getConfig();
+    abstract protected function query();
+    abstract protected function queryMock($methods);
+    abstract protected function getEntity();
 }

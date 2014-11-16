@@ -36,9 +36,14 @@ class Mapper
         $deleteStep = $this->steps->query($query);
         $plan->add($deleteStep);
 
-        $plan->push($this->steps->query($dbQuery))
+        $plan->push($this->steps->query($dbQuery));
 
         return $plan;
+    }
+    
+    public function mapCount($query)
+    {
+    
     }
     
     public function mapUpdate($query, $data)

@@ -2,96 +2,182 @@
 
 namespace PHPixie\ORM\Conditions\Builder;
 
-class Container extends \PHPixie\Database\Conditions\Builder\Container
-                implements \PHPixie\ORM\Conditions\Builder
+class Proxy implements \PHPixie\ORM\Conditions\Builder
 {
-    public function __construct($conditions, $defaultOperator = '=')
+    protected $builder;
+    protected $aliases = array(
+        'and' => '_and',
+        'or'  => '_or',
+        'xor' => '_xor',
+        'not' => '_not',
+    );
+    
+    public function __construct($builder)
     {
-        parent::__construct($conditions, $defaultOperator);
+        $this->builder = $builder;
+    }
+    
+    public function __call($method, $params)
+    {
+        if(!array_key_exists($method, $this->aliases))
+            throw new \PHPixie\ORM\Exception\Builder("Method $method does not exist.");
+
+        return call_user_func_array(array($this, $this->aliases[$method]), $params);
+    }
+    
+    public function addCondition($logic, $negate, $parmas)
+    {
+        $this->builder->addCondition($logic, $negate, $parmas);
     }
 
     public function addOperatorCondition($logic, $negate, $field, $operator, $values)
     {
-        $relationship = null;
-        
-        if (($pos = strpos($field, '>')) !== false || ($pos = strrpos($field, '.')) !== false) {
-            $relationship = substr($field, 0, $pos);
-            $field = substr($field, $pos + 1);
-        }
-
-        $condition = $this->conditions->operator($field, $operator, $values);
-        $this->addToRelationship($logic, $negate, $condition, $relationship);
-    }
-    
-    public function startRelatedToConditionGroup($relationship, $logic = 'and', $negate = false)
-    {
-        $path = explode('.', $relationship);
-        $root = null;
-        $current = null;
-        
-        foreach ($path as $key => $step) {
-            $group = $this->conditions->relationshipGroup($step);
-            
-            if ($key == 0) {
-                $root = $group;
-            }else{
-                $current->add($group);
-            }
-            
-            $current = $group;
-        }
-        
-        $this->addToCurrentGroup($logic, $negate, $root);
-        $this->pushGroup($current);
-        return $this;
-    }
-    
-
-    public function addRelatedToCondition($logic, $negate, $relationship, $condition)
-    {
-        if (!is_callable($condition))
-            return $this->addInCondition($logic, $negate, $condition, $relationship);
-
-        $this->startRelatedToConditionGroup($relationship, $logic, $negate);
-        call_user_func($condition, $this);
-        $this->endGroup();
-        
+        $this->builder->addOperatorCondition($logic, $negate, $field, $operator, $values);
         return $this;
     }
 
     public function addInCondition($logic, $negate, $items, $relationship = null)
     {
-        $condition = $this->conditions->collection($items);
-        $this->addToRelationship($logic, $negate, $condition, $relationship);
+        $this->builder->addInCondition($logic, $negate, $items, $relationship);
         return $this;
     }
 
-    protected function addToRelationship($logic, $negate, $condition, $relationship)
+    public function startConditionGroup($logic = 'and', $negate = false)
     {
-        if ($relationship !== null) {
-            $this->startRelatedToConditionGroup($relationship, $logic, $negate);
-            $this->addToCurrentGroup('and', false, $condition);
-            $this->endGroup();
-        }else{
-            $this->addToCurrentGroup($logic, $negate, $condition);
-        }
-    }    
+        $this->builder->startConditionGroup($logic, $negate);
+        return $this;
+    }
     
-    public function addWhereOperatorCondition($logic, $negate, $field, $operator, $values)
+    public function endGroup()
     {
-        return $this->addOperatorCondition($logic, $negate, $field, $operator, $values);
+        $this->builder->endGroup();
+        return $this;
     }
 
-    public function startWhereConditionGroup($logic = 'and', $negate = false)
+    public function addPlaceholder($logic = 'and', $negate = false, $allowEmpty = true)
     {
-        return $this->startConditionGroup($logic, $negate);
+        $this->builder->addPlaceholder($logic, $negate, $allowEmpty);
+        return $this;
+    }
+
+    public function addWhereOperatorCondition($logic, $negate, $field, $operator, $values)
+    {
+        $this->builder->addWhereOperatorCondition($logic, $negate, $field, $operator, $values);
+        return $this;
     }
 
     public function addWherePlaceholder($logic = 'and', $negate = false, $allowEmpty = true)
     {
-        return $this->addPlaceholder($logic, $negate, $allowEmpty);
+        $this->builder->addWherePlaceholder($logic, $negate, $allowEmpty);
+        return $this;
     }
 
+    public function startWhereConditionGroup($logic = 'and', $negate = false)
+    {
+        $this->builder->startWhereConditionGroup($logic, $negate);
+        return $this;
+    }
+
+    public function endWhereGroup()
+    {
+        $this->builder->endWhereGroup();
+        return $this;
+    }
+
+    public function addRelatedToCondition($logic, $negate, $relationship, $items)
+    {
+        $this->builder->addRelatedToCondition($logic, $negate, $relationship, $items);
+        return $this;
+    }
+
+    public function startRelatedToConditionGroup($relationship, $logic = 'and', $negate = false)
+    {
+        $this->builder->startRelatedToConditionGroup($relationship, $logic, $negate);
+        return $this;
+    }
+    
+    public function endRelatedToGroup()
+    {
+        $this->builder->endRelatedToGroup();
+        return $this;
+    }
+    
+//
+
+    public function _and()
+    {
+        return $this->addCondition('and', false, func_get_args());
+    }
+
+    public function _or()
+    {
+        return $this->addCondition('or', false, func_get_args());
+    }
+
+    public function _xor()
+    {
+        return $this->addCondition('xor', false, func_get_args());
+    }
+
+    public function _not()
+    {
+        return $this->addCondition('and', true, func_get_args());
+    }
+
+    public function andNot()
+    {
+        return $this->addCondition('and', true, func_get_args());
+    }
+
+    public function orNot()
+    {
+        return $this->addCondition('or', true, func_get_args());
+    }
+
+    public function xorNot()
+    {
+        return $this->addCondition('xor', true, func_get_args());
+    }
+
+    public function startGroup()
+    {
+        return $this->startConditionGroup('and', false);
+    }
+
+    public function startAndGroup()
+    {
+        return $this->startConditionGroup('and', false);
+    }
+
+    public function startOrGroup()
+    {
+        return $this->startConditionGroup('or', false);
+    }
+
+    public function startXorGroup()
+    {
+        return $this->startConditionGroup('xor', false);
+    }
+
+    public function startNotGroup()
+    {
+        return $this->startConditionGroup('and', true);
+    }
+
+    public function startAndNotGroup()
+    {
+        return $this->startConditionGroup('and', true);
+    }
+
+    public function startOrNotGroup()
+    {
+        return $this->startConditionGroup('or', true);
+    }
+
+    public function startXorNotGroup()
+    {
+        return $this->startConditionGroup('xor', true);
+    }
     public function where()
     {
         return $this->addCondition('and', false, func_get_args());
@@ -134,49 +220,44 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
 
     public function startWhereGroup()
     {
-        return $this->startConditionGroup('and', false);
+        return $this->startWhereConditionGroup('and', false);
     }
 
     public function startAndWhereGroup()
     {
-        return $this->startConditionGroup('and', false);
+        return $this->startWhereConditionGroup('and', false);
     }
 
     public function startOrWhereGroup()
     {
-        return $this->startConditionGroup('or', false);
+        return $this->startWhereConditionGroup('or', false);
     }
 
     public function startXorWhereGroup()
     {
-        return $this->startConditionGroup('xor', false);
+        return $this->startWhereConditionGroup('xor', false);
     }
 
     public function startWhereNotGroup()
     {
-        return $this->startConditionGroup('and', true);
+        return $this->startWhereConditionGroup('and', true);
     }
 
     public function startAndWhereNotGroup()
     {
-        return $this->startConditionGroup('and', true);
+        return $this->startWhereConditionGroup('and', true);
     }
 
     public function startOrWhereNotGroup()
     {
-        return $this->startConditionGroup('or', true);
+        return $this->startWhereConditionGroup('or', true);
     }
 
     public function startXorWhereNotGroup()
     {
-        return $this->startConditionGroup('xor', true);
+        return $this->startWhereConditionGroup('xor', true);
     }
-
-    public function endWhereGroup()
-    {
-        return $this->endGroup();
-    }
-    
+ 
     public function in($items)
     {
         return $this->addInCondition('and', false, $items);
@@ -298,10 +379,4 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
     {
         return $this->startRelatedToConditionGroup($relationship, 'xor', true);
     }
-    
-    public function endRelatedToGroup()
-    {
-        return $this->endGroup();
-    }
-    
 }

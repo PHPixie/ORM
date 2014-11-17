@@ -104,6 +104,7 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::addWhereCondition
      * @covers ::addWhereOperatorCondition
      * @covers ::addWherePlaceholder
      * @covers ::startWhereConditionGroup
@@ -127,6 +128,9 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
      */
     public function testWhere()
     {
+        $this->method($this->builder, 'addWhereCondition', null, array('or', true, array('a', 1)), 0);
+        $this->proxy->addWhereCondition('or', true, array('a', 1));
+        
         $this->method($this->builder, 'addWhereOperatorCondition', null, array('or', true, 'a', '>', 1), 0);
         $this->proxy->addWhereOperatorCondition('or', true, 'a', '>', 1);
         

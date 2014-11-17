@@ -91,6 +91,11 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
     {
         return $this->addPlaceholder($logic, $negate, $allowEmpty);
     }
+    
+    public function addWhereCondition($logic, $negate, $args)
+    {
+        return $this->addCondition($logic, $negate, $args);
+    }
 
     public function where()
     {

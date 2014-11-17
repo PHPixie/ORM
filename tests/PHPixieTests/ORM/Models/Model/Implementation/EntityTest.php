@@ -80,7 +80,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
     public function testSetField()
     {
         $this->prepareSetDataField('test', 5);
-        $this->entity->setField('test', 5);
+        $this->assertSame($this->entity, $this->entity->setField('test', 5));
     }
     
     /**

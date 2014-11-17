@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Repository\Embedded;
+namespace PHPixie\ORM\Loaders\Loader\Embedded;
 
-class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Repository\Embedded
+class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
 {
     protected $arrayNode;
     protected $owner;

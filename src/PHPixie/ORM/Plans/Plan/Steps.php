@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Plans\Plan;
 
-class Step extends \PHPixie\ORM\Plans\Plan
+class Steps extends \PHPixie\ORM\Plans\Plan
 {
     protected $steps = array();
 

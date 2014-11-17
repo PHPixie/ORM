@@ -37,6 +37,7 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
     public function setField($name, $value)
     {
         $this->data->set($name, $value);
+        return $this;
     }
     
     public function getRelationshipProperty($name, $createMissing = true)

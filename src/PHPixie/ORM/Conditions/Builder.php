@@ -7,6 +7,7 @@ interface Builder extends \PHPixie\Database\Conditions\Builder
     public function addWhereOperatorCondition($logic, $negate, $field, $operator, $values);
     public function addWherePlaceholder($logic = 'and', $negate = false, $allowEmpty = true);
     public function startWhereConditionGroup($logic = 'and', $negate = false);
+    public function addWhereCondition($logic, $negate, $args);
     
     public function where();
     public function andWhere();

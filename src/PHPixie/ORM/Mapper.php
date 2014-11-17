@@ -4,24 +4,22 @@ namespace PHPixie\ORM;
 
 class Mapper
 {
-    protected $orm;
     protected $loaders;
-    protected $repositoryRegistry;
+    protected $repositories;
     protected $groupMapper;
     protected $cascadeMapper;
 
-    public function __construct($orm, $loaders, $repositoryRegistry, $groupMapper, $cascadeMapper)
+    public function __construct($loaders, $repositories, $groupMapper, $cascadeMapper)
     {
-        $this->orm = $orm;
         $this->loaders = $loaders;
-        $this->repositoryRegistry = $repositoryRegistry;
+        $this->repositories = $repositories;
         $this->groupMapper = $groupMapper;
         $this->cascadeMapper = $cascadeMapper;
     }
 
     public function mapDelete($query)
     {
-        $plan = $this->plans->delete();
+        $plan = $this->plans->query();
         $modelName = $query->modelName();
         $repository = $this->repositoryRegistry->get($modelName);
 
@@ -43,7 +41,17 @@ class Mapper
     
     public function mapCount($query)
     {
-    
+        $modelName = $query->modelName();
+        $repository = $this->repositories->get($modelName);
+        $databaseQuery = $repository->databaseCountQuery();
+        $step = $this->steps->countQuery($databaseQuery);
+        $plan = $this->plans->count($step);
+        
+        $conditions   = $query->conditions();
+        $requiredPlan = $plan->requiredPlan();
+        $this->groupMapper->mapConditions($databaseQuery, $conditions, $modelName, $requiredPlan);
+        
+        return $plan;
     }
     
     public function mapUpdate($query, $data)

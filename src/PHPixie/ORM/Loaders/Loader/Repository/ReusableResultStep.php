@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Repository\Database;
+namespace PHPixie\ORM\Loaders\Loader\Repository;
 
-class ReusableResult extends \PHPixie\ORM\Loaders\Loader\Repository
+class ReusableResultStep extends \PHPixie\ORM\Loaders\Loader\Repository
 {
     protected $repository;
     protected $reusableResultStep;
@@ -24,7 +24,7 @@ class ReusableResult extends \PHPixie\ORM\Loaders\Loader\Repository
         return $this->loadModel($data);
     }
 
-    public function reusableResult()
+    public function reusableResultStep()
     {
         return $this->reusableResultStep;
     }

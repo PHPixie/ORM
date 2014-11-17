@@ -6,7 +6,12 @@ class Plans
 {
     protected $transaction;
 
-    public function plan()
+    public function steps()
+    {
+        return new Plans\Plan\Steps($this);
+    }
+    
+    public function query()
     {
         return new Plans\Plan\Step($this);
     }

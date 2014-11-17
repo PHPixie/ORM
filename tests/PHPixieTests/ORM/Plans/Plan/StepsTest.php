@@ -3,16 +3,16 @@
 namespace PHPixieTests\ORM\Plans\Plan;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Plans\Plan\Step
+ * @coversDefaultClass \PHPixie\ORM\Plans\Plan\Steps
  */
-class StepTest extends \PHPixieTests\ORM\Plans\PlanTest
+class StepsTest extends \PHPixieTests\ORM\Plans\PlanTest
 {
     protected function getPlan()
     {
-        return new \PHPixie\ORM\Plans\Plan\Step($this->plans);
+        return new \PHPixie\ORM\Plans\Plan\Steps($this->transaction);
     }
     
-    protected function addSteps()
+    protected function addSteps($withConnections = false)
     {
         foreach($this->steps as $step)
             $this->plan->add($step);

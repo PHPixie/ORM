@@ -7,12 +7,9 @@ namespace PHPixieTests\ORM\Plans;
  */
 abstract class PlanTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $plans;
     protected $transaction;
     protected $connections;
-    protected $steps;
     protected $plan;
-    
     
     public function setUp()
     {
@@ -30,8 +27,6 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
             $this->step(array($this->connections[1])),
         );
         
-        $this->plans = $this->quickMock('\PHPixie\ORM\Plans', array('transaction', 'plan'));
-        $this->method($this->plans, 'transaction', $this->transaction);
         $this->plan = $this->getPlan();
     }
     
@@ -45,6 +40,7 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
     
     /**
      * @covers ::steps
+     * @covers \PHPixie\ORM\Plans\Plan::steps
      * @covers ::<protected>
      */
     public function testSteps()
@@ -59,7 +55,7 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
      */
     public function testUsedConnections()
     {
-        $this->addSteps();
+        $this->addSteps(true);
         $this->assertEquals($this->connections, $this->plan->usedConnections());
     }
     
@@ -69,25 +65,18 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
      */
     public function testExecute()
     {
-        $this->addSteps();
-        $this->method($this->transaction, 'begin', null, array($this->connections), 0);
-        $this->method($this->transaction, 'commit', null, array($this->connections), 1);
-        foreach($this->steps as $step) {
-            $step
-                ->expects($this->once())
-                ->method('execute')
-                ->with();
-        }
+        $this->prepareExecute();
         $this->plan->execute();
     }
     
     /**
      * @covers ::execute
+     * @covers \PHPixie\ORM\Plans\Plan::execute
      * @covers ::<protected>
      */
     public function testExecuteRollback()
     {
-        $this->addSteps();
+        $this->addSteps(true);
         $this->method($this->transaction, 'begin', null, array($this->connections), 0);
         $this->method($this->transaction, 'rollback', null, array($this->connections), 1);
         foreach($this->steps as $step)
@@ -106,6 +95,19 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
         return $step;
     }
     
+    protected function prepareExecute()
+    {
+        $this->addSteps(true);
+        $this->method($this->transaction, 'begin', null, array($this->connections), 0);
+        $this->method($this->transaction, 'commit', null, array($this->connections), 1);
+        foreach($this->steps as $step) {
+            $step
+                ->expects($this->once())
+                ->method('execute')
+                ->with();
+        }
+    }
+    
     abstract protected function getPlan();
-    abstract protected function addSteps();
+    abstract protected function addSteps($withConnections = false);
 }

@@ -16,4 +16,9 @@ abstract class Repository extends \PHPixie\ORM\Loaders\Loader
     {
         return $this->repository;
     }
+    
+    protected function loadModel($data)
+    {
+        return $this->repository->load($data);
+    }
 }

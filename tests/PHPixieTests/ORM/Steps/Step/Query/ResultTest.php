@@ -3,7 +3,7 @@
 namespace PHPixieTests\ORM\Steps\Step\Query;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Steps\Step\Query
+ * @coversDefaultClass \PHPixie\ORM\Steps\Step\Query\Result
  */
 abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
 {

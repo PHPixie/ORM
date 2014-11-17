@@ -4,16 +4,14 @@ namespace PHPixie\ORM\Mapper;
 
 class Group
 {
-    protected $ormBuilder;
-    protected $repositoryRegistry;
+    protected $repositories;
     protected $planners;
     protected $optimizer;
     protected $optimizerEnabled = true;
 
-    public function __construct($ormBuilder, $repositoryRegistry, $planners, $optimizer)
+    public function __construct($repositories, $planners, $optimizer)
     {
-        $this->ormBuilder = $ormBuilder;
-        $this->repositoryRegistry = $repositoryRegistry;
+        $this->repositories = $repositoryRegistry;
         $this->planners = $planners;
         $this->optimizer = $optimizer;
 

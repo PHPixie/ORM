@@ -67,6 +67,7 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
     }
     
     /**
+     * @covers ::addWhereCondition
      * @covers ::addWhereOperatorCondition
      * @covers ::addWherePlaceholder
      * @covers ::startWhereConditionGroup
@@ -91,6 +92,9 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
     public function testWhere()
     {
         $expected = array();
+        
+        $this->container->addWhereCondition('or', true, array('a', 1));
+        $expected[] = array('or', true, 'a', '>', 1);
         
         $this->container->addWhereOperatorCondition('or', true, 'a', '>', 1);
         $expected[] = array('or', true, 'a', '>', 1);

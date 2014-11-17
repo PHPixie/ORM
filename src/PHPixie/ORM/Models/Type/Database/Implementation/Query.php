@@ -5,10 +5,10 @@ namespace PHPixie\ORM\Models\Type\Database\Implementation;
 class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
             implements \PHPixie\ORM\Models\Type\Database\Query
 {
-    protected $container;
     protected $values;
     protected $mapper;
     protected $relationshipMap;
+    protected $container;
     protected $config;
     
     protected $relationshipProperties = array();
@@ -22,6 +22,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     {
         parent::__construct($container);
         
+        $this->container        = $container;
         $this->values           = $values;
         $this->mapper           = $mapper;
         $this->relationshipMap  = $relationshipMap;
@@ -94,6 +95,11 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     {
         $this->orderBy = array();
         return $this;
+    }
+    
+    public function getConditions()
+    {
+        return $this->container->getConditions();
     }
 
     public function find($preload = array())

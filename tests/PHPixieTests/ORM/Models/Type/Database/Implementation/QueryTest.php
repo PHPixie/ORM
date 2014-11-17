@@ -16,6 +16,7 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
         'modelName' => 'fairies'
     );
     
+    protected $container;
     protected $query;
     
     public function setUp()
@@ -27,6 +28,7 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
         
         parent::setUp();
         
+        $this->container = $this->builder;
         $this->query = $this->proxy;
     }
     
@@ -116,6 +118,18 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
         $this->assertSame($this->query, $this->query->clearOrderBy());
         $this->assertSame(array(), $this->query->getOrderBy());
     }
+    
+    /**
+     * @covers ::getConditions
+     * @covers ::<protected>
+     */
+    public function testGetConditions()
+    {
+        $conditions = array('test');
+        $this->method($this->container, 'getConditions', $conditions, array(), 0);
+        $this->assertSame($conditions, $this->query->getConditions());
+    }
+    
     
     /**
      * @covers ::planFind
@@ -371,6 +385,11 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     protected function proxy()
     {
         return $this->query();
+    }
+    
+    protected function getBuilder()
+    {
+        return $this->quickMock('\PHPixie\ORM\Conditions\Builder\Container');
     }
     
     abstract protected function getConfig();

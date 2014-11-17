@@ -36,6 +36,7 @@ interface Query extends \PHPixie\ORM\Conditions\Condition\Collection\Item,
     
     public function getRelationshipProperty($name);
     
+    public function getConditions();
     
     public function __get($name);
     

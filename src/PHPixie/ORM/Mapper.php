@@ -4,13 +4,17 @@ namespace PHPixie\ORM;
 
 class Mapper
 {
+    protected $plans;
+    protected $steps;
     protected $loaders;
     protected $repositories;
     protected $groupMapper;
     protected $cascadeMapper;
 
-    public function __construct($loaders, $repositories, $groupMapper, $cascadeMapper)
+    public function __construct($plans, $steps, $loaders, $repositories, $groupMapper, $cascadeMapper)
     {
+        $this->plans = $plans;
+        $this->steps = $steps;
         $this->loaders = $loaders;
         $this->repositories = $repositories;
         $this->groupMapper = $groupMapper;
@@ -44,10 +48,10 @@ class Mapper
         $modelName = $query->modelName();
         $repository = $this->repositories->get($modelName);
         $databaseQuery = $repository->databaseCountQuery();
-        $step = $this->steps->countQuery($databaseQuery);
+        $step = $this->steps->count($databaseQuery);
         $plan = $this->plans->count($step);
         
-        $conditions   = $query->conditions();
+        $conditions   = $query->getConditions();
         $requiredPlan = $plan->requiredPlan();
         $this->groupMapper->mapConditions($databaseQuery, $conditions, $modelName, $requiredPlan);
         

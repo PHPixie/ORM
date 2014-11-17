@@ -15,6 +15,11 @@ class Plans
     {
         return new Plans\Plan\Step($this);
     }
+    
+    public function count()
+    {
+        return new Plans\Plan\Step($this);
+    }
 
     public function loader()
     {

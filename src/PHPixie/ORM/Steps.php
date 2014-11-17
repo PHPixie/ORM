@@ -15,6 +15,11 @@ class Steps
     {
         return new Steps\Step\Query($query);
     }
+    
+    public function count($query)
+    {
+        return new Steps\Step\Query($query);
+    }
 
     public function result($query)
     {

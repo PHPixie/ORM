@@ -301,7 +301,7 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
     
     protected function getBuilder()
     {
-        return $this->quickMock('\PHPixie\ORM\Conditions\Builder\Container');
+        return $this->abstractMock('\PHPixie\ORM\Conditions\Builder');
     }
     
     protected function proxy()

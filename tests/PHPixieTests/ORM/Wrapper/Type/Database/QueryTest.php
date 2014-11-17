@@ -47,6 +47,7 @@ class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
             array('orderDescendingBy', false, array('a')),
             array('getOrderBy', true, array()),
             array('clearOrderBy', false, array()),
+            array('getConditions', true, array()),
             array('planFind', true, array()),
             array('find', true, array()),
             array('findOne', true, array()),

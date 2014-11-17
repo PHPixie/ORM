@@ -76,6 +76,11 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
         return $this;
     }
     
+    public function getConditions()
+    {
+        return $this->query->getConditions();
+    }
+    
     public function planFind($preload = array())
     {
         return $this->query->planFind($preload);

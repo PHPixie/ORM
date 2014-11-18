@@ -23,9 +23,8 @@ class Mapper
 
     public function mapDelete($query)
     {
-        $plan = $this->plans->query();
         $modelName = $query->modelName();
-        $repository = $this->repositoryRegistry->get($modelName);
+        $repository = $this->repositories->get($modelName);
 
         $handledSides = $this->cascadeMapper->deletionSides($modelName);
         $hasHandledSides = !empty($handledSides);
@@ -51,53 +50,61 @@ class Mapper
         $step = $this->steps->count($databaseQuery);
         $plan = $this->plans->count($step);
         
-        $conditions   = $query->getConditions();
-        $requiredPlan = $plan->requiredPlan();
-        $this->groupMapper->mapConditions($databaseQuery, $conditions, $modelName, $requiredPlan);
+        $this->mapConditions($query, $databaseQuery, $plan);
         
         return $plan;
     }
     
     public function mapUpdate($query, $data)
     {
-        $plan = $this->orm->plan();
         $modelName = $query->modelName();
-        $repository = $this->repositoryRegistry->get($modelName);
-
-        $dbQuery = $repository->query('update');
-        $db->query->data($data);
-        $this->groupMapper->mapConditions($dbQuery, $query->conditions(), $modelName, $plan);
-        $plan->push($this->steps->query($dbQuery));
-
+        $repository = $this->repositories->get($modelName);
+        $databaseQuery = $repository->databaseUpdateQuery();
+        $databaseQuery->data($data);
+        
+        $step = $this->steps->query($databaseQuery);
+        $plan = $this->plans->query($step);
+        
+        $this->mapConditions($query, $databaseQuery, $plan);
+        
         return $plan;
     }
-
+    
+    protected function mapConditions($query, $databaseQuery, $queryPlan)
+    {
+        $modelName = $queyr->modelName();
+        $conditions   = $query->getConditions();
+        $requiredPlan = $queryPlan->requiredPlan();
+        $this->groupMapper->mapConditions($databaseQuery, $conditions, $modelName, $requiredPlan);
+    }
+    
     public function mapFind($query, $preload)
     {
         $modelName = $query->modelName();
-        $resultPlan = $this->orm->resultPlan($modelName);
-        $repository = $this->repositoryRegistry->get($modelName);
-
-        $dbQuery = $repository->query('select');
-        $this->groupMapper->mapConditions($dbQuery, $query->conditions(), $modelName, $resultPlan->requiredPlan());
-
-        $resultStep = $this->steps->reusableResult($dbQuery);
-        $plan->setResultStep($resultStep);
-
-        $loader = $this->loaders->reusableResult($resultStep);
-        $plan->setLoader($loader);
-
-        foreach($preload as $relationship)
-            $this->addPreloaders($model, $relationship, $loader, $plan->preloadPlan());
-
+        $repository = $this->repositories->get($modelName);
+        $databaseQuery = $repository->databaseSelectQuery();
+        
+        $step = $this->steps->reusableResult($databaseQuery);
+        $loader = $this->loaders->reusableResultStep($repository, $step);
+        $preloadingProxy = $this->loaders->peloadingProxy($loader);
+        $plan = $this->plans->loader($loader);
+        
+        $this->mapConditions($query, $databaseQuery, $plan);
+        
+        $preloadPlan = $plan->preloadPlan();
+        
+        foreach($preload as $relationship) {
+            $this->addPreloaders($modelName, $relationship, $preloadingProxy, $preloadPlan);
+        }
+        
         return $plan;
     }
 
-    protected function addPreloaders($model, $relationship, $loader, $plan)
+    protected function addPreloaders($model, $relationship, $preloadingProxy, $stepsPlan)
     {
         $path = explode('.', $relationship);
         foreach ($path as $rel) {
-            $preloader = $loader->getPreloader($relationship);
+            $preloader = $preloadingProxy->getPreloader($relationship);
             if ($preloader === null) {
                 $preloader = $this->buildPreloader($model, $relationship, $loader, $plan);
                 $loader->setPreloader($relationship, $preloader);
@@ -112,7 +119,8 @@ class Mapper
         $side = $this->relationshipRegistry->getSide($model, $relationship);
         $handler = $this->orm->relationshipType($side->relationshipType())->handler();
 
-        return $handler->preloader($side, $loader, $plan);
+        $preloader = $handler->preloader($side, $loader, $plan);
+        $preloadingProxy = $this->loaders->peloadingProxy($preloader);
     }
 
 }

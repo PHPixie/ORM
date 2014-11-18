@@ -1,5 +1,28 @@
+Loader
+    Preloadable
+        Repository
+            Reusable
+            Iterator
+        Embedded
+            ArrayAccess
+            
 
-CachingProxy->PreloadingProxy(A)->ReusableResultLoader
+Embedded\Preloader
+    Loader<-Preloadable
 
-PreloadingProxy(A):
-    Preloader->PreloadingProxy(B)->ReusableResultLoader
+
+=======================
+
+SourceInterface
+    ->loader()
+    ->preloadingProxy()
+    ReusableResult
+        ->reusableResult()
+
+Preloader implements Source
+    ->loader()
+    ->preloadingProxy()
+    ->resultStep()
+
+
+    

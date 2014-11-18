@@ -87,30 +87,31 @@ class Mapper
         $step = $this->steps->reusableResult($databaseQuery);
         $loader = $this->loaders->reusableResultStep($repository, $step);
         $preloadingProxy = $this->loaders->peloadingProxy($loader);
+        $cachingProxy = $this->loaders->cachingProxy($loader);
+        
         $plan = $this->plans->loader($loader);
-        
         $this->mapConditions($query, $databaseQuery, $plan);
-        
         $preloadPlan = $plan->preloadPlan();
         
+        $source = $this->sources->source($cachingProxy, $step);
+        
         foreach($preload as $relationship) {
-            $this->addPreloaders($modelName, $relationship, $preloadingProxy, $preloadPlan);
+            $this->addPreloaders($modelName, $relationship, $preloadingProxy, $source, $preloadPlan);
         }
         
         return $plan;
     }
 
-    protected function addPreloaders($model, $relationship, $preloadingProxy, $stepsPlan)
+    protected function addPreloaders($model, $relationship, $preloadingProxy, $source, $stepsPlan)
     {
         $path = explode('.', $relationship);
         foreach ($path as $rel) {
             $preloader = $preloadingProxy->getPreloader($relationship);
             if ($preloader === null) {
-                $preloader = $this->buildPreloader($model, $relationship, $loader, $plan);
+                $preloader = $this->buildPreloader($model, $relationship, $source, $plan);
                 $loader->setPreloader($relationship, $preloader);
             }
-            $model = $preloader->modelName();
-            $resultLoader = $preloader->loader();
+            $source = $preloader->source();
         }
     }
 

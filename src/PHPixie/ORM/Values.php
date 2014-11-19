@@ -8,4 +8,7 @@ class Values
     {
         return new \PHPixie\ORM\Values\OrderBy($field, $direction);
     }
+    
+    public function preloadProperty(){}
+    public function preload(){}
 }

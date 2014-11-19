@@ -129,7 +129,13 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     
     public function planFind($preload = array())
     {
-        return $this->mapper->mapFind($this, $preload);
+        $preloads = $this->values->preload();
+        
+        foreach($preload as $item) {
+            $preloads->add($item);
+        }
+        
+        return $this->mapper->mapFind($this, $preloads);
     }
 
 

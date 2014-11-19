@@ -303,10 +303,16 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
         return $orderBy;
     }
                               
-    protected function preparePlanFind($preload = array(), $query = null)
+    protected function preparePlanFind($preloadPaths = array(), $query = null)
     {
         if($query === null)
             $query = $this->query;
+        
+        $preload = $this->quickMock('\PHPixie\ORM\Values\Preload');
+        $this->method($this->values, 'preload', $preload, array(), 0);
+        foreach($preloadPaths as $key => $path) {
+            $this->method($preload, 'add', null, array($path), $key);
+        }
         
         $plan = $this->getPlan();
         $this->method($this->mapper, 'mapFind', $plan, array($query, $preload), 0);

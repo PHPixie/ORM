@@ -2,7 +2,8 @@
 
 namespace PHPixie\ORM\Steps\Step\Query;
 
-abstract class Result extends \PHPixie\ORM\Steps\Step\Query implements \IteratorAggregate
+abstract class Result extends \PHPixie\ORM\Steps\Step\Query 
+                      implements \PHPixie\ORM\Steps\Result
 {
     protected $result;
     

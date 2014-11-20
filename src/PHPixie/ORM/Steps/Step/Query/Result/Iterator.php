@@ -8,4 +8,9 @@ class SingleUse extends \PHPixie\ORM\Steps\Step\Query\Result
     {
         return $this->result();
     }
+    
+    public function asArray()
+    {
+        return iterator_to_array($this->result);
+    }
 }

@@ -3,10 +3,11 @@
 namespace PHPixie\ORM\Steps\Step\Query\Result;
 
 class Reusable extends \PHPixie\ORM\Steps\Step\Query\Result
+               implements \PHPixie\ORM\Steps\Result\Reusable
 {
     protected $data;
 
-    protected function data()
+    protected function asArray()
     {
         if ($this->data === null)
             $this->data = $this->result()->asArray();

@@ -41,4 +41,6 @@ class Relationships
         $relationshipMap = $this->ormBuilder->relationshipMap();
         return new Relationships\Type\Embedded\Type\Embeds\Mapper\Group($this, $relationshipMap);
     }
+    
+    public function map(){}
 }

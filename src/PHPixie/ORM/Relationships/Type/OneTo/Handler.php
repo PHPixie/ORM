@@ -141,7 +141,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         $plan->add($deleteStep);
     }
 
-    public function mapPreload($side, $resultStepLoader, $preloadPlan)
+    public function mapPreload($side, $preloadProperty, $reusableResult, $plan)
     {
         $config = $side->config();
 

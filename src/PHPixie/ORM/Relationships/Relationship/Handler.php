@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Relationship;
 
-class Handler
+abstract class Handler
 {
     protected $ormBuilder;
     protected $repositories;
@@ -73,7 +73,4 @@ class Handler
 
     abstract public function mapPreload();
     abstract public function mapQuery();
-
-
-
 }

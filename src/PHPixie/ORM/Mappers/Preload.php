@@ -18,12 +18,12 @@ class Preload
         $this->addPreloaders($preloadingProxy, $modelName, $preload, $result, $plan);
     }
     
-    public function mapPreloadEmbedded($preloadingProxy, $modelName, $preload, $result, $plan, $embeddedPrefix)
+    public function mapPreloadEmbedded($preloadingProxy, $modelName, $preload, $result, $plan, $embeddedPath)
     {
-        $this->addPreloaders($preloadingProxy, $modelName, $preload, $result, $plan, $embeddedPrefix);
+        $this->addPreloaders($preloadingProxy, $modelName, $preload, $result, $plan, $embeddedPath);
     }
     
-    protected function addPreloaders($preloadingProxy, $modelName, $preload, $result, $plan, $embeddedPrefix = null)
+    protected function addPreloaders($preloadingProxy, $modelName, $preload, $result, $plan, $embeddedPath = null)
     {
         
         foreach($preload->properties() as $property) {
@@ -34,8 +34,8 @@ class Preload
             $relationship = $this->relationships->get($side->relationshipType());
             $handler = $relationship->handler();
             
-            if($embeddedPrefix !== null) {
-                $preloader = $handler->mapPreloadEmbedded($side, $property, $result, $plan, $embeddedPrefix);
+            if($embeddedPath !== null) {
+                $preloader = $handler->mapPreloadEmbedded($side, $property, $result, $plan, $embeddedPath);
             }else{
                 $preloader = $handler->mapPreload($side, $property, $result, $plan);
             }

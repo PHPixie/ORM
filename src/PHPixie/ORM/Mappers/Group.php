@@ -1,24 +1,25 @@
 <?php
 
-namespace PHPixie\ORM\Mapper;
+namespace PHPixie\ORM\Mappers;
 
 class Group
 {
     protected $repositories;
     protected $relationships;
+    protected $relationshipMap;
     protected $planners;
 
     public function __construct($repositories, $relationships, $planners)
     {
-        $this->repositories = $repositoryRegistry;
-        $this->relationship = $relationships;
+        $this->repositories = $repositories;
+        $this->relationships = $relationships;
+        $this->relationshipMap = $relationships->map();
         $this->planners = $planners;
     }
     
-    protected function mapOperatorCondition($builder, $condition, $fieldPrefix = null)
+    protected function mapOperatorCondition($builder, $condition, $embeddedPath = null)
     {
-        $prefix = $fieldPrefix === null ? '' : $fieldPrefix.'.';
-        
+        $prefix = $embeddedPath === null ? '' : $embeddedPath.'.';
         $builder->addOperatorCondition(
             $condition->logic(),
             $condition->negated(),
@@ -28,74 +29,77 @@ class Group
         );
     }
     
-    protected function mapConditionGroup($group, $builder, $modelName, $plan, $fieldPrefix = null)
+    protected function mapConditionGroup($builder, $modelName, $group, $plan, $embeddedPath = null)
     {
-        $query->startWhereGroup($group->logic, $group->negated());
-        $this->mapConditions($query, $group->conditions(), $modelName, $plan, $fieldPrefix);
-        $builder->endWhereGroup();
+        $builder->startGroup($group->logic(), $group->negated());
+        $this->mapConditions($builder, $modelName, $group->conditions(), $plan, $embeddedPath);
+        $builder->endGroup();
     }
     
-    protected function mapRelationshipGroup($group, $query, $modelName, $plan, $embeddedPrefix = null)
+    protected function mapRelationshipGroup($builder, $modelName, $group, $plan, $embeddedPath = null)
     {
-        $side = $this->relationshipMap->getSide($modelName, $group->relationship);
+        $side = $this->relationshipMap->getSide($modelName, $group->relationship());
         $type = $side->relationshipType();
-        $handler = $this->relationships($type)->handler();
+        $handler = $this->relationships->get($type)->handler();
         
-        if($embeddedPrefix !== null) {
-            $handler->mapSubdocument($side, $query, $group, $plan, $embeddedPrefix);
+        if($embeddedPath !== null) {
+            $handler->mapSubdocument($builder, $side, $group, $plan, $embeddedPath);
         }else{
-            $handler->mapQuery($side, $query, $group, $plan);
+            $handler->mapQuery($builder, $side, $group, $plan);
         }
     }
     
-    protected function mapCollection($builder, $modelName, $collection, $embeddedPrefix)
+    protected function mapCollection($builder, $modelName, $collectionCondition, $plan, $embeddedPath = null)
     {
-        if($embeddedPrefix !== null)
-            throw
-            
+        if($embeddedPath !== null)
+            throw new \PHPixie\ORM\Exception\Mapper("Collection conditions are not allowed for embedded models");
+        
+        $collection = $this->planners->collection($modelName, $collectionCondition->items());
         $idField = $this->repositories->get($modelName)->config()->idField;
+        
         $this->planners->in()->collection(
             $builder,
             $idField,
-            $collectionCondition->collection(),
+            $collection,
             $idField,
             $plan,
-            $collectionCondition->logic,
+            $collectionCondition->logic(),
             $collectionCondition->negated()
         );
     }
     
     
 
-    protected function mapConditions($builder, $conditions, $modelName, $plan, $embeddedPrefix = null)
+    protected function mapConditions($builder, $modelName, $conditions, $plan, $embeddedPath = null)
     {
-        foreach ($conditions as $cond) {
+        foreach ($conditions as $condition) {
+            
+            if ($condition instanceof \PHPixie\ORM\Conditions\Condition\Operator) {
+                $this->mapOperatorCondition($builder, $condition, $embeddedPath);
+                
+            }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
+                $this->mapCollection($builder, $modelName, $condition, $plan, $embeddedPath);
 
-            if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Operator) {
-                $builder->mapOperatorCondition($builder, $condition, $embeddedPrefix);
+            }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\Group\Relationship) {
+                $this->mapRelationshipGroup($builder, $modelName, $condition, $plan, $embeddedPath);
 
-            }elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
-                $this->mapCollection($builder, $condition, $embeddedPrefix);
+            }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\Group) {
+                $this->mapConditionGroup($builder, $modelName, $condition, $plan, $embeddedPath);
 
-            }elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group\Relationship) {
-                $this->mapRelationshipGroup($group, $currentModel, $query, $plan, $embeddedPrefix);
-
-            }elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group) {
-                $this->mapConditionGroup($cond, $query, $currentModel, $plan, $embeddedPrefix);
-
-            }else
+            }else {
                 throw new \PHPixie\ORM\Exception\Mapper("Unexpected condition encountered");
+            }
         }
     }
     
-    public function mapDatabaseQuery($query, $conditions, $modelName, $plan)
+    public function mapDatabaseQuery($query, $modelName, $conditions, $plan)
     {
-        return $this->mapConditions($builder, $conditions, $modelName, $plan);
+        return $this->mapConditions($query, $modelName, $conditions, $plan);
     }
     
-    public function mapSubdocument($query, $conditions, $modelName, $plan, $prefix)
+    public function mapSubdocument($subdocument, $modelName, $conditions, $plan, $path)
     {
-        return $this->mapConditions($builder, $conditions, $modelName, $plan, $prefix);
+        return $this->mapConditions($subdocument, $modelName, $conditions, $plan, $path);
     }
     
 }

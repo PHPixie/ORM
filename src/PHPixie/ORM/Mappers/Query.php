@@ -82,20 +82,26 @@ class Query
     {
         $modelName = $query->modelName();
         $repository = $this->repositories->get($modelName);
-
-        $handledSides = $this->cascadeMapper->deletionSides($modelName);
-        $hasHandledSides = !empty($handledSides);
-        $dbQuery = $repository->query($hasHandledSides? 'select' : 'delete');
-        $this->groupMapper->mapConditions($dbQuery, $query->conditions(), $modelName, $plan);
-
-        if ($hasHandledSides)
-            $query = $this->cascadeMapper->deletion($query, $handledSides, $repository, $plan);
-
-        $deleteStep = $this->steps->query($query);
-        $plan->add($deleteStep);
-
-        $plan->push($this->steps->query($dbQuery));
-
+        
+        $deletionSides = $this->cascadeMapper->deletionSides($modelName);
+        if(empty($deletionSides)) {
+            $databaseQuery = $repository->databaseDeleteQuery();
+            $step = $this->steps->query($databaseQuery);
+            $plan = $this->plans->query($step);
+            $this->mapConditions($query, $databaseQuery, $plan);
+        }else{
+            $selectQuery = $repository->databaseSelectQuery();
+            $step = $this->steps->reusableResult($databaseQuery);
+            $this->mapConditions($query, $databaseQuery, $plan);
+            
+            $deleteQuery = $repository->databaseDeleteQuery();
+            $idField = $this->repositories->get($modelName)->config()->idField;
+            $this->planners->in()->result($deleteQuery, $idField, $step, $idField, $plan);
+            
+            $step = $this->steps->query($deleteQuery);
+            $plan = $this->plans->query($step);
+        }
+        
         return $plan;
     }
     

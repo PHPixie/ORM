@@ -63,21 +63,21 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
         $reusableResult = $this->getReusableResult();
         $stepsPlan = $this->getStepsPlan();
         
-        $embeddedPrefix = 'embedded.prefix';
+        $embeddedPath = 'embedded.prefix';
         
-        $this->prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan, $embeddedPrefix);
+        $this->prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan, $embeddedPath);
         $this->preloadMapper->mapPreloadEmbedded(
             $preloadingProxy,
             $this->modelName,
             $preload,
             $reusableResult,
             $stepsPlan,
-            $embeddedPrefix
+            $embeddedPath
         );
     }
 
     
-    protected function prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan, $embeddedPrefix = null)
+    protected function prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan, $embeddedPath = null)
     {
         $sets = array(
             array('pixie', 'oneToOne'),
@@ -102,7 +102,7 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
             
             $preloader = $this->getPreloader();
             
-            if($embeddedPrefix !== null) {
+            if($embeddedPath !== null) {
                 $handler = $this->getHandler(true);
                 
                 $this->method($handler, 'mapPreloadEmbedded', $preloader, array(
@@ -110,7 +110,7 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
                     $property,
                     $reusableResult,
                     $stepsPlan,
-                    $embeddedPrefix
+                    $embeddedPath
                 ), 0);
                 
             }else{

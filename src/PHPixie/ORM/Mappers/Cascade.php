@@ -1,4 +1,4 @@
-<?php
+x<?php
 
 namespace PHPixie\ORM\Mapper;
 
@@ -42,6 +42,16 @@ class Cascade
             $handler = $relationship->handler();
             $handler->handleDeletion($side, $reusableResult, $plan, $path);
         }
+    }
+    
+    public function chainDeletion($selectQuery, $modelName, $plan, $path)
+    {
+        $step = $this->steps->reusableResult($selectQuery);
+        $plan->add($step);
+        $this->chainDeletion($step, $modelName, $plan, $path);
+        $deleteQuery = $repository->databaseDeleteQuery();
+        $idField = $this->repositories->get($modelName)->config()->idField;
+        
     }
     
     public function deletion($selectQuery, $modelName)

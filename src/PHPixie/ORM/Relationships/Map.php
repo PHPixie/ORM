@@ -24,6 +24,11 @@ class Map
                 $this->addSide($side);
         }
     }
+    
+    public function modelSides()
+    {
+        return array_values($this->propertyMap[$modelName]);
+    }
 
     public function addSide($side)
     {

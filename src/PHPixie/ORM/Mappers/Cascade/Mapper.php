@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Mappers;
+namespace PHPixie\ORM\Mappers\Cascade;
 
-abstract class Cascade
+abstract class Mapper
 {
     protected $relationships;
     protected $relationshipMap;
@@ -32,22 +32,8 @@ abstract class Cascade
     
     abstract protected function isSideHandled($side);
     
-    /*
-    public function deletion($selectQuery, $sides, $repository, $plan)
-    {
-        $resultStep = $this->steps->reusableResult($selectQuery);
-        $plan->add($resultStep);
-        foreach ($sides as $side) {
-            $handler = $this->ormBuilder->relationship($side->relationship())->handler();
-            $handler->handleDeletion($repository->modelName(), $side, $resultStep, $plan);
-        }
-        $deleteQuery = $repository->databaseQuery('delete');
-        $idField = $repository->idField();
-        $this->planners->in()->result($deleteQuery, $idField, $resultStep, $idField);
 
-        return $deleteQuery;
-    }
-*
+/*
     
     public function chainDeletion($reusableResult, $modelName, $plan, $path)
     {

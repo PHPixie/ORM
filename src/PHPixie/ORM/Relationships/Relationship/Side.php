@@ -22,7 +22,8 @@ abstract class Side
     {
         return $this->config;
     }
-
+    
+    abstract public function isDeleteHandled();
     abstract public function modelName();
     abstract public function propertyName();
     abstract public function relationshipType();

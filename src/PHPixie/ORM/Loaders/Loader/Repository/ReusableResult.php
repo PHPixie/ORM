@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Loaders\Loader\Repository;
 
-class ReusableResultStep extends \PHPixie\ORM\Loaders\Loader\Repository
+class ReusableResult extends \PHPixie\ORM\Loaders\Loader\Repository
 {
     protected $repository;
     protected $reusableResultStep;

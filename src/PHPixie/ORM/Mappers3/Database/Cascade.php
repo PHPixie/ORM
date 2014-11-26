@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Mapper;
 
-class Cascade
+abstract class Cascade
 {
     protected $ormBuilder;
     protected $repositoryRegistry;

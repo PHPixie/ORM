@@ -35,14 +35,14 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
         }
     }
     
-    public function handleQuery($selectQuery, $modelName, $plan, $path)
+    protected function mapDelesteQuery($selectQuery, $deleteQuery, $modelName, $plan, $path)
     {
         $resultStep = $this->steps->reusableResult($selectQuery);
         $plan->add($resultStep);
         $this->handleResult($resultStep, $modelName, $plan, $path);
         
         $repository = $this->repositories->get($modelName);
-        $deleteQuery = $repository->databaseDeleteQuery();
+        
         $idField = $repository->config()->idField;
         $this->planners->in()->result(
             $deleteQuery,
@@ -51,13 +51,28 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
             $idField,
             $plan
         );
+    }
+    
+    public function handleQuery($selectQuery, $modelName, $plan, $path)
+    {
+        $repository = $this->repositories->get($modelName);
+        $deleteQuery = $repository->databaseDeleteQuery();
         $deleteStep = $this->steps->query($deleteQuery);
+        
+        $this->mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan, $path);
+        
         $plan->add($deleteStep);
     }
     
-    public function cascade($selectQuery, $modelName, $plan)
+    public function mapDeleteQuery($selectQuery, $modelName, $plan)
     {
         $path = $this->mappers->cascadePath();
-        $this->handleQuery($selectQuery, $modelName, $plan, $path);
+        
+        $repository = $this->repositories->get($modelName);
+        $deleteQuery = $repository->databaseDeleteQuery();
+        $deleteStep = $this->steps->query($deleteQuery);
+        $plan = $this->plans->query($deleteStep);
+                
+        $this->mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan->requiredPlan(), $path);
     }
 }

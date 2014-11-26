@@ -4,19 +4,19 @@ namespace PHPixie\ORM\Mappers;
 
 class Query
 {
+    protected $mappers;
     protected $plans;
     protected $steps;
     protected $loaders;
     protected $repositories;
-    protected $mappers;
 
-    public function __construct($plans, $steps, $loaders, $repositories, $mappers)
+    public function __construct($mappers, $plans, $steps, $loaders, $repositories )
     {
+        $this->mappers = $mappers;
         $this->plans = $plans;
         $this->steps = $steps;
         $this->loaders = $loaders;
         $this->repositories = $repositories;
-        $this->mappers = $mappers;
     }
 
     public function mapCount($query)
@@ -47,72 +47,73 @@ class Query
         return $plan;
     }
     
-    public function mapFind($query, $preload)
+    public function mapFind($query, $preload = null)
     {
         $modelName = $query->modelName();
         $repository = $this->repositories->get($modelName);
         $databaseQuery = $repository->databaseSelectQuery();
         
-        $step = $this->steps->reusableResult($databaseQuery);
-        $loader = $this->loaders->reusableResult($repository, $step);
-        $preloadingProxy = $this->loaders->peloadingProxy($loader);
-        $cachingProxy = $this->loaders->cachingProxy($loader);
+        $resultStep = $this->steps->reusableResult($databaseQuery);
+        $loader = $this->loaders->reusableResult($repository, $resultStep);
         
-        $plan = $this->plans->loader($cachingProxy);
+        $preloadingProxy = null;
+        
+        if($preload !== null) {
+            $preloadingProxy = $this->loaders->preloadingProxy($loader);
+            $loader = $preloadingProxy;
+        }
+        
+        $loader = $this->loaders->cachingProxy($loader);
+        
+        $plan = $this->plans->loader($resultStep, $loader);
         $this->mapConditions($query, $databaseQuery, $plan);
-        $preloadPlan = $plan->preloadPlan();
         
-        $preloadMapper = $this->mappers->preload();
-        $preloadMapper->map($preloadingProxy, $modelName, $preload, $step);
+        if($preload !== null) {
+            $preloadPlan = $plan->preloadPlan();
+            $preloadMapper = $this->mappers->preload();
+            $preloadMapper->map($preloadingProxy, $modelName, $preload, $resultStep, $plan);
+        }
         
         return $plan;
     }
     
     protected function mapConditions($query, $databaseQuery, $queryPlan)
     {
-        $modelName = $queyr->modelName();
+        $modelName    = $query->modelName();
         $conditions   = $query->getConditions();
         $requiredPlan = $queryPlan->requiredPlan();
-        $groupMapper = $this->mappers->group();
-        $groupMapper->mapConditions($databaseQuery, $conditions, $modelName, $requiredPlan);
+        $groupMapper  = $this->mappers->group();
+        
+        $this->mappers->group()->mapDatabaseQuery(
+            $databaseQuery,
+            $conditions,
+            $modelName,
+            $requiredPlan
+        );
     }
     
     
     public function mapDelete($query)
     {
+        $deleteMapper = $this->mappers->cascadeDelete();
         $modelName = $query->modelName();
         $repository = $this->repositories->get($modelName);
+    
+        $deleteQuery = $repository->databaseDeleteQuery();
+        $step = $this->steps->query($deleteQuery);
+        $plan = $this->plans->query($step);
         
-        $deletionSides = $this->cascadeMapper->deletionSides($modelName);
-        if(empty($deletionSides)) {
-            $databaseQuery = $repository->databaseDeleteQuery();
-            $step = $this->steps->query($databaseQuery);
-            $plan = $this->plans->query($step);
-            $this->mapConditions($query, $databaseQuery, $plan);
-        }else{
+        if($deleteMapper->isModelHandled($modelName)) {
             $selectQuery = $repository->databaseSelectQuery();
-            $step = $this->steps->reusableResult($databaseQuery);
-            $this->mapConditions($query, $databaseQuery, $plan);
+            $this->mapConditions($query, $selectQuery, $plan);
+            $requiredPlan = $plan->requiredPlan();
+            $deleteMapper->mapDeleteQuery($deleteQuery, $selectQuery, $requiredPlan);
             
-            $deleteQuery = $repository->databaseDeleteQuery();
-            $idField = $this->repositories->get($modelName)->config()->idField;
-            $this->planners->in()->result($deleteQuery, $idField, $step, $idField, $plan);
-            
-            $step = $this->steps->query($deleteQuery);
-            $plan = $this->plans->query($step);
+        }else{
+            $this->mapConditions($query, $deleteQuery, $plan);
         }
         
         return $plan;
     }
     
-
-    
-
-    
-
-    
-
-
-
-
 }

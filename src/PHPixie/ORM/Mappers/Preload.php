@@ -13,12 +13,12 @@ class Preload
         $this->relationshipMap = $relationships->map();
     }
     
-    public function mapPreload($preloadingProxy, $modelName, $preload, $result, $plan)
+    public function map($preloadingProxy, $modelName, $preload, $result, $plan)
     {
         $this->addPreloaders($preloadingProxy, $modelName, $preload, $result, $plan);
     }
     
-    public function mapPreloadEmbedded($preloadingProxy, $modelName, $preload, $result, $plan, $embeddedPath)
+    public function mapEmbedded($preloadingProxy, $modelName, $preload, $result, $plan, $embeddedPath)
     {
         $this->addPreloaders($preloadingProxy, $modelName, $preload, $result, $plan, $embeddedPath);
     }

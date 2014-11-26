@@ -7,45 +7,73 @@ namespace PHPixieTests\ORM\Mappers;
  */
 class QueryTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $mappers;
     protected $plans;
     protected $steps;
     protected $loaders;
     protected $repositories;
-    protected $groupMapper;
-    protected $cascadeMapper;
-    
-    protected $mapper;
+        
+    protected $queryMapper;
     
     protected $modelName = 'fairy';
     
+    protected $groupMapper;
+    protected $preloadMapper;
+    protected $cascadeDeleteMapper;
+    
     protected $stepClasses = array(
-        'count' => 'Query\Count'
+        'query' => 'Query',
+        'count' => 'Query\Count',
+        'reusableResult' => 'Query\Result\Reusable'
     );
     
-    protected $plansClasses = array(
+    protected $planClasses = array(
+        'query' => 'Query',
         'count' => 'Query\Count',
-        'steps' => 'Steps'
+        'steps' => 'Steps',
+        'loader' => 'Query\Loader'
+    );
+    
+    protected $loaderClasses = array(
+        'preloadingProxy' => 'Proxy\Preloading',
+        'cachingProxy' => 'Proxy\Caching',
+        'reusableResult' => 'Repository\ReusableResult',
     );
     
     public function setUp()
     {
+        $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
         $this->plans = $this->quickMock('\PHPixie\ORM\Plans');
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
         $this->loaders = $this->quickMock('\PHPixie\ORM\Loaders');
         $this->repositories = $this->quickMock('\PHPixie\ORM\Repositories');
-        $this->groupMapper = $this->quickMock('\PHPixie\ORM\Mapper\Group');
-        $this->cascadeMapper = $this->quickMock('\PHPixie\ORM\Mapper\Cascade');
         
-        $this->mapper = new \PHPixie\ORM\Mapper(
+        $this->groupMapper = $this->quickMock('\PHPixie\ORM\Mappers\Group');
+        $this->preloadMapper = $this->quickMock('\PHPixie\ORM\Mappers\Preload');
+        $this->cascadeDeleteMapper = $this->quickMock('\PHPixie\ORM\Mappers\Cascade\Mapper\Delete');
+        
+        $this->method($this->mappers, 'group', $this->groupMapper, array());
+        $this->method($this->mappers, 'preload', $this->preloadMapper, array());
+        $this->method($this->mappers, 'cascadeDelete', $this->cascadeDeleteMapper, array());
+        
+        $this->queryMapper = new \PHPixie\ORM\Mappers\Query(
+            $this->mappers,
             $this->plans,
             $this->steps,
             $this->loaders,
-            $this->repositories,
-            $this->groupMapper,
-            $this->cascadeMapper
+            $this->repositories
         );
     }
     
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+        
     /**
      * @covers ::mapCount
      * @covers ::<protected>
@@ -59,7 +87,88 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $plan  = $this->preparePlan('count', array($step));
         
         $this->prepareMapConditons($query, $databaseQuery, $plan);
-        $this->assertSame($plan, $this->mapper->mapCount($query));
+        $this->assertSame($plan, $this->queryMapper->mapCount($query));
+    }
+    
+    /**
+     * @covers ::mapFind
+     * @covers ::<protected>
+     */
+    public function testMapFind()
+    {
+        $this->findTest(false);
+        $this->findTest(true);
+    }
+    
+    /**
+     * @covers ::mapDelete
+     * @covers ::<protected>
+     */
+    public function testMapDelete()
+    {
+        $this->deleteTest(false);
+        $this->deleteTest(true);
+    }
+    
+    protected function findTest($withPreload)
+    {
+        $query = $this->getQuery();
+        
+        $preload = null;
+        if($withPreload) {
+            $preload = $this->getPreload();
+        }
+        
+        $repository = $this->prepareRepository($this->modelName);
+        $databaseQuery = $this->prepareDatabaseQuery('select', $repository);
+        
+        $step  = $this->prepareStep('reusableResult', array($databaseQuery));
+        
+        $loader = $this->prepareLoader('reusableResult', array($repository, $step));
+        
+        $loadersOffset = 1;
+        
+        if($withPreload) {
+            $preloadingProxy = $this->prepareLoader('preloadingProxy', array($loader), $loadersOffset++);
+            $loader = $preloadingProxy;
+        }
+        
+        $cachingProxy = $this->prepareLoader('cachingProxy', array($loader), $loadersOffset++);
+        
+        $plan  = $this->preparePlan('loader', array($step, $cachingProxy));
+        
+        $this->prepareMapConditons($query, $databaseQuery, $plan);
+        
+        if($withPreload) {
+            $preloadPlan = $this->getPlan('Steps');
+            $this->method($plan, 'preloadPlan', $preloadPlan, array(), 1);
+            $this->method($this->preloadMapper, 'map', null, array($preloadingProxy, $this->modelName, $preload, $step), 0);
+        }
+        
+        $this->assertSame($plan, $this->queryMapper->mapFind($query, $preload));
+    }
+    
+    protected function deleteTest($cascade)
+    {
+        $query = $this->getQuery();
+        $repository = $this->prepareRepository($this->modelName);
+        
+        $deleteQuery = $this->prepareDatabaseQuery('delete', $repository);
+        $step  = $this->prepareStep('query', array($deleteQuery));
+        $plan  = $this->preparePlan('query', array($step));
+        
+        $this->method($this->cascadeDeleteMapper, 'isModelHandled', $cascade, array($this->modelName), 0);
+        if($cascade) {
+            $selectQuery = $this->prepareDatabaseQuery('select', $repository, 1);
+            $requiredPlan = $this->getPlan('Steps');
+            $this->method($plan, 'requiredPlan', $requiredPlan, array(), 1);
+            $this->method($this->cascadeDeleteMapper, 'mapDeleteQuery', null, array($deleteQuery, $selectQuery, $requiredPlan), 1);
+        }else{
+            $this->prepareMapConditons($query, $deleteQuery, $plan);
+        }
+        
+        
+        $this->assertSame($plan, $this->queryMapper->mapDelete($query));
     }
     
     protected function prepareMapConditons($query, $databaseQuery, $plan)
@@ -67,10 +176,10 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $conditions = array('test');
         $this->method($query, 'getConditions', $conditions, array());
         
-        $requiredPlan = $this->getPlan('steps');
+        $requiredPlan = $this->getPlan('Steps');
         $this->method($plan, 'requiredPlan', $requiredPlan, array(), 0);
         
-        $this->method($this->groupMapper, 'mapConditions', null, array(
+        $this->method($this->groupMapper, 'mapDatabaseQuery', null, array(
             $databaseQuery,
             $conditions,
             $this->modelName,
@@ -79,11 +188,12 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
 
     }
     
-    protected function prepareDatabaseQuery($type)
+    protected function prepareDatabaseQuery($type, $repository = null, $at = 0)
     {
-        $repository = $this->prepareRepository($this->modelName);
+        if($repository === null)
+            $repository = $this->prepareRepository($this->modelName);
         $query = $this->getDatabaseQuery($type);
-        $this->method($repository, 'database'.ucfirst($type).'Query', $query, array(), 0);
+        $this->method($repository, 'database'.ucfirst($type).'Query', $query, array(), $at);
         return $query;
     }
 
@@ -96,9 +206,16 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     
     protected function preparePlan($type, $params)
     {
-        $plan = $this->getPlan($this->plansClasses[$type]);
+        $plan = $this->getPlan($this->planClasses[$type]);
         $this->method($this->plans, $type, $plan, $params, 0);
         return $plan;
+    }
+    
+    protected function prepareLoader($type, $params, $at = 0)
+    {
+        $loader = $this->getLoader($this->loaderClasses[$type]);
+        $this->method($this->loaders, $type, $loader, $params, $at);
+        return $loader;
     }
     
     protected function prepareRepository($name)
@@ -133,5 +250,15 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     protected function getPlan($class)
     {
         return $this->abstractMock('\PHPixie\ORM\Plans\Plan\\'.ucfirst($class));
+    }
+    
+    protected function getLoader($class)
+    {
+        return $this->abstractMock('\PHPixie\ORM\Loaders\Loader\\'.ucfirst($class));
+    }
+    
+    protected function getPreload()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Values\Preload');
     }
 }

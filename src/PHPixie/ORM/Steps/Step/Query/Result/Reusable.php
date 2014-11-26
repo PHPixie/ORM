@@ -7,7 +7,7 @@ class Reusable extends \PHPixie\ORM\Steps\Step\Query\Result
 {
     protected $data;
 
-    protected function asArray()
+    public function asArray()
     {
         if ($this->data === null)
             $this->data = $this->result()->asArray();

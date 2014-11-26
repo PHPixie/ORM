@@ -7,6 +7,35 @@ namespace PHPixieTests\ORM\Mappers\Cascade\Mapper;
  */
 class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
 {
+    protected $repositories;
+    protected $planners;
+    protected $steps;
+    
+    protected $inPlanner;
+    
+    public function setUp()
+    {
+        $this->repositories = $this->quickMock('\PHPixie\ORM\Repositories');
+        $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
+        $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
+        
+        $this->inPlanner = $this->quickMock('\PHPixie\ORM\Planners\Planner\In');
+        $this->method($this->planners, 'in', $this->inPlanner, array());
+        
+        parent::setUp();
+    }
+    
+    /**
+     * @covers \PHPixie\ORM\Mappers\Cascade\Mapper::__construct
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
+    
     /**
      * @covers ::handleResult
      * @covers ::<protected>
@@ -15,11 +44,89 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
     {
         $result = $this->getReusableResult();
         $plan = $this->getPlan();
-        $relationshipTypes = array('oneToOne', 'manyToOne');
-        
         $path = $this->getPath();
         
-        $this->method($path, 'hasModel', false, array($this->modelName), 0);
+        $this->method($path, 'containsModel', true, array($this->modelName), 0);
+        
+        $this->setExpectedException('\PHPixie\ORM\Exception\Mapper');
+        $this->cascadeMapper->handleResult($result, $this->modelName, $plan, $path);
+    }
+    
+    /**
+     * @covers ::handleResult
+     * @covers ::<protected>
+     */
+    public function testHandleResultClosedPath()
+    {
+        $result = $this->getReusableResult();
+        $plan = $this->getPlan();
+        $path = $this->getPath();
+        
+        $this->prepareHandleResult($result, $plan, $path);
+        
+        $this->cascadeMapper->handleResult($result, $this->modelName, $plan, $path);
+    }
+    
+    /**
+     * @covers ::handleQuery
+     * @covers ::<protected>
+     */
+    public function testHandleQuery()
+    {
+        $selectQuery = $this->getDatabaseQuery('select');
+        $plan = $this->getPlan();
+        $path = $this->getPath();
+        
+        $this->prepareHandleQuery($selectQuery, $plan, $path);
+        
+        $this->cascadeMapper->handleQuery($selectQuery, $this->modelName, $plan, $path);
+    }
+    
+    /**
+     * @covers ::cascade
+     * @covers ::<protected>
+     */
+    public function testCascade()
+    {
+        $selectQuery = $this->getDatabaseQuery('select');
+        $plan = $this->getPlan();
+        
+        $path = $this->getPath();
+        $this->method($this->mappers, 'cascadePath', $path, array(), 0);
+        
+        $this->prepareHandleQuery($selectQuery, $plan, $path);
+        
+        $this->cascadeMapper->cascade($selectQuery, $this->modelName, $plan);
+    }
+    
+    protected function prepareHandleQuery($selectQuery, $plan, $path)
+    {
+        $resultStep = $this->getReusableResultStep();
+        $this->method($this->steps, 'reusableResult', $resultStep, array($selectQuery), 0);
+        $this->method($plan, 'add', null, array($resultStep), 0);
+        
+        $this->prepareHandleResult($resultStep, $plan, $path);
+        
+        $repository = $this->getRepository();
+        $this->method($this->repositories, 'get', $repository, array($this->modelName), 0);
+        
+        $deleteQuery = $this->getDatabaseQuery('delete');
+        $this->method($repository, 'databaseDeleteQuery', $deleteQuery, array(), 0);
+        
+        $config = $this->config(array('idField' => 'id'));
+        $this->method($repository, 'config', $config, array(), 1);
+        
+        $this->method($this->inPlanner, 'result', null, array($deleteQuery, 'id', $resultStep, 'id', $plan), 0);
+        $deleteStep = $this->getQueryStep();
+        $this->method($this->steps, 'query', $deleteStep, array($deleteQuery), 1);
+        $this->method($plan, 'add', null, array($deleteStep), 1);
+    }
+    
+    protected function prepareHandleResult($result, $plan, $path)
+    {
+        $relationshipTypes = array('oneToOne', 'manyToOne');
+                
+        $this->method($path, 'containsModel', false, array($this->modelName), 0);
         $sides = $this->prepareGetHandledSides($relationshipTypes);
         foreach($sides as $key => $side) {
             $sidePath = $this->getPath();
@@ -33,8 +140,6 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
             
             $this->method($handler, 'handleDelete', null, array($side, $result, $plan, $sidePath), 0);
         }
-        
-        $this->cascadeMapper->handleResult($result, $this->modelName, $plan, $path);
     }
     
     protected function setSideIsHandled($side, $isHandled)
@@ -42,9 +147,44 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
         $this->method($side, 'isDeleteHandled', $isHandled, array());
     }
     
+    protected function getDatabaseQuery($type)
+    {
+        return $this->abstractMock('\PHPixie\Database\Query\Type\\'.ucfirst($type));
+    }
+    
+    protected function getQueryStep()
+    {
+        return $this->quickMock('\PHPixie\ORM\Steps\Step\Query');
+    }
+    
+    protected function getReusableResultStep()
+    {
+        return $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
+    }
+    
+    protected function getRepository()
+    {
+        return $this->quickMock('\PHPixie\ORM\Models\Type\Database\Repository');
+    }
+    
+    protected function config($properties)
+    {
+        $config = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
+        foreach($properties as $key => $value) {
+            $config->$key = $value;
+        }
+        return $config;
+    }
+    
     protected function cascadeMapper()
     {
-        return new \PHPixie\ORM\Mappers\Cascade\Mapper\Delete($this->relationships);
+        return new \PHPixie\ORM\Mappers\Cascade\Mapper\Delete(
+            $this->mappers,
+            $this->relationships,
+            $this->repositories,
+            $this->planners,
+            $this->steps
+        );
     }
     
 }

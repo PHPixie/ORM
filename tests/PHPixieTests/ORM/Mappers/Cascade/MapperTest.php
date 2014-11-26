@@ -7,6 +7,7 @@ namespace PHPixieTests\ORM\Mappers\Cascade;
  */
 abstract class MapperTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $mappers;
     protected $relationships;
     protected $relationshipMap;
     
@@ -16,6 +17,7 @@ abstract class MapperTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
+        $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
         $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
         $this->method($this->relationships, 'map', $this->relationshipMap, array(), 0);
@@ -27,7 +29,7 @@ abstract class MapperTest extends \PHPixieTests\AbstractORMTest
      * @covers ::__construct
      * @covers ::<protected>
      */
-    public function __construct()
+    public function testConstruct()
     {
     
     }

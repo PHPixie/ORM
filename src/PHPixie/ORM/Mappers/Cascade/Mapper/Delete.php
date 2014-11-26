@@ -4,6 +4,18 @@ namespace PHPixie\ORM\Mappers\Cascade\Mapper;
 
 class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
 {
+    protected $repositories;
+    protected $planners;
+    protected $steps;
+    
+    public function __construct($mappers, $relationships, $repositories, $planners, $steps)
+    {
+        parent::__construct($mappers, $relationships);
+        $this->repositories = $repositories;
+        $this->planners = $planners;
+        $this->steps = $steps;
+    }
+    
     protected function isSideHandled($side)
     {
         return $side->isDeleteHandled();
@@ -11,8 +23,7 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
     
     public function handleResult($reusableResult, $modelName, $plan, $path)
     {
-        if($path->hasModel($modelName))
-            throw new Exception();
+        $this->assertDirectionalPath($path, $modelName);
         
         $sides = $this->getHandledSides($modelName);
         foreach($sides as $side) {
@@ -24,18 +35,29 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
         }
     }
     
-    public function handleDatabaseQuery($selectQuery, $sides, $repository, $plan)
+    public function handleQuery($selectQuery, $modelName, $plan, $path)
     {
         $resultStep = $this->steps->reusableResult($selectQuery);
         $plan->add($resultStep);
-        foreach ($sides as $side) {
-            $handler = $this->ormBuilder->relationship($side->relationship())->handler();
-            $handler->handleDeletion($repository->modelName(), $side, $resultStep, $plan);
-        }
-        $deleteQuery = $repository->databaseQuery('delete');
-        $idField = $repository->idField();
-        $this->planners->in()->result($deleteQuery, $idField, $resultStep, $idField);
-
-        return $deleteQuery;
+        $this->handleResult($resultStep, $modelName, $plan, $path);
+        
+        $repository = $this->repositories->get($modelName);
+        $deleteQuery = $repository->databaseDeleteQuery();
+        $idField = $repository->config()->idField;
+        $this->planners->in()->result(
+            $deleteQuery,
+            $idField,
+            $resultStep,
+            $idField,
+            $plan
+        );
+        $deleteStep = $this->steps->query($deleteQuery);
+        $plan->add($deleteStep);
+    }
+    
+    public function cascade($selectQuery, $modelName, $plan)
+    {
+        $path = $this->mappers->cascadePath();
+        $this->handleQuery($selectQuery, $modelName, $plan, $path);
     }
 }

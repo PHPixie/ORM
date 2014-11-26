@@ -30,6 +30,8 @@ abstract class Cascade
         return count($sides) > 0;
     }
     
+
+    
     abstract protected function isSideHandled($side);
     
     /*
@@ -49,21 +51,7 @@ abstract class Cascade
     }
 *
     
-    public function chainDeletion($reusableResult, $modelName, $plan, $path)
-    {
-        if($path->hasModel($modelName))
-            throw new Exception();
-        
-        $sides = $this->getDeletionSides($modelName);
-        foreach($sides as $side) {
-            $sidePath = $path->clone();
-            $sidePath->addSide($side);
-            $relationship = $this->relationships->get($side->relationshipType());
-            $handler = $relationship->handler();
-            $handler->handleDeletion($side, $reusableResult, $plan, $path);
-        }
-    }
-    
+ 
     public function chainDeletionQuery($selectQuery, $modelName, $plan, $path)
     {
         $selectStep = $this->steps->reusableResult($selectQuery);

@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM;
+namespace PHPixieTests\ORM\Mappers;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Mapper
+ * @coversDefaultClass \PHPixie\ORM\Mappers\Query
  */
-class MapperTest extends \PHPixieTests\AbstractORMTest
+class QueryTest extends \PHPixieTests\AbstractORMTest
 {
     protected $plans;
     protected $steps;

@@ -83,43 +83,55 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
     }
     
     /**
-     * @covers ::cascade
+     * @covers ::map
      * @covers ::<protected>
      */
-    public function testCascade()
+    public function testMap()
     {
         $selectQuery = $this->getDatabaseQuery('select');
+        $deleteQuery = $this->getDatabaseQuery('delete');
+        
         $plan = $this->getPlan();
         
         $path = $this->getPath();
         $this->method($this->mappers, 'cascadePath', $path, array(), 0);
         
-        $this->prepareHandleQuery($selectQuery, $plan, $path);
+        $this->prepareMapDeleteQuery($deleteQuery, $selectQuery, $plan, $path);
         
-        $this->cascadeMapper->cascade($selectQuery, $this->modelName, $plan);
+        $this->cascadeMapper->map($deleteQuery, $selectQuery, $this->modelName, $plan);
     }
     
     protected function prepareHandleQuery($selectQuery, $plan, $path)
     {
+        $repository = $this->prepareRepository();
+        
+        $deleteQuery = $this->getDatabaseQuery('delete');
+        $this->method($repository, 'databaseDeleteQuery', $deleteQuery, array(), 0);
+        
+        $this->prepareMapDeleteQuery($deleteQuery, $selectQuery, $plan, $path, $repository, 1);
+        
+        $deleteStep = $this->getQueryStep();
+        $this->method($this->steps, 'query', $deleteStep, array($deleteQuery), 1);
+        $this->method($plan, 'add', null, array($deleteStep), 1);
+        
+    }
+    
+    protected function prepareMapDeleteQuery($deleteQuery, $selectQuery, $plan, $path, $repository = null, $repositoryOffset = 0)
+    {
+        if($repository === null) {
+            $repository = $this->prepareRepository();
+        }
         $resultStep = $this->getReusableResultStep();
         $this->method($this->steps, 'reusableResult', $resultStep, array($selectQuery), 0);
         $this->method($plan, 'add', null, array($resultStep), 0);
         
         $this->prepareHandleResult($resultStep, $plan, $path);
         
-        $repository = $this->getRepository();
-        $this->method($this->repositories, 'get', $repository, array($this->modelName), 0);
-        
-        $deleteQuery = $this->getDatabaseQuery('delete');
-        $this->method($repository, 'databaseDeleteQuery', $deleteQuery, array(), 0);
-        
         $config = $this->config(array('idField' => 'id'));
-        $this->method($repository, 'config', $config, array(), 1);
+        $this->method($repository, 'config', $config, array(), $repositoryOffset);
         
         $this->method($this->inPlanner, 'result', null, array($deleteQuery, 'id', $resultStep, 'id', $plan), 0);
-        $deleteStep = $this->getQueryStep();
-        $this->method($this->steps, 'query', $deleteStep, array($deleteQuery), 1);
-        $this->method($plan, 'add', null, array($deleteStep), 1);
+       
     }
     
     protected function prepareHandleResult($result, $plan, $path)
@@ -145,6 +157,13 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
     protected function setSideIsHandled($side, $isHandled)
     {
         $this->method($side, 'isDeleteHandled', $isHandled, array());
+    }
+    
+    protected function prepareRepository()
+    {
+        $repository = $this->getRepository();
+        $this->method($this->repositories, 'get', $repository, array($this->modelName));
+        return $repository;
     }
     
     protected function getDatabaseQuery($type)

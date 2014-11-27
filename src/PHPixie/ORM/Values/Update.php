@@ -4,27 +4,17 @@ namespace PHPixie\ORM\Values;
 
 class Update
 {
-    protected $data = array();
+    protected $values;
+    protected $query;
     
-    public function __construct($values)
+    public function __construct($values, $query)
     {
-        
+        $this->values = $values;
+        $this->query = $query;
     }
     
-    public function increment($field, $amount)
+    public function set($values)
     {
-        $this->updates[$field] = $this->values->updateIncrement($amount);
-        return $this;
-    }
-    
-    public function decrement($field, $amount)
-    {
-        return $this->increment($field, -$amount);
-    }
-    
-    public function set($field, $value)
-    {
-        $this->updates[$field] = $value;
-        return $this;
+        $this->builder = 
     }
 }

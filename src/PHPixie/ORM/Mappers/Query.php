@@ -107,7 +107,7 @@ class Query
             $selectQuery = $repository->databaseSelectQuery();
             $this->mapConditions($query, $selectQuery, $plan);
             $requiredPlan = $plan->requiredPlan();
-            $deleteMapper->mapDeleteQuery($deleteQuery, $selectQuery, $requiredPlan);
+            $deleteMapper->map($deleteQuery, $selectQuery, $modelName, $requiredPlan);
             
         }else{
             $this->mapConditions($query, $deleteQuery, $plan);

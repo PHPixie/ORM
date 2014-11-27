@@ -185,7 +185,7 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
             $selectQuery = $this->prepareDatabaseQuery('select', $repository, 1);
             $requiredPlan = $this->getPlan('Steps');
             $this->method($plan, 'requiredPlan', $requiredPlan, array(), 1);
-            $this->method($this->cascadeDeleteMapper, 'mapDeleteQuery', null, array($deleteQuery, $selectQuery, $requiredPlan), 1);
+            $this->method($this->cascadeDeleteMapper, 'map', null, array($deleteQuery, $selectQuery, $this->modelName, $requiredPlan), 1);
         }else{
             $this->prepareMapConditons($query, $deleteQuery, $plan);
         }

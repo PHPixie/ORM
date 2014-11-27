@@ -35,14 +35,30 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
         }
     }
     
-    protected function mapDelesteQuery($selectQuery, $deleteQuery, $modelName, $plan, $path)
+    public function handleQuery($selectQuery, $modelName, $plan, $path)
+    {
+        $repository = $this->repositories->get($modelName);
+        $deleteQuery = $repository->databaseDeleteQuery();
+        
+        $this->mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan, $path);
+        
+        $deleteStep = $this->steps->query($deleteQuery);
+        $plan->add($deleteStep);
+    }
+    
+    public function map($deleteQuery, $selectQuery, $modelName, $plan)
+    {
+        $path = $this->mappers->cascadePath();
+        $this->mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan, $path);
+    }
+    
+    protected function mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan, $path)
     {
         $resultStep = $this->steps->reusableResult($selectQuery);
         $plan->add($resultStep);
-        $this->handleResult($resultStep, $modelName, $plan, $path);
+        $this->handleResult($resultStep, $modelName, $plan, $path); 
         
         $repository = $this->repositories->get($modelName);
-        
         $idField = $repository->config()->idField;
         $this->planners->in()->result(
             $deleteQuery,
@@ -52,27 +68,5 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
             $plan
         );
     }
-    
-    public function handleQuery($selectQuery, $modelName, $plan, $path)
-    {
-        $repository = $this->repositories->get($modelName);
-        $deleteQuery = $repository->databaseDeleteQuery();
-        $deleteStep = $this->steps->query($deleteQuery);
-        
-        $this->mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan, $path);
-        
-        $plan->add($deleteStep);
-    }
-    
-    public function mapDeleteQuery($selectQuery, $modelName, $plan)
-    {
-        $path = $this->mappers->cascadePath();
-        
-        $repository = $this->repositories->get($modelName);
-        $deleteQuery = $repository->databaseDeleteQuery();
-        $deleteStep = $this->steps->query($deleteQuery);
-        $plan = $this->plans->query($deleteStep);
-                
-        $this->mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan->requiredPlan(), $path);
-    }
+
 }

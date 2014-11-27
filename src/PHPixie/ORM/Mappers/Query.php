@@ -32,17 +32,17 @@ class Query
         return $plan;
     }
     
-    public function mapUpdate($query, $data)
+    public function mapUpdate($query, $update)
     {
         $modelName = $query->modelName();
         $repository = $this->repositories->get($modelName);
         $databaseQuery = $repository->databaseUpdateQuery();
-        $databaseQuery->data($data);
         
         $step = $this->steps->query($databaseQuery);
         $plan = $this->plans->query($step);
         
         $this->mapConditions($query, $databaseQuery, $plan);
+        $this->mappers->update()->map($databaseQuery, $update);
         
         return $plan;
     }

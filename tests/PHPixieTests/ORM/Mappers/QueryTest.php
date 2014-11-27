@@ -19,7 +19,9 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     
     protected $groupMapper;
     protected $preloadMapper;
+    protected $updateMapper;
     protected $cascadeDeleteMapper;
+    
     
     protected $stepClasses = array(
         'query' => 'Query',
@@ -50,10 +52,12 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         
         $this->groupMapper = $this->quickMock('\PHPixie\ORM\Mappers\Group');
         $this->preloadMapper = $this->quickMock('\PHPixie\ORM\Mappers\Preload');
+        $this->updateMapper = $this->quickMock('\PHPixie\ORM\Mappers\Update');
         $this->cascadeDeleteMapper = $this->quickMock('\PHPixie\ORM\Mappers\Cascade\Mapper\Delete');
         
         $this->method($this->mappers, 'group', $this->groupMapper, array());
         $this->method($this->mappers, 'preload', $this->preloadMapper, array());
+        $this->method($this->mappers, 'update', $this->updateMapper, array());
         $this->method($this->mappers, 'cascadeDelete', $this->cascadeDeleteMapper, array());
         
         $this->queryMapper = new \PHPixie\ORM\Mappers\Query(
@@ -89,6 +93,25 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $this->prepareMapConditons($query, $databaseQuery, $plan);
         $this->assertSame($plan, $this->queryMapper->mapCount($query));
     }
+    
+    /**
+     * @covers ::mapUpdate
+     * @covers ::<protected>
+     */
+    public function testMapUpdate()
+    {
+        $query = $this->getQuery();
+        $update = $this->getUpdate();
+        
+        $databaseQuery = $this->prepareDatabaseQuery('update');
+        $step  = $this->prepareStep('query', array($databaseQuery));
+        $plan  = $this->preparePlan('query', array($step));
+        
+        $this->prepareMapConditons($query, $databaseQuery, $plan);
+        $this->method($this->updateMapper, 'map', null, array($databaseQuery, $update), 0);
+        
+        $this->assertSame($plan, $this->queryMapper->mapUpdate($query, $update));
+    }    
     
     /**
      * @covers ::mapFind
@@ -259,6 +282,11 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     
     protected function getPreload()
     {
-        return $this->abstractMock('\PHPixie\ORM\Values\Preload');
+        return $this->quickMock('\PHPixie\ORM\Values\Preload');
+    }
+    
+    protected function getUpdate()
+    {
+        return $this->quickMock('\PHPixie\ORM\Values\Update');
     }
 }

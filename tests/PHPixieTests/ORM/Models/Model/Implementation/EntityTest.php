@@ -99,7 +99,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
             $this->assertSame($property, $this->entity->getRelationshipProperty($name));
         }
         
-        $this->setExpectedException('\PHPixie\ORM\Exception\Entity');
+        $this->setExpectedException('\PHPixie\ORM\Exception\Relationship');
         $this->entity->getRelationshipProperty('test5');
     }
     

@@ -1,9 +1,10 @@
 <?php
 
-namespace PHPixie\ORM\Mapper\Group;
+namespace PHPixie\ORM\Mappers\Group;
+
 use \PHPixie\ORM\Conditions\Condition\Group;
 
-class Optimizer extends \PHPixie\DB\Conditions\Logic\Parser
+class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
 {
     protected $orm;
     protected $merger;

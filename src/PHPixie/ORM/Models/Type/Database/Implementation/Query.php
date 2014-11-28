@@ -140,15 +140,21 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
 
 
     
-    public function update($data)
+    public function update($updates)
     {
-        $this->planUpdate($data)->execute();
+        $this->planUpdate($updates)->execute();
         return $this;
     }
     
-    public function planUpdate($data)
+    public function planUpdate($updates)
     {
-        return $this->mapper->mapUpdate($this, $data);
+        $update = $this->values->update();
+        
+        foreach($updates as $key => $value) {
+            $update->set($key, $value);
+        }
+        
+        return $this->mapper->mapUpdate($this, $update);
     }
     
     

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Values\Update;
 
-class UnsetField
+class Remove
 {
 
 }

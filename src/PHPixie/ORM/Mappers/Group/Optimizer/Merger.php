@@ -1,6 +1,7 @@
 <?php
 
-namespace PHPixie\ORM\Mapper\Group\Optimizer;
+namespace PHPixie\ORM\Mappers\Group\Optimizer;
+
 use \PHPixie\ORM\Conditions\Condition\Group;
 
 class Merger

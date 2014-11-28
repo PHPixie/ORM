@@ -5,16 +5,31 @@ namespace PHPixie\ORM\Values;
 class Update
 {
     protected $values;
-    protected $query;
+    protected $updates = array();
     
-    public function __construct($values, $query)
+    public function __construct($values)
     {
         $this->values = $values;
-        $this->query = $query;
     }
     
-    public function set($values)
+    public function set($key, $value)
     {
-        $this->builder = 
+        $this->updates[$key] = $value;
+        return $this;
+    }
+    
+    public function increment($key, $amount)
+    {
+        return $this->set($key, $this->values->updateIncrement($amount));
+    }
+    
+    public function remove($key)
+    {
+        return $this->set($key, $this->values->updateRemove());
+    }
+    
+    public function updates()
+    {
+        return $this->updates;
     }
 }

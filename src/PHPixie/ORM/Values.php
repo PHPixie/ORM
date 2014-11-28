@@ -11,4 +11,7 @@ class Values
     
     public function preloadProperty(){}
     public function preload(){}
+    public function update(){}
+    public function updateIncrement(){}
+    public function updateRemove(){}
 }

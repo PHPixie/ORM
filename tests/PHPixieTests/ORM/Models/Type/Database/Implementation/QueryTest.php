@@ -8,7 +8,7 @@ namespace PHPixieTests\ORM\Models\Type\Database\Implementation;
 abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
 {
     protected $values;
-    protected $mapper;
+    protected $queryMapper;
     protected $relationshipMap;
     protected $config;
     
@@ -22,7 +22,7 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     public function setUp()
     {
         $this->values = $this->quickMock('\PHPixie\ORM\Values');
-        $this->mapper = $this->quickMock('\PHPixie\ORM\Mapper');
+        $this->queryMapper = $this->quickMock('\PHPixie\ORM\Mappers\Query');
         $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
         $this->config = $this->config();
         
@@ -315,28 +315,36 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
         }
         
         $plan = $this->getPlan();
-        $this->method($this->mapper, 'mapFind', $plan, array($query, $preload), 0);
+        $this->method($this->queryMapper, 'mapFind', $plan, array($query, $preload), 0);
         return $plan;
     }
     
     protected function preparePlanUpdate($data)
     {
         $plan = $this->getPlan();
-        $this->method($this->mapper, 'mapUpdate', $plan, array($this->query, $data), 0);
+        $update = $this->quickMock('\PHPixie\ORM\Values\Update');
+        $this->method($this->values, 'update', $update, array(), 0);
+        $key = 0;
+        foreach($data as $field => $value) {
+            $this->method($update, 'set', null, array($field, $value), $key);
+            $key++;
+        }
+        
+        $this->method($this->queryMapper, 'mapUpdate', $plan, array($this->query, $update), 0);
         return $plan;
     }
     
     protected function preparePlanDelete()
     {
         $plan = $this->getPlan();
-        $this->method($this->mapper, 'mapDelete', $plan, array(), 0);
+        $this->method($this->queryMapper, 'mapDelete', $plan, array(), 0);
         return $plan;
     }
     
     protected function preparePlanCount()
     {
         $plan = $this->getPlan();
-        $this->method($this->mapper, 'mapCount', $plan, array(), 0);
+        $this->method($this->queryMapper, 'mapCount', $plan, array(), 0);
         return $plan;
     }
     

@@ -11,7 +11,7 @@ class Conditions
 
     public function operator($field, $operator, $values)
     {
-        return new \PHPixie\ORM\Conditions\Condition\Placeholder($field, $operator, $values);
+        return new \PHPixie\ORM\Conditions\Condition\Operator($field, $operator, $values);
     }
 
     public function group()

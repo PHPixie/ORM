@@ -6,13 +6,6 @@ use \PHPixie\ORM\Conditions\Condition\Group;
 
 class Merger
 {
-    protected $orm;
-
-    public function __construct($orm)
-    {
-        $this->orm = $orm;
-    }
-
     public function findMergeTarget($conditionList, $newCondition, $logicPrecedance)
     {
         if (!($newCondition instanceof Group\Relationship))
@@ -23,8 +16,8 @@ class Merger
 
         for ($i = count($conditionList) - 1; $i >= 0; $i-- ) {
             $cond = $conditionList[$i];
-            $newPrec = $logicPrecedance[$newCondition->logic];
-            $condPrec = $i === 0 ? 0 : $logicPrecedance[$cond->logic];
+            $newPrec = $logicPrecedance[$newCondition->logic()];
+            $condPrec = $i === 0 ? 0 : $logicPrecedance[$cond->logic()];
 
             $isAvailable = $nextAvailable;
             $nextAvailable = $condPrec <= $newPrec;
@@ -33,7 +26,7 @@ class Merger
                 continue;
 
             if ($cond instanceof Group\Relationship) {
-                if ($cond->relationship === $newCondition->relationship)
+                if ($cond->relationship() === $newCondition->relationship())
                     return $i;
 
             } elseif ($unrelatedSubgroup === null && $cond instanceof Group) {
@@ -53,16 +46,16 @@ class Merger
         if (($left instanceof Group\Relationship) xor ($right instanceof Group\Relationship))
             return false;
 
-        if ($left instanceof Group\Relationship && $right instanceof Group\Relationship && $right->relationship != $left->relationship)
+        if ($left instanceof Group\Relationship && $right instanceof Group\Relationship && $right->relationship() != $left->relationship())
             return false;
 
         if ($left->negated() || $right->negated())
             return false;
         foreach($right->conditions() as $key=>$rcond)
-            if ($key > 0 && $logicPrecedance[$rcond->logic] < $logicPrecedance[$right->logic])
+            if ($key > 0 && $logicPrecedance[$rcond->logic()] < $logicPrecedance[$right->logic()])
                 return false;
         foreach($right->conditions() as $key => $rcond)
-            $left->add($rcond, $key === 0 ? $right->logic : $rcond->logic);
+            $left->add($rcond, $key === 0 ? $right->logic() : $rcond->logic());
 
         return true;
     }

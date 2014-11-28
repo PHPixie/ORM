@@ -6,15 +6,20 @@ use \PHPixie\ORM\Conditions\Condition\Group;
 
 class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
 {
-    protected $orm;
+    protected $conditions;
     protected $merger;
 
-    public function __construct($orm, $merger)
+    public function __construct($conditions, $merger)
     {
-        $this->orm = $orm;
+        $this->conditions = $conditions;
         $this->merger = $merger;
     }
-
+    
+    public function optimize($conditions)
+    {
+        return $this->parseLogic($conditions);
+    }
+    
     protected function normalize($condition)
     {
         if ($condition instanceof Group) {
@@ -28,22 +33,25 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
     {
         $conditions = $group->conditions();
         $conditions = $this->optimize($conditions);
+        
+        $condition = $group;
+        
         if (!($group instanceof Group\Relationship) && count($conditions) === 1) {
-            $subgroup = current($conditions);
+            $condition = current($conditions);
             if ($group->negated())
-                $subgroup->negate();
-            $subgroup->logic = $group->logic;
-            $group = $subgroup;
+                $condition->negate();
+            $condition->setLogic($group->logic());
         } else {
+            
             $group->setConditions($conditions);
         }
 
-        return $group;
+        return $condition;
     }
 
     protected function merge($left, $right)
     {
-        if (count($right) !== 1) {
+        if (true || count($right) !== 1) {
             foreach($right as $cond)
                 $left[] = $cond;
 
@@ -63,7 +71,7 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         $sameRelationship = false;
 
         if ($cond instanceof Group\Relationship && $right instanceof Group\Relationship)
-            $sameRelationship = $cond->relationship === $right->relationship;
+            $sameRelationship = $cond->relationship() === $right->relationship();
 
         $optimizeMerge = true;
 
@@ -71,14 +79,14 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         $isSuitable = $isSuitable || ($cond instanceof Group\Relationship && $sameRelationship);
 
         if (!$isSuitable) {
-            $group = $this->orm->conditionGroup();
+            $group = $this->conditions->group();
 
-            $group->logic = $cond->logic;
+            $group->setLogic($cond->logic());
             $group->add($cond,  'and');
             $left[$target] = $cond = $group;
         } elseif ($cond->negated()) {
-            $group = $this->orm->conditionGroup();
-            $group->logic = 'and';
+            $group = $this->conditions->group();
+            $group->setLogic('and');
             $group->setConditions($cond->conditions());
             $group->negate();
             $cond->negate();
@@ -103,12 +111,6 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
 
     }
 
-    public function optimize($group)
-    {
-        //print_r($group); die;
-        reset($group);
 
-        return $this->expandGroup($group);
-    }
 
 }

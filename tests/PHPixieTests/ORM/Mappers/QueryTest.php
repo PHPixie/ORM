@@ -21,6 +21,7 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     protected $preloadMapper;
     protected $updateMapper;
     protected $cascadeDeleteMapper;
+    protected $groupOptimizer;
     
     
     protected $stepClasses = array(
@@ -54,11 +55,13 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $this->preloadMapper = $this->quickMock('\PHPixie\ORM\Mappers\Preload');
         $this->updateMapper = $this->quickMock('\PHPixie\ORM\Mappers\Update');
         $this->cascadeDeleteMapper = $this->quickMock('\PHPixie\ORM\Mappers\Cascade\Mapper\Delete');
+        $this->groupOptimizer = $this->quickMock('\PHPixie\ORM\Mappers\Group\Optimizer');
         
         $this->method($this->mappers, 'group', $this->groupMapper, array());
         $this->method($this->mappers, 'preload', $this->preloadMapper, array());
         $this->method($this->mappers, 'update', $this->updateMapper, array());
         $this->method($this->mappers, 'cascadeDelete', $this->cascadeDeleteMapper, array());
+        $this->method($this->mappers, 'groupOptimizer', $this->groupOptimizer, array());
         
         $this->queryMapper = new \PHPixie\ORM\Mappers\Query(
             $this->mappers,
@@ -199,12 +202,15 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $conditions = array('test');
         $this->method($query, 'getConditions', $conditions, array());
         
+        $optimized = array('test2');
+        $this->method($this->groupOptimizer, 'optimize', $optimized, array($conditions), 0);
+        
         $requiredPlan = $this->getPlan('Steps');
         $this->method($plan, 'requiredPlan', $requiredPlan, array(), 0);
         
         $this->method($this->groupMapper, 'mapDatabaseQuery', null, array(
             $databaseQuery,
-            $conditions,
+            $optimized,
             $this->modelName,
             $requiredPlan
         ), 0);

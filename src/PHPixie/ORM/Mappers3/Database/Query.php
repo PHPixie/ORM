@@ -73,7 +73,8 @@ class Mapper
     protected function mapConditions($query, $databaseQuery, $queryPlan)
     {
         $modelName = $queyr->modelName();
-        $conditions   = $query->getConditions();
+        $conditions = $query->getConditions();
+        $conditions = $this->mappers->groupOptimizer()->optimize($conditions);
         $requiredPlan = $queryPlan->requiredPlan();
         $this->groupMapper->mapConditions($databaseQuery, $conditions, $modelName, $requiredPlan);
     }

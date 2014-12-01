@@ -11,4 +11,5 @@ class Mappers
     public function group(){}
     public function entity(){}
     public function query(){}
+    public function groupOptimizer(){}
 }

@@ -83,6 +83,9 @@ class Query
         $conditions   = $query->getConditions();
         $requiredPlan = $queryPlan->requiredPlan();
         $groupMapper  = $this->mappers->group();
+        $groupOptimizer = $this->mappers->groupOptimizer();
+        
+        $conditions = $groupOptimizer->optimize($conditions);
         
         $this->mappers->group()->mapDatabaseQuery(
             $databaseQuery,

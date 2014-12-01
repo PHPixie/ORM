@@ -31,7 +31,7 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
      */
     public function testOptimize()
     {
-      /*  $this->assertOptimize(array(
+        $this->assertOptimize(array(
             array(
                 'and_a' => array (
                     'and.f1',
@@ -166,7 +166,7 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                 $b->_and('f4', 1);
             })
         );
-        */
+        
         $this->assertOptimize(array(
             array (
                 'and_a' => array (

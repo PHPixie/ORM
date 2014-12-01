@@ -7,12 +7,10 @@ use \PHPixie\ORM\Conditions\Condition\Group;
 class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
 {
     protected $conditions;
-    protected $merger;
 
-    public function __construct($conditions, $merger)
+    public function __construct($conditions)
     {
         $this->conditions = $conditions;
-        $this->merger = $merger;
     }
     
     public function optimize($conditions)
@@ -51,66 +49,96 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
 
     protected function merge($left, $right)
     {
-        if (true || count($right) !== 1) {
-            foreach($right as $cond)
-                $left[] = $cond;
-
-            return $left;
-        }
-
-        $right = current($right);
-        $target = $this->merger->findMergeTarget($left, $right, $this->logicPrecedance);
-        if ($target === null) {
-            $left[] = $right;
-
-            return $left;
-        }
-
-        $cond = $left[$target];
-
-        $sameRelationship = false;
-
-        if ($cond instanceof Group\Relationship && $right instanceof Group\Relationship)
-            $sameRelationship = $cond->relationship() === $right->relationship();
-
-        $optimizeMerge = true;
-
-        $isSuitable = $cond instanceof Group && !$sameRelationship;
-        $isSuitable = $isSuitable || ($cond instanceof Group\Relationship && $sameRelationship);
-
-        if (!$isSuitable) {
-            $group = $this->conditions->group();
-
-            $group->setLogic($cond->logic());
-            $group->add($cond,  'and');
-            $left[$target] = $cond = $group;
-        } elseif ($cond->negated()) {
-            $group = $this->conditions->group();
-            $group->setLogic('and');
-            $group->setConditions($cond->conditions());
-            $group->negate();
-            $cond->negate();
-            $cond->setConditions(array($group));
-        }
-
-        if (!($right instanceof Group) || !$this->merger->mergeGroups($cond, $right, $this->logicPrecedance)) {
-
-        }
-
-        if ($optimizeMerge) {
-            $left[$target] = $cond = $this->optimizeGroup($cond);
-        }
-
-        if (count($left) === 1) {
-            if (!$cond->negated() && !($cond instanceof Group\Relationship)) {
-                return $cond->conditions();
-            }
-        }
-
+        if(count($right) !== 1)
+            return $this->mergeConditions($left, $right);
+        
+        $rightCondition = current($right);
+        $target = $this->findMergeTarget($left, $rightCondition);
+        
+        if($target === null)
+            return $this->mergeConditions($left, $right);
+        
+        $this->mergeRelationshipGroups($left[$target], $rightCondition);
+        $left[$target] = $this->optimizeGroup($left[$target]);
         return $left;
+    }
+    
+    protected function mergeConditions($left, $right)
+    {
+        foreach($right as $condition) {
+            $left[]= $condition;
+        }
+        
+        return $left;
+    }
+    
+    protected function findMergeTarget($conditionList, $newCondition)
+    {
+        if (!($newCondition instanceof Group\Relationship))
+            return null;
 
+        $isNextFree = true;
+        $newPrecedance = $this->logicPrecedance[$newCondition->logic()];
+        
+        for ($i = count($conditionList) - 1; $i >= 0; $i-- ) {
+            $current = $conditionList[$i];
+            
+            $currentPrecedance = 0;
+            if($i > 0) {
+                $currentPrecedance = $this->logicPrecedance[$current->logic()];
+            }
+            
+            $isCurrentFree = $isNextFree;
+            
+            $isNextFree = $currentPrecedance <= $newPrecedance;
+
+            if (!$isNextFree || !$isCurrentFree)
+                continue;
+
+            if ($current instanceof Group\Relationship && $this->areMergeable($current, $newCondition)) {
+                return $i;
+            }
+
+            if ($newPrecedance > $currentPrecedance)
+                return null;
+        }
+
+        return null;
+    }
+    
+    protected function areMergeable($left, $right)
+    {
+        
+        if ($left->relationship() !== $right->relationship())
+            return false;
+        
+        if($left->negated() !== $right->negated())
+            return false;
+        
+        if($right->logic() === 'xor')
+            return false;
+        
+        return true;
     }
 
-
+    protected function mergeRelationshipGroups($left, $right)
+    {
+        $newLeft = $this->conditions->group();
+        $newRight = $this->conditions->group();
+        
+        $newLeft->setConditions($left->conditions());
+        $newRight->setConditions($right->conditions());
+        $newRight->setLogic($right->logic());
+        
+        if($left->negated()) {
+            if($right->logic() === 'and') {
+                $newRight->setLogic('or');
+            }else{
+                $newRight->setLogic('and');
+            }
+        }
+        
+        $left->setConditions(array($newLeft, $newRight));
+    }
 
 }

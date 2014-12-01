@@ -1,545 +1,202 @@
 <?php
 
-class OptimizerTest extends PHPUnit_Framework_TestCase
+namespace PHPixieTests\ORM\Mappers\Group;
+
+/**
+ * @coversDefaultClass \PHPixie\ORM\Mappers\Group\Optimizer
+ */
+class OptimizerTest extends \PHPixieTests\AbstractORMTest
 {
     protected $conditions;
-    protected $optimizer;
     protected $merger;
 
     public function setUp()
     {
         $this->conditions = new \PHPixie\ORM\Conditions();
-        $this->merger = new \PHPixie\ORM\Mappers\Group\Optimizer\Merger();
         $this->optimizer = new \PHPixie\ORM\Mappers\Group\Optimizer($this->conditions, $this->merger);
     }
 
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
+    /**
+     * @covers ::optimize
+     * @covers ::<protected>
+     */
     public function testOptimize()
     {
+      /*  $this->assertOptimize(array(
+            array(
+                'and_a' => array (
+                    'and.f1',
+                    'or.f2',
+                ),
+            ),
+        ),$this->builder()
+            ->relatedTo('a', function($b) {
+                $b->_and('f1', 1);
+            })
+            ->orRelatedTo('a', function($b) {
+                $b->_and('f2', 1);
+            })
+        );
+        
         $this->assertOptimize(array(
             array (
-                'and_b' => array (
+                'and_a' => array (
+                    'and.f1',
+                ),
+            ),
+            array (
+                '!or_a' => array (
+                    'and.f2',
+                ),
+            ),
+        ),$this->builder()
+            ->relatedTo('a', function($b) {
+                $b->_and('f1', 1);
+            })
+            ->orNotRelatedTo('a', function($b) {
+                $b->_and('f2', 1);
+            })
+        );
+        
+        $this->assertOptimize(array(
+            array (
+                'and_a' => array (
+                    'and.f1',
+                ),
+            ),
+            array (
+                'xor_a' => array (
+                    'and.f2',
+                ),
+            ),
+        ),$this->builder()
+            ->relatedTo('a', function($b) {
+                $b->_and('f1', 1);
+            })
+            ->xorRelatedTo('a', function($b) {
+                $b->_and('f2', 1);
+            })
+        );
+        
+        $this->assertOptimize(array(
+            array(
+                '!and_a' => array (
                     'and.f1',
                     'and.f2',
+                ),
+            ),
+        ),$this->builder()
+            ->notRelatedTo('a', function($b) {
+                $b->_and('f1', 1);
+            })
+            ->orNotRelatedTo('a', function($b) {
+                $b->_and('f2', 1);
+            })
+        );
+        
+        $this->assertOptimize(array(
+            array (
+                '!and_a' => array (
                     array (
                         'and' => array (
-                            'and.f3',
-                            'or.f4',
-                        ),
-                    ),
-                ),
-            ),
-        ),$this->builder()
-            ->_and(function ($b) {
-                $b
-                    ->_and('b.f1', 1)
-                    ->_and('b.f2', 1);
-            })
-            ->_and(function ($b) {
-                $b
-                    ->_and('b.f3', 1)
-                    ->_or('b.f4', 1);
-            })
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_b' => array (
-                    'and.f1',
-                    'and.f2',
-                    'or.f3',
-                    'and.f4',
-                ),
-            ),
-        ),$this->builder()
-            ->_and(function ($b) {
-                $b
-                    ->_and('b.f1', 1)
-                    ->_and('b.f2', 1);
-            })
-            ->_or(function ($b) {
-                $b
-                    ->_and('b.f3', 1)
-                    ->_and('b.f4', 1);
-            })
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_b' => array (
-                    'and.f1',
-                    'and.f2',
-                    'or.f3',
-                ),
-            ),
-            array (
-                'or_c' => array (
-                    'and.f1',
-                    'and.f2',
-                ),
-            ),
-        ),$this->builder()
-            ->_and('b.f1', 1)
-            ->_and('b.f2', 2)
-            ->_or('c.f1', 2)
-            ->_and('c.f2', 2)
-            ->_or('b.f3', 2)
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_b' => array (
-                    'and.f1',
-                    'and.f2',
-                ),
-            ),
-            array (
-                'or_c' => array (
-                    'and.f1',
-                    'and.f2',
-                ),
-            ),
-            array (
-                'and_b' => array (
-                    'and.f3',
-                ),
-            ),
-        ),$this->builder()
-            ->_and('b.f1', 1)
-            ->_and('b.f2', 2)
-            ->_or('c.f1', 2)
-            ->_and('c.f2', 2)
-            ->_and('b.f3', 2)
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_b' => array (
-                    array (
-                        'and_la' => array (
                             'and.f1',
+                            'xor.f2',
                         ),
                     ),
-                    array (
-                        'or_lal' => array (
-                            'and.f2',
-                        ),
-                    ),
-                ),
-            )
-        ),$this->builder()
-            ->_and('b.la.f1', 1)
-            ->_or('b.lal.f2', 2)
-        );
-
-        $this->assertOptimize(array(
-            'and.!f'
-        ),$this->builder()
-            ->_and(function ($b) {
-                $b->orNot('f', 1);
-            })
-        );
-
-        $this->assertOptimize(array(
-            array(
-                'and_b' => array (
-                    'and.f',
-                ),
-            )
-        ),$this->builder()
-            ->_and(function ($b) {
-                $b->_or('b.f', 1);
-            })
-        );
-
-        $this->assertOptimize(array(
-            array(
-                'or_b' => array (
-                    'and.f',
-                ),
-            )
-        ),$this->builder()
-            ->_or('b.f', 1)
-        );
-
-        $this->assertOptimize(array(
-            array (
-                '!and' => array (
-                        'or.f',
-                        'or.f1',
-                ),
-            ),
-        ),$this->builder()
-            ->andNot(function ($b) {
-                $b->_or('f', 1);
-                $b->_or('f1', 1);
-            })
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_b' => array (
-                        'and.f',
-                        'or.f1',
-                ),
-            ),
-        ),$this->builder()
-            ->_and(function ($b) {
-                $b->_or('b.f', 1);
-                $b->_or('b.f1', 1);
-            })
-        );
-
-        $this->assertOptimize(array(
-            array (
-                '!and_b' => array (
-                    'and.f',
-                    'or.f1',
-                )
-            ),
-        ),$this->builder()
-            ->andNot(function ($b) {
-                $b->_or('b.f', 1);
-                $b->_or('b.f1', 1);
-            })
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_b' => array (
-                    'and.!f',
-                ),
-            ),
-        ),$this->builder()
-            ->andNot('b.f', 1)
-
-        );
-
-        $this->assertOptimize(array(
-            array (
-                '!and_b' => array (
-                    'and.f',
-                ),
-            ),
-        ),$this->builder()
-            ->andNot(function ($b) {
-                $b->_or('b.f', 1);
-            })
-        );
-
-        $this->assertOptimize(array(
-            'and.!f'
-        ),$this->builder()
-            ->andNot(function ($b) {
-                $b->andNot(function ($b) {
-                    $b->andNot(function ($b) {
-                        $b->_or('f', 1);
-                    });
-                });
-            })
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_b' => array (
-                    'and.f1',
-                ),
-            ),
-            array (
-                'and_c' => array (
-                    'and.!f2',
-                ),
-            ),
-            array (
-                'or_b' => array (
                     'and.f3',
-                )
+                ),
             ),
         ),$this->builder()
-            ->_and('b.f1', 1)
-            ->andNot('c.f2', 1)
-            ->_or('b.f3', 2)
+            ->notRelatedTo('a', function($b) {
+                $b->_and('f1', 1);
+                $b->_xor('f2', 1);
+            })
+            ->orNotRelatedTo('a', function($b) {
+                $b->_and('f3', 1);
+            })
         );
-
+        
+        $this->assertOptimize(array(
+            array(
+                '!and_a' => array (
+                    'and.f1',
+                    'or.f2',
+                ),
+            ),
+        ),$this->builder()
+            ->notRelatedTo('a', function($b) {
+                $b->_and('f1', 1);
+            })
+            ->notRelatedTo('a', function($b) {
+                $b->_and('f2', 1);
+            })
+        );
+        
         $this->assertOptimize(array(
             array (
                 'and_a' => array (
                     'and.f1',
-                ),
-            ),
-            array (
-                'or_b' => array (
-                    'and.f2',
-                    'and.f3',
-                ),
-            ),
-        ),$this->builder()
-            ->_and('a.f1', 1)
-            ->_or('b.f2', 1)
-            ->_and('b.f3', 2)
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_a' => array (
-                    'and.f1',
-                ),
-            ),
-            array (
-                'or_b' => array (
-                    'and.f2',
-                    'and.f3',
-                    'or.f6',
+                    'or.f4',
                 ),
             ),
             array (
                 'or_a' => array (
-                    'and.f4',
+                    'and.f2',
                 ),
             ),
-            array (
-                'and_b' => array (
-                    'and.f5',
-                ),
-            ),
-        ),$this->builder()
-            ->_and('a.f1', 1)
-            ->_or('b.f2', 1)
-            ->_and('b.f3', 1)
-            ->_or('a.f4', 1)
-            ->_and('b.f5', 1)
-            ->_or('b.f6', 1)
+        'and.f3',
+        ), $this->builder()
+            ->relatedTo('a', function($b) {
+                $b->_and('f1', 1);
+            })
+            ->orRelatedTo('a', function($b) {
+                $b->_and('f2', 1);
+            })
+            ->_and('f3', 1)
+            ->orRelatedTo('a', function($b) {
+                $b->_and('f4', 1);
+            })
         );
-
+        */
         $this->assertOptimize(array(
             array (
                 'and_a' => array (
-                    'and.f1',
-                ),
-            ),
-            array (
-                'or_b' => array (
                     array (
-                        '!and' => array (
-                            'and.b1',
-                            'and.b2',
-                        ),
-                    ),
-                    'or.b3',
-                )
-            ),
-        ),$this->builder()
-            ->_and('a.f1', 1)
-            ->orNot(function ($builder) {
-                $builder->_and('b.b1', 1)
-                        ->_and('b.b2', 1);
-            })
-            ->_or('b.b3', 1)
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'or_b' => array (
-                    array (
-                        'and_c' => array (
-                            'and.b4',
-                            'or.b7',
-                        ),
-                    ),
-                    array (
-                        'or_d' => array (
-                            'and.b5',
-                        ),
-                    ),
-                ),
-            )
-        ),$this->builder()
-            ->_or('b.c.b4', 1)
-            ->_or('b.d.b5', 1)
-            ->_or('b.c.b7', 1)
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_a' => array (
-                    'and.f1',
-                ),
-            ),
-            array (
-                'or_b' => array (
-                    array (
-                        '!and' => array (
-                            'and.b1',
-                            'and.b2',
-                        ),
-                    ),
-                    array (
-                        'xor' => array (
-                            'and.b3',
-                            array (
-                                'or_c' => array (
-                                    'and.b4',
-                                    'or.b7',
-                                ),
-                            ),
-                            array (
-                                'or_c' => array (
-                                    'and.b5',
-                                ),
-                            ),
-                            'and.b6',
+                        'and_b' => array (
+                            'and.f1',
+                            'or.f3',
                         ),
                     ),
                 ),
             ),
-        ),$this->builder()
-            ->_and('a.f1', 1)
-            ->orNot(function ($builder) {
-                $builder->_and('b.b1', 1)
-                        ->_and('b.b2', 1);
+            'or.f2',
+            'or.f4',
+        ), $this->builder()
+            ->relatedTo('a', function($b) {
+                $b->relatedTo('b', function($b) {
+                    $b->_and('f1', 1);
+                });
+                
+                $b->_or('f2', 1);
             })
-            ->_xor(function ($builder) {
-                $builder->_and('b.b3', 1)
-                        ->_or(function ($builder) {
-                            $builder
-                                    ->_or('b.c.b4', 1)
-                                    ->_or('b.c.b5', 1)
-                                    ->_and('b.b6', 1)
-                                    ->_or('b.c.b7', 1);
-                        });
-            })
-
-        );
-
-        $this->assertOptimize(array(
-              array (
-                'and_b' =>
-                    array (
-                        'and.f1',
-                        array (
-                            'or_c' => array (
-                                        'and.f2',
-                                        'or.f5',
-                                    ),
-                        ),
-                        'or.f4',
-                    ),
-                ),
-        ),$this->builder()
-            ->_and(function ($b) {
-                $b
-                    ->_and('b.f1',1)
-                    ->_or('b.c.f2', 1);
-            })
-            ->_or(function ($b) {
-                $b
-                    ->_and('b.f4',1)
-                    ->_or('b.c.f5', 1);
-            })
-
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_b' => array (
-                    array (
-                        'and_c' => array (
-                            'and.f2',
-                            'or.f5',
-                        ),
-                    ),
-                    'or.f4',
-                ),
-            ),
-        ),$this->builder()
-            ->_and(function ($b) {
-                $b
-                    ->_or('b.c.f2', 1);
-            })
-            ->_or(function ($b) {
-                $b
-                    ->_xor('b.f4',1)
-                    ->_or('b.c.f5', 1);
-            })
-
-        );
-
-        $this->assertOptimize(array(
-            array (
-                'and_b' => array (
-                    'and.f1',
-                    'or.f2',
-                    'xor.f3',
-                ),
-            ),
-            array (
-                'or_c.d' => array (
-                    'and.f4',
-                    array (
-                        'and' => array (
-                            'and.f5',
-                            'or.f6',
-                        ),
-                    ),
-                    'or.f7',
-                ),
-            ),
-        ),$this->builder()
-            ->_and(function ($b) {
-                $b
-                    ->_and('b.f1', 1)
-                    ->_or('b.f2', 1)
-                    ->_xor('b.f3', 1)
-                    ->_or('c.d.f4', 1)
-                    ->_and(function ($b) {
-                        $b
-                        ->_or('c.d.f5', 1)
-                        ->_or('c.d.f6', 1);
-                    });
-            })
-
-            ->_or(function ($b) {
-                $b
-                    ->_or('c.d.f7', 1);
+            ->orRelatedTo('a', function($b) {
+                $b->relatedTo('b', function($b) {
+                    $b->_and('f3', 1);
+                });
+                
+                $b->_or('f4', 1);
             })
         );
-
-        $this->assertOptimize(array(
-                array (
-                    'and_b' => array (
-                        'and.f1',
-                        'or.f2',
-                    ),
-                ),
-                array (
-                    'or_c' => array (
-                        'and.f3',
-                        array (
-                            'or_d' => array (
-                                'and.f3',
-                                'or.f4',
-                                'or.f5',
-                                'or.f6',
-                            ),
-                        ),
-                    ),
-                ),
-        ),$this->builder()
-            ->_and(function ($b) {
-                $b
-                    ->_and('b.f1', 1)
-                    ->_or('b.f2', 1)
-                    ->_or('c.f3', 1)
-                    ->_or(function ($b) {
-                        $b
-                            ->_or('c.d.f3', 1)
-                            ->_or('c.d.f4', 1);
-                    });
-            })
-            ->_or(function ($b) {
-                $b->_or('c.d.f5', 1)
-                ->_or('c.d.f6', 1);
-            })
-        );
+        
     }
 
     protected function extractConditions($conds)
@@ -555,7 +212,7 @@ class OptimizerTest extends PHPUnit_Framework_TestCase
 
             $negated = $cond->negated() ? '!':'';
 
-            if ($cond instanceof PHPixie\ORM\Conditions\Condition\Group) {
+            if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group) {
                 $arr[] = array(
                     $negated.$prefix => $this->extractConditions($cond->conditions()));
             } else {
@@ -574,7 +231,7 @@ class OptimizerTest extends PHPUnit_Framework_TestCase
 
         $conds = $this->optimizer->optimize($builder->getConditions());
         $res = $this->extractConditions($conds);
-        //var_export($res);
+        var_export($res);
 
         $this->assertEquals($expected, $res);
     }

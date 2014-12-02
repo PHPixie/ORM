@@ -31,6 +31,7 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
      */
     public function testOptimize()
     {
+        
         $this->assertOptimize(array(
             array(
                 'and_a' => array (
@@ -102,7 +103,7 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                 $b->_and('f2', 1);
             })
         );
-        
+        /*
         $this->assertOptimize(array(
             array (
                 '!and_a' => array (
@@ -123,7 +124,7 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
             ->orNotRelatedTo('a', function($b) {
                 $b->_and('f3', 1);
             })
-        );
+        );*/
         
         $this->assertOptimize(array(
             array(
@@ -170,16 +171,16 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
         $this->assertOptimize(array(
             array (
                 'and_a' => array (
-                    array (
+                    array ( 
                         'and_b' => array (
                             'and.f1',
                             'or.f3',
                         ),
                     ),
+                    'or.f2',
+                    'or.f4',
                 ),
-            ),
-            'or.f2',
-            'or.f4',
+            )
         ), $this->builder()
             ->relatedTo('a', function($b) {
                 $b->relatedTo('b', function($b) {
@@ -194,6 +195,40 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                 });
                 
                 $b->_or('f4', 1);
+            })
+        );
+        
+        $this->assertOptimize(array(
+            array (
+                '!and_a' => array (
+                    array (
+                        'and_b' => array (
+                            'and.f1',
+                        ),
+                    ),
+                    'or.f2',
+                    array (
+                        'and_b' => array (
+                            'and.f3',
+                        ),
+                    ),
+                    'and.f4',
+                ),
+            ),
+        ), $this->builder()
+            ->notRelatedTo('a', function($b) {
+                $b->relatedTo('b', function($b) {
+                    $b->_and('f1', 1);
+                });
+                
+                $b->_or('f2', 1);
+            })
+            ->orNotRelatedTo('a', function($b) {
+                $b->relatedTo('b', function($b) {
+                    $b->_and('f3', 1);
+                });
+                
+                $b->_and('f4', 1);
             })
         );
         
@@ -229,8 +264,13 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
         //$res = $this->extractConditions($conds);
         //var_export($res);
 
-        $conds = $this->optimizer->optimize($builder->getConditions());
+        $conds = $builder->getConditions();
         $res = $this->extractConditions($conds);
+        print_r($res);
+        
+        $conds = $this->optimizer->optimize($conds);
+        $res = $this->extractConditions($conds);
+        print_r($res);
         var_export($res);
 
         $this->assertEquals($expected, $res);

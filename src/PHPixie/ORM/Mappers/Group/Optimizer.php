@@ -83,14 +83,18 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         return $left;
     }
     
-    protected function isExtractable($group)
+    protected function isExtractable($group, $rightLogic = 'or')
     {
         if($group->negated())
             return false;
         
-        $precedance = $this->logicPrecedance[$group->logic()];
+        $groupPrecedance = $this->logicPrecedance[$group->logic()];
+        $rightPrecedance = $this->logicPrecedance[$rightLogic];
+        
         foreach($group->conditions() as $condition) {
-            if($this->logicPrecedance[$condition->logic()] < $precedance)
+            $precedance = $this->logicPrecedance[$condition->logic()];
+            
+            if($precedance < $groupPrecedance || $precedance < $rightPrecedance)
                 return false;
         }
         
@@ -175,11 +179,17 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
                 }
             }
             
-            if($this->isExtractable($newRight)) {
+            $conditions = array();
+            if($this->isExtractable($newLeft, $newRight->logic())) {
                 $conditions = $newLeft->conditions();
+            }else{
+                $conditions[]= $newLeft;
+            }
+            
+            if($this->isExtractable($newRight)) {
                 $conditions = $this->extractGroup($conditions, $newRight);
             }else{
-                $conditions = array($newLeft, $newRight);
+                $conditionsp[]= $newRight;
             }
         }
         $left->setConditions($conditions);

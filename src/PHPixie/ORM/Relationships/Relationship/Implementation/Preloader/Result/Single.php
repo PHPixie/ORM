@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Preloader\Result;
+namespace PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result;
 
-abstract class Single extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result
+abstract class Single extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result
 {
     public function getMappedFor($model)
     {

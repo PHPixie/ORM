@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple;
+namespace PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple;
 
-abstract class IdMap extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple
+abstract class IdMap extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple
 {
     protected $idMap = array();
     

@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Handler;
+namespace PHPixie\ORM\Relationships\Relationship\Implementation\Handler;
 
-abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Handler
+abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
 {
     protected function getLoadedProperty($model, $propertyName)
     {
@@ -41,12 +41,4 @@ abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Handler
         return $property;
     }
 
-
-    public function handleDeletion($modelName, $side, $resultStep, $plan)
-    {
-
-    }
-
-    abstract public function mapPreloadEmbedded();
-    abstract public function mapSubdocument();
 }

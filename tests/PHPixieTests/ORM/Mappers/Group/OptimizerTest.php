@@ -103,7 +103,8 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                 $b->_and('f2', 1);
             })
         );
-        /*
+        
+        
         $this->assertOptimize(array(
             array (
                 '!and_a' => array (
@@ -124,7 +125,7 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
             ->orNotRelatedTo('a', function($b) {
                 $b->_and('f3', 1);
             })
-        );*/
+        );
         
         $this->assertOptimize(array(
             array(

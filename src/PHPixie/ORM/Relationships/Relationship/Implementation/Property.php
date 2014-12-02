@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Property;
+namespace PHPixie\ORM\Relationships\Relationship\Implementation;
 
-abstract class Implementation
+abstract class Property implements \PHPixie\ORM\Relationships\Relationship\Property
 {
     protected $handler;
     protected $side;

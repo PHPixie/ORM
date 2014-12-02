@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Relationship;
 
-interface Handler
+interface Delete
 {
-
+    public function isDeleteHandled();
 }

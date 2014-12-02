@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Preloader;
+namespace PHPixie\ORM\Relationships\Relationship\Implementation\Preloader;
 
-abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Preloader
+abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader
 {
     protected $idOffsets;
     protected $mapped = false;

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Handler;
+namespace PHPixie\ORM\Relationships\Relationship\Implementation;
 
 abstract class Handler
 {
@@ -65,12 +65,4 @@ abstract class Handler
         return $property;
     }
 
-
-    public function handleDeletion($modelName, $side, $resultStep, $plan)
-    {
-
-    }
-
-    abstract public function mapPreload();
-    abstract public function mapQuery();
 }

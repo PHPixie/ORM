@@ -2,29 +2,11 @@
 
 namespace PHPixie\ORM\Relationships\Relationship;
 
-abstract class Side
+interface Side
 {
-    protected $config;
-    protected $type;
-
-    public function __construct($type, $config)
-    {
-        $this->type = $type;
-        $this->config = $config;
-    }
-
-    public function type()
-    {
-        return $this->type;
-    }
-
-    public function config()
-    {
-        return $this->config;
-    }
-    
-    abstract public function isDeleteHandled();
-    abstract public function modelName();
-    abstract public function propertyName();
-    abstract public function relationshipType();
+    public function type();
+    public function config();
+    public function modelName();
+    public function propertyName();
+    public function relationshipType();
 }

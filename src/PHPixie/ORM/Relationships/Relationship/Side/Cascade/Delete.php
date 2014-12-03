@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship;
+namespace PHPixie\ORM\Relationships\Relationship\Side\Cascade;
 
 interface Delete
 {

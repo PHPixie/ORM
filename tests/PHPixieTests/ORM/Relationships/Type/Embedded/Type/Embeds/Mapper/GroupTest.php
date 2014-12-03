@@ -179,7 +179,7 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
 
     protected function getPlan()
     {
-        return $this->quickMock('\PHPixie\ORM\Plans\Plan\Step');
+        return $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
     }
 
     protected function getGroup($conditions, $logic = 'and', $negated = false)

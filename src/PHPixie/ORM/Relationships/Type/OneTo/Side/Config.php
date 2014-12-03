@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Side;
 
-abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Side\Config
+abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side\Config
 {
     public $ownerModel;
     public $itemModel;

@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\OneTo\Property\Model;
+namespace PHPixie\ORM\Relationships\Type\OneTo\Property\Entity;
 
-abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model
+abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity
 {
     public function value()
     {

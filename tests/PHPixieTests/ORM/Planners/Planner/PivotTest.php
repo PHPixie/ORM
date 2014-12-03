@@ -77,7 +77,7 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
             array(array($pdoConnection, $pdoConnection, null), 'SQL'),
         ) as $params){
             
-            $plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Step');
+            $plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
             $pivot = $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot\Pivot');
             $firstSide = $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot\Side');
             $this->method($pivot, 'connection', $params[0][0], array(), 0);

@@ -16,7 +16,7 @@ class UpdateTest extends \PHPixieTests\ORM\Planners\PlannerTest
     {
         $updateQuery = $this->abstractMock('\PHPixie\Database\Query\Type\Update');
         $resultStep = $this->abstractMock('\PHPixie\ORM\Steps\Step\Query\Result');
-        $plan = $this->abstractMock('\PHPixie\ORM\Plans\Plan\Step');
+        $plan = $this->abstractMock('\PHPixie\ORM\Plans\Plan\Steps');
         
         $map = array(
                         'a' => 't',
@@ -38,7 +38,7 @@ class UpdateTest extends \PHPixieTests\ORM\Planners\PlannerTest
         $updateQuery = $this->abstractMock('\PHPixie\Database\Query\Type\Update');
         $subquery = $this->abstractMock('\PHPixie\Database\Query\Type\Select');
         $resultStep = $this->abstractMock('\PHPixie\ORM\Steps\Step\Query\Result');
-        $plan = $this->abstractMock('\PHPixie\ORM\Plans\Plan\Step');
+        $plan = $this->abstractMock('\PHPixie\ORM\Plans\Plan\Steps');
         
         $map = array(
                         'a' => 't',

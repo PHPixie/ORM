@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
+namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Entity;
 
-class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model
+class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity
 {
     protected function load()
     {

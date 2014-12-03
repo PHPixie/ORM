@@ -19,7 +19,7 @@ abstract class StrategyTest extends \PHPixieTests\AbstractORMTest
     {
         $this->query = $this->abstractMock('\PHPixie\Database\Query\Items');
         $this->subquery = $this->abstractMock('\PHPixie\Database\Query\Type\Select');
-        $this->plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Step');
+        $this->plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
         $this->builder = $this->quickMock('\PHPixie\Database\Conditions\Builder');
         
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');

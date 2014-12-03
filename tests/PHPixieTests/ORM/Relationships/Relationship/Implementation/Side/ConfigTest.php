@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship\Side;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation\Side;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Side\Config
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Side\Config
  */
 abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
 {
@@ -14,7 +14,7 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
 
     public function setUp()
     {
-        $this->inflector = $this->quickMock('\PHPixie\ORM\Inflector');
+        $this->inflector = $this->quickMock('\PHPixie\ORM\Configs\Inflector');
 
         $plural = $this->plural;
         $singular = array_flip($this->plural);
@@ -64,7 +64,7 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
 
     protected function slice($data)
     {
-        $slice = $this->quickMock('\PHPixie\Config\Slice', array('get'));
+        $slice = $this->abstractMock('\PHPixie\Config\Slice', array('get'));
         $slice
             ->expects($this->any())
             ->method('get')

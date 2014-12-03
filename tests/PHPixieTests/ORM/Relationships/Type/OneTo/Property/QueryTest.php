@@ -24,6 +24,6 @@ abstract class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
     
     protected function getPlan()
     {
-        return $this->quickMock('\PHPixie\ORM\Plans\Plan\Step');
+        return $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
     }
 }

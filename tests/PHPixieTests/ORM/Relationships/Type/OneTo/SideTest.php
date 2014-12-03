@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Side
  */
-abstract class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\SideTest
+abstract class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\SideTest
 {
     protected $type = 'owner';
     protected $relationshipType;

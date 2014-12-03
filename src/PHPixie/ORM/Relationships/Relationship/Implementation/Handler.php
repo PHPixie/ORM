@@ -4,28 +4,23 @@ namespace PHPixie\ORM\Relationships\Relationship\Implementation;
 
 abstract class Handler
 {
-    protected $ormBuilder;
     protected $repositories;
     protected $planners;
     protected $plans;
     protected $steps;
     protected $loaders;
+    protected $mappers;
     protected $relationship;
-    protected $groupMapper;
-    protected $cascadeMapper;
 
-    public function __construct($ormBuilder, $repositories, $planners, $plans, $steps,
-                                $loaders, $relationship, $groupMapper, $cascadeMapper)
+    public function __construct($repositories, $planners, $plans, $steps, $loaders, $mappers, $relationship)
     {
-        $this->ormBuilder         = $ormBuilder;
         $this->repositories       = $repositories;
         $this->planners           = $planners;
         $this->plans              = $plans;
         $this->steps              = $steps;
         $this->loaders            = $loaders;
+        $this->mappers            = $mappers;
         $this->relationship       = $relationship;
-        $this->groupMapper        = $groupMapper;
-        $this->cascadeMapper      = $cascadeMapper;
     }
 
     protected function getLoadedProperty($model, $propertyName)
@@ -63,6 +58,11 @@ abstract class Handler
         if ($property === null || !$property->isLoaded())
             return null;
         return $property;
+    }
+    
+    protected function getIdField($repository)
+    {
+        return $repository->config()->idField;
     }
 
 }

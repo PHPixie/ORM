@@ -21,7 +21,7 @@ class PlansTest extends \PHPixieTests\AbstractORMTest
     public function testPlan()
     {
         $plan = $this->plans->plan();
-        $this->assertInstanceOf('\PHPixie\ORM\Plans\Plan\Step', $plan);
+        $this->assertInstanceOf('\PHPixie\ORM\Plans\Plan\Steps', $plan);
         $this->assertAttributeEquals($this->plans, 'plans', $plan);
     }
 

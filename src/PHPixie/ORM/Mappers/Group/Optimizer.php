@@ -15,38 +15,87 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
     
     public function optimize($conditions)
     {
-        return $this->parseLogic($conditions);
+        return $this->extractGroups($conditions, true);
     }
     
     protected function normalize($condition)
     {
-        if ($condition instanceof Group) {
-            $condition = $this->optimizeGroup($condition);
-        }
-
         return array($condition);
     }
-
-    protected function optimizeGroup($group)
+    
+    protected function extractGroups($conditions, $parseLogic = false)
+    {
+        $extracted = array();
+        $count = count($conditions);
+        
+        foreach($conditions as $key => $condition) {
+            
+            if($condition instanceof Group) {
+                $optimized = $this->optimize($condition->conditions());
+                $condition->setConditions($optimized);
+            }
+               
+            if(!$this->isConditionGroup($condition) || $condition->negated()) {
+                $extracted[] = $condition;
+                continue;
+            } 
+            
+            $minPrecedance = 0;
+            if($key > 0) {
+                $precedance = $this->logicPrecedance[$condition->logic()];
+                $minPrecedance = max($minPrecedance, $precedance);
+            }
+            
+            if($key < $count - 1) {
+                $precedance = $this->logicPrecedance[$conditions[$key+1]->logic()];
+                $minPrecedance = max($minPrecedance, $precedance);
+            }
+            
+            if(!$this->isExpandable($condition, $minPrecedance)) {
+                $extracted[] = $condition;
+                continue;
+            }
+            
+            $parseLogic = true;
+            
+            foreach($condition->conditions() as $key => $groupCondition) {
+                if($key == 0)
+                    $groupCondition->setLogic($condition->logic());
+                $extracted[]= $groupCondition;
+            }
+        }
+        
+        if($parseLogic)
+            $extracted = $this->parseLogic($extracted);
+        
+        return $extracted;
+    }
+    
+    protected function isConditionGroup($condition)
+    {
+        if(!($condition instanceof Group))
+            return false;
+        
+        if($condition instanceof Group\Relationship)
+            return false;
+        
+        return true;
+    }
+    
+    protected function isExpandable($group, $minPrecedance)
     {
         $conditions = $group->conditions();
-        $conditions = $this->optimize($conditions);
-        
-        $condition = $group;
-        
-        if (!($group instanceof Group\Relationship) && count($conditions) === 1) {
-            $condition = current($conditions);
-            if ($group->negated())
-                $condition->negate();
-            $condition->setLogic($group->logic());
-        } else {
+        foreach($conditions as $key => $condition){
+            if($key == 0)
+                continue;
             
-            $group->setConditions($conditions);
+            if($this->logicPrecedance[$condition->logic()] < $minPrecedance)
+                return false;
         }
-
-        return $condition;
+        
+        return true;
     }
-
+    
     protected function merge($left, $right)
     {
         if(count($right) !== 1)
@@ -58,14 +107,10 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
             
             if(($target = $this->findMergeTarget($left, $rightCondition)) !== null) {
                 $this->mergeRelationshipGroups($left[$target], $rightCondition);
-                $left[$target] = $this->optimizeGroup($left[$target]);
+            
             }else{
                 $left[]= $rightCondition;
             }
-            
-        }elseif($rightCondition instanceof Group && $this->isExtractable($rightCondition)) {
-            $left = $this->extractGroup($left, $rightCondition);
-            $left = $this->optimize($left);
             
         }else{
             $left[]= $rightCondition;
@@ -81,34 +126,6 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         }
         
         return $left;
-    }
-    
-    protected function isExtractable($group, $rightLogic = 'or')
-    {
-        if($group->negated())
-            return false;
-        
-        $groupPrecedance = $this->logicPrecedance[$group->logic()];
-        $rightPrecedance = $this->logicPrecedance[$rightLogic];
-        
-        foreach($group->conditions() as $condition) {
-            $precedance = $this->logicPrecedance[$condition->logic()];
-            
-            if($precedance < $groupPrecedance || $precedance < $rightPrecedance)
-                return false;
-        }
-        
-        return true;
-    }
-    
-    protected function extractGroup($left, $group)
-    {
-        $conditions = $group->conditions();
-        if(count($conditions) > 0) {
-            $conditions[0]->setLogic($group->logic());
-        }
-        
-        return $this->mergeConditions($left, $conditions);
     }
     
     protected function findMergeTarget($conditionList, $newCondition)
@@ -159,40 +176,24 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
 
     protected function mergeRelationshipGroups($left, $right)
     {
-        if($this->isExtractable($right)) {
-            $conditions = $left->conditions();
-            $conditions = $this->extractGroup($conditions, $right);
-            
-        }else{
-            $newLeft = $this->conditions->group();
-            $newRight = $this->conditions->group();
+        $newLeft = $this->conditions->group();
+        $newRight = $this->conditions->group();
         
-            $newLeft->setConditions($left->conditions());
-            $newRight->setConditions($right->conditions());
-            $newRight->setLogic($right->logic());
+        $newLeft->setConditions($left->conditions());
+        $newRight->setConditions($right->conditions());
         
-            if($left->negated()) {
-                if($right->logic() === 'and') {
-                    $newRight->setLogic('or');
-                }else{
-                    $newRight->setLogic('and');
-                }
-            }
-            
-            $conditions = array();
-            if($this->isExtractable($newLeft, $newRight->logic())) {
-                $conditions = $newLeft->conditions();
+        $newRight->setLogic($right->logic());
+        if($left->negated()) {
+            if($right->logic() === 'and') {
+                $newRight->setLogic('or');
             }else{
-                $conditions[]= $newLeft;
-            }
-            
-            if($this->isExtractable($newRight)) {
-                $conditions = $this->extractGroup($conditions, $newRight);
-            }else{
-                $conditionsp[]= $newRight;
+                $newRight->setLogic('and');
             }
         }
+            
+        $conditions = $this->extractGroups(array($newLeft, $newRight));
         $left->setConditions($conditions);
+        
     }
 
 }

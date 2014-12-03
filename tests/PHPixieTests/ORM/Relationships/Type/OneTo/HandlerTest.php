@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Handler
  */
-abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTest
+abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\HandlerTest
 {
     protected $itemSide;
     protected $ownerPropertyName;
@@ -34,7 +34,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         foreach(array('owner', $this->itemSide) as $type) {
             $side = $this->side($type, $this->configData);
             $query = $this->getQuery();
-            $related = $this->getModel();
+            $related = $this->getEntity();
             $this->prepareQuery($side, $query, $related);
             $this->assertEquals($query, $this->handler->query($side, $related));
         }
@@ -177,7 +177,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $planners = $this->getPlanners(array('in', 'update'));
         
         $plan = $this->getPlan();
-        $this->method($this->plans, 'plan', $plan, array(), $plansOffset);
+        $this->method($this->plans, 'steps', $plan, array(), $plansOffset);
 
         $ownerQuery = $this->getDatabaseQuery();
         $this->method($ownerRepository, 'databaseSelectQuery', $ownerQuery, array(), $ownerRepoOffset++);
@@ -221,10 +221,10 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
 
     protected function prepareUnlinkTest($constrainOwners, $owners, $constrainItems, $items, $logic = 'and')
     {
+        $this->prepareRepositories();
         $itemRepository = $this->repositories->get($this->configData['itemModel']);
-        
         $plan = $this->getPlan();
-        $this->method($this->plans, 'plan', $plan, array(), 0);
+        $this->method($this->plans, 'steps', $plan, array(), 0);
 
         $ownerKey = $this->configData['ownerKey'];
         $updateQuery = $this->getDatabaseQuery('update');
@@ -274,30 +274,30 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $repository = $this->getRepository();
         $this->method($this->repositories, 'get', $repository, array($data[$type.'Model']), 0);
         $this->method($repository, 'query', $query, array(), 0);
-        $this->method($query, 'related', $query, array($this->propertyName($type), $related), 0);
+        $this->method($query, 'relatedTo', $query, array($this->propertyName($type), $related));
     }
     
     protected function prepareLoadSingleProperty($side, $related)
     {
-        $model = $this->getDatabaseModel();
+        $entity = $this->getDatabaseEntity();
         $query = $this->getQuery();
         
         $this->prepareQuery($side, $query, $related);
-        $this->method($query, 'findOne', $model, array());
-        return $model;
+        $this->method($query, 'findOne', $entity, array());
+        return $entity;
     }
     
     protected function getQuery()
     {
-        return $this->quickMock('\PHPixie\ORM\Query');
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');
     }
 
     protected function getRepository()
     {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database');
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Repository');
     }
     
-    protected function addSingleProperty($model, $type, $propertyExists = true, $loaded = false, $owner = null, $expectCreateMissing = null)
+    protected function addSingleProperty($entity, $type, $propertyExists = true, $loaded = false, $owner = null, $expectCreateMissing = null)
     {
         $property = null;
         if($propertyExists) {
@@ -314,9 +314,9 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         if($expectCreateMissing !== null)
             $with[]=$expectCreateMissing;
         
-        $this->method($model, 'relationshipProperty', $property, array($propertyName), null, true);
+        $this->method($entity, 'relationshipProperty', $property, array($propertyName), null, true);
         return array(
-            'model'    => $model,
+            'entity'   => $entity,
             'property' => $property,
             'owner'    => $owner
         );
@@ -326,7 +326,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     {
         $value = null;
         if($valueMock !== null)
-            $value = $valueMock['model'];
+            $value = $valueMock['entity'];
         $itemMock['property']
             ->expects($this->once())
             ->method('setValue')
@@ -355,9 +355,9 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         return $this->configData['itemOwnerProperty'];    
     }
     
-    protected function getDatabaseModel()
+    protected function getDatabaseEntity()
     {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database\Model');
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Entity');
     }
     
     abstract protected function getSingleProperty($type);

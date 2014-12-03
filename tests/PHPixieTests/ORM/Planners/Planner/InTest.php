@@ -44,7 +44,7 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
     {
 		$query = $this->itemsQueryMock(array('getWhereBuilder'));
 		$resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
-		$plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Step');
+		$plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
 		
 		$this->prepareResultTest($query, $resultStep, $plan, 'or', true);
         $this->planner->result($query, 'pixie', $resultStep, 'fairy', $plan, 'or', true);
@@ -113,7 +113,7 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
         ) as $params){
             $query = $this->itemsQueryMock(array('startWhereGroup', 'endWhereGroup', 'where', 'connection'));
             $collection = $this->quickMock('\PHPixie\ORM\Planners\Collection');
-            $plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Step');
+            $plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
             $collectionQueries = array(
                 $this->quickMock('\PHPixie\ORM\Model', array('planFind')),
                 $this->quickMock('\PHPixie\ORM\Model', array('planFind')),

@@ -2,7 +2,8 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo;
 
-abstract class Side extends \PHPixie\ORM\Relationships\Relationship\Side
+abstract class Side extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side
+                    implements \PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete
 {
     public function modelName()
     {
@@ -20,7 +21,7 @@ abstract class Side extends \PHPixie\ORM\Relationships\Relationship\Side
         return $this->config->itemOwnerProperty;
     }
 
-    public function handleDeletions()
+    public function isDeleteHandled()
     {
         return $this->type !== 'owner';
     }

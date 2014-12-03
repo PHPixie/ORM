@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo;
 
-abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
+abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
 {
 
     public function query($side, $related)
@@ -17,12 +17,12 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
         }
 
         $repository = $this->repositories->get($model);
-        return $repository->query()->related($property, $related);
+        return $repository->query()->relatedTo($property, $related);
     }
 
     public function linkPlan($config, $owner, $items)
     {
-        $plan = $this->plans->plan();
+        $plan = $this->plans->steps();
 
         $ownerRepository = $this->repositories->get($config->ownerModel);
         $ownerQuery = $ownerRepository->databaseSelectQuery();
@@ -47,7 +47,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     protected function addCollectionCondition($query, $repository, $items, $plan, $queryField = null, $logic = 'and')
     {
-        $idField = $repository->idField();
+        $idField = $repository->config->idField();
         if($queryField === null)
             $queryField = $idField;
         
@@ -57,7 +57,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
 
     protected function getUnlinkPlan($config, $constrainOwners, $owners, $constrainItems, $items, $logic = 'and')
     {
-        $plan = $this->plans->plan();
+        $plan = $this->plans->steps();
 
         $itemRepository = $this->repositories->get($config->itemModel);
         $updateQuery = $itemRepository->databaseUpdateQuery();
@@ -131,8 +131,8 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Handler
             $hasHandledSides = !empty($handlesSides);
             $query = $repository->databaseQuery($hasHandledSides ? 'select' : 'delete');
         }
-
-        $this->planners->in()->result($query, $itemKey, $resultStep, $ownerRepository->idField());
+        
+        $this->planners->in()->result($query, $itemKey, $resultStep, $ownerRepository->config()->idField());
 
         if ($hasHandledSides)
             $query = $this->cascadeMapper->deletion($query, $handledSides, $itemRepository, $plan);

@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Side;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Side\Config
  */
-abstract class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\Side\ConfigTest
+abstract class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Side\ConfigTest
 {
     protected $itemOptionName;
     protected $ownerProperty;

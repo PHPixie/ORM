@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
+namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Entity;
 
-class Owner extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model\Single
+class Owner extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity\Single
 {
     protected function load()
     {

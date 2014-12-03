@@ -1,34 +1,44 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Handler
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
  */
 abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
 {
     protected $handler;
-    protected $ormBuilder;
     protected $repositories;
     protected $planners;
     protected $plans;
     protected $steps;
     protected $loaders;
+    protected $mappers;
     protected $relationship;
-    protected $groupMapper;
-    protected $cascadeMapper;
     
+    protected $mapperMocks = array();
+        
     public function setUp()
     {
-        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
         $this->repositories = $this->quickMock('\PHPixie\ORM\Repositories');
         $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
         $this->plans = $this->quickMock('\PHPixie\ORM\Plans');
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
         $this->loaders = $this->quickMock('\PHPixie\ORM\Loaders');
         $this->relationship = $this->getRelationship();
-        $this->groupMapper = $this->quickMock('\PHPixie\ORM\Mapper\Group');
-        $this->cascadeMapper = $this->quickMock('\PHPixie\ORM\Mapper\Cascade');
+        $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
+        
+        $mappers = array(
+            'group' => '\PHPixie\ORM\Mappers\Group',
+            'preload' => '\PHPixie\ORM\Mappers\Preload',
+            'cascadeDelete' => '\PHPixie\ORM\Mappers\Cascade\Mapper\Delete',
+        );
+        
+        foreach($mappers as $key => $class) {
+            $this->mapperMocks[$key] = $this->quickMock($class);
+            $this->method($this->mappers, $key, $this->mapperMocks[$key], array());
+        }
+        
         $this->handler = $this->getHandler();
     }
     
@@ -50,6 +60,19 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
                     ->will($this->returnCallback(function($name) use($repositories){
                         return $repositories[$name]; 
                     }));
+    }
+    
+    protected function prepareRepositoryConfig($repository, $configData)
+    {
+        $this->method($repository, $this->modelConfig($configData), array());
+    }
+    
+    protected function modelConfig($configData)
+    {
+        $config = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
+        foreach($configData as $key => $value)
+            $config->$key = $value;
+        return $config;
     }
     
     protected function side($type, $map = array(), $sideMethodMap = array(), $configMethodMap = array())
@@ -96,7 +119,12 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
 
     protected function getReusableResult()
     {
-        return $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
+        return $this->abstractMock('\PHPixie\ORM\Steps\Result\Reusable');
+    }
+    
+    protected function getReusableResultStep()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
     }
     
     protected function getReusableResultLoader()
@@ -106,7 +134,7 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
     
     protected function getPlan()
     {
-        return $this->abstractMock('\PHPixie\ORM\Plans\Plan\Step');
+        return $this->abstractMock('\PHPixie\ORM\Plans\Plan\Steps');
     }
     
     protected function getDatabaseQuery($type = 'select')
@@ -114,9 +142,9 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
         return $this->abstractMock('\PHPixie\Database\Query\Type\\'.ucfirst($type));
     }
     
-    protected function getModel($methods = array())
+    protected function getEntity()
     {
-        return $this->abstractMock('\PHPixie\ORM\Model', $methods);
+        return $this->abstractMock('\PHPixie\ORM\Models\Model\Entity');
     }
     
     protected function getPlanners($types)

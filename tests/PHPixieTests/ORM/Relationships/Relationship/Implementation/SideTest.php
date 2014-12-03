@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Side
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Side
  */
 abstract class SideTest extends \PHPixieTests\AbstractORMTest
 {

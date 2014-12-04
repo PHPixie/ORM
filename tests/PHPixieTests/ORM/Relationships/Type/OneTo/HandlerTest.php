@@ -45,9 +45,13 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
      * @covers ::<protected>
      */
     public function testLinkPlan()
-    {
-        $plan = $this->prepareLinkPlan();
-        $this->assertSame($plan, $this->handler->linkPlan($config, $owner, $items));
+    {   
+        $owner = $this->getDatabaseEntity();
+        $items = $this->getDatabaseEntity();
+        $this->prepareRepositories();
+        
+        $plan = $this->prepareLinkPlan($owner, $items);
+        $this->assertSame($plan, $this->handler->linkPlan($this->propertyConfig, $owner, $items));
     }
 
     /**
@@ -64,7 +68,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $plan = $this->getPlan();
 
             $subqueryRepository = $repositories[$type == 'owner' ? 'owner' : 'item'];
-            $this->method($repositories['owner'], 'idField', 'id', array(), 0);
+            $this->prepareRepositoryConfig($repositories['owner'], array('idField' =>'id'));
 
             if ($type === 'owner') {
                 $queryField = $this->configData['ownerKey'];
@@ -123,7 +127,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $preloadPlan = $this->getPlan();
 
             $preloadRepository = $repositories[$type == 'owner' ? 'owner' : 'item'];
-            $this->method($repositories['owner'], 'idField', 'id', array(), 0);
+            $this->prepareRepositoryConfig($repositories['owner'], array('idField' =>'id'));
 
             if ($type === 'owner') {
                 $queryField = 'id';
@@ -188,7 +192,8 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $this->prepareAddCollectionQuery($updateQuery, 'item', $items, $plan, $planners['in'], null, 'and', 1, $plannersOffset + 2, $itemRepoOffset++);
 
         $this->method($this->planners, 'update', $planners['update'], array(), $plannersOffset + 4);
-        $this->method($ownerRepository, 'idField', 'id', array(), $ownerRepoOffset + 2);
+        
+        $this->prepareRepositoryConfig($ownerRepository, array('idField' =>'id'), $ownerRepoOffset + 2);
 
         $this->method($planners['update'], 'subquery', null, array(
                                                                 $updateQuery,
@@ -210,7 +215,9 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $repository = $this->repositories->get($modelName);
 
         $collection = $this->quickMock('\PHPixie\ORM\Planners\Collection');
-        $this->method($repository, 'idField', 'id', array(), $repositoryOffset++);
+        
+        $this->prepareRepositoryConfig($repository, array('idField' =>'id'), $repositoryOffset++);
+        
         $this->method($repository, 'modelName', $modelName, array(), $repositoryOffset++);
 
         $this->method($this->planners, 'collection', $collection, array($modelName, $items), $plannersOffset++);
@@ -228,6 +235,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
 
         $ownerKey = $this->configData['ownerKey'];
         $updateQuery = $this->getDatabaseQuery('update');
+
         $this->method($itemRepository, 'databaseUpdateQuery', $updateQuery, array(), 0);
 
         $this->method($updateQuery, 'set', null, array($ownerKey, null), 0);
@@ -297,7 +305,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Repository');
     }
     
-    protected function addSingleProperty($entity, $type, $propertyExists = true, $loaded = false, $owner = null, $expectCreateMissing = null)
+    protected function addSingleProperty($entity, $type, $propertyExists = true, $loaded = false, $value = null, $expectCreateMissing = null)
     {
         $property = null;
         if($propertyExists) {
@@ -305,7 +313,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $this->method($property, 'isLoaded', $loaded, array());
         
             if($loaded) {
-                $this->method($property, 'value', $owner, array());
+                $this->method($property, 'value', $value, array());
             }
         }
         $propertyName = $this->propertyName($type);
@@ -314,11 +322,11 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         if($expectCreateMissing !== null)
             $with[]=$expectCreateMissing;
         
-        $this->method($entity, 'relationshipProperty', $property, array($propertyName), null, true);
+        $this->method($entity, 'getRelationshipProperty', $property, $with, null, true);
         return array(
             'entity'   => $entity,
             'property' => $property,
-            'owner'    => $owner
+            'value'    => $value
         );
     }
     
@@ -350,9 +358,9 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     protected function propertyName($type)
     {
         if($type === 'owner')
-            return $this->configData[$this->ownerPropertyName];
+            return $this->configData['itemOwnerProperty']; 
         
-        return $this->configData['itemOwnerProperty'];    
+        return $this->configData[$this->ownerPropertyName];
     }
     
     protected function getDatabaseEntity()

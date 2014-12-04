@@ -28,7 +28,7 @@ abstract class Handler
         if ($model === null)
             return null;
 
-        $property = $model->relationshipProperty($propertyName, false);
+        $property = $model->getRelationshipProperty($propertyName, false);
         if ($property === null || !$property->isLoaded())
             return null;
 

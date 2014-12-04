@@ -35,19 +35,20 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
 
         $this->planners->update()->subquery(
-                                                $updateQuery,
-                                                array(
-                                                    $config->ownerKey => $ownerRepository->idField()
-                                                ),
-                                                $ownerQuery,
-                                                $plan
-                                            );
+            $updateQuery,
+            array(
+                $config->ownerKey => $this->getIdField($ownerRepository)
+            ),
+            $ownerQuery,
+            $plan
+        );
+        
         return $plan;
     }
 
     protected function addCollectionCondition($query, $repository, $items, $plan, $queryField = null, $logic = 'and')
     {
-        $idField = $repository->config->idField();
+        $idField = $this->getIdField($repository);
         if($queryField === null)
             $queryField = $idField;
         
@@ -84,10 +85,10 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         if ($side->type() === 'owner') {
             $subqueryRepository = $ownerRepository;
             $queryField = $config->ownerKey;
-            $subqueryField = $ownerRepository->idField();
+            $subqueryField = $this->getIdField($ownerRepository);
         } else {
             $subqueryRepository = $itemRepository;
-            $queryField = $ownerRepository->idField();
+            $queryField = $this->getIdField($ownerRepository);
             $subqueryField = $config->ownerKey;
         }
 
@@ -132,7 +133,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
             $query = $repository->databaseQuery($hasHandledSides ? 'select' : 'delete');
         }
         
-        $this->planners->in()->result($query, $itemKey, $resultStep, $ownerRepository->config()->idField());
+        $this->planners->in()->result($query, $itemKey, $resultStep, $this->getIdField($ownerRepository));
 
         if ($hasHandledSides)
             $query = $this->cascadeMapper->deletion($query, $handledSides, $itemRepository, $plan);
@@ -150,12 +151,12 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
 
         if ($side->type() === 'owner') {
             $preloadRepository = $ownerRepository;
-            $queryField = $ownerRepository->idField();
+            $queryField = $this->getIdField($ownerRepository);
             $resultField = $config->ownerKey;
         } else {
             $preloadRepository = $itemRepository;
             $queryField = $config->ownerKey;
-            $resultField = $ownerRepository->idField();
+            $resultField = $this->getIdField($ownerRepository);
         }
 
         $query = $preloadRepository->databaseSelectQuery();
@@ -171,6 +172,11 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         $preloadPlan->add($preloadStep);
         $loader = $this->loaders->reusableResult($preloadRepository, $preloadStep);
         return $this->relationship->preloader($side, $loader);
+    }
+    
+    protected function getIdField($repository)
+    {
+        return $repository->config()->idField;
     }
     
     protected function loadSingleProperty($side, $related)

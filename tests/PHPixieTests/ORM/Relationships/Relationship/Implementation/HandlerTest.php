@@ -62,17 +62,19 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
                     }));
     }
     
-    protected function prepareRepositoryConfig($repository, $configData)
+    protected function prepareRepositoryConfig($repository, $params, $at = 0)
     {
-        $this->method($repository, $this->modelConfig($configData), array());
+        $config = $this->getModelConfig();
+        $this->method($repository, 'config', $config, array(), $at);
+        
+        foreach($params as $key => $value) {
+            $config->$key = $value;
+        }
     }
     
-    protected function modelConfig($configData)
+    protected function getModelConfig()
     {
-        $config = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
-        foreach($configData as $key => $value)
-            $config->$key = $value;
-        return $config;
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
     }
     
     protected function side($type, $map = array(), $sideMethodMap = array(), $configMethodMap = array())

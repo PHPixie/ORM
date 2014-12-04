@@ -76,14 +76,15 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
         if(!is_array($items))
             $items = array($items);
 
-        if($action == 'set' && $owner instanceof \PHPixie\ORM\Query)
+        if($action == 'set' && $owner instanceof \PHPixie\ORM\Models\Type\Database\Query)
             $action = 'reset';
-
+            
         foreach($items as $item) {
-            if($item instanceof \PHPixie\ORM\Query)
+            if($item instanceof \PHPixie\ORM\Models\Type\Database\Query)
                 continue;
             
-            $property = $item->relationshipProperty($config->itemOwnerProperty, $action !== 'reset');
+            $property = $item->getRelationshipProperty($config->itemOwnerProperty, $action !== 'reset');
+            
             if($property === null)
                 continue;
             
@@ -113,16 +114,19 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
     {
         if(!is_array($items))
             $items = array($items);
-
-        if($owner instanceof \PHPixie\ORM\Query)
+        
+        
+        if($owner instanceof \PHPixie\ORM\Models\Type\Database\Query)
             return;
-
+        
+        
         $property = $this->getLoadedProperty($owner, $config->ownerProperty());
+        
         if($property === null)
             return;
 
         foreach($items as $item) {
-            if($item instanceof \PHPixie\ORM\Query) {
+            if($item instanceof \PHPixie\ORM\Models\Type\Database\Query) {
                 $action = 'reset';
                 break;
             }

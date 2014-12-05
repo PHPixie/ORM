@@ -90,10 +90,10 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
 
             $this->method($subqueryRepository, 'modelName', $modelName, array(), $subqueryRepoOffset++);
 
-            $this->method($this->groupMapper, 'mapConditions', null, array(
+            $this->method($this->mapperMocks['group'], 'mapDatabaseQuery', null, array(
                 $subquery,
-                array(5),
                 $modelName,
+                array(5),
                 $plan
             ), 0);
 
@@ -109,7 +109,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
                 true
             ), 0);
 
-            $this->handler->mapQuery($side, $group, $query, $plan);
+            $this->handler->mapQuery($query, $side, $group, $plan);
         }
     }
 
@@ -121,14 +121,16 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     {
         $repositories = $this->prepareRepositories();
 
-        foreach(array('owner', 'item') as $type) {
+        foreach(array($this->itemSide) as $type) {
             $side = $this->side($type, $this->configData);
             $query = $this->getDatabaseQuery();
-            $preloadPlan = $this->getPlan();
+            $preloadProperty = $this->preloadPropertyValue();
+            $plan = $this->getPlan();
+            
 
             $preloadRepository = $repositories[$type == 'owner' ? 'owner' : 'item'];
             $this->prepareRepositoryConfig($repositories['owner'], array('idField' =>'id'));
-
+            
             if ($type === 'owner') {
                 $queryField = 'id';
                 $resultField = $this->configData['ownerKey'];
@@ -140,34 +142,51 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $query = $this->getDatabaseQuery();
 
             $preloadRepoOffset = $type == 'owner' ? 1 : 0;
-
-            $this->method($preloadRepository, 'databaseSelectQuery', $query, array(), $preloadRepoOffset++);
+            $this->method($preloadRepository, 'databaseSelectQuery', $query, array(), $preloadRepoOffset);
 
             $inPlanner = $this->getPlanner('in');
             $this->method($this->planners, 'in', $inPlanner, array(), 0);
 
-            $repoLoader = $this->getReusableResultLoader();
-            $resultStep = $this->getReusableResult();
-            $this->method($repoLoader, 'reusableResult', $resultStep, array(), 0);
+            $result = $this->getReusableResult();
 
             $this->method($inPlanner, 'result', null, array(
                 $query,
                 $queryField,
-                $resultStep,
+                $result,
                 $resultField,
-                $preloadPlan
+                $plan
             ), 0);
 
             $preloadStep = $this->getReusableResult();
             $this->method($this->steps, 'reusableResult', $preloadStep, array($query), 0);
-            $this->method($preloadPlan, 'add', null, array($preloadStep), 0);
+            $this->method($plan, 'add', null, array($preloadStep), 0);
             $loader = $this->getReusableResultLoader();
+            
             $this->method($this->loaders, 'reusableResult', $loader, array($preloadRepository, $preloadStep), 0);
-
+            
+            $preloadingProxy = $this->getLoaderProxy('preloading');
+            $this->method($this->loaders, 'preloadingProxy', $preloadingProxy, array($loader), 1);
+            
+            $cachingProxy = $this->getLoaderProxy('caching');
+            $this->method($this->loaders, 'cachingProxy', $cachingProxy, array($preloadingProxy), 2);
+            
+            $this->method($this->mapperMocks['preload'], 'map', null, array(
+                $preloadingProxy,
+                $preloadRepository->modelName(),
+                $preloadProperty['preload'],
+                $preloadStep,
+                $plan
+            ), 0);
+            
             $preloader = $this->getPreloader($type);
-            $this->method($this->relationship, 'preloader', $preloader, array($side, $loader), 0);
+            $this->method($this->relationship, 'preloader', $preloader, array($side, $cachingProxy), 0);
 
-            $this->assertEquals($preloader, $this->handler->mapPreload($side, $repoLoader, $preloadPlan));
+            $this->assertEquals($preloader, $this->handler->mapPreload(
+                $side,
+                $preloadProperty['property'],
+                $result,
+                $plan
+            ));
         }
     }
 
@@ -282,7 +301,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $repository = $this->getRepository();
         $this->method($this->repositories, 'get', $repository, array($data[$type.'Model']), 0);
         $this->method($repository, 'query', $query, array(), 0);
-        $this->method($query, 'relatedTo', $query, array($this->propertyName($type), $related));
+        $this->method($query, 'relatedTo', $query, array($this->sidePropertyName($type), $related));
     }
     
     protected function prepareLoadSingleProperty($side, $related)
@@ -316,7 +335,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
                 $this->method($property, 'value', $value, array());
             }
         }
-        $propertyName = $this->propertyName($type);
+        $propertyName = $this->opposingPropertyName($type);
         
         $with = array($propertyName);
         if($expectCreateMissing !== null)
@@ -355,12 +374,18 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         return parent::config($map, $methodMap);
     }
     
-    protected function propertyName($type)
+    protected function sidePropertyName($type)
     {
         if($type === 'owner')
-            return $this->configData['itemOwnerProperty']; 
+            return $this->configData[$this->ownerPropertyName];
         
-        return $this->configData[$this->ownerPropertyName];
+        return $this->configData['itemOwnerProperty']; 
+    }
+    
+    protected function opposingPropertyName($type)
+    {
+        $opposing = $type == 'owner' ? $this->itemSide : 'owner';
+        return $this->sidePropertyName($opposing);
     }
     
     protected function getDatabaseEntity()

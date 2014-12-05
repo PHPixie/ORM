@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Relationship\Implementation;
 
-abstract class Preloader implements \PHPixie\ORM\Relationships\Relationship\PreloaderI
+abstract class Preloader implements \PHPixie\ORM\Relationships\Relationship\Preloader
 {
     protected $loader;
 

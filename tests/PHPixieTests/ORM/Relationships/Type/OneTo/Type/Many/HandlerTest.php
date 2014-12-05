@@ -87,13 +87,14 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     {
         $this->modifyOwnerSingleItemTest('add');
         $this->modifyOwnerSingleItemTest('add', true);
+        
         $this->modifyOwnerItemsTest('add');
         $this->modifyOwnerItemsTest('add', true);
+        
         $this->withOwnedItemTest('add');
-        /*
         $this->withOwnedItemTest('add', true);
         $this->withOwnedItemTest('add', false, true);
-        */
+        
     }
 
     /**
@@ -104,11 +105,14 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     {
         $this->modifyOwnerSingleItemTest('remove');
         $this->modifyOwnerSingleItemTest('remove', true);
+        
         $this->modifyOwnerItemsTest('remove');
         $this->modifyOwnerItemsTest('remove', true);
+        
         $this->withOwnedItemTest('remove');
         $this->withOwnedItemTest('remove', true);
         $this->withOwnedItemTest('remove', false, true);
+        
     }
 
     /**
@@ -185,7 +189,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         $query = $this->getDatabaseQuery();
 
         $withoutProperty = $this->getDatabaseEntity();
-        $this->method($withoutProperty, 'getRelationshipProperty', null, array($this->propertyName($type), false), 0);
+        $this->method($withoutProperty, 'getRelationshipProperty', null, array($this->opposingPropertyName($type), true), 0);
 
 
         $param = $type === 'owner' ? $owner : $item;
@@ -198,7 +202,8 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     protected function modifyOwnerSingleItemTest($action = 'add', $ownerIsQuery = false)
     {
         $owner = $ownerIsQuery ? $this->getQuery() : $this->getOwner();
-        $item  = $this->getItem($action !== 'reset' && !$ownerIsQuery);
+        
+        $item  = $this->getItem($this->ifCreateMissingProperty($action, $ownerIsQuery));
 
         if(!$ownerIsQuery) {
             $this->expectItemsModified($owner, $action, array($item));
@@ -248,11 +253,12 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         $method = $action.'OwnerItems';
         $this->handler->$method($this->propertyConfig, $owner['entity'], $itemParams);
     }
-
+    
     protected function withOwnedItemTest($action = 'add', $ownerIsQuery = false, $sameId = false)
     {
         $itemOwner = $this->getOwner(true, true, 1);
-        $item  = $this->getItem(true, true, $itemOwner);
+        
+        $item  = $this->getItem($this->ifCreateMissingProperty($action, $ownerIsQuery), true, true, $itemOwner);
 
         $owner = $ownerIsQuery ? $this->getQuery() : $this->getOwner(true, true, $sameId ? 1 : 2);
 
@@ -277,6 +283,11 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         $this->handler->$method($this->propertyConfig, $ownerParam, $item['entity']);
     }
 
+    
+    protected function ifCreateMissingProperty($action, $ownerIsQuery) {
+        return !($action === 'reset' || ($action === 'add' && $ownerIsQuery));
+    }
+    
     protected function expectItemsModified($ownerMock, $method, $itemMocks, $expectNotCalled = false)
     {
         $items = array();
@@ -338,7 +349,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
             }
         }
 
-        $propertyName = $this->propertyName('item');
+        $propertyName = $this->opposingPropertyName('item');
         $this->method($entity, 'getRelationshipProperty', $property, array($propertyName, false), null, true);
         
         return array(

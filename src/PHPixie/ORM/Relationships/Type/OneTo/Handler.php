@@ -76,7 +76,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         return $plan;
     }
 
-    public function mapQuery($side, $group, $query, $plan)
+    public function mapQuery($query, $side, $group, $plan)
     {
         $config = $side->config();
         $itemRepository = $this->repositories->get($config->itemModel);
@@ -93,29 +93,26 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         }
 
         $subquery = $subqueryRepository->databaseSelectQuery();
-        $this->groupMapper->mapConditions(
-                                            $subquery,
-                                            $group->conditions(),
-                                            $subqueryRepository->modelName(),
-                                            $plan
-                                        );
+        $this->mappers->group()->mapDatabaseQuery(
+            $subquery,
+            $subqueryRepository->modelName(),
+            $group->conditions(),
+            $plan
+        );
 
         $this->planners->in()->subquery(
-                                        $query,
-                                        $queryField,
-                                        $subquery,
-                                        $subqueryField,
-                                        $plan,
-                                        $group->logic(),
-                                        $group->negated()
-                                    );
+            $query,
+            $queryField,
+            $subquery,
+            $subqueryField,
+            $plan,
+            $group->logic(),
+            $group->negated()
+        );
     }
 
     public function handleDeletion($modelName, $side, $resultStep, $plan)
     {
-        if ($side->type() === 'owner')
-            return;
-
         $config = $side->config();
         $itemKey = $config->itemKey;
         $itemModel = $config->itemModel;
@@ -149,6 +146,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         $itemRepository = $this->repositories->get($config->itemModel);
         $ownerRepository = $this->repositories->get($config->ownerModel);
 
+        
         if ($side->type() === 'owner') {
             $preloadRepository = $ownerRepository;
             $queryField = $this->getIdField($ownerRepository);
@@ -163,15 +161,26 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         $this->planners->in()->result(
                                         $query,
                                         $queryField,
-                                        $resultStepLoader->reusableResult(),
+                                        $reusableResult,
                                         $resultField,
-                                        $preloadPlan
+                                        $plan
                                     );
 
         $preloadStep = $this->steps->reusableResult($query);
-        $preloadPlan->add($preloadStep);
+        $plan->add($preloadStep);
         $loader = $this->loaders->reusableResult($preloadRepository, $preloadStep);
-        return $this->relationship->preloader($side, $loader);
+        $preloadingProxy = $this->loaders->preloadingProxy($loader);
+        $cachingProxy = $this->loaders->cachingProxy($preloadingProxy);
+        
+        $this->mappers->preload()->map(
+            $preloadingProxy,
+            $preloadRepository->modelName(),
+            $preloadProperty->preload(),
+            $preloadStep,
+            $plan
+        );
+        
+        return $this->relationship->preloader($side, $cachingProxy);
     }
     
     protected function getIdField($repository)

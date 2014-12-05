@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader;
 
-class Items extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple\IdMap
+class Items extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple\IdMap
 {
     protected function mapItems()
     {

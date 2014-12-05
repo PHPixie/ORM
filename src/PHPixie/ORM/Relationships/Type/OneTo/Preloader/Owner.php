@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Preloader;
 
-abstract class Owner extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Single
+abstract class Owner extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Single
 {
     protected $ownerKey;
     

@@ -119,6 +119,30 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
         return $group;
     }
 
+    
+    protected function preloadPropertyValue($preloadAt = 0)
+    {
+        $property = $this->getPreloadPropertyValue();
+        $preload = $this->getPreloadValue();
+        
+        $this->method($property, 'preload', $preload, array(), $preloadAt);
+        
+        return array(
+            'property' => $property,
+            'preload'  => $preload,
+        );
+    }
+    
+    protected function getPreloadPropertyValue()
+    {
+        return $this->quickMock('\PHPixie\ORM\Values\Preload\Property');
+    }
+    
+    protected function getPreloadValue()
+    {
+        return $this->quickMock('\PHPixie\ORM\Values\Preload');
+    }
+    
     protected function getReusableResult()
     {
         return $this->abstractMock('\PHPixie\ORM\Steps\Result\Reusable');
@@ -132,6 +156,11 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
     protected function getReusableResultLoader()
     {
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\ReusableResult');
+    }
+    
+    protected function getLoaderProxy($type)
+    {
+        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Proxy\\'.ucfirst($type));
     }
     
     protected function getPlan()

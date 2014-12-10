@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship\Preloader\Result;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation\Preloader\Result;
 
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Single
  */
-abstract class singleTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\ResultTest
+abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Preloader\ResultTest
 {
     protected $map = array(
         1 => 5,
@@ -17,27 +17,17 @@ abstract class singleTest extends \PHPixieTests\ORM\Relationships\Relationship\P
     public function setUp()
     {
         for($i=1; $i<5; $i++)
-            $this->models[$i] = $this->getModel();
+            $this->entities[$i] = $this->getEntity();
         
         for($i=5; $i<9; $i++)
-            $this->preloadedModels[$i] = $this->getModel();
+            $this->preloadedEntities[$i] = $this->getEntity();
         
         parent::setUp();
     }
     
-    /**
-     * @covers ::loadFor
-     * @covers ::<protected>
-     */
-    public function testLoadFor()
+    protected function getExpectedValue($id)
     {
-        $this->prepareMap();
-        $this->prepareLoader();
-        foreach($this->models as $modelId => $model) {
-            $id = $this->map[$modelId];
-            $preloaded = $this->preloadedModels[$id];
-            
-            $this->assertEquals($preloaded, $this->preloader->valueFor($model));
-        }
+        $id = $this->map[$id];
+        return $this->preloadedEntities[$id];
     }
 }

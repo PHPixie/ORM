@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Preloader
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader
  */
 abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
 {
@@ -18,7 +18,7 @@ abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
     
     /**
      * @covers ::__construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Preloader::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader::__construct
      * @covers ::<protected>
      */
     public function testConstruct()
@@ -35,10 +35,11 @@ abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
         $this->assertEquals($this->loader, $this->preloader->loader());
     }
     
-    protected function property($model, $expectedValue)
+    
+    protected function property($entity, $expectedValue)
     {
         $property = $this->getProperty();
-        $this->method($property, 'model', $model, array());
+        $this->method($property, 'entity', $entity, array());
         $property
             ->expects($this->once())
             ->method('setValue')
@@ -46,12 +47,8 @@ abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
         return $property;
     }
     
-    protected function getProperty()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Model');
-    }
-    
-    abstract protected function getModel();
+    abstract protected function getProperty();
+    abstract protected function getEntity();
     abstract protected function loader();
     abstract protected function preloader();
     

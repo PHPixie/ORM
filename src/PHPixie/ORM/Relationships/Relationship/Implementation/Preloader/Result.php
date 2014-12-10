@@ -14,7 +14,7 @@ abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Implementa
         $this->side = $side;
     }
 
-    public function getModel($id)
+    public function getEntity($id)
     {
         $this->ensureMapped();
         return $this->loader->getByOffset($this->idOffsets[$id]);
@@ -23,8 +23,8 @@ abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Implementa
     public function loadProperty($property)
     {
         $this->ensureMapped();
-        $model = $property->model();
-        $property->setValue($this->getMappedFor($model));
+        $entity = $property->entity();
+        $property->setValue($this->getMappedFor($entity));
     }
 
     protected function ensureMapped()
@@ -39,13 +39,12 @@ abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Implementa
 
     protected function mapIdOffsets()
     {
-        $idField = $this->loader->repository()->idField();
-        $ids = $this->loader->reusableResult()->getField($idField);
-        foreach ($ids as $offset => $id) {
-            $this->idOffsets[$id] = $offset;
-        }
+        $repository = $this->loader->repository();
+        $idField = $repository->config()->idField;
+        
+        $this->idOffsets = array_flip($this->loader->reusableResult()->getField($idField));
     }
 
     abstract protected function mapItems();
-    abstract protected function getMappedFor($model);
+    abstract protected function getMappedFor($entity);
 }

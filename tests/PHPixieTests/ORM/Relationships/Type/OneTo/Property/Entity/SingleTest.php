@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Type\OneTo\Property\Model;
+namespace PHPixieTests\ORM\Relationships\Type\OneTo\Property\Entity;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Property\Model\Single
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity\Single
  */
-abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\ModelTest
+abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\EntityTest
 {
     /**
      * @covers ::set
@@ -55,10 +55,10 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Pro
 
         $this->prepareLoad();
         $this->method($this->value, 'isDeleted', false, array(), 0);
-        $this->method($this->value, 'asObject', $data, array(true), 1);
+        $this->method($this->value, 'asData', $data, array(true), 1);
         $this->assertSame($data, $this->property->asData());
 
-        $this->method($this->value, 'asObject', $data, array(false), 1);
+        $this->method($this->value, 'asData', $data, array(false), 1);
         $this->assertSame($data, $this->property->asData(false));
     }
 
@@ -71,7 +71,7 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Pro
 
     protected function getValue()
     {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database\Model');
+        return $this->getEntity();
     }
 
     abstract protected function prepareLinkPlan($value);

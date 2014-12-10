@@ -3,9 +3,9 @@
 namespace PHPixieTests\ORM\Relationships\Type\OneTo\Property;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Property\Model
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity
  */
-abstract class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\ModelTest
+abstract class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Property\EntityTest
 {
     protected $config;
     
@@ -22,7 +22,7 @@ abstract class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
     public function testQuery()
     {
         $query = $this->getQuery();
-        $this->method($this->handler, 'query', $query, array($this->side, $this->model), 0);
+        $this->method($this->handler, 'query', $query, array($this->side, $this->entity), 0);
         $this->assertEquals($query, $this->property->query());
     }
     
@@ -31,7 +31,7 @@ abstract class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
         if($value === null)
             $value = $this->value();
         $this->value = $value;
-        $this->method($this->handler, 'loadProperty', $this->value, array($this->side, $this->model), 0);
+        $this->method($this->handler, 'loadProperty', $this->value, array($this->side, $this->entity), 0);
     }
     
     protected function value()
@@ -46,6 +46,11 @@ abstract class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
 
     protected function getQuery()
     {
-        return $this->quickMock('\PHPixie\ORM\Query');
+        return $this->quickMock('\PHPixie\ORM\Models\Type\Database\Query');
+    }
+    
+    protected function getEntity()
+    {
+        return $this->quickMock('\PHPixie\ORM\Models\Type\Database\Entity');
     }
 }

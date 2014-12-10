@@ -36,9 +36,9 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
     }
 
     
-    protected function processProperty($type, $config, $model, $action, $value = null, $unsetRelated = true)
+    protected function processProperty($type, $config, $entity, $action, $value = null, $unsetRelated = true)
     {
-        if($model instanceof \PHPixie\ORM\Query)
+        if($entity instanceof \PHPixie\ORM\Models\Type\Database\Query)
             return;
         
         if($type === 'owner') {
@@ -49,15 +49,14 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
             $opposing = 'owner';
         }
         
-        $property = $model->relationshipProperty($propertyName);
+        $property = $entity->getRelationshipProperty($propertyName);
         
         if($unsetRelated) {
-            
             if($property->isLoaded() && $property->value() !== null) {
                 $this->processProperty($opposing, $config, $property->value(), 'set', null, false);
             }
         }
-        if($action === 'set' && $value instanceof \PHPixie\ORM\Query)
+        if($action === 'set' && $value instanceof \PHPixie\ORM\Models\Type\Database\Query)
             $action = 'reset';
         
         if($action === 'reset') {
@@ -67,9 +66,9 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
         }
     }
     
-    public function unlinkProperties($side, $model)
+    public function unlinkProperties($side, $entity)
     {
-        $this->processProperty($side->type(), $side->config(), $model, 'set', null);
+        $this->processProperty($side->type(), $side->config(), $entity, 'set', null);
     }
     
     public function resetProperties($side, $items)

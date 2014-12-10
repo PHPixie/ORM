@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Preloader;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\Items
  */
-class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\Multiple\IdMapTest
+class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple\IdMapTest
 {
     protected $configData = array(
         'ownerModel'     => 'fairy',
@@ -17,14 +17,14 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\R
     
     protected function prepareMap()
     {
-        foreach($this->models as $id => $model) {
+        foreach($this->entities as $id => $model) {
             $this->method($model, 'id', $id, array());
         }
         
         $ownerKey = $this->configData['ownerKey'];
         
         $fields = array();
-        foreach(array_keys($this->preloadedModels) as $id) {
+        foreach(array_keys($this->preloadedEntities) as $id) {
             foreach($this->map as $ownerId => $ids) {
                 if(in_array($id, $ids)) {
                     $fields[]=array(
@@ -35,22 +35,28 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\R
             }
         }
     
-        $repository = $this->getRepository();
+        $repository = $this->repository(array('idField' => 'id'));
         $this->method($this->loader, 'repository', $repository, array(), 0);
-        $this->method($repository, 'idField', 'id', array(), 0);
-        $loaderResult = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
-        $this->method($this->loader, 'reusableResult', $loaderResult, array(), 1);
-        $this->method($loaderResult, 'getFields', $fields, array(array('id', $ownerKey)), 0);
+        
+        $result = $this->getReusableResult();
+        $this->method($this->loader, 'reusableResult', $result, array(), 1);
+        $this->method($result, 'getFields', $fields, array(array('id', $ownerKey)), 0);
+    }
+    
+    
+    protected function getProperty()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Entity\Items');
     }
     
     protected function relationship()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneToOne');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneToMany');
     }
     
     protected function loader()
     {
-        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\Database\ReusableResult');
+        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\ReusableResult');
     }
     
     protected function getSide()

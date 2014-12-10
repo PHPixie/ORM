@@ -5,28 +5,28 @@ namespace PHPixie\ORM\Loaders\Loader\Repository;
 class ReusableResult extends \PHPixie\ORM\Loaders\Loader\Repository
 {
     protected $repository;
-    protected $reusableResultStep;
+    protected $reusableResult;
 
-    public function __construct($loaders, $repository, $reusableResultStep)
+    public function __construct($loaders, $repository, $reusableResult)
     {
         parent::__construct($loaders, $repository);
-        $this->reusableResultStep = $reusableResultStep;
+        $this->reusableResultStep = $reusableResult;
     }
 
     public function offsetExists($offset)
     {
-        return $this->reusableResultStep->offsetExists($offset);
+        return $this->reusableResult->offsetExists($offset);
     }
 
     public function getByOffset($offset)
     {
-        $data = $this->reusableResultStep->getByOffset($offset);
+        $data = $this->reusableResult->getByOffset($offset);
         return $this->loadModel($data);
     }
 
-    public function reusableResultStep()
+    public function reusableResult()
     {
-        return $this->reusableResultStep;
+        return $this->reusableResult;
     }
 
 }

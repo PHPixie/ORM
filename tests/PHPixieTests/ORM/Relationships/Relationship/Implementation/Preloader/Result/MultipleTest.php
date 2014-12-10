@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship\Preloader\Result;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation\Preloader\Result;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple
  */
-abstract class MultipleTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\ResultTest
+abstract class MultipleTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Preloader\ResultTest
 {
     protected function prepareMultiplePreloader($ids)
     {

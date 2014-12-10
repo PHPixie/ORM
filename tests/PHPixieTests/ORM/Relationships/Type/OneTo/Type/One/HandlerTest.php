@@ -19,7 +19,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     {
         foreach(array('owner', 'item') as $type) {
             $side = $this->side($type, $this->configData);
-            $related = $this->getDatabaseModel();
+            $related = $this->getDatabaseEntity();
             $value = $this->prepareLoadSingleProperty($side, $related);
             $this->assertSame($value, $this->handler->loadProperty($side, $related));
         }
@@ -31,8 +31,8 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
      */
     public function testLinkPlan()
     {   
-        $owner = $this->getDatabaseModel();
-        $items = $this->getDatabaseModel();
+        $owner = $this->getDatabaseEntity();
+        $items = $this->getDatabaseEntity();
         $this->prepareRepositories();
         
         $plan = $this->prepareUnlinkTest(true, $owner, true, $items, 'or');
@@ -48,7 +48,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     public function testUnlinkPlan()
     {   
         foreach(array('owner', 'item') as $type) {
-            $items = $this->getDatabaseModel();
+            $items = $this->getDatabaseEntity();
             $this->prepareRepositories();
             if($type === 'owner'){
                 $plan = $this->prepareUnlinkTest(true, $items, false, null);
@@ -114,13 +114,13 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
                 $related = null;
                 if(${$side.'Loaded'}){
                     if(!${$side.'ValueNull'}) {
-                        $related = $this->getProperty($opposing);
+                        $related = $this->getSideEntity($opposing);
                         $this->expectSetValue($related, null);
                     }
                 }
                 
-                $mocks[$side] = $this->getProperty($side, true, ${$side.'Loaded'}, $related);
-                $params[$side] = $mocks[$side]['model'];    
+                $mocks[$side] = $this->getSideEntity($side, true, ${$side.'Loaded'}, $related);
+                $params[$side] = $mocks[$side]['entity'];    
             }else{
                 $params[$side] = $this->getQuery();
             }
@@ -142,46 +142,45 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     {
         $related = null;
         if($isLoaded) {
-            $related = $this->getProperty($this->opposing($type), true, $relatedIsLoaded);
+            $related = $this->getSideEntity($this->opposing($type), true, $relatedIsLoaded);
             if($relatedIsLoaded)
                 $this->expectSetValue($related, null);
         }
-        $mock = $this->getProperty($type, true, $isLoaded, $related);
+        $mock = $this->getSideEntity($type, true, true, $isLoaded, $related);
         $side = $this->side($this->opposing($type), $this->configData);
-        $this->handler->unlinkProperties($side, $mock['model']);
+        $this->handler->unlinkProperties($side, $mock['entity']);
     }
     
     protected function resetPropertiesTest($type)
     {
         $side = $this->side($this->opposing($type), $this->configData);
         
-        $mock = $this->getProperty($type);
+        $mock = $this->getSideEntity($type, true);
         $this->expectsExactly($mock['property'], 'reset', 1);
-        $this->handler->resetProperties($side, $mock['model']);
+        $this->handler->resetProperties($side, $mock['entity']);
         
-        $related = $this->getProperty($this->opposing($type));
+        $related = $this->getSideEntity($this->opposing($type));
         $items = array(
-            $this->getProperty($type),
-            $this->getProperty($type, true),
-            $this->getProperty($type, true, true, null),
-            $this->getProperty($type, true, true, $related),
+            $this->getSideEntity($type, true),
+            $this->getSideEntity($type, true, true),
+            $this->getSideEntity($type, true, true, true, null),
+            $this->getSideEntity($type, true, true, true, $related),
         );
 
-        $models = array();
+        $entities = array();
         foreach($items as $item){
             $this->expectsExactly($item['property'], 'reset', 1);
-            $models[]=$item['model'];
+            $entities[]=$item['entity'];
         }
         
         $this->expectSetValue($related, null);
         
-        $this->handler->resetProperties($side, $models);
+        $this->handler->resetProperties($side, $entities);
     }
     
-    protected function getProperty($side, $hasProperty = true, $ownerLoaded = false, $value = null) {
-        $property = $side === 'owner' ? 'item' : 'owner';
-        $model = $this->getDatabaseModel();
-        return $this->addSingleProperty($model, $side, $hasProperty, $ownerLoaded, $value['model']);
+    protected function getSideEntity($type, $expectCreateMissing = true, $hasProperty = true, $valueLoaded = false, $value = null) {
+        $entity = $this->getDatabaseEntity();
+        return $this->addSingleProperty($entity, $this->opposing($type), $hasProperty, $valueLoaded, $value['entity'], $expectCreateMissing);
     }
     
     protected function opposing($type)
@@ -191,13 +190,15 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     
     protected function getSingleProperty($type)
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\One\Property\Model');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\One\Property\Entity\\'.ucfirst($type));
     }
-    
+
     protected function getPreloader($type)
     {
-    
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\One\Preloader');
+        if($type !== 'owner')
+            $type = 'items';
+
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\One\Preloader\\'.ucfirst($type));
     }
 
     protected function getConfig()
@@ -212,21 +213,19 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
 
     protected function getRelationship()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneToMany');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneToOne');
     }
 
     protected function getHandler()
     {
         return new \PHPixie\ORM\Relationships\Type\OneTo\Type\One\Handler(
-            $this->ormBuilder,
             $this->repositories,
             $this->planners,
             $this->plans,
             $this->steps,
             $this->loaders,
-            $this->relationship,
-            $this->groupMapper,
-            $this->cascadeMapper
+            $this->mappers,
+            $this->relationship
         );
     }
 }

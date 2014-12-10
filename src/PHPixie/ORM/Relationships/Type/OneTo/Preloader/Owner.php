@@ -9,11 +9,10 @@ abstract class Owner extends \PHPixie\ORM\Relationships\Relationship\Implementat
     protected function mapItems()
     {
         $this->ownerKey = $this->side->config()->ownerKey;
-        $idField = $this->loader->repository()->idField();
-        $this->idOffsets = array_flip($this->loader->reusableResult()->getField($idField));
+        $this->mapIdOffsets();
     }
 
-    public function getMappedIdFor($model)
+    protected function getMappedIdFor($model)
     {
         return $model->getField($this->ownerKey);
     }

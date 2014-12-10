@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Property
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Property
  */
 abstract class PropertyTest extends \PHPixieTests\AbstractORMTest
 {
@@ -26,10 +26,6 @@ abstract class PropertyTest extends \PHPixieTests\AbstractORMTest
     public function testConstruct()
     {
 
-    }
-
-    protected function getModel(){
-        return $this->abstractMock('\PHPixie\ORM\Model');
     }
 
     protected abstract function property();

@@ -1,26 +1,26 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship\Property\Entity;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation\Property;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Property\Entity\Implementation
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Property\Entity\Implementation
  */
-abstract class ImplementationTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\ImplementationTest
+abstract class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\PropertyTest
 {
-    protected $model;
+    protected $entity;
     protected $side;
     protected $value;
 
     public function setUp()
     {
-        $this->model = $this->getModel();
+        $this->entity = $this->getEntity();
         parent::setUp();
     }
 
     /**
      * @covers ::__construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Property\Model::__construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Property::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Property\Entity::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Property::__construct
      * @covers ::<protected>
      */
     public function testConstruct()
@@ -29,12 +29,12 @@ abstract class ImplementationTest extends \PHPixieTests\ORM\Relationships\Relati
     }
 
     /**
-     * @covers ::model
+     * @covers ::entity
      * @covers ::<protected>
      */
-    public function testModel()
+    public function testEntity()
     {
-        $this->assertEquals($this->model, $this->property->model());
+        $this->assertEquals($this->entity, $this->property->entity());
     }
 
     /**
@@ -84,5 +84,6 @@ abstract class ImplementationTest extends \PHPixieTests\ORM\Relationships\Relati
     abstract protected function getValue();
     abstract protected function value();
     abstract protected function prepareLoad();
+    abstract protected function getEntity();
 
 }

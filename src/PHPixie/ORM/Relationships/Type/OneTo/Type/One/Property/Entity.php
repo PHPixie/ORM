@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Type\One\Property;
 
-class Model extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Model\Single
+class Entity extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity\Single
 {
 
     protected function load()

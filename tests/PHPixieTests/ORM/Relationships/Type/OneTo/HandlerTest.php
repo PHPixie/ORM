@@ -112,7 +112,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $this->handler->mapQuery($query, $side, $group, $plan);
         }
     }
-
+    
     /**
      * @covers ::mapPreload
      * @covers ::<protected>
@@ -121,14 +121,15 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     {
         $repositories = $this->prepareRepositories();
 
-        foreach(array($this->itemSide) as $type) {
+        foreach(array('owner', $this->itemSide) as $type) {
             $side = $this->side($type, $this->configData);
             $query = $this->getDatabaseQuery();
             $preloadProperty = $this->preloadPropertyValue();
+            $result = $this->getReusableResult();
             $plan = $this->getPlan();
-            
 
-            $preloadRepository = $repositories[$type == 'owner' ? 'owner' : 'item'];
+            $normalizedType = $type == 'owner' ? 'owner' : 'item';
+            $preloadRepository = $repositories[$normalizedType];
             $this->prepareRepositoryConfig($repositories['owner'], array('idField' =>'id'));
             
             if ($type === 'owner') {
@@ -142,12 +143,10 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $query = $this->getDatabaseQuery();
 
             $preloadRepoOffset = $type == 'owner' ? 1 : 0;
-            $this->method($preloadRepository, 'databaseSelectQuery', $query, array(), $preloadRepoOffset);
+            $this->method($preloadRepository, 'databaseSelectQuery', $query, array(), $preloadRepoOffset++);
 
             $inPlanner = $this->getPlanner('in');
             $this->method($this->planners, 'in', $inPlanner, array(), 0);
-
-            $result = $this->getReusableResult();
 
             $this->method($inPlanner, 'result', null, array(
                 $query,
@@ -170,9 +169,11 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $cachingProxy = $this->getLoaderProxy('caching');
             $this->method($this->loaders, 'cachingProxy', $cachingProxy, array($preloadingProxy), 2);
             
+            $this->method($preloadRepository, 'modelName', $this->configData[$normalizedType.'Model'], array(), $preloadRepoOffset);
+                        
             $this->method($this->mapperMocks['preload'], 'map', null, array(
                 $preloadingProxy,
-                $preloadRepository->modelName(),
+                $this->configData[$normalizedType.'Model'],
                 $preloadProperty['preload'],
                 $preloadStep,
                 $plan
@@ -180,7 +181,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             
             $preloader = $this->getPreloader($type);
             $this->method($this->relationship, 'preloader', $preloader, array($side, $cachingProxy), 0);
-
+            
             $this->assertEquals($preloader, $this->handler->mapPreload(
                 $side,
                 $preloadProperty['property'],

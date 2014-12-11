@@ -9,7 +9,6 @@ abstract class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\I
 {
     protected $entity;
     protected $side;
-    protected $value;
 
     public function setUp()
     {
@@ -38,39 +37,40 @@ abstract class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     }
 
     /**
-     * @covers ::value
-     * @covers ::reset
-     * @covers ::reload
-     * @covers ::setValue
-     * @covers ::isLoaded
-     * @covers ::__invoke
-     * @covers ::<protected>
-     */
-     public function testValue()
-     {
+    * @covers ::value
+    * @covers ::reset
+    * @covers ::reload
+    * @covers ::setValue
+    * @covers ::isLoaded
+    * @covers ::__invoke
+    * @covers ::<protected>
+    */
+    public function testValue()
+    {
         $property = $this->property;
-        $this->assertLoaded(false);
-        $this->prepareLoad();
-        $this->assertEquals($this->value, $property->value());
-        $this->assertEquals($this->value, $property());
-        $this->assertLoaded(true, $this->value);
-        $property->reset();
-
-        $this->assertLoaded(false);
-        $this->prepareLoad();
-        $this->assertEquals($this->value, $property());
-        $this->assertLoaded(true, $this->value);
-        $property->reset();
-
-        $this->assertLoaded(false);
         $value = $this->getValue();
+        
+        $this->assertLoaded(false);
+        $this->prepareLoad($value);
+        $this->assertEquals($value, $property->value());
+        $this->assertEquals($value, $property());
+        $this->assertLoaded(true, $value);
+        $property->reset();
+
+        $this->assertLoaded(false);
+        $this->prepareLoad($value);
+        $this->assertEquals($value, $property());
+        $this->assertLoaded(true, $value);
+        $property->reset();
+
+        $this->assertLoaded(false);
         $this->property->setValue($value);
         $this->assertLoaded(true, $value);
         $this->assertEquals($value, $property());
 
-        $this->prepareLoad();
-        $this->assertEquals($this->value, $property->reload());
-        $this->assertLoaded(true, $this->value);
+        $this->prepareLoad($value);
+        $this->assertEquals($value, $property->reload());
+        $this->assertLoaded(true, $value);
         $property->reset();
     }
 
@@ -82,8 +82,7 @@ abstract class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     }
 
     abstract protected function getValue();
-    abstract protected function value();
-    abstract protected function prepareLoad();
+    abstract protected function prepareLoad($value);
     abstract protected function getEntity();
 
 }

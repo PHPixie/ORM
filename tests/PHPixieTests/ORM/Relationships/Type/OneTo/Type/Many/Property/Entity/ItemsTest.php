@@ -1,23 +1,29 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
+namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Property\Entity;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model\Items
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Entity\Items
  */
-class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\ModelTest
+class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\EntityTest
 {
+    
+    protected function prepareLoad($value)
+    {
+        $this->method($this->handler, 'loadItemsProperty', $value, array($this->side, $this->entity), 0);
+    }
+    
     /**
      * @covers ::add
      * @covers ::<protected>
      */
     public function testAdd()
     {
-        $item = $this->getModel();
+        $item = $this->getEntity();
         $plan = $this->getPlan();
-        $this->method($this->handler, 'linkPlan', $plan, array($this->config, $this->model, $item), 0);
+        $this->method($this->handler, 'linkPlan', $plan, array($this->config, $this->entity, $item), 0);
         $this->method($plan, 'execute', null, array(), 0);
-        $this->method($this->handler, 'setItemsOwner', null, array($this->config, $this->model, $item), 1);
+        $this->method($this->handler, 'addOwnerItems', null, array($this->config, $this->entity, $item), 1);
         $this->assertSame($this->property, $this->property->add($item));
     }
     
@@ -27,11 +33,11 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Mode
      */
     public function testRemove()
     {
-        $item = $this->getModel();
+        $item = $this->getEntity();
         $plan = $this->getPlan();
-        $this->method($this->handler, 'unlinkPlan', $plan, array($this->config, $this->model, $item), 0);
+        $this->method($this->handler, 'unlinkPlan', $plan, array($this->config, $this->entity, $item), 0);
         $this->method($plan, 'execute', null, array(), 0);
-        $this->method($this->handler, 'removeOwnerItems', null, array($this->config, $this->model, $item), 1);
+        $this->method($this->handler, 'removeOwnerItems', null, array($this->config, $this->entity, $item), 1);
         $this->assertSame($this->property, $this->property->remove($item));
     }
     
@@ -42,9 +48,9 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Mode
     public function testRemoveAll()
     {
         $plan = $this->getPlan();
-        $this->method($this->handler, 'unlinkOwnersPlan', $plan, array($this->config, $this->model), 0);
+        $this->method($this->handler, 'unlinkOwnersPlan', $plan, array($this->config, $this->entity), 0);
         $this->method($plan, 'execute', null, array(), 0);
-        $this->method($this->handler, 'removeAllOwnerItems', null, array($this->config, $this->model), 1);
+        $this->method($this->handler, 'removeAllOwnerItems', null, array($this->config, $this->entity), 1);
         $this->assertSame($this->property, $this->property->removeAll());
     }
     
@@ -56,19 +62,19 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Mode
     {
         $this->prepareLoad(new \ArrayObject);
         for($i=0;$i<3;$i++){
-            $model = $this->quickMock('stdClass', array('asObject'));
-            $this->value[]=$model;
-            $this->method($model, 'asObject', $i, array(true), 0);
-            $this->method($model, 'asObject', $i, array(false), 1);
+            $entity = $this->getEntity();
+            $this->value[]=$entity;
+            $this->method($entity, 'asObject', $i, array(false), 0);
+            $this->method($entity, 'asObject', $i, array(true), 1);
         }
         
         $this->assertEquals(array(0, 1, 2), $this->property->asData());
-        $this->assertEquals(array(0, 1, 2), $this->property->asData(false));
+        $this->assertEquals(array(0, 1, 2), $this->property->asData(true));
     }
     
     protected function property()
     {
-        return new \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model\Items($this->handler, $this->side, $this->model);
+        return new \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Entity\Items($this->handler, $this->side, $this->entity);
     }
     
     protected function getValue()

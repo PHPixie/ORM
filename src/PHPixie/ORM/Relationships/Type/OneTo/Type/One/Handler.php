@@ -6,7 +6,17 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
 {
     public function loadProperty($side, $related)
     {
-        return parent::loadSingleProperty($side, $related);
+        $value = parent::loadSingleProperty($side, $related);
+        
+        if($value === null) {
+            $this->unlinkProperties($side, $related);
+            
+        }elseif($side->type() === 'owner') {
+            $this->linkProperties($side->config, $value, $related);
+            
+        }else{
+            $this->linkProperties($side->config, $value, $related);
+        }
     }
     
     public function linkPlan($config, $owner, $item)

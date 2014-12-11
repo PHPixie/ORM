@@ -18,11 +18,10 @@ abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Ent
     public function asData($recursive = false)
     {
         $value = $this->value();
-        
-        if ($value === null || $value->isDeleted())
+        if ($value === null)
             return null;
         
-        return $value->asData($recursive);
+        return $value->asObject($recursive);
     }
 
     public function set($value)

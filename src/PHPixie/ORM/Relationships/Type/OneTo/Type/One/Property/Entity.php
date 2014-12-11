@@ -7,7 +7,7 @@ class Entity extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity\Singl
 
     protected function load()
     {
-        return $this->handler->loadProperty($this->side, $this->model);
+        $value = $this->handler->loadProperty($this->side, $this->entity);
     }
 
     protected function linkPlan($value)
@@ -26,19 +26,19 @@ class Entity extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity\Singl
 
     protected function unlinkPlan()
     {
-        return $this->handler->unlinkPlan($this->side, $this->model);
+        return $this->handler->unlinkPlan($this->side, $this->entity);
     }
 
     protected function unsetProperties()
     {
-        $this->handler->unlinkProperties($this->side, $this->model);
+        $this->handler->unlinkProperties($this->side, $this->entity);
     }
 
     protected function getSides($opposing)
     {
         if ($this->side->type() === 'item')
-            return array($this->model, $opposing);
+            return array($this->entity, $opposing);
 
-        return array($opposing, $this->model);
+        return array($opposing, $this->entity);
     }
 }

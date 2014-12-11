@@ -5,14 +5,14 @@ namespace PHPixie\ORM\Relationships\Relationship\Implementation\Property;
 abstract class Entity extends \PHPixie\ORM\Relationships\Relationship\Implementation\Property
                               implements \PHPixie\ORM\Relationships\Relationship\Property\Entity
 {
-    protected $model;
+    protected $entity;
     protected $value;
     protected $isLoaded = false;
 
-    public function __construct($handler, $side, $model)
+    public function __construct($handler, $side, $entity)
     {
         parent::__construct($handler, $side);
-        $this->model = $model;
+        $this->entity = $entity;
     }
 
     public function __invoke()
@@ -22,8 +22,7 @@ abstract class Entity extends \PHPixie\ORM\Relationships\Relationship\Implementa
 
     public function reload()
     {
-        $this->isLoaded = true;
-        $this->value = $this->load();
+        $this->load();
         return $this->value;
     }
 
@@ -35,7 +34,7 @@ abstract class Entity extends \PHPixie\ORM\Relationships\Relationship\Implementa
 
     public function entity()
     {
-        return $this->model;
+        return $this->entity;
     }
 
     public function value()

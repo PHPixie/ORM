@@ -7,6 +7,17 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
  */
 class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Entity\SingleTest
 {
+    
+    protected function prepareLoad($value)
+    {
+        $property = $this->property;
+        
+        $this->method($this->handler, 'loadOwnerProperty', function() use($property, $value) {
+            $property->setValue($value);
+            return $value;
+        }, array($this->side, $this->entity), 0);
+    }
+    
     protected function prepareLinkPlan($owner)
     {
         $plan = $this->getPlan();
@@ -16,6 +27,7 @@ class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Enti
     
     protected function prepareSetProperties($owner)
     {
+        $plan = $this->getPlan();
         $this->method($this->handler, 'addOwnerItems', null, array($this->config, $owner, $this->entity), 1);
     }
     

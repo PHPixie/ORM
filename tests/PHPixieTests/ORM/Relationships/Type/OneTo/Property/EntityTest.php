@@ -8,6 +8,7 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Property;
 abstract class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Property\EntityTest
 {
     protected $config;
+    protected $loadPropertyMethod;
     
     public function setUp()
     {
@@ -26,19 +27,6 @@ abstract class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\I
         $this->assertEquals($query, $this->property->query());
     }
     
-    protected function prepareLoad($value = null)
-    {
-        if($value === null)
-            $value = $this->value();
-        $this->value = $value;
-        $this->method($this->handler, 'loadProperty', $this->value, array($this->side, $this->entity), 0);
-    }
-    
-    protected function value()
-    {
-        return $this->getValue();
-    }
-    
     protected function getPlan()
     {
         return $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
@@ -53,4 +41,5 @@ abstract class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     {
         return $this->quickMock('\PHPixie\ORM\Models\Type\Database\Entity');
     }
+    
 }

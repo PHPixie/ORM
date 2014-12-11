@@ -19,7 +19,6 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Pro
     protected function setTest()
     {
         $value = $this->getValue();
-        $this->method($value, 'isDeleted', false, array(), 0);
         $plan = $this->prepareLinkPlan($value);
 
         $this->method($plan, 'execute', null, array(), 0);
@@ -30,7 +29,7 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Pro
         $this->prepareRemove();
         $this->property->set(null);
 
-        $this->method($value, 'isDeleted', true, array(), 0);
+        $value = $this->getValue(true);
         $this->prepareRemove();
         $this->property->set($value);
     }
@@ -52,14 +51,14 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Pro
     public function testAsData()
     {
         $data = new \stdClass;
-
-        $this->prepareLoad();
-        $this->method($this->value, 'isDeleted', false, array(), 0);
-        $this->method($this->value, 'asData', $data, array(true), 1);
+        $value = $this->getValue();
+        
+        $this->prepareLoad($value);
+        $this->method($value, 'asObject', $data, array(false), 1);
         $this->assertSame($data, $this->property->asData());
 
-        $this->method($this->value, 'asData', $data, array(false), 1);
-        $this->assertSame($data, $this->property->asData(false));
+        $this->method($value, 'asObject', $data, array(true), 1);
+        $this->assertSame($data, $this->property->asData(true));
     }
 
     protected function prepareRemove()
@@ -69,9 +68,11 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Pro
         $this->prepareUnsetProperties();
     }
 
-    protected function getValue()
+    protected function getValue($isDeleted = false)
     {
-        return $this->getEntity();
+        $value = $this->getEntity();
+        $this->method($value, 'isDeleted', $isDeleted, array());
+        return $value;
     }
 
     abstract protected function prepareLinkPlan($value);

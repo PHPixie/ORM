@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Property;
 
-abstract class Query extends \PHPixie\ORM\Relationships\Relationship\Property\Query
+abstract class Query extends \PHPixie\ORM\Relationships\Relationship\Implementation\Property\Query
 {
     protected $handler;
 

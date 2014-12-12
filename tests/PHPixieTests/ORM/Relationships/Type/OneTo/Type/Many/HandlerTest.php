@@ -11,34 +11,17 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     protected $ownerPropertyName = 'ownerItemsProperty';
     protected $configOnwerProperty = 'flowers';
 
-    /**
+    
+   /**
      * @covers ::loadOwnerProperty
      * @covers ::<protected>
      */
     public function testLoadOwnerProperty()
     {
-        $side = $this->side('owner', $this->configData);
-        $related = $this->getDatabaseEntity();
-        $owner = $this->prepareLoadSingleProperty($side, $related);
-        $this->assertSame($owner, $this->handler->loadOwnerProperty($side, $related));
+        $this->loadOwnerPropertyTest(true);
+        $this->loadOwnerPropertyTest(false);
     }
-
-    /**
-     * @covers ::loadItemsProperty
-     * @covers ::<protected>
-     *
-    public function testLoadItemsProperty()
-    {
-        $side = $this->side('item', $this->configData);
-        $related = $this->getDatabaseEntity();
-        $loader = $this->quickMock();
-        $query = $this->getQuery();
-
-        $this->prepareQuery($side, $query, $related);
-        $this->method($query, 'findOne', $model, array());
-        $this->assertSame($owner, $this->handler->loadOwnerProperty($side, $related));
-    }
-
+    
     /**
      * @covers ::unlinkPlan
      * @covers ::<protected>
@@ -144,7 +127,26 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         $this->removeAllOwnerItemsTest(false);
         $this->removeAllOwnerItemsTest(true);
     }
+    
+    protected function loadOwnerPropertyTest($isNull = false)
+    {
+        $side = $this->side('owner', $this->configData);
+        $item = $this->getItem(true);
+        
+        if($isNull) {
+            $this->prepareLoadSingleProperty($side, $item['entity'], null);
+            $this->expectSetValue($item, null);
+            
+        }else {
+            $owner  = $this->getOwner(false);
+            $this->prepareLoadSingleProperty($side, $item['entity'], $owner['entity']);
 
+            $this->expectSetValue($item, $owner);
+        }
+        
+        $this->handler->loadOwnerProperty($side, $item['entity']);
+    }
+    
     protected function removeAllOwnerItemsTest($hasLoadedProperty = false)
     {
         $owner = $this->getOwner(true, $hasLoadedProperty);

@@ -10,7 +10,7 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Enti
     
     protected function prepareLoad($value)
     {
-        $this->method($this->handler, 'loadItemsProperty', $value, array($this->side, $this->entity), 0);
+        $this->method($this->handler, 'loadItemsProperty', $this->setValueCallback($value), array($this->side, $this->entity), 0);
     }
     
     /**
@@ -60,16 +60,23 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Enti
      */
     public function testAsData()
     {
-        $this->prepareLoad(new \ArrayObject);
+        $value = new \ArrayObject;
+        $this->prepareLoad($value);
         for($i=0;$i<3;$i++){
             $entity = $this->getEntity();
-            $this->value[]=$entity;
-            $this->method($entity, 'asObject', $i, array(false), 0);
-            $this->method($entity, 'asObject', $i, array(true), 1);
+            if($i != 1) {
+                $this->method($entity, 'isDeleted', false, array());
+                $value[]=$entity;
+                $this->method($entity, 'asObject', $i, array(false), 1);
+                $this->method($entity, 'asObject', $i, array(true), 3);
+                
+            }else{
+                $this->method($entity, 'isDeleted', true, array());
+            }
         }
         
-        $this->assertEquals(array(0, 1, 2), $this->property->asData());
-        $this->assertEquals(array(0, 1, 2), $this->property->asData(true));
+        $this->assertEquals(array(0, 2), $this->property->asData());
+        $this->assertEquals(array(0, 2), $this->property->asData(true));
     }
     
     protected function property()

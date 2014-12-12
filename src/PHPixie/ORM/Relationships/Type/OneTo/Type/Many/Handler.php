@@ -4,15 +4,21 @@ namespace PHPixie\ORM\Relationships\Type\OneTo\Type\Many;
 
 class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
 {
-    public function loadOwnerProperty($side, $related)
+    public function loadOwnerProperty($side, $item)
     {
-        return parent::loadSingleProperty($side, $related);
+        $owner = parent::loadSingleProperty($side, $item);
+        if($owner === null) {
+            $this->removeItemOwner($side->config(), $item);
+            
+        }else {
+            $this->addOwnerItems($side->config(), $owner, $item);
+        }
     }
     
     public function loadItemsProperty($side, $related)
     {
         $loader = $this->query($side, $related)->findAll();
-        $loader = $this->ensurePreloadingLoader($loader);
+        
         $preloader = $this->relationshipType->ownerPropertyPrloader($loader, $related);
         $loader->addPreloader($side->config()->itemProperty, $preloader);
         return $this->loaders->editable($loader);

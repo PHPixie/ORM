@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Property;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Property\Query
  */
-abstract class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\QueryTest
+abstract class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Property\QueryTest
 {
     protected $config;
     

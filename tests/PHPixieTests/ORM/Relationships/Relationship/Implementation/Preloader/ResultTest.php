@@ -11,10 +11,12 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     protected $preloadedEntities = array();
     protected $loaders;
     protected $side;
+    protected $loader;
     
     public function setUp()
     {
         $this->side = $this->side();
+        $this->loader    = $this->loader();
         parent::setUp();
     }
     
@@ -126,6 +128,7 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\I
         return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
     }    
     
+    abstract protected function loader();
     abstract protected function getSide();
     abstract protected function getConfig();
     abstract protected function prepareMap();

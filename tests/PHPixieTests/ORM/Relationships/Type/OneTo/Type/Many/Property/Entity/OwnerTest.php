@@ -12,10 +12,7 @@ class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Enti
     {
         $property = $this->property;
         
-        $this->method($this->handler, 'loadOwnerProperty', function() use($property, $value) {
-            $property->setValue($value);
-            return $value;
-        }, array($this->side, $this->entity), 0);
+        $this->method($this->handler, 'loadOwnerProperty', $this->setValueCallback($value), array($this->side, $this->entity), 0);
     }
     
     protected function prepareLinkPlan($owner)

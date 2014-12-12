@@ -34,12 +34,7 @@ class EntityTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Ent
     
     protected function prepareLoad($value)
     {
-        $property = $this->property;
-        
-        $this->method($this->handler, 'loadProperty', function() use($property, $value) {
-            $property->setValue($value);
-            return $value;
-        }, array($this->side, $this->entity), 0);
+        $this->method($this->handler, 'loadProperty', $this->setValueCallback($value), array($this->side, $this->entity), 0);
     }
     
     protected function prepareLinkPlan($value)

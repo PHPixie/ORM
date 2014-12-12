@@ -7,22 +7,15 @@ namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Property\Query;
  */
 class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\QueryTest
 {
+    
     /**
      * @covers ::add
      * @covers ::<protected>
      */
     public function testAdd()
     {
-        $value = $this->getValue();
-        $plan = $this->prepareLinkPlan($value);
-        $this->method($plan, 'execute', null, array(), 0);
-        $this->prepareResetProperties($value);
-        $this->assertSame($this->property, $this->property->set($value));
-        
-        $this->prepareRemove();
-        $this->property->set(null);
+        $this->modifyTest('add');
     }
-    
     
     /**
      * @covers ::remove
@@ -30,13 +23,36 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Quer
      */
     public function testRemove()
     {
-        $this->prepareRemove();
-        $this->assertSame($this->property, $this->property->remove());
+        $this->modifyTest('remove');
     }
     
-    protected function getOwner()
+    /**
+     * @covers ::removeAll
+     * @covers ::<protected>
+     */
+    public function testRemoveAll()
     {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database\Model');
+        $plan = $this->getPlan();
+        $this->method($this->handler, 'unlinkItemsPlan', $plan, array($this->config, $this->query), 0);
+        $this->method($plan, 'execute', null, array(), 0);
+        $this->assertSame($this->property, $this->property->removeAll());
+    }
+    
+    protected function modifyTest($action)
+    {
+        $method = $action === 'add' ? 'linkPlan' : 'unlinkPlan';
+        
+        $item = $this->getEntity();
+        $plan = $this->getPlan();
+        $this->method($this->handler, $method, $plan, array($this->config, $this->query, $item), 0);
+        $this->method($plan, 'execute', null, array(), 0);
+        $this->method($this->handler, 'resetProperties', $plan, array($this->side, $item), 1);
+        $this->assertSame($this->property, $this->property->$action($item));
+    }
+    
+    protected function getEntity()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Entity');
     }
     
     protected function property()

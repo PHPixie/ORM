@@ -8,11 +8,9 @@ namespace PHPixieTests\ORM\Relationships\Relationship\Implementation;
 abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
 {
     protected $preloader;
-    protected $loader;
 
     public function setUp()
     {
-        $this->loader    = $this->loader();
         $this->preloader = $this->preloader();
     }
     
@@ -24,15 +22,6 @@ abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
     public function testConstruct()
     {
     
-    }
-    
-    /**
-     * @covers ::loader
-     * @covers ::<protected>
-     */
-    public function testLoader()
-    {
-        $this->assertEquals($this->loader, $this->preloader->loader());
     }
     
     
@@ -49,7 +38,6 @@ abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
     
     abstract protected function getProperty();
     abstract protected function getEntity();
-    abstract protected function loader();
     abstract protected function preloader();
     
 }

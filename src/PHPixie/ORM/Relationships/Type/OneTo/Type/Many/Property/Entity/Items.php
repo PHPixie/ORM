@@ -40,7 +40,7 @@ class Items extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity
     {
         $data = array();
         foreach($this->value() as $entity) {
-            if(!$value->isDeleted()) {
+            if(!$entity->isDeleted()) {
                 $data[] = $entity->asObject($recursive);
             }
         }

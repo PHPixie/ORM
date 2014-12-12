@@ -12,10 +12,10 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
             $this->unlinkProperties($side, $related);
             
         }elseif($side->type() === 'owner') {
-            $this->linkProperties($side->config, $value, $related);
+            $this->linkProperties($side->config(), $value, $related);
             
         }else{
-            $this->linkProperties($side->config, $value, $related);
+            $this->linkProperties($side->config(), $related, $value);
         }
     }
     

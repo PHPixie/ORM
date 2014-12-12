@@ -305,14 +305,13 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $this->method($query, 'relatedTo', $query, array($this->sidePropertyName($type), $related));
     }
     
-    protected function prepareLoadSingleProperty($side, $related)
+    protected function prepareLoadSingleProperty($side, $related, $value)
     {
-        $entity = $this->getDatabaseEntity();
         $query = $this->getQuery();
         
         $this->prepareQuery($side, $query, $related);
-        $this->method($query, 'findOne', $entity, array());
-        return $entity;
+        $this->method($query, 'findOne', $value, array());
+        return $value;
     }
     
     protected function getQuery()
@@ -355,6 +354,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $value = null;
         if($valueMock !== null)
             $value = $valueMock['entity'];
+        
         $itemMock['property']
             ->expects($this->once())
             ->method('setValue')

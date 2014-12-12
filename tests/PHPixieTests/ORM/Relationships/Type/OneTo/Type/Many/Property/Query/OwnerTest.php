@@ -16,7 +16,7 @@ class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Quer
     
     protected function prepareResetProperties($owner)
     {
-        $this->method($this->handler, 'resetItemsOwner', null, array($this->config, $owner), 1);
+        $this->method($this->handler, 'resetProperties', null, array($this->side, $owner), 1);
     }
     
     protected function prepareUnlinkPlan()

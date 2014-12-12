@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Relationship\Property\Query;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation\Property;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Property\Query\Implementation
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Property\Query
  */
-abstract class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\PropertyTest
+abstract class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\PropertyTest
 {
     protected $query;
 
@@ -17,8 +17,8 @@ abstract class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
 
     /**
      * @covers ::__construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Property\Query::__construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Property::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Property\Query::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Property::__construct
      * @covers ::<protected>
      */
     public function testConstruct()
@@ -43,6 +43,6 @@ abstract class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Pr
     
     protected function getQuery()
     {
-        return $this->quickMock('\PHPixie\ORM\Query');
+        return $this->quickMock('\PHPixie\ORM\Models\Type\Database\Query');
     }
 }

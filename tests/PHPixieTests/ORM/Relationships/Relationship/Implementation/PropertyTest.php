@@ -20,7 +20,7 @@ abstract class PropertyTest extends \PHPixieTests\AbstractORMTest
 
     /**
      * @covers ::construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Property::construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Property::construct
      * @covers ::<protected>
      */
     public function testConstruct()

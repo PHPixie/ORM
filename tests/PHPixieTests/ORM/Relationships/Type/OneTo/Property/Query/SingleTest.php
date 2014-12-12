@@ -47,7 +47,7 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Pro
     
     protected function getValue()
     {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database\Model');
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Entity');
     }
     
     abstract protected function prepareLinkPlan($value);

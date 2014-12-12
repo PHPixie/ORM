@@ -80,7 +80,16 @@ abstract class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\I
         if($isLoaded)
             $this->assertEquals($value, $this->property->value());
     }
-
+    
+    protected function setValueCallback($value)
+    {
+        $property = $this->property;
+        return function() use($property, $value) {
+            $property->setValue($value);
+            return $value;
+        };
+    }
+    
     abstract protected function getValue();
     abstract protected function prepareLoad($value);
     abstract protected function getEntity();

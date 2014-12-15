@@ -15,13 +15,28 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
         }
     }
     
-    public function loadItemsProperty($side, $related)
+    public function loadItemsProperty($side, $owner)
     {
-        $loader = $this->query($side, $related)->findAll();
+        $config = $side->config();
+        $preloadValue = $this->relationship->ownerPreloadValue($owner);
         
-        $preloader = $this->relationshipType->ownerPropertyPrloader($loader, $related);
-        $loader->addPreloader($side->config()->itemProperty, $preloader);
-        return $this->loaders->editable($loader);
+        $loader = $this->query($side, $owner)->find(array(
+            $config->itemOwnerProperty => $preloadValue
+        ));
+        
+        $loader = $this->loaders->editableProxy($loader);
+        $property = $owner->getRelationshipProperty($config->ownerProperty());
+        $property->setValue($loader);
+    }
+    
+    public function mapPreload($side, $preloadProperty, $reusableResult, $plan)
+    {
+        if($preloadProperty instanceof Value\Preload\Owner) {
+            $owner = $preloadProperty->owner();
+            return $this->relationshipType->ownerPropertyPreloader($owner);
+        }
+        
+        return parent::mapPreload($side, $preloadProperty, $reusableResult, $plan);
     }
 
     public function addOwnerItems($config, $owner, $items)

@@ -5,12 +5,10 @@ namespace PHPixie\ORM\Values\Preload;
 class Property
 {
     protected $propertyName;
-    protected $preload;
-    
-    public function __construct($propertyName, $preload)
+     
+    public function __construct($propertyName)
     {
         $this->propertyName = $propertyName;
-        $this->preload = $preload;
     }
     
     public function propertyName()
@@ -18,8 +16,4 @@ class Property
         return $this->propertyName;
     }
     
-    public function preload()
-    {
-        return $this->preload;
-    }
 }

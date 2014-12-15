@@ -43,9 +43,14 @@ class OneToMany extends \PHPixie\ORM\Relationships\Relationship
         return new OneTo\Type\Many\Property\Query\Items($this->handler(), $side, $query);
     }
 
-    public function ownerLoader($loader, $itemPropertyName, $owner)
+    public function ownerPropertyPreloader($owner)
     {
-        return new OneTo\Type\Many\Loader\Owner($this->orm->loaders(), $loader, $itemPropertyName, $owner);
+        return new OneTo\Type\Many\Preloader\Property\Owner($owner);
+    }
+    
+    public function ownerPreloadValue($owner)
+    {
+        return new OneTo\Type\Many\Value\Preload\Owner($owner);
     }
 
     protected function sideTypes($config)

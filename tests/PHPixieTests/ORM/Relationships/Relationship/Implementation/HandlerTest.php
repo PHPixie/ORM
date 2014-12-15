@@ -122,7 +122,7 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
     
     protected function preloadPropertyValue($preloadAt = 0)
     {
-        $property = $this->getPreloadPropertyValue();
+        $property = $this->getPreloadCascadingProperty();
         $preload = $this->getPreloadValue();
         
         $this->method($property, 'preload', $preload, array(), $preloadAt);
@@ -133,9 +133,9 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
         );
     }
     
-    protected function getPreloadPropertyValue()
+    protected function getPreloadCascadingProperty()
     {
-        return $this->quickMock('\PHPixie\ORM\Values\Preload\Property');
+        return $this->quickMock('\PHPixie\ORM\Values\Preload\Property\Cascading');
     }
     
     protected function getPreloadValue()

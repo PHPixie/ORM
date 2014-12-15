@@ -12,7 +12,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     protected $configOnwerProperty = 'flowers';
 
     
-   /**
+    /**
      * @covers ::loadOwnerProperty
      * @covers ::<protected>
      */
@@ -21,6 +21,35 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         $this->loadOwnerPropertyTest(true);
         $this->loadOwnerPropertyTest(false);
     }
+    
+    /**
+     * @covers ::loadItemsProperty
+     * @covers ::<protected>
+     */
+    public function testLoadItemsProperty()
+    {
+        $side = $this->side('items', $this->configData);
+        $owner = $this->getOwner(true, false, true);
+        
+        $preloadValue = $this->getOwnerPreloadValue();
+        $this->method($this->relationship, 'ownerPreloadValue', $preloadValue, array(), 0);
+        
+        $query = $this->getQuery();
+        $this->prepareQuery($side, $query, $owner['entity']);
+        
+        $loader = $this->getReusableResultLoader();
+        $this->method($query, 'find', $loader, array(array(
+            $this->configData['itemOwnerProperty'] => $preloadValue
+        )));
+        
+        $proxy = $this->getLoaderProxy('editable');
+        $this->method($this->loaders, 'editableProxy', $proxy, array($loader), 0);
+        
+        $this->method($owner['property'], 'setValue', null, array($proxy), 0);
+        
+        $this->handler->loadItemsProperty($side, $owner['entity']);
+    }
+    
     
     /**
      * @covers ::unlinkPlan
@@ -258,11 +287,11 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     
     protected function withOwnedItemTest($action = 'add', $ownerIsQuery = false, $sameId = false)
     {
-        $itemOwner = $this->getOwner(true, true, 1);
+        $itemOwner = $this->getOwner(true, true, false, 1);
         
         $item  = $this->getItem($this->ifCreateMissingProperty($action, $ownerIsQuery), true, true, $itemOwner);
 
-        $owner = $ownerIsQuery ? $this->getQuery() : $this->getOwner(true, true, $sameId ? 1 : 2);
+        $owner = $ownerIsQuery ? $this->getQuery() : $this->getOwner(true, true, false, $sameId ? 1 : 2);
 
         if(!$ownerIsQuery) {
             $this->expectItemsModified($owner, $action, array($item));
@@ -334,7 +363,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         return $this->addSingleProperty($entity, 'owner', $hasProperty, $ownerLoaded, $owner['entity'], $expectCreateMissing);
     }
 
-    protected function getOwner($hasProperty = true, $loaded = true, $id = 1)
+    protected function getOwner($hasProperty = true, $loaded = true, $expectCreateMissing = false, $id = 1)
     {
         $entity = $this->getDatabaseEntity();
         $property = null;
@@ -352,7 +381,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         }
 
         $propertyName = $this->opposingPropertyName('item');
-        $this->method($entity, 'getRelationshipProperty', $property, array($propertyName, false), null, true);
+        $this->method($entity, 'getRelationshipProperty', $property, array($propertyName, $expectCreateMissing), null, true);
         
         return array(
             'entity'   => $entity,
@@ -372,6 +401,16 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
             $type = 'items';
 
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\\'.ucfirst($type));
+    }
+                     
+    protected function getOwnerPreloadValue()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Value\Preload\Owner');
+    }
+                     
+    protected function getOwnerPropertyPreloader()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\Property\Owner');
     }
 
     protected function getConfig()

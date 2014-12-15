@@ -349,13 +349,13 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         );
     }
     
-    protected function expectSetValue($itemMock, $valueMock = null)
+    protected function expectSetValue($entityMock, $valueMock = null)
     {
         $value = null;
         if($valueMock !== null)
             $value = $valueMock['entity'];
         
-        $itemMock['property']
+        $entityMock['property']
             ->expects($this->once())
             ->method('setValue')
             ->with($this->identicalTo($value));

@@ -182,7 +182,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $preloader = $this->getPreloader($type);
             $this->method($this->relationship, 'preloader', $preloader, array($side, $cachingProxy), 0);
             
-            $this->assertEquals($preloader, $this->handler->mapPreload(
+            $this->assertSame($preloader, $this->handler->mapPreload(
                 $side,
                 $preloadProperty['property'],
                 $result,

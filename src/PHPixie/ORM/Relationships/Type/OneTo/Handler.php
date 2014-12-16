@@ -3,6 +3,9 @@
 namespace PHPixie\ORM\Relationships\Type\OneTo;
 
 abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
+                    implements \PHPixie\ORM\Relationships\Relationship\Handler\Database\Mapping,
+                               \PHPixie\ORM\Relationships\Relationship\Handler\Database\Preloading,
+                               \PHPixie\ORM\Relationships\Relationship\Handler\Cascade\Delete
 {
 
     public function query($side, $related)

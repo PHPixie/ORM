@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\ManyToMany\Side;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\ManyToMany\Side\Config
  */
-class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\Side\ConfigTest
+class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Side\ConfigTest
 {
     protected $plural = array(
         'fairy'  => 'fairies',

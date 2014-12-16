@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\ManyToMany\Property;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\ManyToMany\Property\Query
  */
-class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\QueryTest
+class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Property\QueryTest
 {
     protected $config;
 
@@ -42,7 +42,7 @@ class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Qu
     protected function modifyLinkTest($method, $action, $type)
     {
         $this->method($this->side, 'type', $type, array(), 1);
-        $item = $this->getModel();
+        $item = $this->getEntity();
         $plan = $this->getPlan();
 
         $args = $this->reorderArgs(array($this->config, $this->query, $item), $type);
@@ -87,6 +87,11 @@ class QueryTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Qu
         $side = $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Side');
         $this->method($side, 'config', $this->config, array());
         return $side;
+    }
+    
+    protected function getEntity()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Entity');
     }
 
     protected function config()

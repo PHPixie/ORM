@@ -2,7 +2,8 @@
 
 namespace PHPixie\ORM\Relationships\Type\ManyToMany;
 
-class Side extends \PHPixie\ORM\Relationships\Relationship\Side
+class Side extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side
+           implements \PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete
 {
     public function modelName()
     {
@@ -23,6 +24,11 @@ class Side extends \PHPixie\ORM\Relationships\Relationship\Side
     public function relationshipType()
     {
         return 'manyToMany';
+    }
+    
+    public function isDeleteHandled()
+    {
+        return true;
     }
     
  }

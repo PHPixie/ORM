@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\ManyToMany\Side;
 
-class Config extends \PHPixie\ORM\Relationships\Relationship\Side\Config
+class Config extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side\Config
 {
     public $leftModel;
     public $leftProperty;

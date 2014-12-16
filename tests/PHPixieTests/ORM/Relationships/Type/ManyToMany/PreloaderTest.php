@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\ManyToMany;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\ManyToMany\Preloader
  */
-class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\Multiple\IdMapTest
+class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple\IdMapTest
 {
     protected $pivotResult;
     
@@ -27,8 +27,8 @@ class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Preload
     
     protected function prepareMap($type = 'left')
     {
-        foreach($this->models as $id => $model) {
-            $this->method($model, 'id', $id, array());
+        foreach($this->entities as $id => $entity) {
+            $this->method($entity, 'id', $id, array());
         }
         
         $this->method($this->side, 'type', $type, array(), 0);
@@ -50,15 +50,19 @@ class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Preload
         
         $this->method($this->pivotResult, 'getFields', $fields, array(array($ownerKey, $itemKey)), 0);
         
-        $repository = $this->getRepository();
+        $repository = $this->repository(array('idField' => 'id'));
         $this->method($this->loader, 'repository', $repository, array(), 0);
         
         $loaderResult = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
         $this->method($this->loader, 'reusableResult', $loaderResult, array(), 1);
         
-        $this->method($repository, 'idField', 'id', array(), 0);
-        $this->method($loaderResult, 'getField', array_keys($this->preloadedModels), array('id'), 0);
+        $this->method($loaderResult, 'getField', array_keys($this->preloadedEntities), array('id'), 0);
         
+    }
+
+    protected function getProperty()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Property\Entity');
     }
     
     protected function relationship()
@@ -85,7 +89,6 @@ class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Preload
     {
         return new \PHPixie\ORM\Relationships\Type\ManyToMany\Preloader(
             $this->loaders,
-            $this->relationship,
             $this->side,
             $this->loader,
             $this->pivotResult

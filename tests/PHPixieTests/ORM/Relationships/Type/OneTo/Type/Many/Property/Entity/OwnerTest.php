@@ -10,8 +10,6 @@ class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Enti
     
     protected function prepareLoad($value)
     {
-        $property = $this->property;
-        
         $this->method($this->handler, 'loadOwnerProperty', $this->setValueCallback($value), array($this->side, $this->entity), 0);
     }
     

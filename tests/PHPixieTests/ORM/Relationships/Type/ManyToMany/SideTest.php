@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\ManyToMany;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\ManyToMany\Side
  */
-class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\SideTest
+class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\SideTest
 {
     protected $type = 'left';
     protected $relationshipType = 'manyToMany';
@@ -43,6 +43,16 @@ class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\SideTest
         ));
     }
 
+    /**
+     * @covers ::isDeleteHandled
+     * @covers ::<protected>
+     */
+    public function testIsDeleteHandled()
+    {
+        $this->assertSame(true, $this->side->isDeleteHandled());
+    }
+
+    
     protected function config()
     {
         $config = $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Side');

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\ManyToMany\Property;
 
-class Query extends \PHPixie\ORM\Relationships\Relationship\Property\Query
+class Query extends \PHPixie\ORM\Relationships\Relationship\Implementation\Property\Query
 {
     public function query()
     {

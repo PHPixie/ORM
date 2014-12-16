@@ -4,13 +4,14 @@ namespace PHPixie\ORM\Relationships\Relationship\Implementation\Preloader;
 
 abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader
 {
+    protected $loader;
     protected $idOffsets;
     protected $mapped = false;
     protected $side;
 
     public function __construct($side, $loader)
     {
-        parent::__construct($loader);
+        $this->loader = $loader;
         $this->side = $side;
     }
 

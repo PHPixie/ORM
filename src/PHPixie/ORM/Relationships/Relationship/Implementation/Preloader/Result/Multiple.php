@@ -4,7 +4,6 @@ namespace PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result
 
 abstract class Multiple extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result
 {
-    
     protected $loaders;
     
     public function __construct($loaders, $side, $loader)

@@ -2,14 +2,14 @@
 
 namespace PHPixie\ORM\Relationships\Type\ManyToMany;
 
-class Preloader extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Multiple\IdMap
+class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple\IdMap
 {
     protected $pivotResult;
 
-    public function __construct($loaders, $relationshipType, $side, $loader, $pivotResult)
+    public function __construct($loaders, $side, $loader, $pivotResult)
     {
-        parent::__construct($loaders, $relationshipType, $side, $loader);
         $this->pivotResult = $pivotResult;
+        parent::__construct($loaders, $side, $loader);
     }
 
     protected function mapItems()

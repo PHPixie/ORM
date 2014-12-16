@@ -54,15 +54,10 @@ abstract class Handler
 
     protected function getPropertyIfLoaded($model, $propertyName)
     {
-        $property = $model->relationshipProperty($propertyName);
+        $property = $model->getRelationshipProperty($propertyName);
         if ($property === null || !$property->isLoaded())
             return null;
         return $property;
     }
     
-    protected function getIdField($repository)
-    {
-        return $repository->config()->idField;
-    }
-
 }

@@ -3,9 +3,9 @@
 namespace PHPixieTests\ORM\Relationships\Type\ManyToMany\Property;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\ManyToMany\Property\Model
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\ManyToMany\Property\Entity
  */
-class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\ModelTest
+class EntityTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Property\EntityTest
 {
     protected $config;
 
@@ -22,7 +22,7 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
     public function testQuery()
     {
         $query = $this->getQuery();
-        $this->method($this->handler, 'query', $query, array($this->side, $this->model), 0);
+        $this->method($this->handler, 'query', $query, array($this->side, $this->entity), 0);
         $this->assertEquals($query, $this->property->query());
     }
 
@@ -46,8 +46,8 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
     public function testRemoveAll()
     {
         $plan = $this->getPlan();
-        $this->method($this->handler, 'unlinkAllPlan', $plan, array($this->side, $this->model), 0);
-        $this->method($this->handler, 'unlinkAllProperties', $plan, array($this->side, $this->model), 1);
+        $this->method($this->handler, 'unlinkAllPlan', $plan, array($this->side, $this->entity), 0);
+        $this->method($this->handler, 'unlinkAllProperties', $plan, array($this->side, $this->entity), 1);
         
         $this->assertEquals($this->property, $this->property->removeAll());
     }
@@ -58,25 +58,32 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testAsData()
     {
-        $this->prepareLoad(new \ArrayObject);
+        $value = new \ArrayObject;
+        $this->prepareLoad($value);
         for($i=0;$i<3;$i++){
-            $model = $this->quickMock('stdClass', array('asObject'));
-            $this->value[]=$model;
-            $this->method($model, 'asObject', $i, array(true), 0);
-            $this->method($model, 'asObject', $i, array(false), 1);
+            $entity = $this->getEntity();
+            if($i != 1) {
+                $this->method($entity, 'isDeleted', false, array());
+                $value[]=$entity;
+                $this->method($entity, 'asObject', $i, array(false), 1);
+                $this->method($entity, 'asObject', $i, array(true), 3);
+                
+            }else{
+                $this->method($entity, 'isDeleted', true, array());
+            }
         }
         
-        $this->assertEquals(array(0, 1, 2), $this->property->asData());
-        $this->assertEquals(array(0, 1, 2), $this->property->asData(false));
+        $this->assertEquals(array(0, 2), $this->property->asData());
+        $this->assertEquals(array(0, 2), $this->property->asData(true));
     }
 
     protected function modifyLinkTest($method, $action, $type)
     {
         $this->method($this->side, 'type', $type, array(), 1);
-        $item = $this->getModel();
+        $item = $this->getEntity();
         $plan = $this->getPlan();
         
-        $args = $this->reorderArgs(array($this->config, $this->model, $item), $type);
+        $args = $this->reorderArgs(array($this->config, $this->entity, $item), $type);
         $this->method($this->handler, $action.'Plan', $plan, $args, 0);
         $this->method($plan, 'execute', null, array(), 0);
         $this->method($this->handler, $action.'Properties', null, $args, 1);
@@ -95,12 +102,9 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
         return $params;
     }
 
-    protected function prepareLoad($value = null)
+    protected function prepareLoad($value)
     {
-        if($value === null)
-            $value = $this->value();
-        $this->value = $value;
-        $this->method($this->handler, 'loadProperty', $this->value, array($this->side, $this->model), 0);
+        $this->method($this->handler, 'loadProperty', $this->setValueCallback($value), array($this->side, $this->entity), 0);
     }
 
     protected function value()
@@ -120,9 +124,14 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
 
     protected function getQuery()
     {
-        return $this->quickMock('\PHPixie\ORM\Query');
+        return $this->quickMock('\PHPixie\ORM\Models\Type\Database\Query');
     }
-
+    
+    protected function getEntity()
+    {
+        return $this->quickMock('\PHPixie\ORM\Models\Type\Database\Entity');
+    }
+    
     protected function handler()
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Handler');
@@ -142,7 +151,7 @@ class ModelTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
 
     protected function property()
     {
-        return new \PHPixie\ORM\Relationships\Type\ManyToMany\Property\Model($this->handler, $this->side, $this->model);
+        return new \PHPixie\ORM\Relationships\Type\ManyToMany\Property\Entity($this->handler, $this->side, $this->entity);
     }
 
 }

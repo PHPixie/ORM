@@ -24,7 +24,7 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\I
      * @covers ::getEntity
      * @covers ::<protected>
      */
-    public function testGetModel()
+    public function testGetEntity()
     {
         $this->prepareMap();
         $this->prepareLoader();

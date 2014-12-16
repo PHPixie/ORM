@@ -134,7 +134,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     public function testResetProperties()
     {
         $this->resetPropertiesTest('owner');
-        //$this->resetPropertiesTest('item');
+        $this->resetPropertiesTest('item');
     }
 
     /**
@@ -155,6 +155,32 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     {
         $this->removeAllOwnerItemsTest(false);
         $this->removeAllOwnerItemsTest(true);
+    }
+    
+    /**
+     * @covers ::mapPreload
+     * @covers ::<protected>
+     */
+    public function mapPreloadOwner()
+    {
+        $side = $this->side($type, $this->configData);
+        $query = $this->getDatabaseQuery();
+        $result = $this->getReusableResult();
+        $plan = $this->getPlan();
+        $preloadProperty = $this->getOwnerPreloadValue();
+        
+        $owner = $this->getDatabaseEntity();
+        $this->method($preloadValue, 'owner', $owner, array(), 0);
+        
+        $preloader = $his->getOwnerPropertyPreloader();
+        $this->method($this->relationship, 'ownerPropertyPreloader', $preloader, array($owner), 0);
+        
+        $this->assertEquals($preloader, $this->handler->mapPreload(
+            $side,
+            $preloadProperty['property'],
+            $result,
+            $plan
+        ));
     }
     
     protected function loadOwnerPropertyTest($isNull = false)
@@ -216,7 +242,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     protected function resetPropertiesTest($type)
     {
         $owner = $this->getOwner();
-        $item  = $this->getItem(true, true, true, $owner);
+        $item  = $this->getItem(false, true, true, $owner);
         $query = $this->getDatabaseQuery();
 
         $withoutProperty = $this->getDatabaseEntity();

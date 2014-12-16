@@ -2,19 +2,19 @@
 
 namespace PHPixie\ORM\Relationships\Type\ManyToMany\Property;
 
-class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
-            implements \PHPixie\ORM\Relationships\Relationship\Property\Model\Data,
-                       \PHPixie\ORM\Relationships\Relationship\Property\Model\Query
+class Entity extends   \PHPixie\ORM\Relationships\Relationship\Implementation\Property\Entity
+            implements \PHPixie\ORM\Relationships\Relationship\Property\Entity\Data,
+                       \PHPixie\ORM\Relationships\Relationship\Property\Entity\Query
 {
 
     public function query()
     {
-        return $this->handler->query($this->side, $this->model);
+        return $this->handler->query($this->side, $this->entity);
     }
 
     protected function load()
     {
-        return $this->handler->loadProperty($this->side, $this->model);
+        $this->handler->loadProperty($this->side, $this->entity);
     }
 
     public function add($items)
@@ -39,25 +39,28 @@ class Model extends \PHPixie\ORM\Relationships\Relationship\Property\Model
 
     public function removeAll()
     {
-        $plan = $this->handler->unlinkAllPlan($this->side, $this->model);
+        $plan = $this->handler->unlinkAllPlan($this->side, $this->entity);
         $plan->execute();
-        $this->handler->unlinkAllProperties($this->side, $this->model);
+        $this->handler->unlinkAllProperties($this->side, $this->entity);
         return $this;
     }
 
     protected function getSides($opposing)
     {
         if ($this->side->type() === 'right')
-            return array($this->model, $opposing);
+            return array($this->entity, $opposing);
 
-        return array($opposing, $this->model);
+        return array($opposing, $this->entity);
     }
 
     public function asData($recursive = false)
     {
         $data = array();
-        foreach($this->value() as $model)
-            $data[] = $model->asObject($recursive);
+        foreach($this->value() as $entity) {
+            if(!$entity->isDeleted()) {
+                $data[] = $entity->asObject($recursive);
+            }
+        }
         return $data;
     }
 

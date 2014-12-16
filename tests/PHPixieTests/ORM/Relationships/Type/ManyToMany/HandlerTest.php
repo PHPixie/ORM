@@ -7,14 +7,6 @@ namespace PHPixieTests\ORM\Relationships\Type\ManyToMany;
  */
 class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\HandlerTest
 {
-    protected $database;
-    
-    public function setUp()
-    {
-        $this->database = $this->quickMock('\PHPixie\ORM\Database');
-        parent::setUp();
-    }
-    
     protected $configData = array(
         'leftModel'     => 'fairy',
         'leftProperty'  => 'flowers',
@@ -635,7 +627,6 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
             $this->steps,
             $this->loaders,
             $this->mappers,
-            $this->database,
             $this->relationship
         );
     }

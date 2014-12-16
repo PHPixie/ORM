@@ -6,14 +6,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
                     implements \PHPixie\ORM\Relationships\Relationship\Handler\Database\Mapping,
                                \PHPixie\ORM\Relationships\Relationship\Handler\Database\Preloading
 {
-    protected $database;
-    
-    public function __construct($repositories, $planners, $plans, $steps, $loaders, $mappers, $database, $relationship)
-    {
-        parent::__construct($repositories, $planners, $plans, $steps, $loaders, $mappers, $relationship);
-        $this->database = $database;
-    }
-    
+
     public function query($side, $related)
     {
         $config = $side->config();

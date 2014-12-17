@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many;
+namespace PHPixie\ORM\Relationships\Type\Embeds\Type\Many;
 
-class Side extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Side
+class Side extends \PHPixie\ORM\Relationships\Type\Embeds\Side
 {
     public function relationshipType()
     {

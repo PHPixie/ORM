@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many;
+namespace PHPixie\ORM\Relationships\Type\Embeds\Type\Many;
 
-class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Handler
+class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 {
     public function mapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix = null)
     {

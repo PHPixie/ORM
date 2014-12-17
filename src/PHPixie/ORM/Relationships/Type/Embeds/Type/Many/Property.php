@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many;
+namespace PHPixie\ORM\Relationships\Type\Embeds\Type\Many;
 
 class Property extends \PHPixie\ORM\Relationships\Relationship\Property\Model implements \ArrayAccess, \Countable
 {

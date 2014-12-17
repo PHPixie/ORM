@@ -42,6 +42,12 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
     {
         return new Pivot\Pivot($connection, $source);
     }
+    
+    public function pivotByConnectionName($connectionName, $source)
+    {
+        $connection = $this->database->connection($connectionName);
+        return $this->pivot($connection, $source);
+    }
 
     public function side($items, $repository, $pivotKey)
     {

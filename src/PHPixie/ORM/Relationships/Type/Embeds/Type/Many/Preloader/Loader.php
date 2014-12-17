@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\Many\Preloader;
+namespace PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Preloader;
 
-class Loader extends \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Preloader\Loader
+class Loader extends \PHPixie\ORM\Relationships\Type\Embeds\Preloader\Loader
 {
     public function getModelByOffset($offset)
     {

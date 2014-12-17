@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Side;
+namespace PHPixie\ORM\Relationships\Type\Embeds\Side;
 
-abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Side\Config
+abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side\Config
 {
     public $ownerModel;
     public $itemModel;

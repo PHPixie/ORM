@@ -46,7 +46,7 @@ class RelationshipsTest extends \PHPixieTests\AbstractORMTest
     public function testEmbedsGroupMapper()
     {
         $mapper = $this->relationships->embedsGroupMapper();
-        $this->assertInstanceOf('\PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Mapper\Group', $mapper);
+        $this->assertInstanceOf('\PHPixie\ORM\Relationships\Type\Embeds\Mapper\Group', $mapper);
         $this->assertSame($mapper, $this->relationships->embedsGroupMapper());
     }
 }

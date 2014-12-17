@@ -39,7 +39,7 @@ class Relationships
     protected function buildEmbedsGroupMapper()
     {
         $relationshipMap = $this->ormBuilder->relationshipMap();
-        return new Relationships\Type\Embedded\Type\Embeds\Mapper\Group($this, $relationshipMap);
+        return new Relationships\Type\Embeds\Mapper\Group($this, $relationshipMap);
     }
     
     public function map(){}

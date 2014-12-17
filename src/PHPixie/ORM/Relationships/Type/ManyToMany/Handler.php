@@ -6,14 +6,6 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
                     implements \PHPixie\ORM\Relationships\Relationship\Handler\Database\Mapping,
                                \PHPixie\ORM\Relationships\Relationship\Handler\Database\Preloading
 {
-    protected $database;
-    
-    public function __construct($repositories, $planners, $plans, $steps, $loaders, $mappers, $database, $relationship)
-    {
-        parent::__construct($repositories, $planners, $plans, $steps, $loaders, $mappers, $relationship);
-        $this->database = $database;
-    }
-    
     public function query($side, $related)
     {
         $config = $side->config();
@@ -85,7 +77,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
 
     protected function pivotConnection($config)
     {
-        if ($config->pivotConnection !== null)
+        
             return $this->ormBuilder->databaseConnection($config->pivotConnection);
 
         return $this->repositories->get($config->leftModel)->connection();
@@ -93,9 +85,14 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
 
     protected function plannerPivot($config)
     {
-        $pivotConnection = $this->pivotConnection($config);
-
-        return $this->planners->pivot()->pivot($pivotConnection, $config->pivot);
+        $pivotPlanner = $this->planners->pivot();
+        
+        if ($config->pivotConnection !== null) {
+            return $pivotPlanner->pivotByConnectionName($config->pivotConnection, $config->pivot);
+        }
+        
+        $connection = $this->repositories->get($config->leftModel)->connection();
+        return $pivotPlanner->pivot($connection, $config->pivot);
     }
 
     public function mapQuery($side, $group, $query, $plan)

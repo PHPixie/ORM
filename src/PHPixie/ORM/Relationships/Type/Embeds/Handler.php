@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds;
+namespace PHPixie\ORM\Relationships\Type\Embeds;
 
-abstract class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Handler
+abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler\Embedded
 {
 
     public function mapRelationship($side, $query, $group, $plan)
@@ -17,7 +17,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Type\Embedded\Handler
         if ($owner !== null) {
             $propertyName = $item->ownerPropertyName();
             $property = $owner->relationshipProperty($propertyName);
-            if ($property instanceof \PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds\Type\One\Property\Item) {
+            if ($property instanceof \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Item) {
                 $property->remove();
             } else {
                 $property->remove($item);

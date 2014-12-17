@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embedded\Type\Embeds;
+namespace PHPixie\ORM\Relationships\Type\Embeds;
 
-class Preloader extends \PHPixie\ORM\Relationships\Relationship\Preloader
+class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader
 {
     public function loadProperty($property)
     {

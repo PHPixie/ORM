@@ -13,6 +13,7 @@ abstract class ResultTest extends \PHPixieTests\AbstractORMTest
     protected $result;
     
     protected $data;
+    protected $iteratorData;
 
     public function setUp()
     {
@@ -36,7 +37,7 @@ abstract class ResultTest extends \PHPixieTests\AbstractORMTest
             ),
 
             (object) array(
-                'name' => 'fairy',
+                'name' => 'Fairy',
                 'flower' => (object) array(
 
                 )
@@ -89,6 +90,38 @@ abstract class ResultTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::getField
+     * @covers ::<protected>
+     */
+    public function testGetField()
+    {
+        $this->prepareData();
+        
+        $rows = $this->result->getField('flower.petals.color');
+        $this->assertSame(array('red', 'green'), $rows);
+        
+        $rows = $this->result->getField('flower.petals.color', false);
+        $this->assertSame(array('red', 'green', null, null), $rows);
+    }
+    
+    /**
+     * @covers ::getFields
+     * @covers ::<protected>
+     */
+    public function testGetFields()
+    {
+        $this->prepareData();
+        $rows = $this->result->getFields(array('name', 'flower.petals'));
+        
+        $this->assertSame(array(
+            array('name' => 'Pixie', 'flower.petals' => $this->data[0]->flower->petals),
+            array('name' => 'Trixie', 'flower.petals' => $this->data[1]->flower->petals),
+            array('name' => 'Fairy', 'flower.petals' => null),
+            array('name' => 'Blum', 'flower.petals' => null),
+        ), $rows);
+    }
+    
+    /**
      * @covers ::getIterator
      * @covers ::<protected>
      */
@@ -100,13 +133,27 @@ abstract class ResultTest extends \PHPixieTests\AbstractORMTest
         }
     }
     
+    /**
+     * @covers ::asArray
+     * @covers ::<protected>
+     */
+    public function testAsArray()
+    {
+        $this->prepareData();
+        $this->assertSame($this->data, $this->result->asArray());
+    }
+    
     protected function prepareIterator($data)
     {
         $iterator = new \ArrayIterator($data);
         $this->method($this->reusableResult, 'getIterator', $iterator, array());
     }
     
-    abstract protected function prepareData();
+    protected function prepareData()
+    {
+        $this->prepareIterator($this->iteratorData);
+    }
+    
     abstract protected function result();
 
 }

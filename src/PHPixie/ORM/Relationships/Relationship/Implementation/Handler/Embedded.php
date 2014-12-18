@@ -4,41 +4,57 @@ namespace PHPixie\ORM\Relationships\Relationship\Implementation\Handler;
 
 abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
 {
-    protected function getLoadedProperty($model, $propertyName)
+
+    protected function explodePath($path)
     {
-        if ($model === null)
+        return explode('.', $path);
+    }
+    protected function getDocument($model, $path, $createMissing = true)
+    {
+        $explodedPath = $this->explodePath($path);
+        return $this->getDocumentByExplodedPath($model, $explodedPath, $createMissing);
+    }
+    protected function getArrayNode($model, $path, $createMissing = true)
+    {
+        list($document, $key) = $this->getParentDocumentAndKey($model, $path);
+        if($document === null)
             return null;
-
-        $property = $model->relationshipProperty($propertyName, false);
-        if ($property === null || !$property->isLoaded())
+        $property = $document->get($key);
+        if($property !== null) {
+            if(!($property instanceof \PHPixie\ORM\Data\Types\Document\Node\ArrayNode))
+                throw new \PHPixie\ORM\Exception\Relationship("$path is not an array node");
+        }elseif($createMissing) {
+            $document->addArray($key);
+        }else{
             return null;
-
-        return $property;
+        }
+        return $document->get($key);
     }
-
-    protected function assertModelName($model, $requiredModel)
+    protected function getParentDocumentAndKey($model, $path, $createMissing = true)
     {
-        if ($model->modelName() !== $requiredModel)
-            throw new \PHPixie\ORM\Exception\Relationship("Only '$requiredModel' models can be used for this relationship.");
+        $explodedPath = $this->explodePath($path);
+        $key = array_pop($explodedPath);
+        $document = $this->getDocumentByExplodedPath($model, $explodedPath, $createMissing);
+        return array($document, $key);
     }
-
-    protected function deletePlanResultStep($plan)
+    protected function getDocumentByExplodedPath($model, $explodedPath, $createMissing = true)
     {
-        if (($resultStep = $plan->resultStep()) !== null)
-            return $resultStep;
-
-        $resultStep = $this->steps->result(null);
-        $plan->setResultStep($resultStep);
-
-        return $resultStep;
+        $document = $model->data()->document();
+        $last = count($explodedPath) - 1;
+        foreach($explodedPath as $i => $key) {
+            $property = $document->get($key);
+            if($property !== null) {
+                if($i === $last && !($property instanceof \PHPixie\ORM\Data\Types\Document\Node\Document)) {
+                    $path = implode('.', array_slice($explodedPath, 0, $i+1));
+                    throw new \PHPixie\ORM\Exception\Relationship("$path is not a document node.");
+                }
+            }elseif($createMissing) {
+                $document->addDocument($key);
+            }else{
+                return null;
+            }
+            $document = $document->get($key);
+        }
+        return $document;
     }
-
-    protected function getPropertyIfLoaded($model, $propertyName)
-    {
-        $property = $model->relationshipProperty($propertyName);
-        if ($property === null || !$property->isLoaded())
-            return null;
-        return $property;
-    }
-
 }

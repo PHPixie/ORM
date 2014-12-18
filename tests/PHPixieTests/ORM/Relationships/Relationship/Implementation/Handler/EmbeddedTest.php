@@ -1,20 +1,12 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Type\Embedded;
+namespace PHPixieTests\ORM\Relationships\Relationship\Implementation\Handler;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embedded\Handler
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Handler\Embedded
  */
-abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\HandlerTest
+abstract class EmbeddedTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\HandlerTest
 {
-    protected $embeddedGroupMapper;
-
-    public function setUp()
-    {
-        $this->embeddedGroupMapper = $this->quickMock( 'PHPixie\ORM\Relationships\Type\Embedded\Mapper\Group' );
-        parent::setUp();
-    }
-
     protected function prepareGetDocument($document, $path)
     {
         $path = explode('.', $path);
@@ -61,9 +53,9 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     {
         return $this->abstractMock('\PHPixie\ORM\Data\Types\Document\Node\Document');
     }
-
-    protected function getEmbeddedRepository()
+    
+    protected function getEmbeddedEntity()
     {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Embedded');
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Embedded\Entity');
     }
 }

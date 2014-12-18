@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\Embeds;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Handler
  */
-abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded\HandlerTest
+abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Handler\EmbeddedTest
 {
     protected $ownerPropertyName;
     protected $propertyConfig;
@@ -48,7 +48,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
     {
         $params = array();
         if($owner['property'] instanceof \PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property) {
-            $params[]= $item['model'];
+            $params[]= $item['entity'];
         }
         $this->method($owner['property'], 'remove', null, $params, $propertyOffset++);
     }
@@ -58,11 +58,11 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
         $item = $this->getRelationshipModel('item');
 
         if($owner === null){
-            $this->method($item['model'], 'ownerPropertyName', null, array());
-            $this->method($item['model'], 'owner', null, array());
+            $this->method($item['entity'], 'ownerPropertyName', null, array());
+            $this->method($item['entity'], 'owner', null, array());
         }else{
-            $this->method($item['model'], 'ownerPropertyName', $this->oldOwnerProperty, array());
-            $this->method($item['model'], 'owner', $owner['model'], array());
+            $this->method($item['entity'], 'ownerPropertyName', $this->oldOwnerProperty, array());
+            $this->method($item['entity'], 'owner', $owner['entity'], array());
         }
         return $item;
     }
@@ -70,15 +70,15 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
 
     protected function getRelationshipModel($type)
     {
-        $model = $this->getEmbeddedModel();
-        $this->method($model, 'modelName', $this->configData[$type.'Model'], array());
+        $entity = $this->getEmbeddedEntity();
+        $this->method($entity, 'modelName', $this->configData[$type.'Model'], array());
         $data = $this->getData();
         $document = $this->getDocument();
 
-        $this->method($model, 'data', $data, array());
+        $this->method($entity, 'data', $data, array());
         $this->method($data, 'document', $document, array());
         return array(
-            'model' => $model,
+            'entity' => $entity,
             'data'  => $data,
             'document' => $document
         );
@@ -86,26 +86,16 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embedded
 
     protected function prepareWrongItem()
     {
-        $model = $this->getEmbeddedModel();
-        $this->method($model, 'modelName', 'nope', array());
+        $entity = $this->getEmbeddedEntity();
+        $this->method($entity, 'modelName', 'nope', array());
         $this->setExpectedException('\PHPixie\ORM\Exception\Relationship');
-        return $model;
+        return $entity;
     }
 
     protected function getArrayNodeLoader() {
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\Embedded\ArrayNode');
     }
 
-
-    protected function getDatabaseModel()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database\Model');
-    }
-
-    protected function getEmbeddedModel()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Embedded\Model');
-    }
 
     abstract protected function prepareMapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix);
     abstract protected function getPreloader();

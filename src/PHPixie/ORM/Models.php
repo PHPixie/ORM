@@ -4,7 +4,10 @@ namespace PHPixie\ORM;
 
 class Models
 {
-    public function repository(){}
-    public function entity(){}
-    public function query(){}
+    protected $configs = array();
+    
+    public function __construct($configSlices)
+    {
+        
+    }
 }

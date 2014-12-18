@@ -56,7 +56,7 @@ abstract class Result implements \PHPixie\ORM\Steps\Result\Reusable
         $path = explode('.', $field);
         
         foreach($this->data as $data) {
-            $value = $this->getEmbeddedData($row, $path);
+            $value = $this->getEmbeddedData($data, $path);
             if($value !== null || !$skipNulls) {
                 $values[] = $value;
             }
@@ -85,7 +85,6 @@ abstract class Result implements \PHPixie\ORM\Steps\Result\Reusable
         }
         
         return $rows;
-        
     }
     
     public function getIterator()
@@ -100,5 +99,17 @@ abstract class Result implements \PHPixie\ORM\Steps\Result\Reusable
         return $this->data;
     }
     
-    abstract protected function prepareData();
+    protected function prepareData()
+    {
+        $this->data = array();
+        $embeddedPath = explode('.', $this->embeddedPrefix);
+        foreach($this->reusableResult as $key => $data) {
+            $embeddedData = $this->getEmbeddedData($data, $embeddedPath);
+            if($embeddedData !== null) {
+                $this->addEmbeddedData($embeddedData);
+            }
+        }
+    }
+    
+    abstract protected function addEmbeddedData($embeddedData);
 }

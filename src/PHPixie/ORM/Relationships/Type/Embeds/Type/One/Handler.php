@@ -32,7 +32,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 
     public function removeItem($model, $config)
     {
-        $property = $model->relationshipProperty($config->ownerItemProperty);
+        $property = $model->getRelationshipProperty($config->ownerItemProperty);
         $this->unsetCurrentItemOwner($property);
         list($document, $key) = $this->getParentDocumentAndKey($model, $config->path);
         $document->remove($key);
@@ -48,7 +48,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 
     protected function setItemModel($model, $config, $item)
     {
-        $property = $model->relationshipProperty($config->ownerItemProperty);
+        $property = $model->getRelationshipProperty($config->ownerItemProperty);
         $this->unsetCurrentItemOwner($property);
 
         list($document, $key) = $this->getParentDocumentAndKey($model, $config->path);

@@ -1,23 +1,27 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Type\Embeds\Type\One\Preload;
+namespace PHPixieTests\ORM\Relationships\Type\Embeds\Type\Many\Preload;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Preload\Result
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Preload\Result
  */
 class ResultTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\Preload\ResultTest
 {
-    protected $embeddedPath = 'tree.fairy';
+    protected $embeddedPath = 'tree.fairies';
     protected $iteratorData = array();
     
     public function setUp()
     {
         parent::setUp();
         
-        foreach($this->data as $data) {
+        for($i=0; $i<4; $i=$i+2) {
             $this->iteratorData[] = (object) array(
                                         'tree' => (object) array(
-                                            'fairy' => $data
+                                            'fairies' => array(
+                                                $this->data[$i],
+                                                $this->data[$i+1],
+                                                null
+                                            )
                                         )
                                     );
         }
@@ -30,7 +34,7 @@ class ResultTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\Preload\Res
     
     protected function result()
     {
-        return new \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Preload\Result($this->reusableResult, $this->embeddedPath);
+        return new \PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Preload\Result($this->reusableResult, $this->embeddedPath);
     }
     
 }

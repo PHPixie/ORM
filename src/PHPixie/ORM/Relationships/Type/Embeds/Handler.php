@@ -40,9 +40,9 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
 
     public function preload($side, $ownerLoader, $plan)
     {
-        $loader = $this->relationshipType->loader($side->config, $ownerLoader);
+        $loader = $this->relationship->loader($side->config, $ownerLoader);
 
-        return $this->relationshipType->preloader($side, $loader);
+        return $this->relationship->preloader($side, $loader);
     }
 
     public abstract function mapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix = '');

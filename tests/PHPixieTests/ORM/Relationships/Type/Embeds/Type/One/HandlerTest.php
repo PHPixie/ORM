@@ -27,7 +27,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     public function testOffsetSetWrongModel() {
         $owner = $this->getOwner();
         $item = $this->prepareWrongItem();
-        $this->handler->setItem($owner['model'], $this->propertyConfig, $item);
+        $this->handler->setItem($owner['entity'], $this->propertyConfig, $item);
     }
 
     /**
@@ -63,9 +63,9 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $item = $this->getItem();
 
         $document = $this->prepareGetDocument($owner['document'], $this->configData['path']);
-        $this->method($itemRepository, 'loadFromDocument', $item['model'], array($document), 0);
-        $this->method($item['model'], 'setOwnerRelationship',null , array($owner['model'], $this->configData['ownerItemProperty']), 0);
-        $this->handler->loadProperty($this->propertyConfig, $owner['model']);
+        $this->method($itemRepository, 'loadFromDocument', $item['entity'], array($document), 0);
+        $this->method($item['entity'], 'setOwnerRelationship',null , array($owner['entity'], $this->configData['ownerItemProperty']), 0);
+        $this->handler->loadProperty($this->propertyConfig, $owner['entity']);
     }
 
     /**
@@ -82,21 +82,21 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     {
         $owner = $this->getOwner(null, $ownerLoaded);
         if($ownerLoaded) {
-            $this->method($owner['item']['model'], 'unsetOwnerRelationship', null, array(), 0);
+            $this->method($owner['item']['entity'], 'unsetOwnerRelationship', null, array(), 0);
         }
         $item = $this->getItem();
         $this->prepareSetItemModel($owner, $item);
-        $this->handler->setItem($owner['model'], $this->propertyConfig, $item['model']);
+        $this->handler->setItem($owner['entity'], $this->propertyConfig, $item['entity']);
     }
 
     protected function removeItemTest($ownerLoaded = false)
     {
         $owner = $this->getOwner(null, $ownerLoaded);
         if($ownerLoaded) {
-            $this->method($owner['item']['model'], 'unsetOwnerRelationship', null, array(), 0);
+            $this->method($owner['item']['entity'], 'unsetOwnerRelationship', null, array(), 0);
         }
         $this->prepareRemoveItem($owner);
-        $this->handler->removeItem($owner['model'], $this->propertyConfig);
+        $this->handler->removeItem($owner['entity'], $this->propertyConfig);
     }
 
     protected function createItemTest($itemRepository, $ownerLoaded = false)
@@ -106,9 +106,9 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $owner = $this->getOwner();
         $data = array('name' => 'pixie');
 
-        $this->method($itemRepository, 'load', $item['model'], array(), 0);
+        $this->method($itemRepository, 'load', $item['entity'], array(), 0);
         $this->prepareSetItemModel($owner, $item, 1);
-        $this->handler->createItem($owner['model'], $this->propertyConfig, $data);
+        $this->handler->createItem($owner['entity'], $this->propertyConfig, $data);
     }
 
 
@@ -116,8 +116,8 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     {
         list($document, $key) = $this->prepareGetParentDocumentAndKey($owner['document'], $this->configData['path']);
         $this->method($document, 'set', null, array($key, $item['document']), 0);
-        $this->method($item['model'], 'setOwnerRelationship',null , array($owner['model'], $this->configData['ownerItemProperty']), $itemOffset);
-        $this->preparePopertySetValue($owner['property'], $item['model']);
+        $this->method($item['entity'], 'setOwnerRelationship',null , array($owner['entity'], $this->configData['ownerItemProperty']), $itemOffset);
+        $this->preparePopertySetValue($owner['property'], $item['entity']);
     }
 
     protected function prepareRemoveItem($owner)
@@ -155,12 +155,12 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $itemModel = null;
         if($loaded) {
             $owner['item'] = $this->getItem($owner);
-            $itemModel = $owner['item']['model'];
+            $itemModel = $owner['item']['entity'];
         }
         $this->method($property, 'isLoaded', $loaded, array());
         $this->method($property, 'value', $itemModel, array());
 
-        $this->method($owner['model'], 'relationshipProperty', $property, array($propertyName), null, true);
+        $this->method($owner['entity'], 'getRelationshipProperty', $property, array($propertyName), null, true);
         $owner['property'] = $property;
         return $owner;
     }
@@ -189,7 +189,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
 
     protected function getProperty()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Model\Item');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity\Item');
     }
 
     protected function getPreloader() {
@@ -208,22 +208,19 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
 
     protected function getRelationship()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\EmbedsMany');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\EmbedsOne');
     }
 
     protected function getHandler()
     {
         return new \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Handler(
-            $this->ormBuilder,
             $this->repositories,
             $this->planners,
             $this->plans,
             $this->steps,
             $this->loaders,
-            $this->relationship,
-            $this->groupMapper,
-            $this->cascadeMapper,
-            $this->embeddedGroupMapper
+            $this->mappers,
+            $this->relationship
         );
     }
 }

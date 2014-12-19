@@ -4,10 +4,16 @@ namespace PHPixie\ORM;
 
 class Models
 {
-    protected $configs = array();
+    
+    protected $configSlices;
     
     public function __construct($configSlices)
     {
-        
+        $this->configSlices = $configSlices;
+    }
+    
+    protected function getSlices($type)
+    {
+        foreach($this->configSlices as 
     }
 }

@@ -28,5 +28,10 @@ class Conditions
     {
         return new \PHPixie\ORM\Conditions\Condition\Collection($collectionItems);
     }
+    
+    public function container($defaultOperator = '=')
+    {
+        return new \PHPixie\ORM\Conditions\Builder\Container($this, $defaultOperator);
+    }
 
 }

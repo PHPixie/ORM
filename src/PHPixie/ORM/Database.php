@@ -20,4 +20,9 @@ class Database
     {
         return $this->database->subdocumentCondition();
     }
+    
+    public function connectionDriverName($connectionName)
+    {
+        return $this->database->subdocumentCondition();
+    }
 }

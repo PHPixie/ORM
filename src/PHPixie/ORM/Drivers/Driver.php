@@ -12,5 +12,7 @@ abstract class Driver
     }
 
     abstract public function repository($modelName);
+    abstract public function config($modelName);
+    abstract public function query($modelName);
 
 }

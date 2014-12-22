@@ -2,24 +2,40 @@
 
 namespace PHPixie\ORM\Models;
 
-class Model
+abstract class Model
 {
-    protected $wrappers;
+    protected $models;
+    protected $config;
+    protected $relationships;
+    protected $wrapper;
     
-    public function __construct($wrappers)
+    protected $modelConfigs = array();
+    
+    public function __construct($models, $config, $relationships)
     {
-        $this->wrappers = $wrappers;
+        $this->models        = $models;
+        $this->config        = $config;
+        $this->relationships = $relationships;
+        $this->wrapper       = $this->models->wrapper();
     }
     
-    public abstract function enity($modelName, $data);
-    
-    public function config()
+    public function config($modelName)
     {
-        if(!array_key_exists($modelName, $this->configs)) {
-            $configSlice = $this->models->configSlice($modelName, $this->type());
-            $this->configs[$modelName] = $this->buildSlice($modelName, $configSlice);
+        if(!array_key_exists($modelName, $this->modelConfigs)) {
+            $configSlice = $this->models->modelConfigSlice($modelName);
+            
+            $modelType = $configSlice->get('type', 'database');
+            if($modelType !== $this->type()) {
+                throw new \PHPixie\ORM\Exception\Model("The type of '$modelName' model is '$modelType', expected {$this->type()}");
+            }
+            
+            $this->modelConfigs[$modelName] = $this->buildConfig($modelName, $configSlice);
         }
         
-        return $this->configs[$modelName];
+        return $this->modelConfigs[$modelName];
     }
+    
+    abstract protected function buildConfig($modelName, $configSlice);
+    
+    abstract protected function type();
 }

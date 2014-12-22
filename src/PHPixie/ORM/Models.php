@@ -12,8 +12,13 @@ class Models
         $this->configSlices = $configSlices;
     }
     
-    protected function getSlices($type)
+    public function modelConfigSlice()
     {
-        foreach($this->configSlices as 
+        
+    }
+    
+    public function wrapper()
+    {
+    
     }
 }

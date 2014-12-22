@@ -5,12 +5,12 @@ namespace PHPixie\ORM\Models\Model;
 abstract class Config extends \PHPixie\ORM\Configs\Config
 {
     public $type;
-    public $modelName;
+    public $model;
     
-    public function __construct($inflector, $config, $modelName)
+    public function __construct($inflector, $model, $config)
     {
         $this->type = $this->type();
-        $this->modelName = $modelName;
+        $this->model = $modelName;
         parent::__construct($inflector, $config);
     }
     

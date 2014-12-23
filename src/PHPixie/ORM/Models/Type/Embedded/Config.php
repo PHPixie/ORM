@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Models\Type\Database;
+namespace PHPixie\ORM\Models\Type\Embedded;
 
 class Config extends \PHPixie\ORM\Models\Model\Config
 {

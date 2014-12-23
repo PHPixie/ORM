@@ -7,16 +7,17 @@ abstract class Model
     protected $models;
     protected $config;
     protected $relationships;
-    protected $wrapper;
+    protected $wrappers;
     
     protected $modelConfigs = array();
+    protected $wrapped = array();
     
     public function __construct($models, $config, $relationships)
     {
         $this->models        = $models;
         $this->config        = $config;
         $this->relationships = $relationships;
-        $this->wrapper       = $this->models->wrapper();
+        $this->wrappers      = $this->models->wrappers();
     }
     
     public function config($modelName)
@@ -35,7 +36,20 @@ abstract class Model
         return $this->modelConfigs[$modelName];
     }
     
+    protected function hasWrapper($type, $modelName)
+    {
+        if(!array_key_exists($type, $this->wrapped)) {
+            if($this->wrappers !== null) {
+                $this->wrapped[$type] = array_fill_keys($this->wrappers->$type(), true);
+            }else{
+                $this->wrapped[$type] = array();
+            }
+        }
+        
+        return array_key_exists($modelName, $this->wrapped[$type]);
+    }
+    
     abstract protected function buildConfig($modelName, $configSlice);
     
-    abstract protected function type();
+    abstract public function type();
 }

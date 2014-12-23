@@ -17,7 +17,7 @@ class Models
         
     }
     
-    public function wrapper()
+    public function wrappers()
     {
     
     }

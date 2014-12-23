@@ -11,8 +11,9 @@ abstract class Driver
         $this->ormBuilder = $ormBuilder;
     }
 
-    abstract public function repository($modelName);
+    abstract public function repository($database, $model, $config);
     abstract public function config($modelName);
-    abstract public function query($modelName);
+    abstract public function query($values, $mapper, $relationshipMap, $container, $config);
+    abstract public function entity($relationshipMap, $repository, $data, $isNew);
 
 }

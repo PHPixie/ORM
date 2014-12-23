@@ -15,7 +15,7 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
 
     protected $inflector;
     protected $relationshipMap;
-    protected $wrapper;
+    protected $wrappers;
     
     protected $type;
     
@@ -31,9 +31,8 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
         $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
         $this->method($this->relationships, 'map', $this->relationshipMap, array());
         
-        $this->wrapper = $this->abstractMock('\PHPixie\ORM\Wrapper');
-        $this->method($this->models, 'wrapper', $this->wrapper, array());
-        $this->prepareWrapper();
+        $this->wrappers = $this->abstractMock('\PHPixie\ORM\Wrappers');
+        $this->method($this->models, 'wrappers', $this->wrappers, array());
         
         $this->model = $this->model();
     }
@@ -60,6 +59,20 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::config
+     * @covers ::<protected>
+     */
+    public function testConfigException()
+    {
+        $configSlice = $this->getConfigSlice('fairy', 'test');
+        $this->method($this->models, 'modelConfigSlice', $configSlice, array('fairy'), 0);
+        $this->method($configSlice, 'get', 'test', array('type', 'database'), 0);
+        
+        $this->setExpectedException('\PHPixie\ORM\Exception\Model');
+        $this->model->config('fairy');
+    }
+    
+    /**
      * @covers ::type
      * @covers ::<protected>
      */
@@ -68,12 +81,29 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
         $this->assertSame($this->type, $this->model->type());
     }
     
+    protected function prepareNullWrappers()
+    {
+        $this->models = $this->quickMock('\PHPixie\ORM\Models');
+        $this->method($this->models, 'wrappers', null, array());
+        $this->model = $this->model();
+    }
+    
     protected function prepareConfig($modelName)
     {
+        $configSlice = $this->prepareConfigSlice($modelName, $this->type);
+        $config = $this->prepareBuildConfig($modelName, $configSlice);
+        $config->model = $modelName;
+        
+        return $config;
+    }
+    
+    protected function prepareConfigSlice($modelName, $type)
+    {
         $configSlice = $this->getConfigSlice();
-        $this->method($this->models, 'modelConfigSlice', $configSlice, array('fairy'), 0);
-        $this->method($configSlice, 'get', $this->type, array('type', 'database'), 0);
-        return $this->prepareBuildConfig($modelName, $configSlice);
+        $this->method($this->models, 'modelConfigSlice', $configSlice, array($modelName), 0);
+        
+        $this->method($configSlice, 'get', $type, array('type', 'database'), 0);
+        return $configSlice;
     }
     
     protected function getConfigSlice()
@@ -81,7 +111,12 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
         return $this->abstractMock('\PHPixie\Config\Slice');
     }
     
-    protected abstract function prepareBuildConfig($modelName, $configSlice);
-    protected abstract function prepareWrapper();
-    protected abstract function model();
+    protected function getData()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Data\Type');
+    }
+    
+    abstract protected function testWrappersNull();
+    abstract protected function prepareBuildConfig($modelName, $configSlice);
+    abstract protected function model();
 }

@@ -10,12 +10,6 @@ class Database extends \PHPixie\ORM\Models\Model
     protected $mappers;
     protected $values;
     
-    protected $wrapper;
-    
-    protected $wrappedRepositories = array();
-    protected $wrappedEntities = array();
-    protected $wrappedQueries = array();
-    
     public function __construct($models, $relationships, $configs, $database, $drivers, $conditions, $mappers, $values)
     {
         parent::__construct($models, $relationships, $configs);
@@ -26,14 +20,9 @@ class Database extends \PHPixie\ORM\Models\Model
         $this->mappers = $mappers;
         $this->values = $values;
         
-        if($this->wrapper !== null) {
-            $this->wrappedRepositories = $this->wrapper->databaseRepositories();
-            $this->wrappedEntities     = $this->wrapper->databaseEntities();
-            $this->wrappedQueries      = $this->wrapper->databaseQueries();
-        }
     }
     
-    public function buildConfig($modelName, $configSlice)
+    protected function buildConfig($modelName, $configSlice)
     {
         $driverName = $this->database->connectionDriverName($configSlice->get('connection', 'default'));
         $driver = $this->drivers->get($driverName);
@@ -44,17 +33,21 @@ class Database extends \PHPixie\ORM\Models\Model
     {
         $config = $this->config($modelName);
         $driver = $this->drivers->get($config->driver);
-        $repository = $driver->repository($modelName, $config);
         
-        if(array_key_exists($this->wrappedRepositories, $modelName)) {
-            $repository = $this->wrapper->databaseRepositoryWrapper($repository);
+        $repository = $driver->repository($this->database, $this, $config);
+        
+        if($this->hasWrapper('databaseRepositories', $config->model)) {
+            $repository = $this->wrappers->databaseRepositoryWrapper($repository);
         }
         
         return $repository;
     }
     
-    public function entity($repository, $data, $isNew = true)
+    public function entity($repository, $data, $isNew)
     {
+        $config = $repository->config();
+        $driver = $this->drivers->get($config->driver);
+        
         $entity = $driver->entity(
             $this->relationships->map(),
             $repository,
@@ -62,8 +55,8 @@ class Database extends \PHPixie\ORM\Models\Model
             $isNew
         );
         
-        if(array_key_exists($this->wrappedEntities, $repository->modelName())) {
-            $entity = $this->wrapper->databaseEntityWrapper($entity);
+        if($this->hasWrapper('databaseEntities', $config->model)) {
+            $entity = $this->wrappers->databaseEntityWrapper($entity);
         }
         
         return $entity;
@@ -81,8 +74,8 @@ class Database extends \PHPixie\ORM\Models\Model
             $config
         );
         
-        if(array_key_exists($config->model, $this->wrappedQueries)) {
-            $query = $this->wrapper->databaseQueryWrapper($query);
+        if($this->hasWrapper('databaseQueries', $config->model)) {
+            $query = $this->wrappers->databaseQueryWrapper($query);
         }
         
         return $query;

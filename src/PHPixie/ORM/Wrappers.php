@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM;
 
-abstract class Wrapper
+abstract class Wrappers
 {
     public function databaseRepositoryWrapper($repository)
     {

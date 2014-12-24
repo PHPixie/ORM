@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Wrapper\Type\Embedded;
+namespace PHPixie\ORM\Wrappers\Type\Embedded;
 
-class Entity extends \PHPixie\ORM\Wrapper\Model\Entity
+class Entity extends \PHPixie\ORM\Wrappers\Model\Entity
              implements \PHPixie\ORM\Models\Type\Embedded\Entity
 {
     public function setOwnerRelationship($owner, $ownerPropertyName)

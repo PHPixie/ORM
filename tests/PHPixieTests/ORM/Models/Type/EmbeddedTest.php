@@ -30,6 +30,34 @@ class EmbeddedTest extends \PHPixieTests\ORM\Models\ModelTest
         $this->entityTest('fairy', false, false);
     }
     
+    /**
+     * @covers ::<protected>
+     */
+    public function testBuildInstances()
+    {
+        $this->model = new \PHPixie\ORM\Models\Type\Embedded(
+            $this->models,
+            $this->config,
+            $this->relationships
+        );
+        $this->method($this->wrappers, 'embeddedEntities', array(), array(), 0);
+        $this->method($this->relationshipMap, 'entityPropertyNames', array(), array('fairy'), 0);
+        
+        $data = $this->getData();
+        $this->prepareConfigSlice('fairy', $this->type);
+        
+        $entity = $this->model->entity('fairy', $data);
+        
+        $config = $this->model->config('fairy');
+        $this->assertInstanceOf('\PHPixie\ORM\Models\Type\Embedded\Config', $config);
+        $this->assertSame('fairy', $config->model);
+        
+        $this->assertInstanceOf('\PHPixie\ORM\Models\Type\Embedded\Implementation\Entity', $entity);
+        $this->assertAttributeEquals($this->relationshipMap, 'relationshipMap', $entity);
+        $this->assertAttributeEquals($config, 'config', $entity);
+        $this->assertAttributeEquals($data, 'data', $entity);
+    }
+    
     protected function entityTest($modelName, $isWrapped, $wrapperAt = 0)
     {
         $data = $this->getData();

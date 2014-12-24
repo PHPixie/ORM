@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Wrapper\Model;
+namespace PHPixie\ORM\Wrappers\Model;
 
 abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
 {

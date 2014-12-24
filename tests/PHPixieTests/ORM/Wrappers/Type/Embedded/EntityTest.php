@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Wrapper\Type\Embedded;
+namespace PHPixieTests\ORM\Wrappers\Type\Embedded;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Wrapper\Type\Embedded\Entity
+ * @coversDefaultClass \PHPixie\ORM\Wrappers\Type\Embedded\Entity
  */
-class EntityTest extends \PHPixieTests\ORM\Wrapper\Model\EntityTest
+class EntityTest extends \PHPixieTests\ORM\Wrappers\Model\EntityTest
 {
     public function setUp()
     {
@@ -26,6 +26,6 @@ class EntityTest extends \PHPixieTests\ORM\Wrapper\Model\EntityTest
     
     protected function wrapper()
     {
-        return new \PHPixie\ORM\Wrapper\Type\Embedded\Entity($this->entity);
+        return new \PHPixie\ORM\Wrappers\Type\Embedded\Entity($this->entity);
     }
 }

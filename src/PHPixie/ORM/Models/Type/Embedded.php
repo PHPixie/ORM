@@ -7,7 +7,7 @@ class Embedded extends \PHPixie\ORM\Models\Model
 
     protected function buildConfig($modelName, $configSlice)
     {
-        return new \PHPixie\ORM\Models\Type\Embedded\Implementation\Config(
+        return new \PHPixie\ORM\Models\Type\Embedded\Config(
             $this->config->inflector(),
             $modelName,
             $configSlice

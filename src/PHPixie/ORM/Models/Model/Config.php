@@ -7,7 +7,7 @@ abstract class Config extends \PHPixie\ORM\Configs\Config
     public $type;
     public $model;
     
-    public function __construct($inflector, $model, $config)
+    public function __construct($inflector, $modelName, $config)
     {
         $this->type = $this->type();
         $this->model = $modelName;

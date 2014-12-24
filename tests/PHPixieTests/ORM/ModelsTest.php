@@ -1,0 +1,67 @@
+<?php
+
+namespace PHPixie\ORM;
+
+/**
+ * @coversDefaultClass \PHPixie\ORM\Models
+ */
+class ModelsTest extends \PHPixieTests\AbstractORMTest
+{
+    protected $ormBuilder;
+    protected $configSlice;
+    protected $wrappers;
+    
+    protected $models;
+    
+    public function setUp()
+    {
+        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
+        $this->configSlice = $this->getConfigSlice();
+        $this->wrappers = $this->abstractMock('\PHPixie\ORM\Wrappers');
+        
+        $this->models = new \PHPixie\ORM\Models($this->ormBuilder, $this->configSlice, $this->wrappers);
+    }
+    
+    /**
+     * @covers ::wrappers
+     * @covers ::<protected>
+     */
+    public function testWrappers()
+    {
+        $this->assertSame($this->wrappers, $this->models->wrappers());
+        
+        $models = new \PHPixie\ORM\Models($this->ormBuilder, $this->configSlice);
+        $this->assertSame(null, $models->wrappers());
+    }
+    
+    /**
+     * @covers ::modelConfigSlice
+     * @covers ::<protected>
+     */
+    public function testModelConfigSlice()
+    {
+        $slice = $this->getConfigSlice();
+        $this->method($this->configSlice, 'slice', $slice, array('pixie'), 0);
+        
+        $this->assertSame($slice, $this->models->modelConfigSlice('pixie'));
+    }
+    
+    /**
+     * @covers ::databaseModel
+     * @covers ::<protected>
+     */
+    public function testModelConfigSlice()
+    {
+        $slice = $this->getConfigSlice();
+        $this->method($this->configSlice, 'slice', $slice, array('pixie'), 0);
+        
+        $this->assertSame($slice, $this->models->modelConfigSlice('pixie'));
+    }
+    
+    protected function getConfigSlice()
+    {
+        return $this->abstractMock('\PHPixie\Config\Slice');
+    }
+              
+    
+}

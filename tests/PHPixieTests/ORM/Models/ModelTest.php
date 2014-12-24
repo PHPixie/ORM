@@ -31,7 +31,7 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
         $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
         $this->method($this->relationships, 'map', $this->relationshipMap, array());
         
-        $this->wrappers = $this->abstractMock('\PHPixie\ORM\Wrappers');
+        $this->wrappers = $this->abstractMock('\PHPixie\ORM\Wrapperss');
         $this->method($this->models, 'wrappers', $this->wrappers, array());
         
         $this->model = $this->model();

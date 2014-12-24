@@ -26,7 +26,7 @@ abstract class Wrappers
         return $this->entityWrapper($entity);
     }
     
-    protected function entityWrapper()
+    protected function entityWrapper($entity)
     {
         $method = $entity->modelName().'Entity';
         return $this->$method($entity);

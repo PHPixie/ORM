@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Wrapper\Type\Database;
+namespace PHPixie\ORM\Wrappers\Type\Database;
 
 class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
             implements \PHPixie\ORM\Models\Type\Database\Query

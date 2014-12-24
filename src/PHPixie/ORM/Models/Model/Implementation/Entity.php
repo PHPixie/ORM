@@ -21,7 +21,7 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
     
     public function modelName()
     {
-        return $this->config->modelName;
+        return $this->config->model;
     }
     
     public function data()

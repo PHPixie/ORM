@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Wrapper\Type\Database;
+namespace PHPixie\ORM\Wrappers\Type\Database;
 
-class Entity extends \PHPixie\ORM\Wrapper\Model\Entity
+class Entity extends \PHPixie\ORM\Wrappers\Model\Entity
              implements \PHPixie\ORM\Models\Type\Database\Entity
 {
     public function id()

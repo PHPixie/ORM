@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Wrapper\Model;
+namespace PHPixieTests\ORM\Wrappers\Model;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Wrapper\Model\Entity
+ * @coversDefaultClass \PHPixie\ORM\Wrappers\Model\Entity
  */
 abstract class EntityTest extends \PHPixieTests\AbstractORMTest
 {

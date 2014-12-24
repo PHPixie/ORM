@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Wrapper\Type\Database;
+namespace PHPixieTests\ORM\Wrappers\Type\Database;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Wrapper\Type\Database\Query
+ * @coversDefaultClass \PHPixie\ORM\Wrappers\Type\Database\Query
  */
 class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
 {
@@ -98,6 +98,6 @@ class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     
     protected function proxy()
     {
-        return new \PHPixie\ORM\Wrapper\Type\Database\Query($this->builder);
+        return new \PHPixie\ORM\Wrappers\Type\Database\Query($this->builder);
     }
 }

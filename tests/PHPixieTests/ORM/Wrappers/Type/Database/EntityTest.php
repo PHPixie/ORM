@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Wrapper\Type\Database;
+namespace PHPixieTests\ORM\Wrappers\Type\Database;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Wrapper\Type\Database\Entity
+ * @coversDefaultClass \PHPixie\ORM\Wrappers\Type\Database\Entity
  */
-class EntityTest extends \PHPixieTests\ORM\Wrapper\Model\EntityTest
+class EntityTest extends \PHPixieTests\ORM\Wrappers\Model\EntityTest
 {
     public function setUp()
     {
@@ -30,6 +30,6 @@ class EntityTest extends \PHPixieTests\ORM\Wrapper\Model\EntityTest
     
     protected function wrapper()
     {
-        return new \PHPixie\ORM\Wrapper\Type\Database\Entity($this->entity);
+        return new \PHPixie\ORM\Wrappers\Type\Database\Entity($this->entity);
     }
 }

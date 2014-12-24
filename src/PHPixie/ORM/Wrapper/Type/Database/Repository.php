@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Wrapper\Type\Database;
+namespace PHPixie\ORM\Wrappers\Type\Database;
 
 class Repository implements \PHPixie\ORM\Models\Type\Database\Repository
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Wrapper\Type\Database;
+namespace PHPixieTests\ORM\Wrappers\Type\Database;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Wrapper\Type\Database\Repository
+ * @coversDefaultClass \PHPixie\ORM\Wrappers\Type\Database\Repository
  */
 class RepositoryTest extends \PHPixieTests\AbstractORMTest
 {
@@ -13,7 +13,7 @@ class RepositoryTest extends \PHPixieTests\AbstractORMTest
     public function setUp()
     {
         $this->repository   = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Repository');
-        $this->wrapper = new \PHPixie\ORM\Wrapper\Type\Database\Repository($this->repository);
+        $this->wrapper = new \PHPixie\ORM\Wrappers\Type\Database\Repository($this->repository);
     }
     
     /**

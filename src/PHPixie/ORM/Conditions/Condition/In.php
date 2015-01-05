@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Conditions\Condition;
 
-class Collection extends \PHPixie\ORM\Conditions\Condition
+class In extends \PHPixie\ORM\Conditions\Condition
 {
     protected $items;
 

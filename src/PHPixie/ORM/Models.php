@@ -28,7 +28,7 @@ class Models
         return $this->wrappers;
     }
     
-    public function databaseModel()
+    public function database()
     {
         if($this->databaseModel === null)
         {
@@ -38,7 +38,7 @@ class Models
         return $this->databaseModel;
     }
     
-    public function embeddedModel()
+    public function embedded()
     {
         if($this->embeddedModel === null)
         {
@@ -64,7 +64,7 @@ class Models
     
     protected function buildEmbeddedModel()
     {
-        return new \PHPixie\ORM\Models\Type\Database(
+        return new \PHPixie\ORM\Models\Type\Embedded(
             $this,
             $this->ormBuilder->relationships(),
             $this->ormBuilder->configs()

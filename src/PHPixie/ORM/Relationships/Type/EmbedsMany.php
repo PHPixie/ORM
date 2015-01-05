@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type;
 
-class EmbedsMany extends \PHPixie\ORM\Relationships\Type\Embeds
+class EmbedsMany extends \PHPixie\ORM\Relationships\Relationship\Implementation
 {
 
     public function config($config)
@@ -15,7 +15,7 @@ class EmbedsMany extends \PHPixie\ORM\Relationships\Type\Embeds
         return new Embeds\Type\Many\Side($this, $propertyName, $config);
     }
 
-    public function buildHandler($repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper)
+    public function buildHandler()
     {
         return new Embeds\Type\Many\Handler($this->ormBuilder, $this, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper, $this->embeddedGroupMapper);
     }
@@ -39,7 +39,7 @@ class EmbedsMany extends \PHPixie\ORM\Relationships\Type\Embeds
         return new Embeds\Type\Many\Loader($loaders, $this, $side, $loader);
     }
 
-    public function modelProperty($side, $model)
+    public function entityProperty($side, $model)
     {
         return new Embeds\Type\Many\Property\Model\Items($this->handler(), $side, $model);
     }

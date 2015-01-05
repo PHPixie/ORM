@@ -3,6 +3,7 @@
 namespace PHPixie\ORM\Loaders\Loader\Proxy;
 
 class Preloading extends \PHPixie\ORM\Loaders\Loader\Proxy
+                 implements \PHPixie\ORM\Mappers\Preloader\Preloadable
 {
     protected $preloaders = array();
 
@@ -26,16 +27,18 @@ class Preloading extends \PHPixie\ORM\Loaders\Loader\Proxy
     
     public function getByOffset($offset)
     {
-        $model = $this->loader->getByOffset($offset);
-        $this->preloadModelProperties($model);
+        $entity = $this->loader->getByOffset($offset);
+        $this->preloadModelProperties($entity);
 
-        return $model;
+        return $entity;
     }
 
-    protected function preloadModelProperties($model)
+    protected function preloadModelProperties($entity)
     {
-        foreach($this->preloaders as $relationship => $preloader)
-            $model->setRelationshipProperty($relationship, $preloader->loadFor($model));
+        foreach($this->preloaders as $relationship => $preloader) {
+            $property = $entity->getRelationshipProperty($relationship);
+            $preloader->loadProperty($property);
+        }
     }
     
 }

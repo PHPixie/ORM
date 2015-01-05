@@ -37,6 +37,4 @@ abstract class Implementation implements \PHPixie\ORM\Relationships\Relationship
     abstract protected function config($config);
     abstract protected function side($type, $config);
     abstract protected function sideTypes($config);
-    abstract protected function buildHandler();
-
 }

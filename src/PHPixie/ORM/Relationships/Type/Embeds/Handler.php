@@ -2,48 +2,38 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embeds;
 
-abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler\Embedded
+abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler\Embedded/*
+                       implements \PHPixie\ORM\Relationships\Relationship\Handler\Preloading,
+                                  \PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Database,
+                                  \PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Embedded*/
 {
-
-    public function mapRelationship($side, $query, $group, $plan)
+    public function mapPreload($side, $property, $result, $plan)
     {
-        $builder = $query->getWhereBuilder();
-        $this->mapRelationshipBuilder($side, $builder, $group, $plan);
+        $config = $side->config();
+        $preloadResult = $this->relationship->preloadResult($result, $config->path);
+        
+        $preloader = $this->relationship->preloader();
+        
+        $this->mappers->preload()->map(
+            $preloader,
+            $config->itemModel,
+            $property->preload(),
+            $preloadResult,
+            $plan
+        );
+        
+        return $preloader;
     }
 
-    protected function removeItemFromOwner($item)
+    public function mapDatabaseQuery($query, $side, $group, $plan)
     {
-        $owner = $item->owner();
-        if ($owner !== null) {
-            $propertyName = $item->ownerPropertyName();
-            $property = $owner->relationshipProperty($propertyName);
-            if ($property instanceof \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Item) {
-                $property->remove();
-            } else {
-                $property->remove($item);
-            }
-        }
-
+        $this->mapConditionBuilder($query, $side, $group, $plan);
     }
-
-
-    protected function fieldPrefix($oldPrefix, $path)
+    
+    public function mapEmbeddedContainer($container, $side, $group, $plan)
     {
-        if ($oldPrefix === null)
-            return $path;
-
-        if ($path === null)
-            return $oldPrefix;
-
-        return $oldPrefix.'.'.$path;
+        $this->mapConditionBuilder($container, $side, $group, $plan);
     }
-
-    public function preload($side, $ownerLoader, $plan)
-    {
-        $loader = $this->relationship->loader($side->config, $ownerLoader);
-
-        return $this->relationship->preloader($side, $loader);
-    }
-
-    public abstract function mapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix = '');
+    
+    abstract protected function mapConditionBuilder($builder, $side, $group, $plan);
 }

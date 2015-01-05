@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Conditions\Condition\Collection;
+namespace PHPixie\ORM\Conditions\Condition\In;
 
 interface Item
 {

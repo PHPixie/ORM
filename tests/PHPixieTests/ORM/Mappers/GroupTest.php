@@ -60,22 +60,22 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::mapSubdocument
+     * @covers ::mapEmbeddedContainer
      * @covers ::<protected>
      */
     public function testMapSubdocument()
     {
         $prefix = 'trixie';
-        $subdocument = $this->getSubdocumentValue();
+        $subdocument = $this->getEmbeddedContainer();
         $plan = $this->getStepsPlan();
-        $conditions = $this->prepareMapConditions($subdocument, $plan, $prefix);
-        $this->groupMapper->mapSubdocument($subdocument, $this->modelName, $conditions, $plan, $prefix);
+        $conditions = $this->prepareMapConditions($subdocument, $plan, true);
+        $this->groupMapper->mapEmbeddedContainer($subdocument, $this->modelName, $conditions, $plan, $prefix);
         
-        $invalid = array('test', $this->collectionCondition('and', false, array(5)));
+        $invalid = array('test', $this->inCondition('and', false, array(5)));
         foreach($invalid as $condition) {
             $except = false;
             try{
-                $this->groupMapper->mapSubdocument($subdocument, $this->modelName, array($condition), $plan, $prefix);        
+                $this->groupMapper->mapEmbeddedContainer($subdocument, $this->modelName, array($condition), $plan, $prefix);        
             }catch(\PHPixie\ORM\Exception\Mapper $e) {
                 $except = true;
             }
@@ -85,12 +85,10 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
         
     }
     
-    protected function prepareMapConditions($builder, $plan, $embeddedPath = null)
+    protected function prepareMapConditions($builder, $plan, $isEmbeddedContainer = false)
     {
-        $fieldPrefix = $embeddedPath === null ? '' : $embeddedPath.'.';
         $operatorParams = array('or', false, 'a', '>', array(1));
         $operator = call_user_func_array(array($this, 'operatorCondition'), $operatorParams);
-        $operatorParams[2] = $fieldPrefix.$operatorParams[2];
         
         $conditions = array();
         
@@ -114,17 +112,17 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
         $relationship = $this->getRelationship();
         $this->method($this->relationships, 'get', $relationship, array('oneToOne'), 0);
         
-        $handler = $this->getHandler($embeddedPath !== null);
+        $handler = $this->getHandler($isEmbeddedContainer);
         $this->method($relationship, 'handler', $handler, array(), 0);
         
-        if($embeddedPath === null) {
+        if(!$isEmbeddedContainer) {
             $this->method($handler, 'mapQuery', null, array($builder, $side, $relationshipGroup, $plan), 0);
         }else{
-            $this->method($handler, 'mapSubdocument', null, array($builder, $side, $relationshipGroup, $plan, $embeddedPath), 0);
+            $this->method($handler, 'mapEmbeddedContainer', null, array($builder, $side, $relationshipGroup, $plan), 0);
         
         }
         
-        if($embeddedPath === null) {
+        if(!$isEmbeddedContainer) {
             $items = array(5);
             $repository = $this->getRepository();
             $this->method($this->repositories, 'get', $repository, array($this->modelName), 0);
@@ -133,7 +131,7 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
             $config->idField = 'id';
             $this->method($repository, 'config', $config, array(), 0);
             
-            $conditions[] = $this->collectionCondition('or', true, $items);
+            $conditions[] = $this->inCondition('or', true, $items);
             $collection = $this->getCollection();
             $this->method($this->planners, 'collection', $collection, array($this->modelName, $items), 0);
             $this->method($this->inPlanner, 'collection', null, array($builder, 'id', $collection, 'id', $plan, 'or', true), 0);
@@ -146,16 +144,16 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
     {
         $condition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\Operator');
 
-        $condition->field = $field;
-        $condition->operator = $operator;
-        $condition->values = $values;
+        $this->method($condition, 'field', $field, array());
+        $this->method($condition, 'operator', $operator, array());
+        $this->method($condition, 'values', $values, array());
         
         return $this->prepareCondition($condition, $logic, $negated);
     }
     
-    protected function collectionCondition($logic, $negated, $items)
+    protected function inCondition($logic, $negated, $items)
     {
-        $group = $this->quickMock('\PHPixie\ORM\Conditions\Condition\Collection');
+        $group = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
         $this->method($group, 'items', $items);
         return $this->prepareCondition($group, $logic, $negated);
     }
@@ -182,7 +180,7 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
     protected function prepareCondition($condition, $logic, $negated)
     {
         $this->method($condition, 'logic', $logic, array());
-        $this->method($condition, 'negated', $negated, array());
+        $this->method($condition, 'isNegated', $negated, array());
         return $condition;
     }
     
@@ -199,9 +197,9 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
     protected function getHandler($embedded = false)
     {
         if($embedded)
-             return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Handler\Embedded');
+             return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Embedded');
         
-        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Handler');
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Database');
     }
     
     protected function getDatabaseQuery()
@@ -209,9 +207,9 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
         return $this->abstractMock('\PHPixie\Database\Query\Items');
     }
     
-    protected function getSubdocumentValue()
+    protected function getEmbeddedContainer()
     {
-        return $this->quickMock('\PHPixie\Database\Document\Conditions\Subdocument');
+        return $this->quickMock('\PHPixie\Database\Type\Document\Conditions\Builder\Container');
     }
     
     protected function getStepsPlan()

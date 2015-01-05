@@ -8,7 +8,7 @@ namespace PHPixieTests\ORM\Relationships\Relationship\Implementation;
 abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
 {
     protected $handler;
-    protected $repositories;
+    protected $models;
     protected $planners;
     protected $plans;
     protected $steps;
@@ -16,17 +16,28 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
     protected $mappers;
     protected $relationship;
     
+    protected $modelMocks = array();
     protected $mapperMocks = array();
         
     public function setUp()
     {
-        $this->repositories = $this->quickMock('\PHPixie\ORM\Repositories');
+        $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
         $this->plans = $this->quickMock('\PHPixie\ORM\Plans');
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
         $this->loaders = $this->quickMock('\PHPixie\ORM\Loaders');
         $this->relationship = $this->getRelationship();
         $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
+        
+        $models = array(
+            'database' => '\PHPixie\ORM\Models\Type\Database',
+            'embedded' => '\PHPixie\ORM\Models\Type\Embedded',
+        );
+        
+        foreach($models as $key => $class) {
+            $this->modelMocks[$key] = $this->quickMock($class);
+            $this->method($this->models, $key, $this->modelMocks[$key], array());
+        }
         
         $mappers = array(
             'group' => '\PHPixie\ORM\Mappers\Group',
@@ -110,7 +121,7 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
         return $config;
     }
 
-    protected function getConditionGroup($logic = 'and', $negated = false, $conditions = array(5))
+    protected function getCollectionCondition($logic = 'and', $negated = false, $conditions = array(5))
     {
         $group = $this->abstractMock('\PHPixie\ORM\Conditions\Condition\Group');
         $this->method($group, 'logic', $logic, array());

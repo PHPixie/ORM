@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type;
 
-class EmbedsOne extends \PHPixie\ORM\Relationships\Relationship
+class EmbedsOne extends \PHPixie\ORM\Relationships\Relationship\Implementation
 {
 
     public function config($config)
@@ -15,7 +15,7 @@ class EmbedsOne extends \PHPixie\ORM\Relationships\Relationship
         return new Embeds\Type\One\Side($this, $propertyName, $config);
     }
 
-    public function buildHandler($repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper)
+    public function buildHandler()
     {
         return new Embeds\Type\One\Handler($this->ormBuilder, $this, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper, $this->embeddedGroupMapper);
     }
@@ -32,15 +32,19 @@ class EmbedsOne extends \PHPixie\ORM\Relationships\Relationship
         return new Embeds\Type\One\Loader($loaders, $config, $ownerLoader);
     }
 
-    public function preloader($side, $loader)
+    public function preloader()
     {
-        $loaders = $this->ormBuilder->loaders();
-
-        return new Embeds\Type\One\Loader($loaders, $this, $side, $loader);
+        
     }
-
-    public function modelProperty($side, $model)
+    
+    public function preloadResult()
+    {
+    
+    }
+    
+    public function entityProperty($side, $model)
     {
         return new Embeds\Type\One\Property\Model\Items($this->handler(), $side, $model);
     }
+    
 }

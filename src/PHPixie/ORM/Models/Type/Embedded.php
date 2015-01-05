@@ -14,9 +14,11 @@ class Embedded extends \PHPixie\ORM\Models\Model
         );
     }
     
-    public function entity($modelName, $data)
+    public function entity($modelName, $document)
     {
         $config = $this->config($modelName);
+        $data = $this->data->document($document);
+        
         $entity = $this->buildEntity($config, $data);
         
         if($this->hasWrapper('embeddedEntities', $config->model)) {
@@ -24,6 +26,16 @@ class Embedded extends \PHPixie\ORM\Models\Model
         }
         
         return $entity;
+    }
+    
+    public function loadEntity()
+    {
+        
+    }
+    
+    public function loadEntityFromData()
+    {
+        
     }
     
     protected function buildEntity($config, $data)

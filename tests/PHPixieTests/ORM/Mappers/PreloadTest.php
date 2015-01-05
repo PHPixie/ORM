@@ -32,18 +32,18 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::mapPreload
+     * @covers ::map
      * @covers ::<protected>
      */
     public function testMapPreload()
     {
-        $preloadingProxy = $this->getPreloadingProxy();
+        $preloadingProxy = $this->getPreloadable();
         $preload = $this->getPreload();
         $reusableResult = $this->getReusableResult();
         $stepsPlan = $this->getStepsPlan();
         
         $this->prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan);
-        $this->preloadMapper->mapPreload(
+        $this->preloadMapper->map(
             $preloadingProxy,
             $this->modelName,
             $preload,
@@ -52,32 +52,7 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
         );
     }
 
-    /**
-     * @covers ::mapPreloadEmbedded
-     * @covers ::<protected>
-     */
-    public function testMapPreloadEmbedded()
-    {
-        $preloadingProxy = $this->getPreloadingProxy();
-        $preload = $this->getPreload();
-        $reusableResult = $this->getReusableResult();
-        $stepsPlan = $this->getStepsPlan();
-        
-        $embeddedPath = 'embedded.prefix';
-        
-        $this->prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan, $embeddedPath);
-        $this->preloadMapper->mapPreloadEmbedded(
-            $preloadingProxy,
-            $this->modelName,
-            $preload,
-            $reusableResult,
-            $stepsPlan,
-            $embeddedPath
-        );
-    }
-
-    
-    protected function prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan, $embeddedPath = null)
+    protected function prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan)
     {
         $sets = array(
             array('pixie', 'oneToOne'),
@@ -102,26 +77,13 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
             
             $preloader = $this->getPreloader();
             
-            if($embeddedPath !== null) {
-                $handler = $this->getHandler(true);
-                
-                $this->method($handler, 'mapPreloadEmbedded', $preloader, array(
-                    $side,
-                    $property,
-                    $reusableResult,
-                    $stepsPlan,
-                    $embeddedPath
-                ), 0);
-                
-            }else{
-                $handler = $this->getHandler();
-                $this->method($handler, 'mapPreload', $preloader, array(
-                    $side,
-                    $property,
-                    $reusableResult,
-                    $stepsPlan
-                ), 0);
-            }
+            $handler = $this->getPreloadingHandler();
+            $this->method($handler, 'mapPreload', $preloader, array(
+                $side,
+                $property,
+                $reusableResult,
+                $stepsPlan
+            ), 0);
             
             $this->method($relationship, 'handler', $handler, array(), 0);
             $this->method($preloadingProxy, 'addPreloader', null, array($set[0], $preloader), $key);
@@ -130,9 +92,9 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
         $this->method($preload, 'properties', $properties, array(), 0);
     }
     
-    protected function getPreloadingProxy()
+    protected function getPreloadable()
     {
-        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Proxy\Preloading');
+        return $this->abstractMock('\PHPixie\ORM\Mappers\Preload\Preloadable');
     }
     
     protected function getPreload()
@@ -165,12 +127,9 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
         return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship');
     }
     
-    protected function getHandler($embedded = false)
+    protected function getPreloadingHandler()
     {
-        if($embedded)
-             return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Handler\Embedded');
-        
-        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Handler');
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Handler\Preloading');
     }
     
     protected function getPreloader()

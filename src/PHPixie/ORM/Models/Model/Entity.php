@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Models\Model;
 
-interface Entity extends \PHPixie\ORM\Conditions\Condition\Collection\Item
+interface Entity extends \PHPixie\ORM\Conditions\Condition\In\Item
 {
     public function modelName();
     public function asObject($recursive = false);

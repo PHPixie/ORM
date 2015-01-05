@@ -18,6 +18,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     {
         $this->setItemTest();
         $this->setItemTest(true);
+        $this->setItemTest(true, true);
     }
 
     /**
@@ -46,10 +47,9 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
      */
     public function testCreateItem()
     {
-        $itemRepository = $this->prepareItemRepository();
-
-        $this->createItemTest($itemRepository);
-        $this->createItemTest($itemRepository, true);
+        $this->createItemTest();
+        $this->createItemTest(true);
+        $this->createItemTest(true, true);
     }
 
     /**
@@ -58,55 +58,43 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
      */
     public function testLoadProperty()
     {
-        $itemRepository = $this->prepareItemRepository();
         $owner = $this->getOwner();
         $item = $this->getItem();
 
         $document = $this->prepareGetDocument($owner['document'], $this->configData['path']);
-        $this->method($itemRepository, 'loadFromDocument', $item['entity'], array($document), 0);
+        $this->method($this->modelMocks['embedded'], 'loadEntity', $item['entity'], array($this->configData['itemModel'], $document), 0);
         $this->method($item['entity'], 'setOwnerRelationship',null , array($owner['entity'], $this->configData['ownerItemProperty']), 0);
         $this->handler->loadProperty($this->propertyConfig, $owner['entity']);
     }
 
-    /**
-     * @covers ::mapRelationshipBuilder
-     * @covers ::<protected>
-     */
-    public function testMapRelationshipBuilder()
+    protected function setItemTest($ownerIsLoaded = false, $ownerItemIsNull = false)
     {
-        $this->mapRelationshipBuilderTest();
-        $this->mapRelationshipBuilderTest('test');
-    }
-
-    protected function setItemTest($ownerLoaded = false)
-    {
-        $owner = $this->getOwner(null, $ownerLoaded);
-        if($ownerLoaded) {
-            $this->method($owner['item']['entity'], 'unsetOwnerRelationship', null, array(), 0);
-        }
+        $owner = $this->getOwner($ownerIsLoaded, $ownerItemIsNull);
+        $this->prepareUnsetCurrentItemOwner($owner, $ownerIsLoaded, $ownerItemIsNull);
+        
         $item = $this->getItem();
         $this->prepareSetItemModel($owner, $item);
         $this->handler->setItem($owner['entity'], $this->propertyConfig, $item['entity']);
     }
 
-    protected function removeItemTest($ownerLoaded = false)
+    protected function removeItemTest($ownerIsLoaded = false, $ownerItemIsNull = false)
     {
-        $owner = $this->getOwner(null, $ownerLoaded);
-        if($ownerLoaded) {
-            $this->method($owner['item']['entity'], 'unsetOwnerRelationship', null, array(), 0);
-        }
+        $owner = $this->getOwner($ownerIsLoaded, $ownerItemIsNull);
+        $this->prepareUnsetCurrentItemOwner($owner, $ownerIsLoaded, $ownerItemIsNull);
         $this->prepareRemoveItem($owner);
         $this->handler->removeItem($owner['entity'], $this->propertyConfig);
     }
 
-    protected function createItemTest($itemRepository, $ownerLoaded = false)
+    protected function createItemTest($ownerIsLoaded = false, $ownerItemIsNull = false)
     {
 
         $item = $this->getItem();
-        $owner = $this->getOwner();
+        $owner = $this->getOwner($ownerIsLoaded, $ownerItemIsNull);
+        $this->prepareUnsetCurrentItemOwner($owner, $ownerIsLoaded, $ownerItemIsNull);
+        
         $data = array('name' => 'pixie');
 
-        $this->method($itemRepository, 'load', $item['entity'], array(), 0);
+        $this->method($this->modelMocks['embedded'], 'loadEntityFromData', $item['entity'], array($this->configData['itemModel'], $data), 0);
         $this->prepareSetItemModel($owner, $item, 1);
         $this->handler->createItem($owner['entity'], $this->propertyConfig, $data);
     }
@@ -116,7 +104,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     {
         list($document, $key) = $this->prepareGetParentDocumentAndKey($owner['document'], $this->configData['path']);
         $this->method($document, 'set', null, array($key, $item['document']), 0);
-        $this->method($item['entity'], 'setOwnerRelationship',null , array($owner['entity'], $this->configData['ownerItemProperty']), $itemOffset);
+        $this->method($item['entity'], 'setOwnerRelationship', null, array($owner['entity'], $this->configData['ownerItemProperty']), $itemOffset);
         $this->preparePopertySetValue($owner['property'], $item['entity']);
     }
 
@@ -127,15 +115,6 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $this->preparePopertySetValue($owner['property'], null);
     }
 
-    protected function prepareItemRepository()
-    {
-        $itemRepository = $this->getEmbeddedRepository();
-        $this->setRepositories(array(
-            $this->configData['itemModel'] => $itemRepository
-        ));
-        return $itemRepository;
-    }
-
     protected function preparePopertySetValue($property, $value)
     {
         $property
@@ -143,17 +122,24 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
             ->method('setValue')
             ->with($value);
     }
-
-    protected function getOwner($propertyName = null, $loaded = false)
+    
+    protected function prepareUnsetCurrentItemOwner($owner, $ownerIsLoaded = true, $ownerItemIsNull =  false)
+    {
+        if($ownerIsLoaded && !$ownerItemIsNull) {
+            $this->method($owner['item']['entity'], 'unsetOwnerRelationship', null, array(), 0);
+        }
+    }
+    
+    protected function getOwner($loaded = false, $itemIsNull = false, $propertyName = null)
     {
         if($propertyName == null) {
             $propertyName = $this->configOwnerProperty;
         }
-
-        $owner = $this->getRelationshipModel('owner');
+        
+        $owner = $this->getRelationshipEntity('owner');
         $property = $this->getProperty();
         $itemModel = null;
-        if($loaded) {
+        if($loaded && !$itemIsNull) {
             $owner['item'] = $this->getItem($owner);
             $itemModel = $owner['item']['entity'];
         }
@@ -165,26 +151,23 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         return $owner;
     }
 
-    protected function mapRelationshipBuilderTest($pathPrefix = null)
+    protected function prepareMapConditionBuilder($builder, $side, $collection, $plan)
     {
-        $builder = $this->quickMock('\PHPixie\Database\Conditions\Builder');
-
-        $side = $this->side('item', $this->configData);
-        $group = $this->getConditionGroup('or', true, array(5));
-        $plan = $this->getPlan();
-
-        $this->prepareMapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix);
-        $this->handler->mapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix);
-    }
-
-    protected function prepareMapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix)
-    {
-        if($pathPrefix === null) {
-            $pathPrefix = $this->configData['path'];
-        }else{
-            $pathPrefix = $pathPrefix.'.'.$this->configData['path'];
-        }
-        $this->method($this->embeddedGroupMapper, 'mapConditionGroup', null, array($this->configData['itemModel'], $builder, $group, $plan, $pathPrefix), 0);
+        $container = $this->quickMock('\PHPixie\Database\Type\Document\Conditions\Builder\Container');
+        
+        $this->method($builder, 'addSubdocumentPlaceholder', $container, array(
+            $this->configData['path'],
+            $collection->logic(),
+            $collection->isNegated(),
+        ), 0);
+        
+        $this->method($this->mapperMocks['group'], 'map', null, array(
+            $container,
+            $this->configData['itemModel'],
+            $collection->conditions(),
+            $plan
+        ), 0);
+        
     }
 
     protected function getProperty()
@@ -193,17 +176,22 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     }
 
     protected function getPreloader() {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Preloader');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Preloader');
+    }
+    
+    protected function getPreloadResult()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Preload\Result');
     }
 
     protected function getConfig()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Config');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Config');
     }
 
     protected function getSide()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Side');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Side');
     }
 
     protected function getRelationship()
@@ -214,7 +202,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     protected function getHandler()
     {
         return new \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Handler(
-            $this->repositories,
+            $this->models,
             $this->planners,
             $this->plans,
             $this->steps,

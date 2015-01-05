@@ -4,23 +4,28 @@ namespace PHPixie\ORM\Relationships\Type\Embeds\Type\One;
 
 class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 {
-    public function mapRelationshipBuilder($side, $builder, $group, $plan, $pathPrefix = null)
+    protected function mapConditionBuilder($builder, $side, $colletion, $plan)
     {
         $config = $side->config();
-        if($pathPrefix === null) {
-            $pathPrefix = $config->path;
-        }else{
-            $pathPrefix = $pathPrefix.'.'.$config->path;
-        }
-        $this->embeddedGroupMapper->mapConditionGroup($config->itemModel, $builder, $group, $plan, $pathPrefix);
+        $container = $builder->addSubdocumentPlaceholder(
+            $config->path,
+            $colletion->logic(),
+            $colletion->isNegated()
+        );
+        
+        $this->mappers->group()->map(
+            $container,
+            $config->itemModel,
+            $colletion->conditions(),
+            $plan
+        );
     }
 
-    public function loadProperty($config, $model)
+    public function loadProperty($config, $owner)
     {
-        $repository = $this->repositories->get($config->itemModel);
-        $document = $this->getDocument($model, $config->path);
-        $item = $repository->loadFromDocument($document);
-        $item->setOwnerRelationship($model, $config->ownerItemProperty);
+        $document = $this->getDocument($owner, $config->path);
+        $item = $this->models->embedded()->loadEntity($config->itemModel, $document);
+        $item->setOwnerRelationship($owner, $config->ownerItemProperty);
         return $item;
     }
 
@@ -41,8 +46,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 
     public function createItem($model, $config, $data)
     {
-        $repository = $this->repositories->get($config->itemModel);
-        $item = $repository->load($data);
+        $item = $this->models->embedded()->loadEntityFromData($config->itemModel, $data);
         $this->setItemModel($model, $config, $item);
     }
 

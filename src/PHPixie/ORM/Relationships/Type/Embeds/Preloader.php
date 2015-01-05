@@ -2,10 +2,37 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embeds;
 
-class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader
+abstract class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader
 {
+    protected $preloaders = array();
+
+    public function addPreloader($relationship, $preloader)
+    {
+        $this->preloaders[$relationship] = $preloader;
+    }
+
+    public function getPreloader($relationship)
+    {
+        if(array_key_exists($relationship, $this->preloaders))
+            return $this->preloaders[$relationship];
+
+        return null;
+    }
+    
     public function loadProperty($property)
     {
+        if(empty($this->preloaders)) {
+            return;
+        }
         
+        $entities = $this->getEntities($property);
+        foreach($entities as $entity) {
+            foreach($this->preloaders as $relationship => $preloader) {
+                $entityProperty = $entity->getRelationshipProperty($relationship);
+                $preloader->loadProperty($entityProperty);
+            }   
+        }
     }
+    
+    abstract protected function getEntities($property);
 }

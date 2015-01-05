@@ -4,7 +4,7 @@ namespace PHPixie\ORM\Relationships\Relationship\Implementation;
 
 abstract class Handler
 {
-    protected $repositories;
+    protected $models;
     protected $planners;
     protected $plans;
     protected $steps;
@@ -12,9 +12,9 @@ abstract class Handler
     protected $mappers;
     protected $relationship;
 
-    public function __construct($repositories, $planners, $plans, $steps, $loaders, $mappers, $relationship)
+    public function __construct($models, $planners, $plans, $steps, $loaders, $mappers, $relationship)
     {
-        $this->repositories       = $repositories;
+        $this->models             = $models;
         $this->planners           = $planners;
         $this->plans              = $plans;
         $this->steps              = $steps;

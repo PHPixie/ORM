@@ -5,8 +5,35 @@ namespace PHPixieTests\ORM\Relationships\Type\Embeds;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Preloader
  */
-class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\PreloaderTest
+abstract class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\PreloaderTest
 {
+    protected $preloader;
+    
+    protected $preloaders;
+    
+    public function setUp()
+    {
+        $this->preloaders = array(
+            'pixie' => $this->quickMock('\PHPixie\ORM\Relationships\Relationship\Preloader'),
+            'fairy' => $this->quickMock('\PHPixie\ORM\Relationships\Relationship\Preloader'),
+        );
+        
+        parent::setUp();
+    }
+    
+    /**
+     * @covers ::addPreloader
+     * @covers ::getPreloader
+     */
+    public function testAddGetPreloader()
+    {
+        foreach($this->preloaders as $relationship => $preloader){
+            $this->assertSame(null, $this->preloader->getPreloader($relationship));
+            $this->preloader->addPreloader($relationship, $preloader);
+            $this->assertSame($preloader, $this->preloader->getPreloader($relationship));
+        }
+    }
+    
     /**
      * @covers ::loadProperty
      * @covers ::<protected>
@@ -15,27 +42,34 @@ class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Impleme
     {
         $property = $this->getProperty();
         $this->preloader->loadProperty($property);
-    }
-    
-    protected function preloader()
-    {
-        return new \PHPixie\ORM\Relationships\Type\Embeds\Preloader(
-            $this->loader
-        );
-    }
-    
-    protected function getProperty()
-    {
-        $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Implementation\Property\Entity');
-    }
-    
-    protected function loader()
-    {
-        $this->abstractMock('\PHPixie\ORM\Relationships\Type\Embeds\Preloader\Loader');
+        
+        foreach($this->preloaders as $relationship => $preloader) {
+            $this->preloader->addPreloader($relationship, $preloader);
+        }
+        
+        $entities = $this->prepareGetEntities($property);
+        
+        foreach($entities as $key => $entity) {
+            $at = 0;
+            foreach($this->preloaders as $relationship => $preloader) {
+                $entityProperty = $this->getProperty();
+                $this->method($entity, 'getRelationshipProperty', $entityProperty, array($relationship), $at++, true);
+                $this->method($preloader, 'loadProperty', null, array($entityProperty), $key);
+            }
+        }
+        
+        $this->preloader->loadProperty($property);
     }
     
     protected function getEntity()
     {
-        $this->abstractMock('\PHPixie\ORM\Models\Type\Embedded\Entity');
+        return $this->abstractMock('\PHPixie\ORM\Models\Model\Entity');
     }
+    
+    protected function getProperty()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity');
+    }
+    
+    abstract protected function prepareGetEntities($property, $isEmpty = false);
 }

@@ -39,6 +39,17 @@ abstract class EmbeddedTest extends \PHPixieTests\ORM\Relationships\Relationship
         return array($subdocument, $key);
     }
 
+    protected function getDatabaseDocumentQuery()
+    {
+        return $this->abstractMock('\PHPixie\Database\Type\Document\Query\Items');
+    }
+    
+    protected function getDocumentConditionContainer()
+    {
+        return $this->abstractMock('\PHPixie\Database\Type\Document\Conditions\Builder\Container');
+    }
+    
+    
     protected function getData()
     {
         return $this->abstractMock('\PHPixie\ORM\Data\Types\Document');

@@ -10,6 +10,8 @@ class Database extends \PHPixie\ORM\Models\Model
     protected $mappers;
     protected $values;
     
+    protected $repositories = array();
+    
     public function __construct($models, $relationships, $configs, $database, $drivers, $conditions, $mappers, $values)
     {
         parent::__construct($models, $relationships, $configs);
@@ -29,7 +31,7 @@ class Database extends \PHPixie\ORM\Models\Model
         return $driver->config($this->config->inflector(), $modelName, $configSlice);
     }
     
-    public function repository($modelName)
+    protected function buildRepository($modelName)
     {
         $config = $this->config($modelName);
         $driver = $this->drivers->get($config->driver);
@@ -41,6 +43,15 @@ class Database extends \PHPixie\ORM\Models\Model
         }
         
         return $repository;
+    }
+    
+    public function repository()
+    {
+        if(!array_key_exists($amodelName, $this->repositories)) {
+            $this->repositories[$modelName] = $this->buildRepository($modelName);
+        }
+        
+        return $this->repositories[$modelName];
     }
     
     public function entity($repository, $data, $isNew)

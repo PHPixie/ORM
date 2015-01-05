@@ -8,7 +8,7 @@ namespace PHPixieTests\ORM\Loaders\Loader\Proxy;
 class PreloadingTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
 {
     protected $preloaders;
-    protected $preloadableModels;
+    protected $preloadableEntities;
     protected $properties;
     
     public function setUp()
@@ -18,14 +18,14 @@ class PreloadingTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
             'fairy' => $this->quickMock('\PHPixie\ORM\Relationships\Relationship\Preloader'),
         );
         
-        $this->preloadableModels = array(
-            $this->quickMock('\PHPixie\ORM\Model'),
-            $this->quickMock('\PHPixie\ORM\Model'),
+        $this->preloadableEntities = array(
+            $this->quickMock('\PHPixie\ORM\Models\Model\Entity'),
+            $this->quickMock('\PHPixie\ORM\Models\Model\Entity'),
         );
         
         $this->properties = array();
         foreach(range(0, 4) as $i) {
-            $this->properties[]=$this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Preloader');
+            $this->properties[]=$this->quickMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity');
         }
         
         parent::setUp();
@@ -63,13 +63,13 @@ class PreloadingTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
      */
     public function testPreloadProperty()
     {
-        $this->method($this->subloader, 'getByOffset', $this->preloadableModels[0], array(0), 0);
-        $this->method($this->subloader, 'getByOffset', $this->preloadableModels[1], array(1), 1);
+        $this->method($this->subloader, 'getByOffset', $this->preloadableEntities[0], array(0), 0);
+        $this->method($this->subloader, 'getByOffset', $this->preloadableEntities[1], array(1), 1);
         
         $pkey = 0;
         foreach($this->preloaders as $relationship => $preloader) {
             
-            foreach($this->preloadableModels as $mkey => $model) {
+            foreach($this->preloadableEntities as $mkey => $model) {
                 $property = $this->properties[$pkey*2+$mkey];
                 $this->method($preloader, 'loadFor', $property, array($model), $mkey);
                 $this->method($model, 'setRelationshipProperty', null, array($relationship, $property), $pkey);
@@ -79,7 +79,7 @@ class PreloadingTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
             $pkey++;
         }        
 
-        foreach($this->preloadableModels as $key => $model)
+        foreach($this->preloadableEntities as $key => $model)
         {
             $this->assertEquals($model, $this->loader->getByOffset($key));
         }

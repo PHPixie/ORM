@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Loaders\Loader\Repository;
+namespace PHPixie\ORM\Loaders\Loader;
 
-abstract class Embedded extends \PHPixie\ORM\Loaders\Loader\Repository
+abstract class Embedded extends \PHPixie\ORM\Loaders\Loader
 {
     protected function loadModel($document)
     {

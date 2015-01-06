@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Model;
+namespace PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Entity;
 
-class Items extends \PHPixie\ORM\Relationships\Type\Embeds\Property\Model
+class Items extends \PHPixie\ORM\Relationships\Type\Embeds\Property\Entity
             implements \ArrayAccess, \Countable
 {
 

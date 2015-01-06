@@ -2,15 +2,8 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity;
 
-class Item extends \PHPixie\ORM\Relationships\Relationship\Implementation\Property\Entity
-           implements \PHPixie\ORM\Relationships\Relationship\Property\Entity\Data
+class Item extends \PHPixie\ORM\Relationships\Type\Embeds\Property\Entity
 {
-
-    protected function load()
-    {
-        $config = $this->side->config();
-        $this->handler->loadProperty($config, $this->entity);
-    }
 
     public function create($data = null)
     {

@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Type\Embeds\Type\One\Property\Entity;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity\Items
  */
-class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Property\EntityTest
+class ItemTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\Property\EntityTest
 {
     protected $config;
 
@@ -82,26 +82,11 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementat
         $this->assertSame($data, $this->property->asData(true));
     }
 
-    protected function prepareLoad($value)
-    {
-        $this->method($this->handler, 'loadProperty', $this->setValueCallback($value), array($this->config, $this->entity), 0);
-    }
-
     protected function prepareRemove()
     {
         $this->method($this->handler, 'removeItem', null, array($this->entity, $this->config), 0);
     }
 
-    protected function property()
-    {
-        return new \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity\Item($this->handler, $this->side, $this->entity);
-    }
-
-    protected function getEntity()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Models\Type\Embedded\Entity');
-    }
-    
     protected function getValue()
     {
         return $this->getEntity();
@@ -123,4 +108,10 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementat
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Side\Config');
     }
+    
+    protected function property()
+    {
+        return new \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity\Item($this->handler, $this->side, $this->entity);
+    }
+
 }

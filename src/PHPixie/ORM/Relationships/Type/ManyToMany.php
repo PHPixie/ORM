@@ -26,7 +26,7 @@ class ManyToMany extends \PHPixie\ORM\Relationships\Relationship
 
     public function modelProperty($side, $model)
     {
-        return new ManyToMany\Property\Model($this->handler(), $side, $model);
+        return new ManyToMany\Property\Entity($this->handler(), $side, $model);
     }
 
     public function queryProperty($side, $model)

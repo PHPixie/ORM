@@ -41,6 +41,6 @@ class EmbedsMany extends \PHPixie\ORM\Relationships\Relationship\Implementation
 
     public function entityProperty($side, $model)
     {
-        return new Embeds\Type\Many\Property\Model\Items($this->handler(), $side, $model);
+        return new Embeds\Type\Many\Property\Entity\Items($this->handler(), $side, $model);
     }
 }

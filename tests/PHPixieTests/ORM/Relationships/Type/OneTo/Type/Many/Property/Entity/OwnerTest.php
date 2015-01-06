@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Property\Model;
+namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\Many\Property\Entity;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Model\Owner
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Entity\Owner
  */
 class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Property\Entity\SingleTest
 {

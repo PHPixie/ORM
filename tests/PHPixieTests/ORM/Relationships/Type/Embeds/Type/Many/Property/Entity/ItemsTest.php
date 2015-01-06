@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Type\Embeds\Type\Many\Property\Model;
+namespace PHPixieTests\ORM\Relationships\Type\Embeds\Type\Many\Property\Entity;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Model\Items
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Entity\Items
  */
-class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\ModelTest
+class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\Property\EntityTest
 {
     protected $config;
 
@@ -21,12 +21,13 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testOffsetExists()
     {
-        $this->prepareLoad();
+        $value = $this->prepareLoad();
+        
         foreach(array(true, false) as $exists) {
-            $this->method($this->value, 'offsetExists', $exists, array(2), 0);
+            $this->method($value, 'offsetExists', $exists, array(2), 0);
             $this->assertEquals($exists, $this->property->offsetExists(2));
 
-            $this->method($this->value, 'offsetExists', $exists, array(3), 0);
+            $this->method($value, 'offsetExists', $exists, array(3), 0);
             $this->assertEquals($exists, isset($this->property[3]));
         }
     }
@@ -37,13 +38,14 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testOffsetGet()
     {
-        $this->prepareLoad();
-        $model = $this->getModel();
-        $this->method($this->value, 'getByOffset', $model, array(2), 0);
-        $this->assertEquals($model, $this->property->offsetGet(2));
+        $value = $this->prepareLoad();
+        
+        $entity = $this->getEntity();
+        $this->method($value, 'getByOffset', $entity, array(2), 0);
+        $this->assertEquals($entity, $this->property->offsetGet(2));
 
-        $this->method($this->value, 'getByOffset', $model, array(3), 0);
-        $this->assertEquals($model, $this->property[3]);
+        $this->method($value, 'getByOffset', $entity, array(3), 0);
+        $this->assertEquals($entity, $this->property[3]);
     }
 
     /**
@@ -52,8 +54,9 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testCount()
     {
-        $this->prepareLoad();
-        $this->method($this->value, 'count', 5, array(), 0);
+        $value = $this->prepareLoad();
+        
+        $this->method($value, 'count', 5, array(), 0);
         $this->assertEquals(5, $this->property->count());
     }
 
@@ -63,11 +66,11 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testOffsetSet()
     {
-        $item = $this->getModel();
-        $this->method($this->handler, 'offsetSet', null, array($this->model, $this->config, 2, $item), 0);
+        $item = $this->getEntity();
+        $this->method($this->handler, 'offsetSet', null, array($this->entity, $this->config, 2, $item), 0);
         $this->property->offsetSet(2, $item);
 
-        $this->method($this->handler, 'offsetSet', null, array($this->model, $this->config, 3, $item), 0);
+        $this->method($this->handler, 'offsetSet', null, array($this->entity, $this->config, 3, $item), 0);
         $this->property[3] = $item;
     }
 
@@ -77,10 +80,10 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testOffsetUnset()
     {
-        $this->method($this->handler, 'offsetUnset', null, array($this->model, $this->config, 2), 0);
+        $this->method($this->handler, 'offsetUnset', null, array($this->entity, $this->config, 2), 0);
         $this->property->offsetUnset(2);
 
-        $this->method($this->handler, 'offsetUnset', null, array($this->model, $this->config, 3), 0);
+        $this->method($this->handler, 'offsetUnset', null, array($this->entity, $this->config, 3), 0);
         unset ( $this->property[3] );
     }
 
@@ -90,12 +93,12 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testCreate()
     {
-        $item = $this->getModel();
+        $item = $this->getEntity();
 
-        $this->method($this->handler, 'offsetCreate', $item, array($this->model, $this->config, null), 0);
+        $this->method($this->handler, 'offsetCreate', $item, array($this->entity, $this->config, null), 0);
         $this->assertSame($item, $this->property->create());
 
-        $this->method($this->handler, 'offsetCreate', $item, array($this->model, $this->config, 3), 0);
+        $this->method($this->handler, 'offsetCreate', $item, array($this->entity, $this->config, 3), 0);
         $this->assertSame($item, $this->property->create(3));
     }
 
@@ -105,11 +108,11 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testAdd()
     {
-        $item = $this->getModel();
-        $this->method($this->handler, 'offsetSet', null, array($this->model, $this->config, null, $item), 0);
+        $item = $this->getEntity();
+        $this->method($this->handler, 'offsetSet', null, array($this->entity, $this->config, null, $item), 0);
         $this->assertSame($this->property, $this->property->add($item));
 
-        $this->method($this->handler, 'offsetSet', null, array($this->model, $this->config, 3, $item), 0);
+        $this->method($this->handler, 'offsetSet', null, array($this->entity, $this->config, 3, $item), 0);
         $this->assertSame($this->property, $this->property->add($item, 3));
     }
 
@@ -119,8 +122,8 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testRemove()
     {
-        $item = $this->getModel();
-        $this->method($this->handler, 'removeItems', null, array($this->model, $this->config, $item), 0);
+        $item = $this->getEntity();
+        $this->method($this->handler, 'removeItems', null, array($this->entity, $this->config, $item), 0);
         $this->assertSame($this->property, $this->property->remove($item));
     }
 
@@ -130,32 +133,26 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
      */
     public function testRemoveAll()
     {
-        $this->method($this->handler, 'removeAllItems', null, array($this->model, $this->config), 0);
+        $this->method($this->handler, 'removeAllItems', null, array($this->entity, $this->config), 0);
         $this->assertSame($this->property, $this->property->removeAll());
     }
-
-    protected function prepareLoad()
+    
+    protected function prepareLoad($value = null)
     {
-        $this->value = $this->value();
-        $this->method($this->handler, 'loadProperty', $this->value, array($this->config, $this->model), 0);
+        if($value === null) {
+            $value = $this->getValue();
+        }
+        
+        parent::prepareLoad($value);
+        
+        return $value;
     }
-
-    protected function value()
-    {
-        return $this->getValue();
-    }
-
-    protected function property()
-    {
-        return new \PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Model\Items($this->handler, $this->side, $this->model);
-    }
-
+    
     protected function getValue()
     {
-        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\Embedded\ArrayNode');
+        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Embedded\ArrayNode');
     }
-
-
+    
     protected function handler()
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Handler');
@@ -171,5 +168,10 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Property\Mo
     protected function config()
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Side\Config');
+    }
+    
+    protected function property()
+    {
+        return new \PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Entity\Items($this->handler, $this->side, $this->entity);
     }
 }

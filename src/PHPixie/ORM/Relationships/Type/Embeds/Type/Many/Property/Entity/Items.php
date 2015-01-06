@@ -1,15 +1,15 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Model;
+namespace PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Entity;
 
-class Items extends \PHPixie\ORM\Relationships\Type\Embeds\Property\Model
+class Items extends \PHPixie\ORM\Relationships\Type\Embeds\Property\Entity
             implements \ArrayAccess, \Countable
 {
 
     protected function load()
     {
         $config = $this->side->config();
-        return $this->handler->loadProperty($config, $this->model);
+        $this->handler->loadProperty($config, $this->entity);
     }
 
     public function offsetExists($key)
@@ -30,19 +30,19 @@ class Items extends \PHPixie\ORM\Relationships\Type\Embeds\Property\Model
     public function offsetSet($key, $item)
     {
         $config = $this->side->config();
-        $this->handler->offsetSet($this->model, $config, $key, $item);
+        $this->handler->offsetSet($this->entity, $config, $key, $item);
     }
 
     public function offsetUnset($key)
     {
         $config = $this->side->config();
-        $this->handler->offsetUnset($this->model, $config, $key);
+        $this->handler->offsetUnset($this->entity, $config, $key);
     }
 
     public function create($key = null, $data = null)
     {
         $config = $this->side->config();
-        return $this->handler->offsetCreate($this->model, $config, $key, $data);
+        return $this->handler->offsetCreate($this->entity, $config, $key, $data);
     }
 
     public function add($item, $key = null)
@@ -54,22 +54,22 @@ class Items extends \PHPixie\ORM\Relationships\Type\Embeds\Property\Model
     public function remove($items)
     {
         $config = $this->side->config();
-        $this->handler->removeItems($this->model, $config, $items);
+        $this->handler->removeItems($this->entity, $config, $items);
         return $this;
     }
 
     public function removeAll()
     {
         $config = $this->side->config();
-        $this->handler->removeAllItems($this->model, $config);
+        $this->handler->removeAllItems($this->entity, $config);
         return $this;
     }
 
     public function asData($recursive = false)
     {
         $data = array();
-        foreach($this->value() as $model)
-            $data[] = $model->asObject($recursive);
+        foreach($this->value() as $entity)
+            $data[] = $entity->asObject($recursive);
         return $data;
     }
 }

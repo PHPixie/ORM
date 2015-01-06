@@ -30,9 +30,9 @@ class OneToMany extends \PHPixie\ORM\Relationships\Relationship
     public function modelProperty($side, $model)
     {
         if ($side->type() === 'owner')
-            return new OneTo\Type\Many\Property\Model\Owner($this->handler(), $side, $model);
+            return new OneTo\Type\Many\Property\Entity\Owner($this->handler(), $side, $model);
 
-        return new OneTo\Type\Many\Property\Model\Items($this->handler(), $side, $model);
+        return new OneTo\Type\Many\Property\Entity\Items($this->handler(), $side, $model);
     }
 
     public function queryProperty($side, $query)

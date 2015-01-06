@@ -14,7 +14,7 @@ class Models
     public function __construct($ormBuilder, $configSlice, $wrappers = null)
     {
         $this->ormBuilder   = $ormBuilder;
-        $this->configSlice = $configSlice;
+        $this->configSlice  = $configSlice;
         $this->wrappers     = $wrappers;
     }
     
@@ -52,8 +52,8 @@ class Models
     {
         return new \PHPixie\ORM\Models\Type\Database(
             $this,
+            $this->ormBuilder->config(),
             $this->ormBuilder->relationships(),
-            $this->ormBuilder->configs(),
             $this->ormBuilder->database(),
             $this->ormBuilder->drivers(),
             $this->ormBuilder->conditions(), 
@@ -66,8 +66,8 @@ class Models
     {
         return new \PHPixie\ORM\Models\Type\Embedded(
             $this,
-            $this->ormBuilder->relationships(),
-            $this->ormBuilder->configs()
+            $this->ormBuilder->config(),
+            $this->ormBuilder->relationships()
         );
     }
 }

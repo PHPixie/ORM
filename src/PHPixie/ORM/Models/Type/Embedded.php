@@ -14,7 +14,7 @@ class Embedded extends \PHPixie\ORM\Models\Model
         );
     }
     
-    public function entity($modelName, $document)
+    public function entity($modelName, $data)
     {
         $config = $this->config($modelName);
         $data = $this->data->document($document);

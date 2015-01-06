@@ -2,12 +2,15 @@
 
 namespace PHPixie\ORM\Conditions\Builder;
 
-class Container extends \PHPixie\Database\Conditions\Builder\Container
-                implements \PHPixie\ORM\Conditions\Builder
+class Container implements \PHPixie\ORM\Conditions\Builder
 {
-    public function __construct($conditions, $defaultOperator = '=')
+    protected $conditions = $conditions;
+    protected $databaseContainer;
+    
+    public function __construct($conditions, $databaseContainer)
     {
-        parent::__construct($conditions, $defaultOperator);
+        $this->conditions = $cconditions;
+        $this->databaseContainer = $databaseContainer;
     }
 
     public function addOperatorCondition($logic, $negate, $field, $operator, $values)

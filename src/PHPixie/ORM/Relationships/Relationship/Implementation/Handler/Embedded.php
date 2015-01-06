@@ -5,10 +5,19 @@ namespace PHPixie\ORM\Relationships\Relationship\Implementation\Handler;
 abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
 {
 
+    protected $embeddedModel;
+    
+    public function __construct($repositories, $planners, $plans, $steps, $loaders, $mappers, $relationship, $embeddedModel)
+    {
+        $this->embeddedModel = $embeddedModel;
+        parent::__construct($repositories, $planners, $plans, $steps, $loaders, $mappers, $relationship);
+    }
+        
     protected function explodePath($path)
     {
         return explode('.', $path);
     }
+    
     protected function getDocument($model, $path, $createMissing = true)
     {
         $explodedPath = $this->explodePath($path);

@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Conditions\Condition\Group;
+namespace PHPixie\ORM\Conditions\Condition\Collection\Group;
 
-class Relationship extends \PHPixie\ORM\Conditions\Condition\Group
+class RelatedTo extends \PHPixie\ORM\Conditions\Condition\Collection\Group
 {
     protected $relationship;
 

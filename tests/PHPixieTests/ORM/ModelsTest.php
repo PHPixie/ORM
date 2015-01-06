@@ -50,12 +50,49 @@ class ModelsTest extends \PHPixieTests\AbstractORMTest
      * @covers ::databaseModel
      * @covers ::<protected>
      */
-    public function testModelConfigSlice()
+    public function testDatabaseModel()
     {
-        $slice = $this->getConfigSlice();
-        $this->method($this->configSlice, 'slice', $slice, array('pixie'), 0);
+        $this->modelTest('database', array(
+            'config',
+            'relationships',
+            'database',
+            'drivers',
+            'conditions',
+            'mappers',
+            'values'
+        ));
+    }
+    
+    /**
+     * @covers ::embeddedModel
+     * @covers ::<protected>
+     */
+    public function testEmbeddedModel()
+    {
+        $this->modelTest('embedded', array(
+            'config',
+            'relationships'
+        ));
+    }
+    
+    protected function modelTest($method, $dependencyNames)
+    {
+        $dependencies = array(
+            'models' => $this->models
+        );
         
-        $this->assertSame($slice, $this->models->modelConfigSlice('pixie'));
+        foreach($dependencyNames as $key => $name) {
+            $dependencies[$name] = $this->quickMock('\PHPixie\ORM\\'.ucfirst($name));
+            $this->method($this->ormBuilder, $name, $dependencies[$name], array(), $key);
+        }
+        
+        $model = $this->models->$method();
+        
+        foreach($dependencies as $name => $dependency) {
+            $this->assertAttributeEquals($dependency, $name, $model);
+        }
+        
+        $this->assertSame($model, $this->models->$method());
     }
     
     protected function getConfigSlice()

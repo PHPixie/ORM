@@ -7,6 +7,14 @@ namespace PHPixieTests\ORM\Relationships\Relationship\Implementation\Handler;
  */
 abstract class EmbeddedTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\HandlerTest
 {
+    protected $embeddedModel;
+    
+    public function setUp()
+    {
+        $this->embeddedModel = $this->quickMock('\PHPixie\ORM\Models\Type\Embedded');
+        parent::setUp();
+    }
+    
     protected function prepareGetDocument($document, $path)
     {
         $path = explode('.', $path);

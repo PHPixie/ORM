@@ -39,6 +39,36 @@ class Builder
         return new \PHPixie\ORM\Inflector();
     }
 
+    public function relationships()
+    {
+    
+    }
+    
+    public function config()
+    {
+    
+    }
+    
+    public function database()
+    {
+    
+    }
+    
+    public function drivers()
+    {
+    
+    }
+    
+    public function mappers()
+    {
+    
+    }
+    
+    public function values()
+    {
+    
+    }
+    
     public function driver($name)
     {
         if (!isset($this->drivers[$name]))

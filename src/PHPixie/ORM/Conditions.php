@@ -6,27 +6,27 @@ class Conditions
 {
     public function placeholder($defaultOperator = '=', $allowEmpty = true)
     {
-        return new \PHPixie\ORM\Conditions\Condition\Placeholder($this, $defaultOperator, $allowEmpty);
+        return new \PHPixie\ORM\Conditions\Condition\Collection\Placeholder($this, $defaultOperator, $allowEmpty);
     }
 
     public function operator($field, $operator, $values)
     {
-        return new \PHPixie\ORM\Conditions\Condition\Operator($field, $operator, $values);
+        return new \PHPixie\ORM\Conditions\Condition\Field\Operator($field, $operator, $values);
     }
 
     public function group()
     {
-        return new \PHPixie\ORM\Conditions\Condition\Group();
+        return new \PHPixie\ORM\Conditions\Condition\Collection\Group();
     }
 
     public function relationshipGroup($relationship)
     {
-        return new \PHPixie\ORM\Conditions\Condition\Group\Relationship($relationship);
+        return new \PHPixie\ORM\Conditions\Condition\Collection\Group\Relationship($relationship);
     }
 
-    public function collection($collectionItems)
+    public function in($collectionItems)
     {
-        return new \PHPixie\ORM\Conditions\Condition\Collection($collectionItems);
+        return new \PHPixie\ORM\Conditions\Condition\In($collectionItems);
     }
     
     public function container($defaultOperator = '=')

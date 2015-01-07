@@ -135,7 +135,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
 
     protected function getArrayNodeLoader()
     {
-        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\Embedded\ArrayNode');
+        return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Embedded\ArrayNode');
     }
     
     abstract protected function prepareMapConditionBuilder($builder, $side, $collection, $plan);

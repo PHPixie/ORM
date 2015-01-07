@@ -3,7 +3,7 @@
 namespace PHPixie\ORM\Loaders\Loader\Proxy;
 
 class Preloading extends \PHPixie\ORM\Loaders\Loader\Proxy
-                 implements \PHPixie\ORM\Mappers\Preloader\Preloadable
+                 implements \PHPixie\ORM\Mappers\Preload\Preloadable
 {
     protected $preloaders = array();
 

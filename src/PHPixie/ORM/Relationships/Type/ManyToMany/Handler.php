@@ -3,8 +3,8 @@
 namespace PHPixie\ORM\Relationships\Type\ManyToMany;
 
 class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
-                    implements \PHPixie\ORM\Relationships\Relationship\Handler\Database\Mapping,
-                               \PHPixie\ORM\Relationships\Relationship\Handler\Database\Preloading
+                    implements \PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Database,
+                               \PHPixie\ORM\Relationships\Relationship\Handler\Preloading
 {
     public function query($side, $related)
     {
@@ -12,7 +12,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $side = $side->type();
         $entity = $config->get($side.'Model');
         $property = $config->get($side.'Property');
-        $repository = $this->repositories->get($entity);
+        $repository = $this->getRepository($entity);
         return $repository->query()->relatedTo($property, $related);
     }
 
@@ -70,32 +70,32 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $entity = $config->get($side.'Model');
         return $this->planners->pivot()->side(
                                             $items,
-                                            $this->repositories->get($entity),
+                                            $this->getRepository($entity),
                                             $config->get($side.'PivotKey')
                                         );
     }
 
     protected function pivotConnection($config)
     {
-        
+
             return $this->ormBuilder->databaseConnection($config->pivotConnection);
 
-        return $this->repositories->get($config->leftModel)->connection();
+        return $this->getRepository($config->leftModel)->connection();
     }
 
     protected function plannerPivot($config)
     {
         $pivotPlanner = $this->planners->pivot();
-        
+
         if ($config->pivotConnection !== null) {
             return $pivotPlanner->pivotByConnectionName($config->pivotConnection, $config->pivot);
         }
-        
-        $connection = $this->repositories->get($config->leftModel)->connection();
+
+        $connection = $this->getRepository($config->leftModel)->connection();
         return $pivotPlanner->pivot($connection, $config->pivot);
     }
 
-    public function mapQuery($side, $group, $query, $plan)
+    public function mapDatabaseQuery($query, $side, $collectionCondition, $plan)
     {
         $dependencies   = $this->getMappingDependencies($side);
         $config         = $dependencies['config'];
@@ -105,10 +105,10 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $sideIdField = $this->getIdField($sideRepository);
 
         $sideQuery = $sideRepository->databaseSelectQuery()->fields(array($sideIdField));
-        $this->mappers->group()->mapDatabaseQuery(
+        $this->mappers->group()->map(
             $sideQuery,
             $sideRepository->modelName(),
-            $group->conditions(),
+            $collectionCondition->conditions(),
             $plan
         );
 
@@ -128,8 +128,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             $pivotQuery,
             $config->get($dependencies['opposing'].'PivotKey'),
             $plan,
-            $group->logic(),
-            $group->negated()
+            $collectionCondition->logic(),
+            $collectionCondition->isNegated()
         );
     }
 
@@ -167,10 +167,10 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $preloadStep = $this->steps->reusableResult($sideQuery);
         $plan->add($preloadStep);
         $loader = $this->loaders->reusableResult($sideRepository, $preloadStep);
-        
+
         $preloadingProxy = $this->loaders->preloadingProxy($loader);
         $cachingProxy = $this->loaders->cachingProxy($preloadingProxy);
-        
+
         $this->mappers->preload()->map(
             $preloadingProxy,
             $sideRepository->modelName(),
@@ -178,7 +178,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             $preloadStep,
             $plan
         );
-        
+
         return $this->relationship->preloader($side, $cachingProxy, $pivotResult);
 
     }
@@ -196,8 +196,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             'type'               => $type,
             'opposing'           => $opposing,
             'pivot'              => $this->plannerPivot($config),
-            'sideRepository'     => $this->repositories->get($config->get($type.'Model')),
-            'opposingRepository' => $this->repositories->get($config->get($opposing.'Model'))
+            'sideRepository'     => $this->getRepository($config->get($type.'Model')),
+            'opposingRepository' => $this->getRepository($config->get($opposing.'Model'))
         );
 
         return $dependencies;
@@ -288,20 +288,24 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         }
     }
 
-
     public function handleDeletion($modelName, $side, $resultStep, $plan)
     {
         $config = $side->config();
         $query = $this->pivotConnection($config)->query('delete');
         $this->planners->query()->setSource($query, $config->pivot);
         $pivotKey = $config->get($side-> type().'PivotKey');
-        $repository = $this->repositories->get($modelName);
+        $repository = $this->getRepository($modelName);
         $idField = $this->getIdField($repository);
         $this->planners->in()->result($query, $pivotKey, $resultStep, $idField);
         $deleteStep = $this->steps->query($query);
         $plan->push($deleteStep);
     }
-                                   
+
+    protected function getRepository($modelName)
+    {
+        return $this->models->database()->repository($modelName);
+    }
+
     protected function getIdField($repository)
     {
         return $repository->config()->idField;

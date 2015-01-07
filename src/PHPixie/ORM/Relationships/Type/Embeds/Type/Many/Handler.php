@@ -32,8 +32,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     }
 
     public function offsetCreate($model, $config, $offset, $data){
-        $repository = $this->repositories->get($config->itemModel);
-        $item = $repository->load($data);
+        $embeddedModel = $this->models->embedded();
+        $item = $embeddedModel->loadEntityFromData($config->itemModel, $data);
         $this->setItem($model, $config, $offset, $item);
     }
 
@@ -41,9 +41,9 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         if(!is_array($items)) {
             $items = array($items);
         }
-        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $property = $model->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
-        $cachedItems = $arrayNodeLoader->cachedModels();
+        $cachedItems = $arrayNodeLoader->cachedEntities();
 
         $offsets = array();
         foreach($items as $item) {
@@ -69,14 +69,14 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
             throw new \PHPixie\ORM\Exception\Relationship("There may be no gaps in items array. Key $offset is larger than item count $count");
         }
 
-        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $property = $model->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
 
         if($offset < $count) {
             $this->unsetCachedItemOwner($arrayNodeLoader, $offset);
         }
 
-        $arrayNodeLoader->cacheModel($offset, $item);
+        $arrayNodeLoader->cacheEntity($offset, $item);
 
         $document  = $item->data()->document();
         $arrayNode->offsetSet($offset, $document);
@@ -86,47 +86,46 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 
     protected function unsetItems($model, $config, $offsets)
     {
-        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $property = $model->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
-        $cachedModels = $arrayNodeLoader->cachedModels();
+        $cachedEntities = $arrayNodeLoader->cachedEntities();
         $arrayNode = $this->getArrayNode($model, $config->path);
 
         sort($offsets, SORT_NUMERIC);
 
         foreach($offsets as $key => $offset) {
 
-            $cachedModels[$offset]->unsetOwnerRelationship();
+            $cachedEntities[$offset]->unsetOwnerRelationship();
 
             $adjustedOffset = $offset - $key;
             $arrayNode->offsetUnset($adjustedOffset);
-            $arrayNodeLoader->shiftCachedModels($adjustedOffset);
+            $arrayNodeLoader->shiftCachedEntities($adjustedOffset);
         }
     }
 
     public function removeAllItems($model, $config) {
-        $property = $model->relationshipProperty($config->ownerItemsProperty);
+        $property = $model->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
-        $cachedModels = $arrayNodeLoader->cachedModels();
+        $cachedEntities = $arrayNodeLoader->cachedEntities();
 
-        foreach($cachedModels as $item) {
+        foreach($cachedEntities as $item) {
             $item->unsetOwnerRelationship();
         }
 
-        $arrayNodeLoader->clearCachedModels();
+        $arrayNodeLoader->clearCachedEntities();
         $arrayNode = $this->getArrayNode($model, $config->path);
         $arrayNode->clear();
     }
 
     public function loadProperty($config, $model)
     {
-        $itemRepository = $this->repositories->get($config->itemModel);
         $arrayNode = $this->getArrayNode($model, $config->path);
-        return $this->loaders->arrayNode($itemRepository, $model, $arrayNode);
+        return $this->loaders->arrayNode($config->itemModel, $model, $arrayNode);
     }
 
     protected function unsetCachedItemOwner($arrayNodeLoader, $offset)
     {
-        $oldItem = $arrayNodeLoader->getCachedModel($offset);
+        $oldItem = $arrayNodeLoader->getCachedEntity($offset);
         if($oldItem !== null) {
             $oldItem->unsetOwnerRelationship();
         }

@@ -96,14 +96,13 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     {
         $owner = $this->getOwner();
 
-        $itemRepository = $this->getEmbeddedRepository();
-        $this->setRepositories(array(
-            $this->configData['itemEntity'] => $itemRepository
-        ));
-
         $arrayNode = $this->prepareGetArrayNode($owner['document'], $this->configData['path']);
         $loader = $this->getArrayNodeLoader();
-        $this->method($this->loaders, 'arrayNode', $loader, array($itemRepository, $owner['entity'], $arrayNode), 0);
+        $this->method($this->loaders, 'arrayNode', $loader, array(
+            $this->configData['itemModel'],
+            $owner['entity'],
+            $arrayNode
+        ), 0);
         $this->assertSame($loader, $this->handler->loadProperty($this->propertyConfig, $owner['entity']));
     }
 
@@ -119,7 +118,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         
         $this->method($this->mapperMocks['group'], 'map', null, array(
             $container,
-            $this->configData['itemEntity'],
+            $this->configData['itemModel'],
             $collection->conditions(),
             $plan
         ), 0);
@@ -201,13 +200,11 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $owner = $this->getOwner();
         $data = array('name' => 'pixie');
 
-        $itemRepository = $this->getEmbeddedRepository();
-        $this->setRepositories(array(
-            $this->configData['itemEntity'] => $itemRepository
-        ));
-
         if($key <= $count) {
-            $this->method($itemRepository, 'load', $item['entity'], array($data), 0);
+            $this->method($this->modelMocks['embedded'], 'loadEntityFromData', $item['entity'], array(
+                $this->configData['itemModel'],
+                $data
+            ), 0);
         }
 
         $this->prepareSetItem($owner, $item, $key, $count);
@@ -234,14 +231,14 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
             $owner['cachedEntities'] = $cached;
             $this->method($owner['loader'], 'cachedEntities', $cached, array());
         }
-        $this->method($owner['entity'], 'relationshipProperty', $property, array($propertyName), null, true);
+        $this->method($owner['entity'], 'getRelationshipProperty', $property, array($propertyName), null, true);
         $owner['property'] = $property;
         return $owner;
     }
 
     protected function getProperty()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Entity\Items');
     }
 
     protected function getPreloader() {

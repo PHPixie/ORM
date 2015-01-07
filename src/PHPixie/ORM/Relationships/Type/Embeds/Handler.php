@@ -35,5 +35,19 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         $this->mapConditionBuilder($container, $side, $group, $plan);
     }
     
+    protected function removeItemFromOwner($item)
+    {
+        $owner = $item->owner();
+        if ($owner !== null) {
+            $propertyName = $item->ownerPropertyName();
+            $property = $owner->getRelationshipProperty($propertyName);
+            if ($property instanceof \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Item) {
+                $property->remove();
+            } else {
+                $property->remove($item);
+            }
+        }
+    }
+    
     abstract protected function mapConditionBuilder($builder, $side, $group, $plan);
 }

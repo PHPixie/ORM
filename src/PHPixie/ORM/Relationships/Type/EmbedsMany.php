@@ -32,11 +32,14 @@ class EmbedsMany extends \PHPixie\ORM\Relationships\Relationship\Implementation
         return new Embeds\Type\Many\Loader($loaders, $config, $ownerLoader);
     }
 
-    public function preloader($side, $loader)
+    public function preloader()
     {
-        $loaders = $this->ormBuilder->loaders();
-
-        return new Embeds\Type\Many\Loader($loaders, $this, $side, $loader);
+        
+    }
+    
+    public function preloadResult()
+    {
+    
     }
 
     public function entityProperty($side, $model)

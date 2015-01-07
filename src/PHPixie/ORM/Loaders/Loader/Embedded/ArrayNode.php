@@ -7,7 +7,7 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
     protected $arrayNode;
     protected $owner;
     protected $ownerPropertyName;
-    protected $cachedModels = array();
+    protected $cachedEntities = array();
 
 
     public function __construct($loaders, $repository, $arrayNode, $owner, $ownerPropertyName)
@@ -25,49 +25,49 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
 
     public function getByOffset($offset)
     {
-        if(!array_key_exists($offset, $this->cachedModels)) {
+        if(!array_key_exists($offset, $this->cachedEntities)) {
 
             if(!$this->offsetExists($offset))
                 throw new \PHPixie\ORM\Exception\Loader("Offset $offset does not exist.");
 
             $document = $this->arrayNode->offsetGet($offset);
-            $this->cachedModels[$offset] = $this->loadModel($document);
+            $this->cachedEntities[$offset] = $this->loadEntity($document);
         }
 
-        return $this->cachedModels[$offset];
+        return $this->cachedEntities[$offset];
     }
 
-    public function cacheModel($offset, $model)
+    public function cacheEntity($offset, $model)
     {
-        $this->cachedModels[$offset] = $model;
+        $this->cachedEntities[$offset] = $model;
     }
 
-    public function shiftCachedModels($offset)
+    public function shiftCachedEntities($offset)
     {
-        if(array_key_exists($offset, $this->cachedModels))
-            unset($this->cachedModels[$offset]);
+        if(array_key_exists($offset, $this->cachedEntities))
+            unset($this->cachedEntities[$offset]);
 
-        $keys = array_keys($this->cachedModels);
+        $keys = array_keys($this->cachedEntities);
         foreach($keys as $key) {
             if($key <= $offset)
                 continue;
 
-            $this->cachedModels[$key-1] = $this->cachedModels[$key];
-            unset($this->cachedModels[$key]);
+            $this->cachedEntities[$key-1] = $this->cachedEntities[$key];
+            unset($this->cachedEntities[$key]);
         }
     }
 
-    public function getCachedModel($offset)
+    public function getCachedEntity($offset)
     {
-        if(array_key_exists($offset, $this->cachedModels))
-            return $this->cachedModels[$offset];
+        if(array_key_exists($offset, $this->cachedEntities))
+            return $this->cachedEntities[$offset];
 
         return null;
     }
 
-    public function clearCachedModels()
+    public function clearCachedEntities()
     {
-        $this->cachedModels = array();
+        $this->cachedEntities = array();
     }
 
     public function count()
@@ -90,8 +90,8 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
         return $this->ownerPropertyName;
     }
 
-    public function cachedModels()
+    public function cachedEntities()
     {
-        return $this->cachedModels;
+        return $this->cachedEntities;
     }
 }

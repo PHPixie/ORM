@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Handler;
+namespace PHPixie\ORM\Relationships\Relationship\Handler\Cascading;
 
 interface Delete extends \PHPixie\ORM\Relationships\Relationship\Handler
 {

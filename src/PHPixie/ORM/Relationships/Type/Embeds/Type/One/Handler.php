@@ -13,7 +13,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
             $colletion->isNegated()
         );
         
-        $this->mappers->group()->map(
+        $this->mappers->conditions()->map(
             $container,
             $config->itemModel,
             $colletion->conditions(),

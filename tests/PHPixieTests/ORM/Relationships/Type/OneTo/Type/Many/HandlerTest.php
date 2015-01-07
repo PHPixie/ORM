@@ -457,7 +457,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
     protected function getHandler()
     {
         return new \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Handler(
-            $this->repositories,
+            $this->models,
             $this->planners,
             $this->plans,
             $this->steps,

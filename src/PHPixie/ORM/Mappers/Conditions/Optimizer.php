@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Mappers\Group;
+namespace PHPixie\ORM\Mappers\Conditions;
 
 use \PHPixie\ORM\Conditions\Condition\Group;
 

@@ -223,7 +223,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
         $this->method($m[$type.'Repo'], 'modelName', $this->configData[$type.'Model'], array(), $sideOffset++);
         $this->method($sideQuery, 'fields', $sideQuery, array(array($type.'Id')), 0);
 
-        $this->method($this->mapperMocks['group'], 'map', null, array(
+        $this->method($this->mapperMocks['conditions'], 'map', null, array(
             $sideQuery,
             $this->configData[$type.'Model'],
             array(5),

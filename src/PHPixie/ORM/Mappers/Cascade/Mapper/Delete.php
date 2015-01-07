@@ -4,16 +4,20 @@ namespace PHPixie\ORM\Mappers\Cascade\Mapper;
 
 class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
 {
-    protected $repositories;
+    protected $models;
     protected $planners;
     protected $steps;
     
-    public function __construct($mappers, $relationships, $repositories, $planners, $steps)
+    protected $databaseModel;
+    
+    public function __construct($mappers, $relationships, $models, $planners, $steps)
     {
         parent::__construct($mappers, $relationships);
-        $this->repositories = $repositories;
+        $this->models = $models;
         $this->planners = $planners;
         $this->steps = $steps;
+        
+        $this->databaseModel = $models->database();
     }
     
     protected function isSideHandled($side)
@@ -37,7 +41,7 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
     
     public function handleQuery($selectQuery, $modelName, $plan, $path)
     {
-        $repository = $this->repositories->get($modelName);
+        $repository = $this->databaseModel->repository($modelName);
         $deleteQuery = $repository->databaseDeleteQuery();
         
         $this->mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan, $path);

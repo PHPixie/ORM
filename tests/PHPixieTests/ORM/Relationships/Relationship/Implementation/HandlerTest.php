@@ -40,7 +40,7 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
         }
 
         $mappers = array(
-            'group' => '\PHPixie\ORM\Mappers\Group',
+            'conditions' => '\PHPixie\ORM\Mappers\Conditions',
             'preload' => '\PHPixie\ORM\Mappers\Preload',
             'cascadeDelete' => '\PHPixie\ORM\Mappers\Cascade\Mapper\Delete',
         );

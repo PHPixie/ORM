@@ -116,7 +116,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
             $collection->isNegated(),
         ), 0);
         
-        $this->method($this->mapperMocks['group'], 'map', null, array(
+        $this->method($this->mapperMocks['conditions'], 'map', null, array(
             $container,
             $this->configData['itemModel'],
             $collection->conditions(),

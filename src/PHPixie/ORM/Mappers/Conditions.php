@@ -2,19 +2,23 @@
 
 namespace PHPixie\ORM\Mappers;
 
-class Group
+class Conditions
 {
-    protected $repositories;
+    protected $models;
     protected $relationships;
-    protected $relationshipMap;
     protected $planners;
+    
+    protected $databaseModel;
+    protected $relationshipMap;
 
-    public function __construct($repositories, $relationships, $planners)
+    public function __construct($models, $relationships, $planners)
     {
-        $this->repositories = $repositories;
+        $this->models = $models;
         $this->relationships = $relationships;
-        $this->relationshipMap = $relationships->map();
         $this->planners = $planners;
+        
+        $this->databaseModel   = $models->database();
+        $this->relationshipMap = $relationships->map();
     }
     
     protected function mapOperatorCondition($builder, $condition)
@@ -59,7 +63,7 @@ class Group
             throw new \PHPixie\ORM\Exception\Mapper("Collection conditions are not allowed for embedded models");
         
         $collection = $this->planners->collection($modelName, $collectionCondition->items());
-        $idField = $this->repositories->get($modelName)->config()->idField;
+        $idField = $this->databaseModel->config($modelName)->idField;
         
         $this->planners->in()->collection(
             $builder,

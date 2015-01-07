@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type;
 
-class OneToOne extends \PHPixie\ORM\Relationships\Relationship
+class OneToOne extends \PHPixie\ORM\Relationships\Relationship\Implementation
 {
     public function config($config)
     {
@@ -14,7 +14,7 @@ class OneToOne extends \PHPixie\ORM\Relationships\Relationship
         return new OneTo\Type\Many\Side\Config($type, $config);
     }
 
-    public function buildHandler($repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper)
+    public function buildHandler()
     {
         return new OneTo\Type\One\Handler($this->ormBuilder, $this, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper);
     }
@@ -27,7 +27,7 @@ class OneToOne extends \PHPixie\ORM\Relationships\Relationship
         return new OneTo\Type\Many\Preloader\Items($this->orm->loaders(), $this, $side, $loader);
     }
 
-    public function modelProperty($side, $model)
+    public function entityProperty($side, $model)
     {
         if ($side->type() === 'owner')
             return new OneTo\Type\Many\Property\Entity\Owner($this->handler(), $side, $model);

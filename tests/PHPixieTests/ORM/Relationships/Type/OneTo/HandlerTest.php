@@ -55,10 +55,10 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     }
 
     /**
-     * @covers ::mapQuery
+     * @covers ::mapDatabaseQuery
      * @covers ::<protected>
      */
-    public function testMapQuery()
+    public function testMapDatabaseQuery()
     {
         $repositories = $this->prepareRepositories();
 
@@ -79,18 +79,15 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             }
 
             $subquery = $this->getDatabaseQuery();
+            $collectionCondition = $this->getCollectionCondition('and', true, array(5));
 
             $subqueryRepoOffset = $type == 'owner' ? 1 : 0;
-
             $this->method($subqueryRepository, 'databaseSelectQuery', $subquery, array(), $subqueryRepoOffset++);
 
-            $group = $group = $this->getConditionGroup('and', true, array(5));
-
             $modelName = $this->configData[$type.'Model'];
-
             $this->method($subqueryRepository, 'modelName', $modelName, array(), $subqueryRepoOffset++);
 
-            $this->method($this->mapperMocks['group'], 'mapDatabaseQuery', null, array(
+            $this->method($this->mapperMocks['conditions'], 'map', null, array(
                 $subquery,
                 $modelName,
                 array(5),
@@ -109,7 +106,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
                 true
             ), 0);
 
-            $this->handler->mapQuery($query, $side, $group, $plan);
+            $this->handler->mapDatabaseQuery($query, $side, $collectionCondition, $plan);
         }
     }
     
@@ -193,8 +190,8 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
 
     protected function prepareLinkPlan($owner, $items, $plansOffset = 0, $ownerRepoOffset = 0, $itemRepoOffset= 0, $plannersOffset = 0)
     {
-        $ownerRepository = $this->repositories->get($this->configData['ownerModel']);
-        $itemRepository = $this->repositories->get($this->configData['itemModel']);
+        $ownerRepository = $this->modelMocks['database']->repository($this->configData['ownerModel']);
+        $itemRepository = $this->modelMocks['database']->repository($this->configData['itemModel']);
         $data = $this->configData;
         $config = $this->config($data);
 
@@ -232,7 +229,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $queryField = 'id';
 
         $modelName = $this->configData[$type.'Model'];
-        $repository = $this->repositories->get($modelName);
+        $repository = $this->modelMocks['database']->repository($modelName);
 
         $collection = $this->quickMock('\PHPixie\ORM\Planners\Collection');
         
@@ -249,7 +246,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     protected function prepareUnlinkTest($constrainOwners, $owners, $constrainItems, $items, $logic = 'and')
     {
         $this->prepareRepositories();
-        $itemRepository = $this->repositories->get($this->configData['itemModel']);
+        $itemRepository = $this->modelMocks['database']->repository($this->configData['itemModel']);
         $plan = $this->getPlan();
         $this->method($this->plans, 'steps', $plan, array(), 0);
 
@@ -300,7 +297,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $type = 'item';
 
         $repository = $this->getRepository();
-        $this->method($this->repositories, 'get', $repository, array($data[$type.'Model']), 0);
+        $this->method($this->modelMocks['database'], 'repository', $repository, array($data[$type.'Model']), 0);
         $this->method($repository, 'query', $query, array(), 0);
         $this->method($query, 'relatedTo', $query, array($this->sidePropertyName($type), $related));
     }

@@ -3,9 +3,9 @@
 namespace PHPixie\ORM\Relationships\Type\OneTo;
 
 abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
-                    implements \PHPixie\ORM\Relationships\Relationship\Handler\Database\Mapping,
-                               \PHPixie\ORM\Relationships\Relationship\Handler\Database\Preloading,
-                               \PHPixie\ORM\Relationships\Relationship\Handler\Cascade\Delete
+                    implements \PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Database,
+                               \PHPixie\ORM\Relationships\Relationship\Handler\Preloading,
+                               \PHPixie\ORM\Relationships\Relationship\Handler\Cascading\Delete
 {
 
     public function query($side, $related)
@@ -19,7 +19,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
             $property = $config->ownerProperty();
         }
 
-        $repository = $this->repositories->get($model);
+        $repository = $this->getRepository($model);
         return $repository->query()->relatedTo($property, $related);
     }
 
@@ -27,12 +27,12 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
     {
         $plan = $this->plans->steps();
 
-        $ownerRepository = $this->repositories->get($config->ownerModel);
+        $ownerRepository = $this->getRepository($config->ownerModel);
         $ownerQuery = $ownerRepository->databaseSelectQuery();
         
         $this->addCollectionCondition($ownerQuery, $ownerRepository, $owner, $plan);
 
-        $itemRepository = $this->repositories->get($config->itemModel);
+        $itemRepository = $this->getRepository($config->itemModel);
         $updateQuery = $itemRepository->databaseUpdateQuery();
         
         $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
@@ -63,7 +63,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
     {
         $plan = $this->plans->steps();
 
-        $itemRepository = $this->repositories->get($config->itemModel);
+        $itemRepository = $this->getRepository($config->itemModel);
         $updateQuery = $itemRepository->databaseUpdateQuery();
         $updateQuery->set($config->ownerKey, null);
 
@@ -71,7 +71,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
             $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
 
         if ($constrainOwners) {
-            $ownerRepository = $this->repositories->get($config->ownerModel);
+            $ownerRepository = $this->getRepository($config->ownerModel);
             $this->addCollectionCondition($updateQuery, $ownerRepository, $owners, $plan, $config->ownerKey, $logic);
         }
 
@@ -79,11 +79,11 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         return $plan;
     }
 
-    public function mapQuery($query, $side, $group, $plan)
+    public function mapDatabaseQuery($query, $side, $collectionCondition, $plan)
     {
         $config = $side->config();
-        $itemRepository = $this->repositories->get($config->itemModel);
-        $ownerRepository = $this->repositories->get($config->ownerModel);
+        $itemRepository = $this->getRepository($config->itemModel);
+        $ownerRepository = $this->getRepository($config->ownerModel);
 
         if ($side->type() === 'owner') {
             $subqueryRepository = $ownerRepository;
@@ -96,10 +96,10 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         }
 
         $subquery = $subqueryRepository->databaseSelectQuery();
-        $this->mappers->group()->mapDatabaseQuery(
+        $this->mappers->conditions()->map(
             $subquery,
             $subqueryRepository->modelName(),
-            $group->conditions(),
+            $collectionCondition->conditions(),
             $plan
         );
 
@@ -109,12 +109,12 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
             $subquery,
             $subqueryField,
             $plan,
-            $group->logic(),
-            $group->negated()
+            $collectionCondition->logic(),
+            $collectionCondition->isNegated()
         );
     }
 
-    public function handleDeletion($modelName, $side, $resultStep, $plan)
+    public function handleDelete($modelName, $side, $resultStep, $plan)
     {
         $config = $side->config();
         $itemKey = $config->itemKey;
@@ -146,8 +146,8 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
     {
         $config = $side->config();
 
-        $itemRepository = $this->repositories->get($config->itemModel);
-        $ownerRepository = $this->repositories->get($config->ownerModel);
+        $itemRepository = $this->getRepository($config->itemModel);
+        $ownerRepository = $this->getRepository($config->ownerModel);
 
         
         if ($side->type() === 'owner') {
@@ -184,6 +184,11 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         );
         
         return $this->relationship->preloader($side, $cachingProxy);
+    }
+    
+    protected function getRepository($modelName)
+    {
+        return $this->models->database()->repository($modelName);
     }
     
     protected function getIdField($repository)

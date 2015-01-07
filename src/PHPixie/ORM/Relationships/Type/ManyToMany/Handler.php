@@ -105,7 +105,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $sideIdField = $this->getIdField($sideRepository);
 
         $sideQuery = $sideRepository->databaseSelectQuery()->fields(array($sideIdField));
-        $this->mappers->group()->map(
+        $this->mappers->conditions()->map(
             $sideQuery,
             $sideRepository->modelName(),
             $collectionCondition->conditions(),

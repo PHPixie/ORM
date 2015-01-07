@@ -4,19 +4,23 @@ namespace PHPixie\ORM\Mappers;
 
 class Query
 {
+    protected $models;
     protected $mappers;
     protected $plans;
     protected $steps;
     protected $loaders;
-    protected $repositories;
+    
+    protected $databaseModel;
 
-    public function __construct($mappers, $plans, $steps, $loaders, $repositories )
+    public function __construct($models, $mappers, $plans, $steps, $loaders)
     {
+        $this->models = $models;
         $this->mappers = $mappers;
         $this->plans = $plans;
         $this->steps = $steps;
         $this->loaders = $loaders;
-        $this->repositories = $repositories;
+        
+        $this->databaseModel = $models->database();
     }
 
     public function mapCount($query)
@@ -79,15 +83,14 @@ class Query
     
     protected function mapConditions($query, $databaseQuery, $queryPlan)
     {
-        $modelName    = $query->modelName();
-        $conditions   = $query->getConditions();
-        $requiredPlan = $queryPlan->requiredPlan();
-        $groupMapper  = $this->mappers->group();
-        $groupOptimizer = $this->mappers->groupOptimizer();
+        $modelName           = $query->modelName();
+        $conditions          = $query->getConditions();
+        $requiredPlan        = $queryPlan->requiredPlan();
         
-        $conditions = $groupOptimizer->optimize($conditions);
+        $conditionsOptimizer = $this->mappers->conditionsOptimizer();
+        $conditions = $conditionsOptimizer->optimize($conditions);
         
-        $this->mappers->group()->mapDatabaseQuery(
+        $this->mappers->conditions()->mapDatabaseQuery(
             $databaseQuery,
             $conditions,
             $modelName,

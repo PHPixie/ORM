@@ -4,21 +4,34 @@ namespace PHPixie\ORM\Relationships\Relationship;
 
 abstract class Implementation implements \PHPixie\ORM\Relationships\Relationship
 {
-    protected $ormBuilder;
+    protected $configs;
+    protected $models;
+    protected $planners;
+    protected $plans;
+    protected $steps;
+    protected $loaders;
+    protected $mappers;
+    
     protected $handler;
 
-    public function __construct($ormBuilder)
+    public function __construct($configs, $models, $planners, $plans, $steps, $loaders, $mappers)
     {
-        $this->ormBuilder = $ormBuilder;
+        $this->configs  = $configs;
+        $this->models   = $models;
+        $this->planners = $planners;
+        $this->plans    = $plans;
+        $this->steps    = $steps;
+        $this->loaders  = $loaders;
+        $this->mappers  = $mappers;
     }
 
-    public function getSides($config)
+    public function getSides($configSlice)
     {
-        $config = $this->config($config);
+        $config = $this->config($configSlice);
         $sides = array();
-        foreach($this->sideTypes($config) as $type)
+        foreach($this->sideTypes($config) as $type) {
             $sides[] = $this->side($type, $config);
-
+        }
         return $sides;
     }
 
@@ -31,7 +44,7 @@ abstract class Implementation implements \PHPixie\ORM\Relationships\Relationship
         return $this->handler;
     }
     
-    abstract public function entityProperty($side, $model);
+    abstract public function entityProperty($side, $entity);
     
     abstract protected function buildHandler();
     abstract protected function config($config);

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM;
 
-class Config
+class Configs
 {
     
     public function inflector()

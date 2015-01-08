@@ -64,8 +64,6 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $this->prepareMapConditionBuilder($container, $side, $collection, $plan);
         $this->handler->mapEmbeddedContainer($container, $side, $collection, $plan);
     }
-    
-    
 
     /**
      * @covers ::mapPreload

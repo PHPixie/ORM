@@ -90,19 +90,24 @@ abstract class ImplementationTest extends \PHPixieTests\AbstractORMTest
     public function testEntityProperty()
     {
         $entity = $this->getEntity();
-        
+        $this->propertyTest('entity', $entity, $this->entityProperties);
+    }
+    
+    protected function propertyTest($type, $owner, $classMap)
+    {
         $configSlice = $this->configSlice();
         $sides = $this->relationship->getSides($configSlice);
         
         $handler = $this->relationship->handler();
+        $method = $type.'Property';
         
         foreach($sides as $side) {
-            $property = $this->relationship->entityProperty($side, $entity);
-            $this->assertInstanceOf($this->entityProperties[$side->type()], $property);
+            $property = $this->relationship->$method($side, $owner);
+            $this->assertInstanceOf($classMap[$side->type()], $property);
             $this->assertProperties($property, array(
                 'handler' => $handler,
                 'side' => $side,
-                'entity' => $entity
+                $type  => $owner
             ));
         }
     }
@@ -163,6 +168,31 @@ abstract class ImplementationTest extends \PHPixieTests\AbstractORMTest
                 throw new \Exception("Key $key is not set.");
             }));
         return $slice;
+    }
+    
+    protected function getDatabaseEntity()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Entity');
+    }
+    
+    protected function getEmbeddedEntity()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Embedded\Entity');
+    }
+    
+    protected function getQuery()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');
+    }
+    
+    protected function getLoader()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Loaders\Loader');
+    }
+    
+    protected function getReusableResult()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Steps\Result\Reusable');
     }
     
     abstract protected function configSlice();

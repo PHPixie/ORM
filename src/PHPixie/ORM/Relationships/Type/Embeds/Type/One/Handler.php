@@ -32,6 +32,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     public function setItem($model, $config, $item)
     {
         $this->assertModelName($item, $config->itemModel);
+        $this->removeItemFromOwner($item);
         $this->setItemModel($model, $config, $item);
     }
 

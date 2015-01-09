@@ -55,7 +55,7 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
 
     /**
      * @covers ::__construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Handler::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Handler::__construct
      * @covers ::<protected>
      */
     public function testConstruct()

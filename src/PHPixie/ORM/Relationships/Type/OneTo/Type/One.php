@@ -1,33 +1,42 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\Embeds\Type;
+namespace PHPixie\ORM\Relationships\Type\OneTo\Type;
 
-class One extends \PHPixie\ORM\Relationships\Type\Embeds
+class One extends \PHPixie\ORM\Relationships\Type\OneTo
 {
     
     public function entityProperty($side, $entity)
     {
-        return new One\Property\Entity\Item($this->handler(), $side, $entity);
+        return new One\Property\Entity($this->handler(), $side, $entity);
     }
     
-    public function preloader()
+    public function queryProperty($side, $query)
     {
-        return new One\Preloader();
+        return new One\Property\Query($this->handler(), $side, $query);
     }
     
-    public function preloadResult($reusableResult, $embeddedPrefix)
+    public function preloader($side, $loader)
     {
-        return new One\Preload\Result($reusableResult, $embeddedPrefix);
+        if ($side->type() === 'owner') {
+            return $this->ownerPreloader($side, $loader);
+        }
+        
+        return $this->itemPreloader($side, $loader);
     }
     
     protected function config($configSlice)
     {
-        return new One\Side\Config($configSlice);
+        return new One\Side\Config($this->configs->inflector(), $configSlice);
     }
 
     protected function side($type, $config)
     {
-        return new One\Side($this, $type, $config);
+        return new One\Side($type, $config);
+    }
+    
+    protected function sideTypes($config)
+    {
+        return array('owner', 'item');
     }
 
     protected function buildHandler()
@@ -43,8 +52,14 @@ class One extends \PHPixie\ORM\Relationships\Type\Embeds
         );
     }
     
-    protected function sideTypes($config)
+    protected function ownerPreloader($side, $loader)
     {
-        return array('item');
+        return new One\Preloader\Owner($side, $loader);
     }
+    
+    protected function itemPreloader($side, $loader)
+    {
+        return new One\Preloader\Item($side, $loader);
+    }
+    
 }

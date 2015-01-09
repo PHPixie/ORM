@@ -20,6 +20,16 @@ abstract class SideTest extends \PHPixieTests\AbstractORMTest
     }
 
     /**
+     * @covers ::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Side::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
+    /**
      * @covers ::type
      * @covers ::<protected>
      */

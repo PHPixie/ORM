@@ -19,20 +19,22 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $this->setItemTest();
         $this->setItemTest(true);
         $this->setItemTest(true, true);
+        $this->setItemTest(true, true, true);
+        $this->setItemTest(true, true, true, 'many');
     }
 
     /**
-     * @covers ::offsetSet
+     * @covers ::setItem
      * @covers ::<protected>
      */
-    public function testOffsetSetWrongModel() {
+    public function testSetItemWrongEntity() {
         $owner = $this->getOwner();
         $item = $this->prepareWrongItem();
         $this->handler->setItem($owner['entity'], $this->propertyConfig, $item);
     }
 
     /**
-     * @covers ::setItem
+     * @covers ::removeItem
      * @covers ::<protected>
      */
     public function testRemoveItem()
@@ -67,13 +69,21 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $this->handler->loadProperty($this->propertyConfig, $owner['entity']);
     }
 
-    protected function setItemTest($ownerIsLoaded = false, $ownerItemIsNull = false)
+    protected function setItemTest($ownerIsLoaded = false, $ownerItemIsNull = false, $withOldOwner = false, $withOldOwnerType = 'one')
     {
+        $oldOwner = null;
+        
+        if($withOldOwner) {
+            $oldOwner = $this->getOldOwner();
+        }
+        
+        $item = $this->getItem($oldOwner);
+        $this->prepareRemoveItemFromOwner($item, $withOldOwnerType);
+        
         $owner = $this->getOwner($ownerIsLoaded, $ownerItemIsNull);
         $this->prepareUnsetCurrentItemOwner($owner, $ownerIsLoaded, $ownerItemIsNull);
         
-        $item = $this->getItem();
-        $this->prepareSetItemModel($owner, $item);
+        $this->prepareSetItemModel($owner, $item, $withOldOwner ? 4 : 3);
         $this->handler->setItem($owner['entity'], $this->propertyConfig, $item['entity']);
     }
 
@@ -196,7 +206,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
 
     protected function getRelationship()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\EmbedsOne');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One');
     }
 
     protected function getHandler()

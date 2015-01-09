@@ -4,21 +4,21 @@ namespace PHPixie\ORM\Relationships;
 
 class Map
 {
-    protected $ormBuilder;
+    protected $relationships;
     protected $propertyMap = array();
 
-    public function __construct($ormBuilder, $config)
+    public function __construct($relationships, $config)
     {
-        $this->ormBuilder = $ormBuilder;
+        $this->relationships = $relationships;
         $this->addSidesFromConfig($config);
     }
 
-    public function addSidesFromConfig($config)
+    public function addSidesFromConfig($configSlice)
     {
-        foreach ($config->data() as $key => $params) {
+        foreach ($configSlice->data() as $key => $params) {
             $type = $params['type'];
             $relationshipConfig = $config->slice($key);
-            $relationship = $this->ormBuilder->relationship($type);
+            $relationship = $this->relationships($type);
             $sides = $relationship->getSides($relationshipConfig);
             foreach($sides as $side)
                 $this->addSide($side);

@@ -14,12 +14,14 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
      * @covers ::offsetSet
      * @covers ::<protected>
      */
-    public function testOffsetSet() {
+    public function testOffsetSet()
+    {
         $this->offsetSetTest(1);
-        $this->offsetSetTest(1, 5, true);
+        $this->offsetSetTest(1, 5, false, true);
         $this->offsetSetTest(6, 5);
         $this->offsetSetTest(5, 5);
-        $this->offsetSetTest(1, 5, false, true);
+        $this->offsetSetTest(1, 5, true, false);
+        $this->offsetSetTest(1, 5, true, true, 'one');
         $this->offsetSetTest(null);
     }
 
@@ -38,7 +40,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
      * @covers ::<protected>
      */
     public function testOffsetUnset() {
-        $owner = $this->getOwner(null, true);
+        $owner = $this->getOwner(true);
         $loaderOffset = 0;
         $this->prepareUnsetItems($owner, array(1), $loaderOffset);
         $this->handler->offsetUnset($owner['entity'], $this->propertyConfig, 1);
@@ -78,7 +80,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
      */
     public function testRemoveAllItems()
     {
-        $owner = $this->getOwner(null, true);
+        $owner = $this->getOwner(true);
         foreach($owner['cachedEntities'] as $item) {
             $this->method($item, 'unsetOwnerRelationship', null, array(), 0);
         }
@@ -125,14 +127,16 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         
     }
 
-    protected function offsetSetTest($key, $count = 5, $withOldOwner = false, $withOldItem = false)
+    protected function offsetSetTest($key, $count = 5, $withOldItem = false, $withOldOwner = false, $withOldOwnerType = 'many')
     {
         $oldOwner = null;
         if($withOldOwner) {
-            $oldOwner = $this->getOwner($this->oldOwnerProperty);
+            $oldOwner = $this->getOldOwner();
         }
 
         $item = $this->getItem($oldOwner);
+        $this->prepareRemoveItemFromOwner($item, $withOldOwnerType);
+        
         $owner = $this->getOwner();
         $this->prepareSetItem($owner, $item, $key, $count);
         $this->handler->offsetSet($owner['entity'], $this->propertyConfig, $key, $item['entity']);
@@ -164,7 +168,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
 
     protected function removeItemsTest($keys)
     {
-        $owner = $this->getOwner(null, true);
+        $owner = $this->getOwner(true);
 
         $remove = array();
         foreach($keys as $key) {
@@ -211,12 +215,8 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $this->handler->offsetCreate($owner['entity'], $this->propertyConfig, $key, $data);
     }
 
-    protected function getOwner($propertyName = null, $addCachedEntities = false)
+    protected function getOwner($addCachedEntities = false)
     {
-        if($propertyName == null) {
-            $propertyName = $this->configOwnerProperty;
-        }
-
         $owner = $this->getRelationshipEntity('owner');
         $property = $this->getProperty();
         $loader = $this->getArrayNodeLoader();
@@ -231,14 +231,15 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
             $owner['cachedEntities'] = $cached;
             $this->method($owner['loader'], 'cachedEntities', $cached, array());
         }
-        $this->method($owner['entity'], 'getRelationshipProperty', $property, array($propertyName), null, true);
+        $this->method($owner['entity'], 'getRelationshipProperty', $property, array($this->configOwnerProperty), null, true);
         $owner['property'] = $property;
+        
         return $owner;
     }
 
     protected function getProperty()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Entity\Items');
+        return $this->getEmbedsManyProperty();
     }
 
     protected function getPreloader() {
@@ -262,7 +263,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
 
     protected function getRelationship()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\EmbedsMany');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many');
     }
 
     protected function getHandler()

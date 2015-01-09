@@ -10,7 +10,7 @@ class Config extends \PHPixie\ORM\Models\Model\Config
         return 'embedded';
     }
     
-    protected function processConfig($config, $inflector)
+    protected function processConfig($configSlice, $inflector)
     {
         
     }

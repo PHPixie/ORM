@@ -2,14 +2,14 @@
 
 namespace PHPixie\ORM\Relationships\Type\OneTo\Type\One\Preloader;
 
-class Item extends \PHPixie\ORM\Relationships\Relationship\Preloader\Result\Single
+class Item extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Single
 {
     protected $map = array();
     
     protected function mapItems()
     {
         $ownerKey = $this->side->config()->ownerKey;
-        $idField = $this->loader->repository()->idField();
+        $idField = $this->loader->repository()->config()->idField;
         $fields = $this->loader->reusableResult()->getFields(array($idField, $ownerKey));
         foreach($fields as $offset => $row) {
             $id = $row[$idField];

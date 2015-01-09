@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Data\Type\Document;
+namespace PHPixie\ORM\Data\Types\Document;
 
 class Builder
 {

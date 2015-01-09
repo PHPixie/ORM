@@ -17,6 +17,11 @@ class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Preloader\Own
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\One\Side');
     }
     
+    protected function getProperty()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\One\Property\Entity');
+    }
+    
     protected function preloader()
     {
         return new \PHPixie\ORM\Relationships\Type\OneTo\Type\One\Preloader\Owner(

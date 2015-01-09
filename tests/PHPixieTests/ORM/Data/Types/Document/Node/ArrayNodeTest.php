@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Data\Type\Document\Node;
+namespace PHPixieTests\ORM\Data\Types\Document\Node;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Data\Type\Document\Node\ArrayNode
+ * @coversDefaultClass \PHPixie\ORM\Data\Types\Document\Node\ArrayNode
  */
-class ArrayNodeTest extends \PHPixieTests\ORM\Data\Type\Document\NodeTest
+class ArrayNodeTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
 {
     protected $data;
     protected $items = array();
@@ -81,7 +81,7 @@ class ArrayNodeTest extends \PHPixieTests\ORM\Data\Type\Document\NodeTest
      */
     public function testIterator()
     {
-        $iterator = $this->quickMock('\PHPixie\ORM\Data\Type\Document\Node\ArrayNode\Iterator');
+        $iterator = $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode\Iterator');
         $this->method($this->documentBuilder, 'arrayIterator', $iterator, array($this->node), 0);
         $this->assertEquals($iterator, $this->node->getIterator());
     }
@@ -165,6 +165,6 @@ class ArrayNodeTest extends \PHPixieTests\ORM\Data\Type\Document\NodeTest
         $this->items[1] = $this->arrayNode();
         $this->method($this->documentBuilder, 'arrayNode', $this->items[1], array($this->data[1]), 1);
         
-        return new \PHPixie\ORM\Data\Type\Document\Node\ArrayNode($this->documentBuilder, $this->data);
+        return new \PHPixie\ORM\Data\Types\Document\Node\ArrayNode($this->documentBuilder, $this->data);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Implementation;
+namespace PHPixie\ORM\Relationships\Relationship\Implementation\Preloader;
 
 abstract class Value extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader
 {

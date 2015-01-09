@@ -5,7 +5,7 @@ namespace PHPixieTests\ORM\Relationships\Relationship\Implementation\Preloader;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Value
  */
-class ValueTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\PreloaderTest
+abstract class ValueTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\PreloaderTest
 {
     protected $value;
     
@@ -34,11 +34,6 @@ class ValueTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementat
     protected function getProperty()
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Property\Entity\Owner');
-    }
-    
-    protected function preloader()
-    {
-        return new \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Value($this->value);
     }
     
 }

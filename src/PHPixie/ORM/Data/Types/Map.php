@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Data\Types;
 
-class Map extends \PHPixie\ORM\Data\Type\Implementation implements \PHPixie\ORM\Data\Type\Diffable
+class Map extends \PHPixie\ORM\Data\Types\Implementation implements \PHPixie\ORM\Data\Types\Diffable
 {
     protected $data;
     protected $originalData;

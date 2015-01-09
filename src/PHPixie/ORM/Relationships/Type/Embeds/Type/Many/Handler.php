@@ -20,28 +20,28 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
             $plan
         );
     }
-    public function offsetSet($model, $config, $offset, $item)
+    public function offsetSet($entity, $config, $offset, $item)
     {
         $this->assertModelName($item, $config->itemModel);
         $this->removeItemFromOwner($item);
-        $this->setItem($model, $config, $offset, $item);
+        $this->setItem($entity, $config, $offset, $item);
     }
 
-    public function offsetUnset($model, $config, $offset){
-        $this->unsetItems($model, $config, array($offset));
+    public function offsetUnset($entity, $config, $offset){
+        $this->unsetItems($entity, $config, array($offset));
     }
 
-    public function offsetCreate($model, $config, $offset, $data){
+    public function offsetCreate($entity, $config, $offset, $data){
         $embeddedModel = $this->models->embedded();
         $item = $embeddedModel->loadEntityFromData($config->itemModel, $data);
-        $this->setItem($model, $config, $offset, $item);
+        $this->setItem($entity, $config, $offset, $item);
     }
 
-    public function removeItems($model, $config, $items) {
+    public function removeItems($entity, $config, $items) {
         if(!is_array($items)) {
             $items = array($items);
         }
-        $property = $model->getRelationshipProperty($config->ownerItemsProperty);
+        $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
         $cachedItems = $arrayNodeLoader->cachedEntities();
 
@@ -54,13 +54,13 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
             $offsets[]=$offset;
         }
 
-        $this->unsetItems($model, $config, $offsets);
+        $this->unsetItems($entity, $config, $offsets);
     }
 
 
-    protected function setItem($model, $config, $offset, $item)
+    protected function setItem($entity, $config, $offset, $item)
     {
-        $arrayNode = $this->getArrayNode($model, $config->path);
+        $arrayNode = $this->getArrayNode($entity, $config->path);
         $count = $arrayNode->count();
 
         if($offset === null) {
@@ -69,7 +69,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
             throw new \PHPixie\ORM\Exception\Relationship("There may be no gaps in items array. Key $offset is larger than item count $count");
         }
 
-        $property = $model->getRelationshipProperty($config->ownerItemsProperty);
+        $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
 
         if($offset < $count) {
@@ -81,15 +81,15 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         $document  = $item->data()->document();
         $arrayNode->offsetSet($offset, $document);
 
-        $item->setOwnerRelationship($model, $config->ownerItemsProperty);
+        $item->setOwnerRelationship($entity, $config->ownerItemsProperty);
     }
 
-    protected function unsetItems($model, $config, $offsets)
+    protected function unsetItems($entity, $config, $offsets)
     {
-        $property = $model->getRelationshipProperty($config->ownerItemsProperty);
+        $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
         $cachedEntities = $arrayNodeLoader->cachedEntities();
-        $arrayNode = $this->getArrayNode($model, $config->path);
+        $arrayNode = $this->getArrayNode($entity, $config->path);
 
         sort($offsets, SORT_NUMERIC);
 
@@ -103,8 +103,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         }
     }
 
-    public function removeAllItems($model, $config) {
-        $property = $model->getRelationshipProperty($config->ownerItemsProperty);
+    public function removeAllItems($entity, $config) {
+        $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
         $cachedEntities = $arrayNodeLoader->cachedEntities();
 
@@ -113,14 +113,14 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         }
 
         $arrayNodeLoader->clearCachedEntities();
-        $arrayNode = $this->getArrayNode($model, $config->path);
+        $arrayNode = $this->getArrayNode($entity, $config->path);
         $arrayNode->clear();
     }
 
-    public function loadProperty($config, $model)
+    public function loadProperty($config, $entity)
     {
-        $arrayNode = $this->getArrayNode($model, $config->path);
-        return $this->loaders->arrayNode($config->itemModel, $model, $arrayNode);
+        $arrayNode = $this->getArrayNode($entity, $config->path);
+        return $this->loaders->arrayNode($config->itemModel, $entity, $arrayNode);
     }
 
     protected function unsetCachedItemOwner($arrayNodeLoader, $offset)

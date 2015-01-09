@@ -6,9 +6,9 @@ abstract class Config extends \PHPixie\ORM\Models\Type\Database\Config
 {
     public $table;
     
-    protected function processConfig($config, $inflector)
+    protected function processConfig($configSlice, $inflector)
     {
-        if (($this->table = $config->get('table', null)) === null)
+        if (($this->table = $configSlice->get('table', null)) === null)
             $this->table = $inflector->plural($this->modelName);
     }
     

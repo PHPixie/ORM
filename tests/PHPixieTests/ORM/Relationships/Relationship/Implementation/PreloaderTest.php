@@ -14,17 +14,6 @@ abstract class PreloaderTest extends \PHPixieTests\AbstractORMTest
         $this->preloader = $this->preloader();
     }
     
-    /**
-     * @covers ::__construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader::__construct
-     * @covers ::<protected>
-     */
-    public function testConstruct()
-    {
-    
-    }
-    
-    
     protected function property($entity, $expectedValue)
     {
         $property = $this->getProperty();

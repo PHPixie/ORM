@@ -3,39 +3,48 @@
 namespace PHPixie\ORM\Relationships\Type;
 
 class ManyToMany extends \PHPixie\ORM\Relationships\Relationship\Implementation
+                 implements \PHPixie\ORM\Relationships\Relationship\Type\Database
 {
-    public function config($config)
+    public function entityProperty($side, $entity)
     {
-        return new ManyToMany\Side\Config($config);
+        return new ManyToMany\Property\Entity($this->handler(), $side, $entity);
+    }
+    
+    public function queryProperty($side, $query)
+    {
+        return new ManyToMany\Property\Query($this->handler(), $side, $query);
+    }
+    
+    public function preloader($side, $loader, $pivotResult)
+    {
+        return new ManyToMany\Preloader($this->loaders, $side, $loader, $pivotResult);
+    }
+    
+    protected function config($configSlice)
+    {
+        return new ManyToMany\Side\Config($this->configs->inflector(), $configSlice);
     }
 
-    public function side($type, $config)
+    protected function side($type, $config)
     {
-        return new ManyToMany\Side($this, $type, $config);
-    }
-
-    public function buildHandler()
-    {
-        return new ManyToMany\Handler($this->ormBuilder, $this, $repositoryRegistry, $planners, $steps, $loaders, $groupMapper, $cascadeMapper);
-    }
-
-    public function preloader($side, $loader)
-    {
-        return new ManyToMany\Preloader($this->orm->loaders(), $this, $side, $loader);
-    }
-
-    public function entityProperty($side, $model)
-    {
-        return new ManyToMany\Property\Entity($this->handler(), $side, $model);
-    }
-
-    public function queryProperty($side, $model)
-    {
-        return new ManyToMany\Property\Query($this->handler(), $side, $model);
+        return new ManyToMany\Side($type, $config);
     }
 
     protected function sideTypes($config)
     {
         return array('left', 'right');
+    }
+    
+    protected function buildHandler()
+    {
+        return new ManyToMany\Handler(
+            $this->models,
+            $this->planners,
+            $this->plans,
+            $this->steps,
+            $this->loaders,
+            $this->mappers,
+            $this
+        );
     }
 }

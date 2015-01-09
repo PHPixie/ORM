@@ -4,9 +4,9 @@ namespace PHPixie\ORM\Configs;
 
 abstract class Config
 {
-    public function __construct($inflector, $config)
+    public function __construct($inflector, $configSlice)
     {
-        $this->processConfig($config, $inflector);
+        $this->processConfig($configSlice, $inflector);
     }
 
     public function get($key)
@@ -14,5 +14,5 @@ abstract class Config
         return $this->$key;
     }
 
-    abstract protected function processConfig($config, $inflector);
+    abstract protected function processConfig($configSlice, $inflector);
 }

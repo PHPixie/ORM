@@ -8,10 +8,10 @@ abstract class Config extends \PHPixie\ORM\Models\Model\Config
     public $connection;
     public $driver;
 
-    public function __construct($inflector, $modelName, $config, $driverName)
+    public function __construct($inflector, $modelName, $configSlice, $driverName)
     {
         $this->driver = $driverName;
-        parent::__construct($inflector, $modelName, $config);
+        parent::__construct($inflector, $modelName, $configSlice);
     }
     
     protected function type()
@@ -19,10 +19,10 @@ abstract class Config extends \PHPixie\ORM\Models\Model\Config
         return 'database';
     }
     
-    protected function processConfig($config, $inflector)
+    protected function processConfig($configSlice, $inflector)
     {
-        $this->connection = $config->get('connection', 'default');
-        $this->idField = $config->get('id', $this->defaultIdField());
+        $this->connection = $configSlice->get('connection', 'default');
+        $this->idField = $configSlice->get('id', $this->defaultIdField());
     }
     
     abstract protected function defaultIdField();

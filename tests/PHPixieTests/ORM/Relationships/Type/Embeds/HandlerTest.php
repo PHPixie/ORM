@@ -25,15 +25,6 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $this->propertyConfig = $this->config($this->configData);
         parent::setUp();
     }
-
-    protected function prepareRemoveItemFromOwner($item, $owner, &$propertyOffset = 0)
-    {
-        $params = array();
-        if($owner['property'] instanceof \PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property) {
-            $params[]= $item['entity'];
-        }
-        $this->method($owner['property'], 'remove', null, $params, $propertyOffset++);
-    }
     
     /**
      * @covers ::mapDatabaseQuery
@@ -92,6 +83,29 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         
         $this->assertSame($preloader, $this->handler->mapPreload($side, $preloadProperty['property'], $result, $plan));
     }
+    
+    protected function prepareRemoveItemFromOwner($item, $ownerRelationshipType = 'one')
+    {
+        if($item['owner'] === null)
+            return;
+        
+        if($ownerRelationshipType == 'many') {
+            $property = $this->getEmbedsOneProperty();
+            $this->method($property, 'remove', null, array(), 0);
+        }else{
+            $property = $this->getEmbedsManyProperty();
+            $this->method($property, 'remove', null, array($item['entity']), 0);
+        }
+        
+        $this->method($item['owner']['entity'], 'getRelationshipProperty', $property, array($this->oldOwnerProperty), null, true);
+    }
+    
+    protected function getOldOwner()
+    {
+        return array(
+            'entity' => $this->getEmbeddedEntity()
+        );
+    }
 
     protected function getItem($owner = null)
     {
@@ -104,6 +118,9 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $this->method($item['entity'], 'ownerPropertyName', $this->oldOwnerProperty, array());
             $this->method($item['entity'], 'owner', $owner['entity'], array());
         }
+        
+        $item['owner'] = $owner;
+        
         return $item;
     }
 
@@ -136,6 +153,16 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Embedded\ArrayNode');
     }
     
+    protected function getEmbedsManyProperty()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\Many\Property\Entity\Items');
+    }
+    
+    protected function getEmbedsOneProperty()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity\Item');
+    }
+
     abstract protected function prepareMapConditionBuilder($builder, $side, $collection, $plan);
     abstract protected function getPreloadResult();
     abstract protected function getPreloader();

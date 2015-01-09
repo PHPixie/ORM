@@ -38,7 +38,7 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
 
     /**
      * @covers ::__construct
-     * @covers \PHPixie\ORM\Relationships\Relationship\Side\Config::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Side\Config::__construct
      * @covers ::<protected>
      */
     public function testConstruct()

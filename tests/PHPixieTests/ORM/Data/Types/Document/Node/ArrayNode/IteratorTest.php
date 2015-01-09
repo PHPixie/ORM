@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Data\Type\Document\Node\ArrayNode;
+namespace PHPixieTests\ORM\Data\Types\Document\Node\ArrayNode;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Data\Type\Document\Node\ArrayNode\Iterator
+ * @coversDefaultClass \PHPixie\ORM\Data\Types\Document\Node\ArrayNode\Iterator
  */
 class IteratorTest extends \PHPixieTests\AbstractORMTest
 {
@@ -13,8 +13,8 @@ class IteratorTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->arrayNode = $this->quickMock('\PHPixie\ORM\Data\Type\Document\Node\ArrayNode');
-        $this->iterator = new \PHPixie\ORM\Data\Type\Document\Node\ArrayNode\Iterator($this->arrayNode);
+        $this->arrayNode = $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode');
+        $this->iterator = new \PHPixie\ORM\Data\Types\Document\Node\ArrayNode\Iterator($this->arrayNode);
     }
     
     /**

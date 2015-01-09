@@ -46,7 +46,7 @@ abstract class EmbedsTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     
     protected function getEntity()
     {
-        return $this->abstractMock('\PHPixie\ORM\Models\Type\Embedded\Entity');
+        return $this->getEmbeddedEntity();
     }
 
 }

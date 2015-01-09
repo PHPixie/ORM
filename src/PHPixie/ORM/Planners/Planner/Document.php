@@ -82,7 +82,7 @@ class Document extends \PHPixie\ORM\Planners\Planner
 
     protected function checkDocument($document)
     {
-         if (!($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\Document))
+         if (!($document instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Types\Document))
             return null;
 
         return $document;
@@ -90,7 +90,7 @@ class Document extends \PHPixie\ORM\Planners\Planner
 
     protected function checkArray($array)
     {
-         if (!($array instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Type\DocumentArray))
+         if (!($array instanceof \PHPixie\ORM\Driver\Mongo\Model\Data\Types\DocumentArray))
             return null;
 
         return $array;

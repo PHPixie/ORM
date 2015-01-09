@@ -32,14 +32,17 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         $owner = $this->getOwner(true, false, true);
         
         $preloadValue = $this->getOwnerPreloadValue();
-        $this->method($this->relationship, 'ownerPreloadValue', $preloadValue, array(), 0);
+        $this->method($this->relationship, 'ownerPreloadValue', $preloadValue, array(
+            $this->configData['itemOwnerProperty'],
+            $owner['entity']
+        ), 0);
         
         $query = $this->getQuery();
         $this->prepareQuery($side, $query, $owner['entity']);
         
         $loader = $this->getReusableResultLoader();
         $this->method($query, 'find', $loader, array(array(
-            $this->configData['itemOwnerProperty'] => $preloadValue
+            $preloadValue
         )));
         
         $proxy = $this->getLoaderProxy('editable');
@@ -451,7 +454,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
 
     protected function getRelationship()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneToMany');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\Many');
     }
 
     protected function getHandler()

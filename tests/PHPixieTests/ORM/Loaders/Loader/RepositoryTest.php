@@ -33,5 +33,8 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $this->assertEquals($this->repository, $this->loader->repository());
     }
 
-    protected abstract function getRepository();
+    protected function getRepository()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Repository');
+    }
 }

@@ -41,17 +41,6 @@ abstract class Handler
             throw new \PHPixie\ORM\Exception\Relationship("Only '$requiredModel' models can be used for this relationship.");
     }
 
-    protected function deletePlanResultStep($plan)
-    {
-        if (($resultStep = $plan->resultStep()) !== null)
-            return $resultStep;
-
-        $resultStep = $this->steps->result(null);
-        $plan->setResultStep($resultStep);
-
-        return $resultStep;
-    }
-
     protected function getPropertyIfLoaded($model, $propertyName)
     {
         $property = $model->getRelationshipProperty($propertyName);

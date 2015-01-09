@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Relationships\Type\OneTo\Preloader;
+namespace PHPixieTests\ORM\Relationships\Type\OneTo\Type\One\Preloader;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Preloader\Owner
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\OneTo\Type\One\Preloader\Item
  */
-class ItemTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Result\SingleTest
+class ItemTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Preloader\Result\SingleTest
 {
     protected $configData = array(
         'ownerModel'       => 'fairy',
@@ -15,8 +15,8 @@ class ItemTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Re
     
     protected function prepareMap()
     {
-        foreach($this->models as $id => $model) {
-            $this->method($model, 'id', $id, array());
+        foreach($this->entities as $id => $entity) {
+            $this->method($entity, 'id', $id, array());
         }
         
         $repository = $this->getDatabaseRepository();
@@ -25,7 +25,11 @@ class ItemTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Re
         $loaderResult = $this->getReusableResult();
         $this->method($this->loader, 'reusableResult', $loaderResult, array(), 1);
         
-        $this->method($repository, 'idField', 'id', array(), 0);
+        $config = $this->getDatabaseConfig();
+        $config->idField = 'id';
+        
+        $this->method($repository, 'config', $config, array(), 0);
+        
         $fields = array();
         foreach($this->map as $id => $preloadId) {
             $fields[] = array(
@@ -54,6 +58,16 @@ class ItemTest extends \PHPixieTests\ORM\Relationships\Relationship\Preloader\Re
     protected function getSide()
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\One\Side');
+    }
+    
+    protected function getDatabaseConfig()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
+    }
+    
+    protected function getProperty()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\One\Property\Entity');
     }
     
     protected function preloader()

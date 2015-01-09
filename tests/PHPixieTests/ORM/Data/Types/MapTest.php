@@ -1,9 +1,9 @@
 <?php
 
-namespace PHPixieTests\ORM\Data\Type;
+namespace PHPixieTests\ORM\Data\Types;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Data\Type\Map
+ * @coversDefaultClass \PHPixie\ORM\Data\Types\Map
  */
 class MapTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
 {
@@ -104,6 +104,6 @@ class MapTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
     
     protected function getType()
     {
-        return new \PHPixie\ORM\Data\Type\Map($this->dataBuilder, $this->data);
+        return new \PHPixie\ORM\Data\Types\Map($this->dataBuilder, $this->data);
     }
 }

@@ -29,6 +29,11 @@ class One extends \PHPixie\ORM\Relationships\Type\Embeds
         return new One\Side($type, $config);
     }
 
+    protected function sideTypes($config)
+    {
+        return array('item');
+    }
+    
     protected function buildHandler()
     {
         return new One\Handler(
@@ -42,8 +47,4 @@ class One extends \PHPixie\ORM\Relationships\Type\Embeds
         );
     }
     
-    protected function sideTypes($config)
-    {
-        return array('item');
-    }
 }

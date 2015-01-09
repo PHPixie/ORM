@@ -3,7 +3,7 @@
 namespace PHPixieTests\ORM\Relationships\Type\Embeds\Type\One\Property\Entity;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity\Items
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity\Item
  */
 class ItemTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\Property\EntityTest
 {

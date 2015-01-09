@@ -231,7 +231,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
 
     protected function getRelationship()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneToOne');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\OneTo\Type\One');
     }
 
     protected function getHandler()

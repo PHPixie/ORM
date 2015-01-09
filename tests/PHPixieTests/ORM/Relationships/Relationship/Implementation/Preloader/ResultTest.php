@@ -28,10 +28,10 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     {
         $this->prepareMap();
         $this->prepareLoader();
-        $models = array_reverse($this->preloadedEntities, true);
-        $i = count($models) - 1;
-        foreach($models as $id => $model) {
-            $this->assertEquals($model, $this->preloader->getEntity($id));
+        $entities = array_reverse($this->preloadedEntities, true);
+        $i = count($entities) - 1;
+        foreach($entities as $id => $entity) {
+            $this->assertEquals($entity, $this->preloader->getEntity($id));
             $i--;
         }
     }

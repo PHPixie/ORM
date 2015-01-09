@@ -27,13 +27,13 @@ class MapTest extends \PHPixieTests\AbstractORMTest
 
     public function setUp()
     {
-        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
+        $this->ormBuilder = $this->abstractMock('\PHPixie\ORM\Builder');
 
         $this->slices = array(
-            $this->quickMock('\PHPixie\Config\Slice'),
-            $this->quickMock('\PHPixie\Config\Slice')
+            $this->abstractMock('\PHPixie\Config\Slice'),
+            $this->abstractMock('\PHPixie\Config\Slice')
         );
-        $this->config = $this->quickMock('\PHPixie\Config\Slice', array('slice', 'data'));
+        $this->config = $this->abstractMock('\PHPixie\Config\Slice', array('slice', 'data'));
         $this->method($this->config, 'data', $this->configData, array(), 0);
         $this->method($this->config, 'slice', $this->slices[0], array(0), 1);
         $this->method($this->config, 'slice', $this->slices[1], array(1), 2);

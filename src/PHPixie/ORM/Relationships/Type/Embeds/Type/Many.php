@@ -28,6 +28,11 @@ class Many extends \PHPixie\ORM\Relationships\Type\Embeds
     {
         return new Many\Side($type, $config);
     }
+    
+    protected function sideTypes($config)
+    {
+        return array('items');
+    }
 
     protected function buildHandler()
     {
@@ -41,9 +46,5 @@ class Many extends \PHPixie\ORM\Relationships\Type\Embeds
             $this
         );
     }
-    
-    protected function sideTypes($config)
-    {
-        return array('items');
-    }
+
 }

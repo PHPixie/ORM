@@ -7,12 +7,10 @@ namespace PHPixieTests\ORM\Plans\Plan;
  */
 class QueryTest extends \PHPixieTests\ORM\Plans\PlanTest
 {
-    protected $requiredPlan;
     protected $queryStep;
     
     public function setUp()
     {
-        $this->requiredPlan = $this->abstractMock('\PHPixie\ORM\Plans\Plan');
         $this->queryStep = $this->queryStep();
         parent::setUp();
         
@@ -33,7 +31,8 @@ class QueryTest extends \PHPixieTests\ORM\Plans\PlanTest
      */
     public function testPlans()
     {
-        $this->assertSame($this->requiredPlan, $this->plan->requiredPlan());
+        $stepsPlan = $this->prepareStepsPlan();
+        $this->assertSame($stepsPlan, $this->plan->requiredPlan());
     }
     
     /**
@@ -47,13 +46,39 @@ class QueryTest extends \PHPixieTests\ORM\Plans\PlanTest
         parent::testSteps();
     }
     
+    /**
+     * @covers ::steps
+     * @covers ::<protected>
+     */
+    public function testOnlyQueryStep()
+    {
+        $this->assertSame(array($this->queryStep), $this->plan->steps());
+    }
+    
+    
     protected function addSteps($withConnections = false)
     {
+        $requiredPlan = $this->prepareStepsPlan();
+        $this->plan->requiredPlan();
+        
         $steps = array_slice($this->steps, 0, 5);
-        $this->method($this->requiredPlan, 'steps', $steps);
+        $this->method($requiredPlan, 'steps', $steps, array());
+        
         if($withConnections) {
             $this->method($this->queryStep, 'usedConnections', array());
         }
+    }
+    
+    protected function prepareStepsPlan($at = 0)
+    {
+        $steps = $this->stepsPlan();
+        $this->method($this->plans, 'steps', $steps, array(), $at);
+        return $steps;
+    }
+
+    protected function stepsPlan()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Plans\Plan\Steps');
     }
     
     protected function queryStep()
@@ -63,6 +88,6 @@ class QueryTest extends \PHPixieTests\ORM\Plans\PlanTest
     
     protected function getPlan()
     {
-        return new \PHPixie\ORM\Plans\Plan\Query($this->transaction, $this->requiredPlan, $this->queryStep);
+        return new \PHPixie\ORM\Plans\Plan\Query($this->plans, $this->queryStep);
     }    
 }

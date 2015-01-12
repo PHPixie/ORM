@@ -36,6 +36,6 @@ class CountTest extends \PHPixieTests\ORM\Plans\Plan\QueryTest
     
     protected function getPlan()
     {
-        return new \PHPixie\ORM\Plans\Plan\Query\Count($this->transaction, $this->requiredPlan, $this->queryStep);
+        return new \PHPixie\ORM\Plans\Plan\Query\Count($this->plans, $this->queryStep);
     } 
 }

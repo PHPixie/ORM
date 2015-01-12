@@ -131,12 +131,4 @@ class LoadersTest extends \PHPixieTests\AbstractORMTest
             'ownerPropertyName' => $ownerPropertyName,
         ));
     }
-    
-    protected function assertInstance($object, $class, $propertyMap)
-    {
-        $this->assertInstanceOf($class, $object);
-        foreach($propertyMap as $name => $value) {
-            $this->assertAttributeEquals($value, $name, $object);
-        }
-    }
 }

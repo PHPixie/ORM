@@ -7,13 +7,11 @@ namespace PHPixieTests\ORM\Plans\Plan\Query;
  */
 class LoaderTest extends \PHPixieTests\ORM\Plans\Plan\QueryTest
 {
-    protected $preloadPlan;
     protected $loader;
     
     public function setUp()
     {
-        $this->preloadPlan = $this->abstractMock('\PHPixie\ORM\Plans\Plan');
-        $this->loader = $this->loader();
+        $this->loader = $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\ReusableResult');
         parent::setUp();
         
         $this->steps[] = $this->step(array());
@@ -34,7 +32,8 @@ class LoaderTest extends \PHPixieTests\ORM\Plans\Plan\QueryTest
      */
     public function testPreloadPlan()
     {
-        $this->assertSame($this->preloadPlan, $this->plan->preloadPlan());
+        $stepsPlan = $this->prepareStepsPlan();
+        $this->assertSame($stepsPlan, $this->plan->preloadPlan());
     }
     
     /**
@@ -51,11 +50,13 @@ class LoaderTest extends \PHPixieTests\ORM\Plans\Plan\QueryTest
     
     protected function addSteps($withConnections = false)
     {
-        $steps = array_slice($this->steps, 0, 5);
-        $this->method($this->requiredPlan, 'steps', $steps);
+        parent::addSteps($withConnections);
+        
+        $preloadPlan = $this->prepareStepsPlan();
+        $this->plan->preloadPlan();
         
         $steps = array_slice($this->steps, 6, 1);
-        $this->method($this->preloadPlan, 'steps', $steps);
+        $this->method($preloadPlan, 'steps', $steps, array());
         
         if($withConnections) {
             $this->method($this->queryStep, 'usedConnections', array());
@@ -63,21 +64,13 @@ class LoaderTest extends \PHPixieTests\ORM\Plans\Plan\QueryTest
         }
     }
     
-    protected function loader()
-    {
-        $loader = $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\ReusableResultStep');
-        $queryStep = $this->abstractMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
-        $this->method($loader, 'reusableResultStep', $queryStep, array());
-        return $loader;
-    }
-    
     protected function queryStep()
     {
-        return $this->loader->reusableResultStep();
+        return $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
     }
     
     protected function getPlan()
     {
-        return new \PHPixie\ORM\Plans\Plan\Query\Loader($this->transaction, $this->requiredPlan, $this->preloadPlan, $this->loader);
+        return new \PHPixie\ORM\Plans\Plan\Query\Loader($this->plans, $this->queryStep, $this->loader);
     } 
 }

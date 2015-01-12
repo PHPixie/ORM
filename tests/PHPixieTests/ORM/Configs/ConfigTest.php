@@ -38,6 +38,7 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
 
     /**
      * @covers ::__construct
+     * @covers \PHPixie\ORM\Configs\Config::__construct
      * @covers ::<protected>
      */
     public function testConstruct()
@@ -51,6 +52,7 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
 
     /**
      * @covers ::get
+     * @covers \PHPixie\ORM\Configs\Config::get
      * @covers ::<protected>
      */
     public function testGet()

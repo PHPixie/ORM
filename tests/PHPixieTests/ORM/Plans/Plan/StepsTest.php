@@ -9,7 +9,7 @@ class StepsTest extends \PHPixieTests\ORM\Plans\PlanTest
 {
     protected function getPlan()
     {
-        return new \PHPixie\ORM\Plans\Plan\Steps($this->transaction);
+        return new \PHPixie\ORM\Plans\Plan\Steps($this->plans);
     }
     
     protected function addSteps($withConnections = false)

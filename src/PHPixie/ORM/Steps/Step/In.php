@@ -4,22 +4,22 @@ namespace PHPixie\ORM\Steps\Step;
 
 class In extends \PHPixie\ORM\Steps\Step
 {
-    protected $placeholder;
-    protected $placeholderField;
+    protected $builder;
+    protected $builderField;
     protected $resultStep;
     protected $resultField;
 
-    public function __construct($placeholder, $placeholderField, $resultStep, $resultField)
+    public function __construct($builder, $builderField, $resultStep, $resultField)
     {
-        $this->placeholder = $placeholder;
-        $this->placeholderField = $placeholderField;
-        $this->resultStep = $resultStep;
-        $this->resultField = $resultField;
+        $this->builder      = $builder;
+        $this->builderField = $builderField;
+        $this->resultStep   = $resultStep;
+        $this->resultField  = $resultField;
     }
 
     public function execute()
     {
         $values = $this->resultStep->getField($this->resultField);
-        $this->placeholder->builder()->_and($this->placeholderField, 'in', $values);
+        $this->builder->_and($this->placeholderField, 'in', $values);
     }
 }

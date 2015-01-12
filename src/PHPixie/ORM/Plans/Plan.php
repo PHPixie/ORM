@@ -4,25 +4,27 @@ namespace PHPixie\ORM\Plans;
 
 abstract class Plan
 {
-    protected $transaction;
-    public function __construct($transaction)
+    protected $plans;
+    
+    public function __construct($plans)
     {
-        $this->transaction = $transaction;
+        $this->plans = $plans;
     }
 
     public function execute()
     {
+        $transaction = $this->plans->transaction();
         $steps = $this->steps();
         $connections = $this->usedConnections();
-        $this->transaction->begin($connections);
+        $transaction->begin($connections);
 
         try {
             foreach($steps as $step)
                 $step->execute();
-            $this->transaction->commit($connections);
+            $transaction->commit($connections);
 
         } catch (\Exception $exception) {
-            $this->transaction->rollback($connections);
+            $transaction->rollback($connections);
             throw $exception;
         }
     }
@@ -31,9 +33,11 @@ abstract class Plan
     {
         $connections = array();
         foreach ($this->steps() as $step) {
-            foreach($step->usedConnections() as $connection)
-                if (!in_array($connection, $connections, true))
+            foreach($step->usedConnections() as $connection) {
+                if (!in_array($connection, $connections, true)) {
                     $connections[] = $connection;
+                }
+            }
         }
 
         return $connections;

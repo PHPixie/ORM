@@ -7,16 +7,21 @@ namespace PHPixieTests\ORM\Plans;
  */
 abstract class PlanTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $plans;
     protected $transaction;
     protected $connections;
     protected $plan;
     
     public function setUp()
     {
-        $this->transaction = $this->quickMock('\PHPixie\ORM\Plans\Transaction', array('begin', 'commit', 'rollback'));
+        $this->plans = $this->quickMock('\PHPixie\ORM\Plans');
+        
+        $this->transaction = $this->quickMock('\PHPixie\ORM\Plans\Transaction');
+        $this->method($this->plans, 'transaction', $this->transaction, array());
+        
         $this->connections = array(
-            $this->valueObject(),
-            $this->valueObject()
+            $this->getConnection(),
+            $this->getConnection()
         );
         
         $this->steps = array(
@@ -91,7 +96,7 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
     protected function step($connections)
     {
         $step = $this->quickMock('\PHPixie\ORM\Steps\Step', array('usedConnections', 'execute'));
-        $this->method($step, 'usedConnections', $connections);
+        $this->method($step, 'usedConnections', $connections, array());
         return $step;
     }
     
@@ -106,6 +111,11 @@ abstract class PlanTest extends \PHPixieTests\AbstractORMTest
                 ->method('execute')
                 ->with();
         }
+    }
+    
+    protected function getConnection()
+    {
+        return $this->abstractMock('\PHPixie\Database\Connection');
     }
     
     abstract protected function getPlan();

@@ -11,19 +11,19 @@ class Plans
         return new Plans\Plan\Steps($this);
     }
     
-    public function query()
+    public function query($queryStep)
     {
-        return new Plans\Plan\Step($this);
+        return new Plans\Plan\Query($this, $queryStep);
     }
     
-    public function count()
+    public function count($countStep)
     {
-        return new Plans\Plan\Step($this);
+        return new Plans\Plan\Query\Count($this, $countStep);
     }
 
-    public function loader()
+    public function loader($resultStep, $loader)
     {
-        return new Plans\Plan\Composite\Loader($this);
+        return new Plans\Plan\Query\Loader($this, $resultStep, $loader);
     }
 
     public function transaction()

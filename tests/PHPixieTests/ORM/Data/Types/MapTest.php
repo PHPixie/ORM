@@ -21,13 +21,19 @@ class MapTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
         parent::setUp();
     }
     
+    
+    /**
+     * @covers ::get
+     * @covers ::set
+     * @covers ::<protected>
+     */
     public function testSetGet()
     {
         $this->assertEquals('Trixie', $this->type->get('name'));
         $this->type->set('test', 5);
         $this->assertEquals(5, $this->type->get('test'));
-        $this->setExpectedException('\Exception');
-        $this->type->get('test2');
+        $this->assertEquals(null, $this->type->get('test2'));
+        $this->assertEquals(5, $this->type->get('test2', 5));
     }
     
     /**
@@ -83,25 +89,40 @@ class MapTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
      */
     public function testDiff()
     {
-        $diff = $this->quickMock('\PHPixie\ORM\Data\Diff');
-        $this->method($this->dataBuilder, 'diff', $diff, array((object) array()), 0);
-        $this->assertEquals($diff, $this->type->diff());
+        $this->assertDiff((object) array());
         
         $this->type
                 ->set('test', 5)
                 ->set('flowers', null);
         
-        $this->method($this->dataBuilder, 'diff', $diff, array((object) array(
+        $this->assertDiff((object) array(
             'test'    => 5,
             'flowers' => null
-        )), 0);
-        $this->assertEquals($diff, $this->type->diff());
+        ));
+        
         $this->type->setCurrentAsOriginal();
-        $this->method($this->dataBuilder, 'diff', $diff, array((object) array()), 0);
+        
+        $this->assertDiff((object) array());
+    }
+    
+    protected function assertDiff($set)
+    {
+        $diff = $this->getDiff();
+        
+        $this->dataBuilder
+            ->expects($this->at(0))
+            ->method('diff')
+            ->with($set)
+            ->will($this->returnValue($diff));
+        
         $this->assertEquals($diff, $this->type->diff());
     }
     
     
+    protected function getDiff()
+    {
+        return $this->quickMock('\PHPixie\ORM\Data\Diff');
+    }
     protected function getType()
     {
         return new \PHPixie\ORM\Data\Types\Map($this->dataBuilder, $this->data);

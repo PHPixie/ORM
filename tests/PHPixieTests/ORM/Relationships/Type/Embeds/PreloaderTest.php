@@ -23,18 +23,6 @@ abstract class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationshi
     
     /**
      * @covers ::addPreloader
-     * @covers ::getPreloader
-     */
-    public function testAddGetPreloader()
-    {
-        foreach($this->preloaders as $relationship => $preloader){
-            $this->assertSame(null, $this->preloader->getPreloader($relationship));
-            $this->preloader->addPreloader($relationship, $preloader);
-            $this->assertSame($preloader, $this->preloader->getPreloader($relationship));
-        }
-    }
-    
-    /**
      * @covers ::loadProperty
      * @covers ::<protected>
      */

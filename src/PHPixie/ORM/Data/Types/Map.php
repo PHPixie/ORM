@@ -2,13 +2,17 @@
 
 namespace PHPixie\ORM\Data\Types;
 
-class Map extends \PHPixie\ORM\Data\Types\Implementation implements \PHPixie\ORM\Data\Types\Diffable
+class Map extends \PHPixie\ORM\Data\Type\Implementation
+          implements \PHPixie\ORM\Data\Type\Diffable
 {
+    protected $dataBuilder;
     protected $data;
     protected $originalData;
     
-    public function __construct($data = null)
+    public function __construct($dataBuilder, $data = null)
     {
+        $this->dataBuilder = $dataBuilder;
+        
         $this->data = (array) $data;
         $this->originalData = $data;
     }

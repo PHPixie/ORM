@@ -31,17 +31,17 @@ abstract class LoaderTest extends \PHPixieTests\AbstractORMTest
      */
     public function testAsArray()
     {
-        $models = array();
+        $entities = array();
         foreach(array(0, 1) as $i) {
-            $model = $this->quickMock('\PHPixie\ORM\Model');
-            $this->method($model, 'asObject', array($i), array(true), null);
-            $models[]=$model;
+            $entity = $this->getEntity();
+            $this->method($entity, 'asObject', array($i), array(true), null);
+            $entities[]=$entity;
         }
         
-        $iterator = new \ArrayIterator($models);
+        $iterator = new \ArrayIterator($entities);
         $this->method($this->loaders, 'iterator', $iterator, array($this->loader), null);
         
-        $this->assertEquals($models, $this->loader->asArray());
+        $this->assertEquals($entities, $this->loader->asArray());
         $this->assertEquals(array(array(0), array(1)), $this->loader->asArray(true));
     }
     
@@ -59,7 +59,12 @@ abstract class LoaderTest extends \PHPixieTests\AbstractORMTest
      * @covers ::getByOffset
      * @covers ::<protected>
      */
-    public abstract function testNotFoundException();
+    abstract public function testNotFoundException();
+    
+    protected function getEntity()
+    {
+        return $this->quickMock('\PHPixie\ORM\Models\Model\Entity');
+    }
     
     abstract protected function getLoader();
 }

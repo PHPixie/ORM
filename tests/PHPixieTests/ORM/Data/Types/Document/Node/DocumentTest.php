@@ -28,6 +28,17 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
     }
 
     /**
+     * @covers ::get
+     * @covers ::<protected>
+     */
+    public function testGet()
+    {
+        $this->assertEquals('Trixie', $this->node->get('name'));
+        $this->assertEquals(null, $this->node->get('test'));
+        $this->assertEquals(5, $this->node->get('test', 5));
+    }
+    
+    /**
      * @covers ::set
      * @covers ::__set
      * @covers ::<protected>
@@ -48,6 +59,18 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
         $this->method($this->documentBuilder, 'arrayNode', $flowersArray, array($flowers), 0);
         $this->node->flowers = $flowers;
         $this->assertEquals($flowersArray, $this->node->flowers);
+    }
+    
+    /**
+     * @covers ::remove
+     * @covers ::<protected>
+     */
+    public function testRemove()
+    {
+        $this->node->remove('test');
+        $this->assertEquals('Trixie', $this->node->name);
+        $this->node->remove('name');
+        $this->assertEquals(false, property_exists($this->node, 'name'));
     }
     
     /**

@@ -12,12 +12,7 @@ abstract class Repository extends \PHPixie\ORM\Loaders\Loader
         $this->repository = $repository;
     }
 
-    public function repository()
-    {
-        return $this->repository;
-    }
-    
-    protected function loadModel($data)
+    protected function loadEntity($data)
     {
         return $this->repository->load($data);
     }

@@ -12,14 +12,6 @@ class Preloading extends \PHPixie\ORM\Loaders\Loader\Proxy
         $this->preloaders[$relationship] = $preloader;
     }
 
-    public function getPreloader($relationship)
-    {
-        if(array_key_exists($relationship, $this->preloaders))
-            return $this->preloaders[$relationship];
-
-        return null;
-    }
-
     public function offsetExists($offset)
     {
         return $this->loader->offsetExists($offset);
@@ -28,12 +20,12 @@ class Preloading extends \PHPixie\ORM\Loaders\Loader\Proxy
     public function getByOffset($offset)
     {
         $entity = $this->loader->getByOffset($offset);
-        $this->preloadModelProperties($entity);
+        $this->preloadEntityProperties($entity);
 
         return $entity;
     }
 
-    protected function preloadModelProperties($entity)
+    protected function preloadEntityProperties($entity)
     {
         foreach($this->preloaders as $relationship => $preloader) {
             $property = $entity->getRelationshipProperty($relationship);

@@ -69,6 +69,16 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
         $this->assertEquals($document, $this->type->addDocument('test'));
     }
     
+    
+    /**
+     * @covers ::document
+     * @covers ::<protected>
+     */
+    public function testDocument()
+    {
+        $this->assertSame($this->document, $this->type->document());
+    }
+    
     protected function arrayNode()
     {
         return $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode');

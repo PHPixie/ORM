@@ -4,7 +4,7 @@ namespace PHPixie\ORM\Conditions\Builder;
 
 class Container implements \PHPixie\ORM\Conditions\Builder
 {
-    protected $conditions = $conditions;
+    protected $conditions;
     protected $databaseContainer;
     
     public function __construct($conditions, $databaseContainer)

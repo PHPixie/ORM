@@ -15,27 +15,27 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
     
     protected $loaderItemsCount = null;
     
-    protected $addedModels = array();
+    protected $addedEntities = array();
     protected $addedIdsOffsets = array();
     protected $addedOffsetsIds = array();
     
-    public function add($models)
+    public function add($entities)
     {
-        $offset = count($this->addedModels);
-        foreach ($models as $model) {
-            $this->skipId($model->id());
-            $this->addedModels[$offset]=$model;
+        $offset = count($this->addedEntities);
+        foreach ($entities as $entity) {
+            $this->skipId($entity->id());
+            $this->addedEntities[$offset]=$entity;
             
-            $id = $model->id();
+            $id = $entity->id();
             $this->addedIdsOffsets[$id]=$offset;
             $this->addedOffsetsIds[$offset]=$id;
         }
     }
     
-    public function remove($models)
+    public function remove($entities)
     {
-        foreach ($models as $model) {
-            $id = $model->id();
+        foreach ($entities as $entity) {
+            $id = $entity->id();
             $this->skipId($id);
             if(array_key_exists($id, $this->addedIdsOffsets))
                 $this->removeAddedById($id);
@@ -43,12 +43,12 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
         $this->updateSkippedOffsets();
     }
     
-    public function accessedModels()
+    public function accessedEntities()
     {
-        $models = array();
+        $entities = array();
         for($i=0; $i<=$this->maxAccessedOffset; $i++)
-            $models[]=$this->getByOffset($i);
-        return $models;
+            $entities[]=$this->getByOffset($i);
+        return $entities;
     }
     
     public function removeAll()
@@ -62,7 +62,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
         $this->skippedOffsets = array();
         $this->existingBefore = array();
         
-        $this->addedModels = array();
+        $this->addedEntities = array();
         $this->addedIdsOffsets = array();
         $this->addedOffsetsIds = array();
         
@@ -73,25 +73,25 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
     {
         $offset = $this->addedIdsOffsets[$id];
         array_splice($this->addedOffsetsIds, $offset, 1);
-        array_splice($this->addedModels, $offset, 1);
+        array_splice($this->addedEntities, $offset, 1);
         $this->addedIdsOffsets = array_flip($this->addedOffsetsIds);
     }
     
     public function offsetExists($offset)
     {
-        return $this->getModelByOffset($offset) !== null;
+        return $this->getEntityByOffset($offset) !== null;
     }
 
     public function getByOffset($offset)
     {
-        $model = $this->getModelByOffset($offset);
-        if($model === null)
+        $entity = $this->getEntityByOffset($offset);
+        if($entity === null)
             throw new \PHPixie\ORM\Exception\Loader("Offset $offset does not exist.");
         
-        return $model;
+        return $entity;
     }
     
-    protected function getModelByOffset($offset)
+    protected function getEntityByOffset($offset)
     {
         $this->assertAllowedOffset($offset);
         $loaderOffset = $this->loaderOffset($offset);
@@ -108,23 +108,23 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
         if ($offset > $this->maxAccessedOffset+1)
             throw new \PHPixie\ORM\Exception\Loader("Items can only be accessed in sequential order");
 
-        if ($offset === $this->maxAccessedOffset-1)
+        if ($offset === $this->maxAccessedOffset+1)
             $this->maxAccessedOffset++;
     }
     
     protected function getAddedByOffset($addedOffset)
     {
-        if(!array_key_exists($addedOffset, $this->addedModels))
+        if(!array_key_exists($addedOffset, $this->addedEntities))
             return null;
         
-        $model = $this->addedModels[$addedOffset];
+        $entity = $this->addedEntities[$addedOffset];
         
-        if ($model->isDeleted()) {
+        if ($entity->isDeleted()) {
             $this->removeAddedById($this->addedOffsetsIds[$addedOffset]);
             return $this->getAddedByOffset($addedOffset);
         }
         
-        return $model;
+        return $entity;
     }
     
     protected function getLoadedByOffset($loaderOffset, $offset)
@@ -138,13 +138,13 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
             return $this->getAddedByOffset(0);
         }
         
-        $model = $this->loader->getByOffset($loaderOffset);
-        if ($model->isDeleted()) {
+        $entity = $this->loader->getByOffset($loaderOffset);
+        if ($entity->isDeleted()) {
             $this->deletedOffsets[] = $loaderOffset;
             return $this->updateAndGet($offset);
         }
 
-        $id = $model->id();
+        $id = $entity->id();
         $this->idOffsets[$id] = $loaderOffset;
 
         if (array_key_exists($id, $this->skippedIds)) {
@@ -152,7 +152,7 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
             return $this->updateAndGet($offset);
         }
 
-        return $model;
+        return $entity;
     }
 
     protected function updateAndGet($offset)

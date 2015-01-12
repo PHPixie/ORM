@@ -7,42 +7,6 @@ namespace PHPixieTests\ORM\Loaders\Loader\Proxy;
  */
 class PreloadingTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
 {
-    protected $preloaders;
-    protected $preloadableEntities;
-    protected $properties;
-    
-    public function setUp()
-    {
-        $this->preloaders = array(
-            'pixie' => $this->quickMock('\PHPixie\ORM\Relationships\Relationship\Preloader'),
-            'fairy' => $this->quickMock('\PHPixie\ORM\Relationships\Relationship\Preloader'),
-        );
-        
-        $this->preloadableEntities = array(
-            $this->quickMock('\PHPixie\ORM\Models\Model\Entity'),
-            $this->quickMock('\PHPixie\ORM\Models\Model\Entity'),
-        );
-        
-        $this->properties = array();
-        foreach(range(0, 4) as $i) {
-            $this->properties[]=$this->quickMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity');
-        }
-        
-        parent::setUp();
-    }
-    
-    /**
-     * @covers ::addPreloader
-     * @covers ::getPreloader
-     */
-    public function testAddGetPreloader()
-    {
-        foreach($this->preloaders as $relationship => $preloader){
-            $this->assertEquals(null, $this->loader->getPreloader($relationship));
-            $this->loader->addPreloader($relationship, $preloader);
-            $this->assertEquals($preloader, $this->loader->getPreloader($relationship));
-        }
-    }
     
     /**
      * @covers ::<protected>
@@ -58,31 +22,47 @@ class PreloadingTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
     }
     
     /**
-     * @covers ::<protected>
+     * @covers ::addPreloader
      * @covers ::getByOffset
+     * @covers ::<protected>
      */
     public function testPreloadProperty()
     {
-        $this->method($this->subloader, 'getByOffset', $this->preloadableEntities[0], array(0), 0);
-        $this->method($this->subloader, 'getByOffset', $this->preloadableEntities[1], array(1), 1);
+        $entities = array();
         
-        $pkey = 0;
-        foreach($this->preloaders as $relationship => $preloader) {
+        for($i=0; $i<2; $i++) {
+            $entity = $this->getEntity();
+            $this->method($this->subloader, 'getByOffset', $entity, array($i), $i);
+            $entities[]=$entity;
+        }
+        
+        for($i=0; $i<2; $i++) {
+            $propertyName = 'prop'.$i;
+            $preloader = $this->getPreloader();
             
-            foreach($this->preloadableEntities as $mkey => $model) {
-                $property = $this->properties[$pkey*2+$mkey];
-                $this->method($preloader, 'loadFor', $property, array($model), $mkey);
-                $this->method($model, 'setRelationshipProperty', null, array($relationship, $property), $pkey);
+            foreach($entities as $key => $entity) {
+                $property = $this->getProperty();
+                $this->method($entity, 'getRelationshipProperty', $property, array($propertyName), $i, true);
+                $this->method($preloader, 'loadProperty', null, array($property), $key);
             }
             
-            $this->loader->addPreloader($relationship, $preloader);
-            $pkey++;
+            $this->loader->addPreloader($propertyName, $preloader);
         }        
 
-        foreach($this->preloadableEntities as $key => $model)
+        foreach($entities as $key => $entity)
         {
-            $this->assertEquals($model, $this->loader->getByOffset($key));
+            $this->assertEquals($entity, $this->loader->getByOffset($key));
         }
+    }
+    
+    protected function getProperty()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity');
+    }
+    
+    protected function getPreloader()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Preloader');
     }
     
     protected function getLoader()

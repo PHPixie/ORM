@@ -57,23 +57,9 @@ class DiffableTest extends \PHPixieTests\ORM\Data\Types\DocumentTest
      */
     public function testDiff()
     {
-        $diff = $this->diff();
-        
-        $this->method($this->dataBuilder, 'removingDiff', $diff, array((object) array(), array()), 0);
         $this->method($this->document, 'data', $this->originalData, array(), 0);
-        $this->assertEquals($diff, $this->type->diff());
+        $this->assertRemovingDiff((object) array(), array());
         
-        $this->method($this->dataBuilder, 'removingDiff', $diff, array((object) array(
-            'name'  => 'Blum',
-            'magic.type' => 'water',
-            'trees'  => array('Oak', (object) array('name' => 'Maple')),
-            'friend' => (object) array(
-                'name' => 'Trixie'
-            ),
-        ), array(
-            'flowers',
-            'magic.spell'
-        )), 0);
         $this->method($this->document, 'data',  (object) array(
             'name'    => 'Blum',
             'trees'   => 2,
@@ -86,6 +72,31 @@ class DiffableTest extends \PHPixieTests\ORM\Data\Types\DocumentTest
             'trees' => array('Oak', (object) array('name' => 'Maple')),
             'animals' => array((object) array('name' => 'Fox'))
         ), array(), 0);
+        
+        $this->assertRemovingDiff((object) array(
+            'name'  => 'Blum',
+            'magic.type' => 'water',
+            'trees'  => array('Oak', (object) array('name' => 'Maple')),
+            'friend' => (object) array(
+                'name' => 'Trixie'
+            ),
+        ), array(
+            'flowers',
+            'magic.spell'
+        ));
+
+    }
+    
+    protected function assertRemovingDiff($set, $remove)
+    {
+        $diff = $this->diff();
+        
+        $this->dataBuilder
+            ->expects($this->at(0))
+            ->method('removingDiff')
+            ->with($set, $remove)
+            ->will($this->returnValue($diff));
+        
         $this->assertEquals($diff, $this->type->diff());
     }
     

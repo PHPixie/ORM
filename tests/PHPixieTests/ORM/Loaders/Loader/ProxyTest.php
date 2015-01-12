@@ -37,4 +37,5 @@ abstract class ProxyTest extends \PHPixieTests\ORM\Loaders\LoaderTest
         $this->setExpectedException('\PHPixie\ORM\Exception\Loader');
         $this->loader->getbyOffset(4);
     }
+    
 }

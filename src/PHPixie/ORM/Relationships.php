@@ -27,20 +27,6 @@ class Relationships
         $class = '\PHPixie\ORM\Relationships\Type\\'.ucfirst($name);
         return new $class($this->ormBuilder);
     }
-
-    public function embedsGroupMapper()
-    {
-        if ($this->embedsGroupMapper === null)
-            $this->embedsGroupMapper = $this->buildEmbedsGroupMapper();
-
-        return $this->embedsGroupMapper;
-    }
-
-    protected function buildEmbedsGroupMapper()
-    {
-        $relationshipMap = $this->ormBuilder->relationshipMap();
-        return new Relationships\Type\Embeds\Mapper\Group($this, $relationshipMap);
-    }
     
     public function map(){}
 }

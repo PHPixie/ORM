@@ -53,6 +53,8 @@ class ArrayNodeTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
         $this->assertEquals($arrayNode, $this->node[4]);
         $this->assertEquals($this->items[1], $this->node[0]);
         
+        $this->setExpectedException('\PHPixie\ORM\Exception\Data');
+        $this->node[6] = 'test';
     }
 
     /**

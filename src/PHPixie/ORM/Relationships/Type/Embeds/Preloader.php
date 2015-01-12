@@ -11,14 +11,6 @@ abstract class Preloader extends \PHPixie\ORM\Relationships\Relationship\Impleme
         $this->preloaders[$relationship] = $preloader;
     }
 
-    public function getPreloader($relationship)
-    {
-        if(array_key_exists($relationship, $this->preloaders))
-            return $this->preloaders[$relationship];
-
-        return null;
-    }
-    
     public function loadProperty($property)
     {
         if(empty($this->preloaders)) {

@@ -11,13 +11,14 @@ abstract class Loader implements \IteratorAggregate
         $this->loaders = $loaders;
     }
 
-    public function asArray($modelsAsObjects = false)
+    public function asArray($entitiesAsObjects = false)
     {
         $array = array();
-        foreach ($this as $model) {
-            if ($modelsAsObjects)
-                $model = $model->asObject(true);
-            $array[] = $model;
+        foreach ($this as $entity) {
+            if ($entitiesAsObjects) {
+                $entity = $entity->asObject(true);
+            }
+            $array[] = $entity;
         }
 
         return $array;

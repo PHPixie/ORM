@@ -24,28 +24,28 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
         
         $this->assertItems(array(0, 2, 3, 4));
         
-        $model5 = $this->model(5);
-        $this->loader->add(array($model5));
+        $entity5 = $this->entity(5);
+        $this->loader->add(array($entity5));
         $this->assertItems(array(0, 2, 3, 4, 5));
         $this->assertEquals(false, $this->loader->offsetExists(5));
         $this->assertEquals(true, $this->loader->offsetExists(3));
         
-        $model7 = $this->model(7);
-        $model7->setIsDeleted(true);
-        $this->loader->add(array($model7));
+        $entity7 = $this->entity(7);
+        $entity7->setIsDeleted(true);
+        $this->loader->add(array($entity7));
         $this->assertItems(array(0, 2, 3, 4, 5));
         
         
-        $this->loader->add(array($this->model(6)));
+        $this->loader->add(array($this->entity(6)));
         $this->assertItems(array(0, 2, 3, 4, 5, 6));
         
         
-        $model5->setIsDeleted(true);
+        $entity5->setIsDeleted(true);
         $this->assertItems(array(0, 2, 3, 4, 6));
         
         
-        $model0 = $this->loader->getByOffset(0);
-        $model0->setIsDeleted(true);
+        $entity0 = $this->loader->getByOffset(0);
+        $entity0->setIsDeleted(true);
         $this->assertItems(array(2, 3, 4, 6));
         
         
@@ -73,23 +73,42 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
         $this->prepareSubloader();
         $this->assertItems(array(0, 2, 3, 4));
         
-        $model3 = $this->loader->getByOffset(2);
+        $entity3 = $this->loader->getByOffset(2);
         
-        $this->loader->remove(array($model3));
+        $this->loader->remove(array($entity3));
         $this->assertItems(array(0, 2, 4));
         
-        $this->loader->add(array($model3));
+        $this->loader->add(array($entity3));
         $this->assertItems(array(0, 2, 4, 3));
         
-        $model5 = $this->model(5);
-        $this->loader->add(array($model5));
+        $entity5 = $this->entity(5);
+        $this->loader->add(array($entity5));
         $this->assertItems(array(0, 2, 4, 3, 5));
         
-        $this->loader->remove(array($model5));
+        $this->loader->remove(array($entity5));
         $this->assertItems(array(0, 2, 4, 3));
         
-        $this->loader->add(array($model5));
+        $this->loader->add(array($entity5));
         $this->assertItems(array(0, 2, 4, 3, 5));
+    }
+
+    /**
+     * @covers ::accessedEntities
+     * @covers ::<protected>
+     */
+    public function testAccessedEntities()
+    {
+        $this->prepareSubloader();
+        $this->loader->getByOffset(0);
+        $this->loader->getByOffset(1);
+        
+        $accessedIds = array();
+        foreach($this->loader->accessedEntities() as $entity) {
+            $accessedIds[]=$entity->id();
+        }
+        
+        $this->assertSame(array('a', 'c'), $accessedIds);
+        
     }
     
     /**
@@ -128,7 +147,7 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
     {
         $this->prepareSubloader();
         $this->assertItems(array(0, 2, 3, 4));
-        $this->loader->add(array($this->model(5)));
+        $this->loader->add(array($this->entity(5)));
         $this->assertItems(array(0, 2, 3, 4, 5));
         $this->loader->removeAll();
         $this->assertItems(array());
@@ -144,7 +163,7 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
     public function testRemoveBeforeLoad()
     {
         $this->prepareSubloader();
-        $this->loader->remove(array($this->model(2)));
+        $this->loader->remove(array($this->entity(2)));
         $this->assertItems(array(0, 3, 4));
     }
     
@@ -159,13 +178,13 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
     {
         $this->prepareSubloader();
         $this->loader->remove(array(
-            $this->model(0),
-            $this->model(2),
-            $this->model(3),
-            $this->model(4),
+            $this->entity(0),
+            $this->entity(2),
+            $this->entity(3),
+            $this->entity(4),
         ));
         $this->loader->add(array(
-            $this->model(5),
+            $this->entity(5),
         ));
         $this->assertItems(array(5));
     }
@@ -183,7 +202,7 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
         $this->loader->removeAll();
         $this->assertItems(array());
         $this->loader->add(array(
-            $this->model(5),
+            $this->entity(5),
         ));
         $this->assertItems(array(5));
     }
@@ -203,42 +222,50 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
         $this->assertEquals($expectedIds, $ids);
     }
     
-    protected function model($id, $isDeleted = false)
+    protected function entity($id, $isDeleted = false)
     {
         $id=$this->ids[$id];
-        $model = $this->quickMock('\PHPixie\ORM\Repositories\Repository\Database\Model', array('id'));
+        $entity = $this->getEntity();
         
-        $model
-            ->expects($this->any())
-            ->method('id')
-            ->will($this->returnValue($id));
+        $this->method($entity, 'id', $id, array());
         
-        $model->setIsDeleted($isDeleted);
+        $this->method($entity, 'isDeleted', function() use(&$isDeleted) {
+            return $isDeleted;
+        }, array());
         
-        return $model;
-    }
+        $this->method($entity, 'setIsDeleted', function($newIsDeleted) use(&$isDeleted) {
+            $isDeleted = $newIsDeleted;
+        });
+        
+        return $entity;
+    }    
     
     protected function prepareSubloader()
     {
-        $models = array();
+        $entities = array();
         for($i=0; $i<5; $i++)
-            $models[] = $this->model($i, $i==1);
+            $entities[] = $this->entity($i, $i==1);
         
         $this->subloader
                     ->expects($this->any())
                     ->method('offsetExists')
-                    ->will($this->returnCallback(function($offset) use($models) {
-                        return array_key_exists($offset, $models);
+                    ->will($this->returnCallback(function($offset) use($entities) {
+                        return array_key_exists($offset, $entities);
                     }));
         
         $this->subloader
                     ->expects($this->any())
                     ->method('getByOffset')
-                    ->will($this->returnCallback(function($offset) use($models) {
-                        if(!array_key_exists($offset, $models))
+                    ->will($this->returnCallback(function($offset) use($entities) {
+                        if(!array_key_exists($offset, $entities))
                             throw new \Exception();
-                        return $models[$offset];
+                        return $entities[$offset];
                     }));
+    }
+    
+    protected function getEntity()
+    {
+        return $this->quickMock('\PHPixie\ORM\Models\Type\Database\Entity');
     }
     
     protected function getLoader()

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Data\Types\Document;
 
-class Diffable extends \PHPixie\ORM\Data\Types\Document implements \PHPixie\ORM\Data\Types\Diffable
+class Diffable extends \PHPixie\ORM\Data\Types\Document implements \PHPixie\ORM\Data\Type\Diffable
 {
     protected $dataBuilder;
     protected $originalData;

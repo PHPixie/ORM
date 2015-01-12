@@ -4,9 +4,17 @@ namespace PHPixie\ORM\Loaders\Loader;
 
 abstract class Embedded extends \PHPixie\ORM\Loaders\Loader
 {
-    protected function loadModel($document)
+    protected $embeddedModel;
+    
+    public function __construct($loaders, $embeddedModel)
     {
-        $model = $this->repository->loadFromDocument($document);
-        return $model;
+        parent::__construct($loaders);
+        $this->embeddedModel = $embeddedModel;;
     }
+    
+    protected function loadEntity($document)
+    {
+        return $this->embeddedModel->loadEntity($document);
+    }
+
 }

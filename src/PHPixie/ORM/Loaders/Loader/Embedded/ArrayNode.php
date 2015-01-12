@@ -7,12 +7,13 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
     protected $arrayNode;
     protected $owner;
     protected $ownerPropertyName;
+    
     protected $cachedEntities = array();
 
 
-    public function __construct($loaders, $repository, $arrayNode, $owner, $ownerPropertyName)
+    public function __construct($loaders, $embeddedModel, $arrayNode, $owner, $ownerPropertyName)
     {
-        parent::__construct($loaders, $repository);
+        parent::__construct($loaders, $embeddedModel);
         $this->arrayNode = $arrayNode;
         $this->owner = $owner;
         $this->ownerPropertyName = $ownerPropertyName;
@@ -31,7 +32,11 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
                 throw new \PHPixie\ORM\Exception\Loader("Offset $offset does not exist.");
 
             $document = $this->arrayNode->offsetGet($offset);
-            $this->cachedEntities[$offset] = $this->loadEntity($document);
+            
+            $entity = $this->loadEntity($document);
+            $entity->setOwnerRelationship($this->owner, $this->ownerPropertyName);
+            $this->cachedEntities[$offset] = $entity;
+            
         }
 
         return $this->cachedEntities[$offset];
@@ -74,24 +79,5 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
     {
         return $this->arrayNode->count();
     }
-
-    public function arrayNode()
-    {
-        return $this->arrayNode;
-    }
-
-    public function owner()
-    {
-        return $this->owner;
-    }
-
-    public function ownerPropertyName()
-    {
-        return $this->ownerPropertyName;
-    }
-
-    public function cachedEntities()
-    {
-        return $this->cachedEntities;
-    }
+    
 }

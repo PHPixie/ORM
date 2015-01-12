@@ -7,58 +7,62 @@ namespace PHPixieTests\ORM\Loaders\Loader\Repository;
  */
 class ReusableResultTest extends \PHPixieTests\ORM\Loaders\Loader\RepositoryTest
 {
-    protected $reusableResultStep;
+    protected $reusableResult;
     
     public function setUp()
     {
-        $this->reusableResultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
+        $this->reusableResult = $this->quickMock('\PHPixie\ORM\Steps\Result\Reusable');
         parent::setUp();
-        
-        $this->reusableResultStep
-                ->expects($this->any())
-                ->method('offsetExists')
-                ->will($this->returnCallBack(function($offset){
-                    return $offset < 5;
-                }));
-        $data = $this->data;
-        $this->reusableResultStep
-                ->expects($this->any())
-                ->method('getByOffset')
-                ->will($this->returnCallBack(function($offset) use($data){
-                    if($offset > 4)
-                        throw new \Exception;
-                    return $data[$offset];
-                }));
     }
-    
-    /**
-     * @covers ::resultStep
+
+    /** 
+     * @covers ::offsetExists
+     * @covers ::<protected>
      */
-    public function testResultStep()
+    public function testOffsetExists()
     {
-        $this->assertEquals($this->reusableResultStep, $this->loader->resultStep());
+        foreach(array(true, false) as $logic) {
+            $this->method($this->reusableResult, 'offsetExists', $logic, array(3), 0);
+            $this->assertSame($logic, $this->loader->offsetExists(3));
+        }
     }
     
-    /**
+    /** 
+     * @covers ::getByOffset
+     * @covers ::<protected>
+     */
+    public function testGetByOffset()
+    {
+        $data = (object) array('name' => 'Pixie');
+        $this->method($this->reusableResult, 'getByOffset', $data, array(3), 0);
+        $entity = $this->prepareLoadEntity($data);
+        $this->assertSame($entity, $this->loader->getByOffset(3));
+    }
+    
+    
+    /** 
      * @covers ::getByOffset
      * @covers ::<protected>
      */
     public function testNotFoundException()
     {
-        $this->reusableResultStep
+        $this->reusableResult
                 ->expects($this->once())
                 ->method('getByOffset')
                 ->with(99)
-                ->will($this->returnCallback(function(){
-                    throw new \Exception;
-                }));
+                ->will($this->throwException(new \Exception));
+        
         $this->setExpectedException('\Exception');
         $this->loader->getByOffset(99);
     }
     
     protected function getLoader()
     {
-        return new \PHPixie\ORM\Loaders\Loader\Repository\ReusableResult($this->loaders, $this->repository, $this->reusableResultStep);
+        return new \PHPixie\ORM\Loaders\Loader\Repository\ReusableResult(
+            $this->loaders,
+            $this->repository,
+            $this->reusableResult
+        );
     }
     
     

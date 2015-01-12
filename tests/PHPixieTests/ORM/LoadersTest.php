@@ -7,11 +7,28 @@ namespace PHPixieTests\ORM;
  */
 class LoadersTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $models;
+    
     protected $loaders;
+    
+    protected $embeddedModel;
     
     public function setUp()
     {
-        $this->loaders = new \PHPixie\ORM\Loaders;
+        $this->models = $this->quickMock('\PHPixie\ORM\Models');
+        $this->embeddedModel = $this->quickMock('\PHPixie\ORM\Models\Type\Embedded');
+        
+        $this->method($this->models, 'embedded', $this->embeddedModel, array());
+        
+        $this->loaders = new \PHPixie\ORM\Loaders($this->models);
+    }
+
+    /**
+     * @covers ::__construct
+     */
+    public function testConstruct()
+    {
+    
     }
     
     /**
@@ -21,34 +38,26 @@ class LoadersTest extends \PHPixieTests\AbstractORMTest
     {
         $loader = $this->quickMock('\PHPixie\ORM\Loaders\Loader');
         $iterator = $this->loaders->iterator($loader);
-        $this->assertInstanceOf('\PHPixie\ORM\Loaders\Iterator', $iterator);
-        $this->assertAttributeEquals($loader, 'loader', $iterator);
+        
+        $this->assertInstance($iterator, '\PHPixie\ORM\Loaders\Iterator', array(
+            'loader' => $loader
+        ));
     }
     
     /**
-     * @covers ::arrayAccess
+     * @covers ::multiplePreloader
      */
-    public function testArrayAccess()
+    public function testMultiplePreloader()
     {
-        $array = new \ArrayObject();
-        $arrayAccess = $this->loaders->arrayAccess($array);
-        $this->assertInstanceOf('\PHPixie\ORM\Loaders\Loader\ArrayAccess', $arrayAccess);
-        $this->assertAttributeEquals($this->loaders, 'loaders', $arrayAccess);
-        $this->assertAttributeEquals($array, 'arrayAccess', $arrayAccess);
-    }
-    
-    /**
-     * @covers ::resultPreloader
-     */
-    public function testReusltPreloader()
-    {
-        $preloader = $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Preloader');
+        $preloader = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple');
         $ids = array(1, 2, 3);
-        $resultPreloader = $this->loaders->resultPreloader($preloader, $ids);
-        $this->assertInstanceOf('\PHPixie\ORM\Loaders\Loader\ResultPreloader', $resultPreloader);
-        $this->assertAttributeEquals($this->loaders, 'loaders', $resultPreloader);
-        $this->assertAttributeEquals($preloader, 'resultPreloader', $resultPreloader);
-        $this->assertAttributeEquals($ids, 'ids', $resultPreloader);
+        $loader = $this->loaders->multiplePreloader($preloader, $ids);
+        
+        $this->assertInstance($loader, '\PHPixie\ORM\Loaders\Loader\MultiplePreloader', array(
+            'loaders' => $this->loaders,
+            'multiplePreloader' => $preloader,
+            'ids' => $ids
+        ));
     }
     
     /**
@@ -62,9 +71,11 @@ class LoadersTest extends \PHPixieTests\AbstractORMTest
         foreach(array('editable', 'caching', 'preloading') as $type) {
             $method = $type.'Proxy';
             $proxy = $this->loaders->$method($loader);
-            $this->assertInstanceOf('\PHPixie\ORM\Loaders\Loader\Proxy\\'.ucfirst($type), $proxy);
-            $this->assertAttributeEquals($this->loaders, 'loaders', $proxy);
-            $this->assertAttributeEquals($loader, 'loader', $proxy);
+            
+            $this->assertInstance($proxy, '\PHPixie\ORM\Loaders\Loader\Proxy\\'.ucfirst($type), array(
+                'loaders' => $this->loaders,
+                'loader' => $loader
+            ));
         }
     }
     
@@ -74,12 +85,15 @@ class LoadersTest extends \PHPixieTests\AbstractORMTest
     public function testReusableResult()
     {
         $repository = $this->quickMock('\PHPixie\ORM\Loaders\Loader');
-        $reusableResultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
+        $reusableResult = $this->quickMock('\PHPixie\ORM\Steps\Result\Reusable');
             
-        $reusableResult = $this->loaders->reusableResult($repository, $reusableResultStep);
-        $this->assertAttributeEquals($this->loaders, 'loaders', $reusableResult);
-        $this->assertAttributeEquals($repository, 'repository', $reusableResult);
-        $this->assertAttributeEquals($reusableResultStep, 'reusableResultStep', $reusableResult);
+        $loader = $this->loaders->reusableResult($repository, $reusableResult);
+
+        $this->assertInstance($loader, '\PHPixie\ORM\Loaders\Loader\Repository\ReusableResult', array(
+            'loaders' => $this->loaders,
+            'repository' => $repository,
+            'reusableResult' => $reusableResult,
+        ));
     }
      
     /**
@@ -91,8 +105,38 @@ class LoadersTest extends \PHPixieTests\AbstractORMTest
         $iterator = new \ArrayIterator();
             
         $dataIterator = $this->loaders->dataIterator($repository, $iterator);
-        $this->assertAttributeEquals($this->loaders, 'loaders', $dataIterator);
-        $this->assertAttributeEquals($repository, 'repository', $dataIterator);
-        $this->assertAttributeEquals($iterator, 'dataIterator', $dataIterator);
+        
+        $this->assertInstance($dataIterator, '\PHPixie\ORM\Loaders\Loader\Repository\DataIterator', array(
+            'loaders' => $this->loaders,
+            'repository' => $repository,
+            'dataIterator' => $iterator,
+        ));
+    }
+    
+    /**
+     * @covers ::arrayNode
+     */
+    public function testArrayNode()
+    {
+        $arrayNode = $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode');
+        $owner = $this->quickMock('\PHPixie\ORM\Models\Type\Embedded\Entity');
+        $ownerPropertyName = 'flowers';
+            
+        $loader = $this->loaders->arrayNode($arrayNode, $owner, $ownerPropertyName);
+        
+        $this->assertInstance($loader,'\PHPixie\ORM\Loaders\Loader\Embedded\ArrayNode', array(
+            'loaders' => $this->loaders,
+            'arrayNode' => $arrayNode,
+            'owner' => $owner,
+            'ownerPropertyName' => $ownerPropertyName,
+        ));
+    }
+    
+    protected function assertInstance($object, $class, $propertyMap)
+    {
+        $this->assertInstanceOf($class, $object);
+        foreach($propertyMap as $name => $value) {
+            $this->assertAttributeEquals($value, $name, $object);
+        }
     }
 }

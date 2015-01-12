@@ -13,15 +13,15 @@ class CachingTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
      */
     public function testExistsGetByOffset()
     {
-        $model = $this->quickMock('\PHPixie\ORM\Model');
+        $entity = $this->getEntity();
 
         $this->method($this->subloader, 'offsetExists', true, array(3), 0);
-        $this->method($this->subloader, 'getByOffset', $model, array(3), 1);
+        $this->method($this->subloader, 'getByOffset', $entity, array(3), 1);
         $this->method($this->subloader, 'offsetExists', false, array(4), 2);
 
         $this->assertEquals(true, $this->loader->offsetExists(3));
-        $this->assertEquals($model, $this->loader->getByOffset(3));
-        $this->assertEquals($model, $this->loader->getByOffset(3));
+        $this->assertEquals($entity, $this->loader->getByOffset(3));
+        $this->assertEquals($entity, $this->loader->getByOffset(3));
         $this->assertEquals(true, $this->loader->offsetExists(3));
         $this->assertEquals(false, $this->loader->offsetExists(4));
     }

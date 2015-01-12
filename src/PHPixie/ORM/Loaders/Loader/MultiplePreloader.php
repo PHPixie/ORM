@@ -4,13 +4,13 @@ namespace PHPixie\ORM\Loaders\Loader;
 
 class MultiplePreloader extends \PHPixie\ORM\Loaders\Loader
 {
-    protected $resultPreloader;
+    protected $multiplePreloader;
     protected $ids;
 
-    public function __construct($loaders, $resultPreloader, $ids)
+    public function __construct($loaders, $multiplePreloader, $ids)
     {
         parent::__construct($loaders);
-        $this->resultPreloader = $resultPreloader;
+        $this->multiplePreloader = $multiplePreloader;
         $this->ids = $ids;
     }
 
@@ -21,6 +21,6 @@ class MultiplePreloader extends \PHPixie\ORM\Loaders\Loader
 
     public function getByOffset($offset)
     {
-        return $this->resultPreloader->getModel($this->ids[$offset]);
+        return $this->multiplePreloader->getEntity($this->ids[$offset]);
     }
 }

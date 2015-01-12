@@ -17,6 +17,7 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Loaders\LoaderTest
 
     /**
      * @covers ::__construct
+     * @covers \PHPixie\ORM\Loaders\Loader\Repository::__construct
      * @covers \PHPixie\ORM\Loaders\Loader::__construct
      * @covers ::<protected>
      */
@@ -24,17 +25,22 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     {
 
     }
-
-    /**
-     * @covers ::repository
-     */
-    public function testRepository()
+    
+    protected function prepareLoadEntity($data, $at = 0)
     {
-        $this->assertEquals($this->repository, $this->loader->repository());
+        $entity = $this->getEntity();
+        $this->method($this->repository, 'load', $entity, array($data), 0);
+        return $entity;
     }
-
+    
     protected function getRepository()
     {
         return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Repository');
     }
+    
+    protected function getEntity()
+    {
+        return $this->quickMock('\PHPixie\ORM\Models\Type\Database\Entity');
+    }
+    
 }

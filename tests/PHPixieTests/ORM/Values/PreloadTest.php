@@ -36,7 +36,7 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
         $this->assertSame(array(), $this->preload->properties());
         $this->assertEquals(null, $this->preload->getProperty('fairy'));
         
-        $property = $this->getProperty('fairy');
+        $property = $this->getCascadingProperty('fairy');
         $this->assertSame($this->preload, $this->preload->addProperty($property));
         
         $this->assertSame(array($property), $this->preload->properties());
@@ -79,7 +79,7 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
         $fairy = $this->prepareAddTest($path);
         $this->assertSame($this->preload, $this->preload->add(implode('.', $path)));
         
-        $property = $this->getProperty('fairy');
+        $property = $this->getCascadingProperty('fairy');
         $this->assertSame($this->preload, $this->preload->addProperty($property));
         $this->assertSame(array($property), $this->preload->properties());
         
@@ -92,8 +92,8 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
         $name = array_shift($path);
         
         if($property === null) {
-            $property = $this->getProperty($name);
-            $this->method($this->values, 'preloadProperty', $property, array($name), 0);
+            $property = $this->getCascadingProperty($name);
+            $this->method($this->values, 'cascadingPreloadProperty', $property, array($name), 0);
         }
         
         if(!empty($path)) {
@@ -103,9 +103,9 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
         return $property;
     }
     
-    protected function getProperty($name)
+    protected function getCascadingProperty($name)
     {
-        $property = $this->quickMock('\PHPixie\ORM\Values\Preload\Property');
+        $property = $this->quickMock('\PHPixie\ORM\Values\Preload\Property\Cascading');
         $this->method($property, 'propertyName', $name, array());
         
         $preload = $this->quickMock('\PHPixie\ORM\Values\Preload');

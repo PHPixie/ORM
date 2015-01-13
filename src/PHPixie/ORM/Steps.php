@@ -18,12 +18,12 @@ class Steps
     
     public function count($query)
     {
-        return new Steps\Step\Query($query);
+        return new Steps\Step\Query\Count($query);
     }
 
-    public function result($query)
+    public function iteratorResult($query)
     {
-        return new Steps\Step\Query\Result\SingleUse($query);
+        return new Steps\Step\Query\Result\Iterator($query);
     }
 
     public function reusableResult($query)

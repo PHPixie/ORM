@@ -10,6 +10,8 @@ class Values
     }
     
     public function preloadProperty(){}
+    public function cascadingPreloadProperty(){}
+    
     public function preload(){}
     public function update(){}
     public function updateIncrement(){}

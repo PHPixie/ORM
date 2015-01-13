@@ -45,6 +45,6 @@ class QueryTest extends \PHPixieTests\ORM\Maps\MapTest
     
     protected function map()
     {
-        return new \PHPixie\ORM\Sides\Map\Query($this->relationships);
+        return new \PHPixie\ORM\Maps\Map\Query($this->relationships);
     }
 }

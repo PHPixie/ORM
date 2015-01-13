@@ -34,4 +34,5 @@ abstract class Result extends \PHPixie\ORM\Steps\Step\Query
     }
 
     abstract public function getIterator();
+    abstract public function asArray();
 }

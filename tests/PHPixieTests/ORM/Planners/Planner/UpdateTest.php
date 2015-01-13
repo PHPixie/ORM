@@ -47,7 +47,7 @@ class UpdateTest extends \PHPixieTests\ORM\Planners\PlannerTest
                     );
         
         $this->method($subquery, 'fields', null, array(array('t', 't2')), 0);
-        $this->method($this->steps, 'result', $resultStep, array($subquery), 0);
+        $this->method($this->steps, 'iteratorResult', $resultStep, array($subquery), 0);
         $this->method($plan, 'add', null, array($resultStep), 0);
         $this->prepareResultTest($updateQuery, $map, $resultStep, $plan, 1, 1);
         $this->planner->subquery($updateQuery, $map, $subquery, $plan);

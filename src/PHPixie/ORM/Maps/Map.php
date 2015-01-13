@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Sides;
+namespace PHPixie\ORM\Maps;
 
 abstract class Map
 {

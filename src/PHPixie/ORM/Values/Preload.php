@@ -42,7 +42,7 @@ class Preload
         $propertyName = array_shift($explodedPath);
         $property = $this->getProperty($propertyName);
         if($property === null) {
-            $property = $this->values->preloadProperty($propertyName);
+            $property = $this->values->cascadingPreloadProperty($propertyName);
             $this->addProperty($property);
         }
         

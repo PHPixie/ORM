@@ -12,7 +12,7 @@ class ReusableResult extends \PHPixie\ORM\Loaders\Loader\Repository
         parent::__construct($loaders, $repository);
         $this->reusableResult = $reusableResult;
     }
-
+    
     public function offsetExists($offset)
     {
         return $this->reusableResult->offsetExists($offset);
@@ -22,5 +22,10 @@ class ReusableResult extends \PHPixie\ORM\Loaders\Loader\Repository
     {
         $data = $this->reusableResult->getByOffset($offset);
         return $this->loadEntity($data);
+    }
+    
+    public function reusableResult()
+    {
+        return $this->reusableResult;
     }
 }

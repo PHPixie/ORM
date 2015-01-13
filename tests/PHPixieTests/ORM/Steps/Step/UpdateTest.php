@@ -9,6 +9,16 @@ abstract class UpdateTest extends \PHPixieTests\ORM\Steps\StepTest
 {
     protected $updateQuery;
     
+    /**
+     * @covers \PHPixie\ORM\Steps\Step\Update::__construct
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
     public function setUp()
     {
         $this->updateQuery = $this->query();

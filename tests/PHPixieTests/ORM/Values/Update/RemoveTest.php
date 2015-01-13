@@ -15,7 +15,6 @@ class RemoveTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::__construct
      * @covers ::<protected>
      */
     public function testConstruct()

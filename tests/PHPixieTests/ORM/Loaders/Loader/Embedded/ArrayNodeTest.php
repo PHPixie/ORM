@@ -96,20 +96,27 @@ class ArrayNodeTest extends \PHPixieTests\ORM\Loaders\Loader\EmbeddedTest
      * @covers ::cacheEntity
      * @covers ::shiftCachedEntities
      * @covers ::getCachedEntity
+     * @covers ::getCachedEntities
      * @covers ::clearCachedEntities
      * @covers ::<protected>
      */
     public function testCachedEntities()
     {
         $this->assertSame(null, $this->loader->getCachedEntity(0));
+        $this->assertSame(array(), $this->loader->getCachedEntities());
         
         $entities = $this->prepareEntities(array(0, 2));
         
         $this->loader->getByOffset(0);
         $this->loader->getByOffset(2);
-
+        
         $this->assertSame($entities[0], $this->loader->getCachedEntity(0));
         $this->assertSame($entities[2], $this->loader->getCachedEntity(2));
+        
+        $this->assertSame(array(
+            0 => $entities[0],
+            2 => $entities[2],
+        ), $this->loader->getCachedEntities());
         
         $this->loader->shiftCachedEntities(1);
         

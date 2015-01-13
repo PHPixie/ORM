@@ -376,7 +376,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
         $itemsModels = array();
         foreach($items as $item)
             $itemsModels[]=$item['entity'];
-        $this->method($owner['loader'], 'accessedModels', $itemsModels, array(), 0);
+        $this->method($owner['loader'], 'accessedEntities', $itemsModels, array(), 0);
         $this->method($owner['loader'], 'removeAll', null, array(), 1);
         $this->method($items[0]['loader'], 'remove', null, array(array($owner['entity'])), 0);
 

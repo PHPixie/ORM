@@ -26,6 +26,15 @@ abstract class RepositoryTest extends \PHPixieTests\ORM\Loaders\LoaderTest
 
     }
     
+    /**
+     * @covers ::repository
+     * @covers ::<protected>
+     */
+    public function testRepository()
+    {
+        $this->assertSame($this->repository, $this->loader->repository());
+    }
+    
     protected function prepareLoadEntity($data, $at = 0)
     {
         $entity = $this->getEntity();

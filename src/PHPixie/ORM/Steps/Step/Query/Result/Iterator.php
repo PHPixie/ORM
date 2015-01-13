@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Steps\Step\Query\Result;
 
-class SingleUse extends \PHPixie\ORM\Steps\Step\Query\Result
+class Iterator extends \PHPixie\ORM\Steps\Step\Query\Result
 {
     public function getIterator()
     {
@@ -11,6 +11,6 @@ class SingleUse extends \PHPixie\ORM\Steps\Step\Query\Result
     
     public function asArray()
     {
-        return iterator_to_array($this->result);
+        return $this->result()->asArray();
     }
 }

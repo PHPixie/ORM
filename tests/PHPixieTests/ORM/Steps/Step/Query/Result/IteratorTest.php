@@ -3,14 +3,14 @@
 namespace PHPixieTests\ORM\Steps\Query\Result;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Steps\Step\Query\Result\SingleUse
+ * @coversDefaultClass \PHPixie\ORM\Steps\Step\Query\Result\Iterator
  */
 class SingleUseTest extends \PHPixieTests\ORM\Steps\Step\Query\ResultTest
 {
 
     protected function getStep()
     {
-        return new \PHPixie\ORM\Steps\Step\Query\Result\SingleUse($this->query);
+        return new \PHPixie\ORM\Steps\Step\Query\Result\Iterator($this->query);
     }
     
     /**

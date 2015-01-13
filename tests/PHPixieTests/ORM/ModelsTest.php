@@ -47,7 +47,7 @@ class ModelsTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::databaseModel
+     * @covers ::database
      * @covers ::<protected>
      */
     public function testDatabaseModel()
@@ -64,7 +64,7 @@ class ModelsTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::embeddedModel
+     * @covers ::embedded
      * @covers ::<protected>
      */
     public function testEmbeddedModel()

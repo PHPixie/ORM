@@ -29,21 +29,35 @@ class StepsTest extends \PHPixieTests\AbstractORMTest
      */
     public function testQuery()
     {
-        $query = $this->quickMock('\PHPixie\Database\Query');
+        $query = $this->getDatabaseQuery();
         $step = $this->steps->query($query);
-        $this->assertInstanceOf('\PHPixie\ORM\Steps\Step\Query', $step);
-        $this->assertAttributeEquals($query, 'query', $step);
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Query', array(
+            'query' => $query
+        ));
     }
     
     /**
-     * @covers ::result
+     * @covers ::count
      */
-    public function testResult()
+    public function testCountQuery()
     {
-        $query = $this->quickMock('\PHPixie\Database\Query');
-        $step = $this->steps->result($query);
-        $this->assertInstanceOf('\PHPixie\ORM\Steps\Step\Query\Result\SingleUse', $step);
-        $this->assertAttributeEquals($query, 'query', $step);
+        $query = $this->getDatabaseQuery();
+        $step = $this->steps->count($query);
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Query\Count', array(
+            'query' => $query
+        ));
+    }
+    
+    /**
+     * @covers ::iteratorResult
+     */
+    public function testIteratorResult()
+    {
+        $query = $this->getDatabaseQuery();
+        $step = $this->steps->iteratorResult($query);
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Query\Result\Iterator', array(
+            'query' => $query
+        ));
     }
     
     /**
@@ -51,10 +65,11 @@ class StepsTest extends \PHPixieTests\AbstractORMTest
      */
     public function testReusableResult()
     {
-        $query = $this->quickMock('\PHPixie\Database\Query');
+        $query = $this->getDatabaseQuery();
         $step = $this->steps->reusableResult($query);
-        $this->assertInstanceOf('\PHPixie\ORM\Steps\Step\Query\Result\Reusable', $step);
-        $this->assertAttributeEquals($query, 'query', $step);
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Query\Result\Reusable', array(
+            'query' => $query
+        ));
     }
     
     /**
@@ -62,14 +77,16 @@ class StepsTest extends \PHPixieTests\AbstractORMTest
      */
     public function testIn()
     {
-        $placeholder = $this->quickMock('\PHPixie\Database\Conditions\Condition\Placeholder');
+        $placeholder = $this->quickMock('\PHPixie\Database\Conditions\Condition\Collection\Placeholder');
         $resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
         $step = $this->steps->in($placeholder, 'fairy', $resultStep, 'pixie');
-        $this->assertInstanceOf('\PHPixie\ORM\Steps\Step\In', $step);
-        $this->assertAttributeEquals($placeholder, 'placeholder', $step);
-        $this->assertAttributeEquals('fairy', 'placeholderField', $step);
-        $this->assertAttributeEquals($resultStep, 'resultStep', $step);
-        $this->assertAttributeEquals('pixie', 'resultField', $step);
+        
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\In', array(
+            'placeholder'      => $placeholder,
+            'placeholderField' => 'fairy',
+            'resultStep'       => $resultStep,
+            'resultField'      => 'pixie',
+        ));
     }
     
     /**
@@ -77,9 +94,14 @@ class StepsTest extends \PHPixieTests\AbstractORMTest
      */
     public function testPivotCartesian()
     {
-        $step = $this->steps->pivotCartesian(array(5));
-        $this->assertInstanceOf('\PHPixie\ORM\Steps\Step\Pivot\Cartesian', $step);
-        $this->assertAttributeEquals(array(5), 'resultFilters', $step);
+        $reusltFilters = array(
+            $this->quickMock('\PHPixie\ORM\Steps\ResultFilter')
+        );
+        
+        $step = $this->steps->pivotCartesian($reusltFilters);
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Pivot\Cartesian', array(
+            'resultFilters' => $reusltFilters
+        ));
     }
     
     /**
@@ -87,18 +109,42 @@ class StepsTest extends \PHPixieTests\AbstractORMTest
      */
     public function testPivotInsert()
     {
+        $query = $this->getDatabaseQuery();
+        $cartesianStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Pivot\Cartesian');
+        $fields = array('fairy', 'trixie');
+            
         $queryPlanner = $this->quickMock('\PHPixie\Database\Planners\Planner\Query');
         $this->method($this->planners, 'query', $queryPlanner, array(), 0);
         
-        $query = $this->quickMock('\PHPixie\Database\Query');
-        $cartesian = $this->quickMock('\PHPixie\ORM\Steps\Step\Pivot\Cartesian');
-        $step = $this->steps->pivotInsert($query, array('fairy', 'trixie'), $cartesian);
+        $step = $this->steps->pivotInsert($query, $fields, $cartesianStep);
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Pivot\Insert', array(
+            'queryPlanner'  => $queryPlanner,
+            'insertQuery'   => $query,
+            'fields'        => $fields,
+            'cartesianStep' => $cartesianStep,
+        ));
+    }
+    
+    /**
+     * @covers ::updateMap
+     */
+    public function testUpdateMap()
+    {
+        $updateQuery = $this->getDatabaseQuery();
+        $map = array('pixie' => 'fairy');
+        $resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
         
-        $this->assertInstanceOf('\PHPixie\ORM\Steps\Step\Pivot\Insert', $step);
-        $this->assertAttributeEquals($queryPlanner, 'queryPlanner', $step);
-        $this->assertAttributeEquals($query, 'insertQuery', $step);
-        $this->assertAttributeEquals(array('fairy', 'trixie'), 'fields', $step);
-        $this->assertAttributeEquals($cartesian, 'cartesianStep', $step);
+        $step = $this->steps->updateMap($updateQuery, $map, $resultStep);
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Update\Map', array(
+            'updateQuery' => $updateQuery,
+            'map'         => $map,
+            'resultStep'  => $resultStep
+        ));
+    }
+    
+    protected function getDatabaseQuery()
+    {
+        return $this->abstractMock('\PHPixie\Database\Query');
     }
 
 }

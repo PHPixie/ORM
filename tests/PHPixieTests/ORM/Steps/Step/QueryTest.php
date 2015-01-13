@@ -16,6 +16,16 @@ class QueryTest extends \PHPixieTests\ORM\Steps\StepTest
     }
     
     /**
+     * @covers \PHPixie\ORM\Steps\Step\Query::__construct
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
+    /**
      * @covers ::query
      */
     public function testQuery()

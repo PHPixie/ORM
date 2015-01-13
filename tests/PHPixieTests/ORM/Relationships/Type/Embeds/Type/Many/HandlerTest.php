@@ -229,7 +229,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
                 $cached[]=$item['entity'];
             }
             $owner['cachedEntities'] = $cached;
-            $this->method($owner['loader'], 'cachedEntities', $cached, array());
+            $this->method($owner['loader'], 'getCachedEntities', $cached, array());
         }
         $this->method($owner['entity'], 'getRelationshipProperty', $property, array($this->configOwnerProperty), null, true);
         $owner['property'] = $property;

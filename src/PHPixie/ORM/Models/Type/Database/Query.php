@@ -28,7 +28,9 @@ interface Query extends \PHPixie\ORM\Conditions\Condition\In\Item,
     public function planDelete();
     public function delete();
 
+    public function getUpdateBuilder();
     public function planUpdate($data);
+    public function planUpdateBuilder($builder);
     public function update($data);
 
     public function planCount();

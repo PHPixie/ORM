@@ -72,8 +72,11 @@ abstract class ResultTest extends \PHPixieTests\AbstractORMTest
             $this->assertSame($item, $this->result->getByOffset($key));
         }
         
-        $this->setExpectedException('\Exception');
-        $this->result->getByOffset(count($this->data));
+        $result = $this->result;
+        $this->assertException(function() use($result) {
+            $result->getByOffset(4);
+        }, '\Exception');
+        
     }
 
     /**

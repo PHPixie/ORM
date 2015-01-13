@@ -19,7 +19,7 @@ class MultiqueryTest extends \PHPixieTests\ORM\Planners\Planner\In\StrategyTest
             ) as $params){
             
             $this->method($this->subquery, 'fields', null, array(array('fairy')), 0);
-            $this->method($this->steps, 'result', $resultStep, array($this->subquery), 0);
+            $this->method($this->steps, 'iteratorResult', $resultStep, array($this->subquery), 0);
             $this->method($this->plan, 'add', null, array($resultStep), 0);
             $this->method($this->query, 'getWhereBuilder', $this->builder, array(), 0);
             $this->method($this->builder, 'addPlaceholder', $placeholder, $params[1], 0);

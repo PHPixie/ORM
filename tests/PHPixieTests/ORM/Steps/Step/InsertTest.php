@@ -15,6 +15,16 @@ abstract class InsertTest extends \PHPixieTests\ORM\Steps\StepTest
         parent::setUp();
     }
     
+    /**
+     * @covers \PHPixie\ORM\Steps\Step\Insert::__construct
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
     protected function query()
     {
         return $this->abstractMock('\PHPixie\Database\Query\Type\Insert', array('data', 'batchData'));

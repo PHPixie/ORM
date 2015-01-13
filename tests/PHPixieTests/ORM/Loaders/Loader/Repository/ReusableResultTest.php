@@ -56,6 +56,15 @@ class ReusableResultTest extends \PHPixieTests\ORM\Loaders\Loader\RepositoryTest
         $this->loader->getByOffset(99);
     }
     
+    /** 
+     * @covers ::reusableResult
+     * @covers ::<protected>
+     */
+    public function testReusableResult()
+    {
+        $this->assertSame($this->reusableResult, $this->loader->reusableResult());
+    }
+    
     protected function getLoader()
     {
         return new \PHPixie\ORM\Loaders\Loader\Repository\ReusableResult(

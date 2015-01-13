@@ -1,12 +1,35 @@
 <phpunit bootstrap="./tests/phpunit.php">
-  <testsuites>
-    <testsuite>
-      <directory>./tests</directory>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite>
+            <directory>./tests</directory>
+        </testsuite>
+        <testsuite name="covered">
+            <directory>./tests/PHPixieTests/ORM/Steps</directory>
+            <directory>./tests/PHPixieTests/ORM/Loaders</directory>
+            <directory>./tests/PHPixieTests/ORM/Plans</directory>
+            <directory>./tests/PHPixieTests/ORM/Relationships</directory>
+            <directory>./tests/PHPixieTests/ORM/Data</directory>
+            <directory>./tests/PHPixieTests/ORM/Configs</directory>
+            <directory>./tests/PHPixieTests/ORM/Maps</directory>
+            <directory>./tests/PHPixieTests/ORM/Wrappers</directory>
+            <directory>./tests/PHPixieTests/ORM/Values</directory>
+            
+            <file>./tests/PHPixieTests/ORM/StepsTest.php</file>
+            <file>./tests/PHPixieTests/ORM/LoadersTest.php</file>
+            <file>./tests/PHPixieTests/ORM/PlansTest.php</file>
+            <file>./tests/PHPixieTests/ORM/DataTest.php</file>
+            <file>./tests/PHPixieTests/ORM/ConfigsTest.php</file>
+            <file>./tests/PHPixieTests/ORM/MapsTest.php</file>
+            <file>./tests/PHPixieTests/ORM/WrappersTest.php</file>
+            <file>./tests/PHPixieTests/ORM/ValuesTest.php</file>
+            <file>./tests/PHPixieTests/ORM/DatabaseTest.php</file>
+            <file>./tests/PHPixieTests/ORM/ModelsTest.php</file>
+            <file>./tests/PHPixieTests/ORM/RepositoriesTest.php</file>
+        </testsuite>
+    </testsuites>
     <filter>
-      <whitelist>
-        <directory suffix=".php">./src</directory>
-      </whitelist>
+        <whitelist>
+            <directory suffix=".php">./src</directory>
+        </whitelist>
     </filter>
 </phpunit>

@@ -30,9 +30,15 @@ class Proxy implements \PHPixie\ORM\Conditions\Builder
         $this->builder->addCondition($logic, $negate, $parmas);
     }
     
+    public function buildCondition($logic, $negate, $args)
+    {
+        $this->builder->buildCondition($logic, $negate, $args);
+    }
+    
     public function addWhereCondition($logic, $negate, $parmas)
     {
         $this->builder->addWhereCondition($logic, $negate, $parmas);
+        return $this;
     }
 
     public function addOperatorCondition($logic, $negate, $field, $operator, $values)

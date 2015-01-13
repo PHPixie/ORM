@@ -63,7 +63,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
             return;
 
         $loader = $property->value();
-        $items = $loader->accessedModels();
+        $items = $loader->accessedEntities();
 
         $loader->removeAll();
         $this->processItems('remove', $config, $items, null, false);

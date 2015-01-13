@@ -69,6 +69,11 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
 
         return null;
     }
+    
+    public function getCachedEntities()
+    {
+        return $this->cachedEntities;
+    }
 
     public function clearCachedEntities()
     {

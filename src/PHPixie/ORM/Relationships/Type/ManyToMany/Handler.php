@@ -225,7 +225,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $property = $this->getPropertyIfLoaded($entity, $side->propertyName());
         if ($property !== null) {
             $loader = $property->value();
-            $items = $loader->accessedModels();
+            $items = $loader->accessedEntities();
             $opposing = $this->getOpposing($side->type());
             $itemsProperty = $side->config()->get($opposing.'Property');
             $this->processProperties('remove', $items, $itemsProperty, $entity);

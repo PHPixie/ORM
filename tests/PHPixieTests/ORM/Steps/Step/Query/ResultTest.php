@@ -67,6 +67,17 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
     }
     
     /**
+     * @covers ::getFields
+     */
+    public function testGetFields()
+    {
+        $fields = array('pixie', 'trixie');
+        $this->setStepResult();
+        $this->method($this->result, 'getFields', array(5), array($fields), 0);
+        $this->assertEquals(array(5), $this->step->getFields($fields));
+    }
+    
+    /**
      * @covers ::getIterator
      * @covers ::<protected>
      */
@@ -74,9 +85,17 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
     {
         $this->prepareIterator();
         $this->setStepResult();
-        $this->method($this->query, 'execute', $this->result, array(), 0);
-        $this->step->execute();
         $this->iteratorTest();
+    }
+    
+    /**
+     * @covers ::asArray
+     * @covers ::<protected>
+     */
+    public function testAsArray()
+    {
+        $this->setStepResult();
+        $this->assertSame($this->rows, $this->step->asArray());
     }
     
     protected function iteratorTest()

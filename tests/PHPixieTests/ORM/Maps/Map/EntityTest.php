@@ -40,6 +40,6 @@ class EntityTest extends \PHPixieTests\ORM\Maps\MapTest
     
     protected function map()
     {
-        return new \PHPixie\ORM\Sides\Map\Entity($this->relationships);
+        return new \PHPixie\ORM\Maps\Map\Entity($this->relationships);
     }
 }

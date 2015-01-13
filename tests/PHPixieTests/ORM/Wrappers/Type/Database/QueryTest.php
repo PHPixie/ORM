@@ -58,6 +58,8 @@ class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
             array('delete', false, array()),
             array('planUpdate', true, array(1)),
             array('update', false, array(1)),
+            array('getUpdateBuilder', true, array()),
+            array('planUpdateBuilder', true, array(array('test'))),
             array('planCount', true, array()),
             array('count', false, array()),
             array('getRelationshipProperty', true, array('test')),

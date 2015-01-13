@@ -220,7 +220,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
                 $this->expectSetValue($item, null);
             }
 
-            $this->method($owner['loader'], 'accessedModels', $itemEntities, array(), 0);
+            $this->method($owner['loader'], 'accessedEntities', $itemEntities, array(), 0);
             $this->method($owner['loader'], 'removeAll', null, array(), 1);
 
             $this->expectsExactly($owner['loader'], 'remove', 0);

@@ -8,11 +8,13 @@ namespace PHPixieTests\ORM\Values;
 class UpdateTest extends \PHPixieTests\AbstractORMTest
 {
     protected $values;
+    protected $query;
     protected $update;
     
     public function setUp()
     {
         $this->values = $this->quickMock('\PHPixie\ORM\Values');
+        $this->query  = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');
         $this->update = $this->update();
     }
     
@@ -25,6 +27,13 @@ class UpdateTest extends \PHPixieTests\AbstractORMTest
         
     }
     
+    /**
+     * @covers ::set
+     * @covers ::increment
+     * @covers ::remove
+     * @covers ::updates
+     * @covers ::<protected>
+     */
     public function testSet()
     {
         $this->assertEquals(array(), $this->update->updates());
@@ -51,6 +60,34 @@ class UpdateTest extends \PHPixieTests\AbstractORMTest
         $this->assertEquals($expects, $this->update->updates());
     }
     
+    /**
+     * @covers ::plan
+     * @covers ::<protected>
+     */
+    public function testPlan()
+    {
+        $plan = $this->getPlan();
+        $this->method($this->query, 'planUpdateBuilder', $plan, array(), 0);
+        $this->assertSame($plan, $this->update->plan());
+    }
+    
+    /**
+     * @covers ::execute
+     * @covers ::<protected>
+     */
+    public function testExecute()
+    {
+        $plan = $this->getPlan();
+        $this->method($this->query, 'planUpdateBuilder', $plan, array(), 0);
+        $this->method($plan, 'execute', null, array(), 0);
+        $this->update->execute();
+    }
+    
+    protected function getPlan()
+    {
+        return $this->quickMock('\PHPixie\ORM\Plans\Plan\Query');;
+    }
+    
     protected function getValue($type)
     {
         return $this->abstractMock('\PHPixie\ORM\Values\Update\\'.ucfirst($type));
@@ -58,6 +95,6 @@ class UpdateTest extends \PHPixieTests\AbstractORMTest
     
     protected function update()
     {
-        return new \PHPixie\ORM\Values\Update($this->values);
+        return new \PHPixie\ORM\Values\Update($this->values, $this->query);
     }
 }

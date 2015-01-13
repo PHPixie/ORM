@@ -14,7 +14,6 @@ class PropertyTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->preload = $this->quickMock('\PHPixie\ORM\Values\Preload');
         $this->property = $this->property();
     }
     
@@ -37,17 +36,8 @@ class PropertyTest extends \PHPixieTests\AbstractORMTest
         $this->assertEquals($this->propertyName, $this->property->propertyName());
     }
     
-    /**
-     * @covers ::preload
-     * @covers ::<protected>
-     */
-    public function testPreload()
-    {
-        $this->assertEquals($this->preload, $this->property->preload());
-    }
-    
     protected function property()
     {
-        return new \PHPixie\ORM\Values\Preload\Property($this->propertyName, $this->preload);
+        return new \PHPixie\ORM\Values\Preload\Property($this->propertyName);
     }
 }

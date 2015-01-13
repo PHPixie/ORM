@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Sides\Map;
+namespace PHPixie\ORM\Maps\Map;
 
-class Query extends \PHPixie\ORM\Sides\Map
+class Query extends \PHPixie\ORM\Maps\Map
 {
     public function property($query, $propertyName)
     {

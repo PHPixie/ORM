@@ -43,7 +43,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         }
         $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
-        $cachedItems = $arrayNodeLoader->cachedEntities();
+        $cachedItems = $arrayNodeLoader->getCachedEntities();
 
         $offsets = array();
         foreach($items as $item) {
@@ -88,7 +88,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     {
         $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
-        $cachedEntities = $arrayNodeLoader->cachedEntities();
+        $cachedEntities = $arrayNodeLoader->getCachedEntities();
         $arrayNode = $this->getArrayNode($entity, $config->path);
 
         sort($offsets, SORT_NUMERIC);
@@ -106,7 +106,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     public function removeAllItems($entity, $config) {
         $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
-        $cachedEntities = $arrayNodeLoader->cachedEntities();
+        $cachedEntities = $arrayNodeLoader->getCachedEntities();
 
         foreach($cachedEntities as $item) {
             $item->unsetOwnerRelationship();

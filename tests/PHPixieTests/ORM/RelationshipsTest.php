@@ -38,7 +38,16 @@ class RelationshipsTest extends \PHPixieTests\AbstractORMTest
         
         $this->relationships = new \PHPixie\ORM\Relationships($this->ormBuilder);
     }
-
+    
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
     /**
      * @covers ::get
      * @covers ::oneToOne

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Conditions\Builder;
 
-class Container implements \PHPixie\ORM\Conditions\Builder
+class Container extends \PHPixie\Database\Conditions\Builder
 {
     protected $conditions;
     protected $databaseContainer;

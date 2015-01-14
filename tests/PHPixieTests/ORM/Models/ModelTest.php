@@ -8,7 +8,7 @@ namespace PHPixieTests\ORM\Models;
 abstract class ModelTest extends \PHPixieTests\AbstractORMTest
 {
     protected $models;
-    protected $config;
+    protected $configs;
     protected $relationships;
     
     protected $model;
@@ -22,7 +22,7 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
     public function setUp()
     {
         $this->models = $this->quickMock('\PHPixie\ORM\Models');
-        $this->config = $this->quickMock('\PHPixie\ORM\Config');
+        $this->configs = $this->quickMock('\PHPixie\ORM\Configs');
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
         
         $this->inflector = $this->quickMock('\PHPixie\ORM\Configs\Inflector');

@@ -5,17 +5,17 @@ namespace PHPixie\ORM\Models;
 abstract class Model
 {
     protected $models;
-    protected $config;
+    protected $configs;
     protected $relationships;
     protected $wrappers;
     
     protected $modelConfigs = array();
     protected $wrapped = array();
     
-    public function __construct($models, $config, $relationships)
+    public function __construct($models, $configs, $relationships)
     {
         $this->models        = $models;
-        $this->config        = $config;
+        $this->configs       = $configs;
         $this->relationships = $relationships;
         $this->wrappers      = $this->models->wrappers();
     }

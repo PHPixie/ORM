@@ -8,45 +8,55 @@ namespace PHPixieTests\ORM;
 class RelationshipsTest extends \PHPixieTests\AbstractORMTest
 {
     protected $ormBuilder;
-    protected $relationships;
+    protected $dependencies;
+    
+    protected $classMap = array(
+        'oneToOne'   => '\PHPixie\ORM\Relationships\Type\OneTo\Type\One',
+        'oneToMany'  => '\PHPixie\ORM\Relationships\Type\OneTo\Type\Many',
+        'manyToMany' => '\PHPixie\ORM\Relationships\Type\ManyToMany',
+        'embedsOne'  => '\PHPixie\ORM\Relationships\Type\Embeds\Type\One',
+        'embedsMany' => '\PHPixie\ORM\Relationships\Type\Embeds\Type\Many',
+    );
 
     public function setUp()
     {
         $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
+        
+        $this->dependencies = array(
+            'configs'  => $this->quickMock('\PHPixie\ORM\Configs'),
+            'models'   => $this->quickMock('\PHPixie\ORM\Models'),
+            'planners' => $this->quickMock('\PHPixie\ORM\Planners'),
+            'plans'    => $this->quickMock('\PHPixie\ORM\Plans'),
+            'steps'    => $this->quickMock('\PHPixie\ORM\Steps'),
+            'loaders'  => $this->quickMock('\PHPixie\ORM\Loaders'),
+            'mappers'  => $this->quickMock('\PHPixie\ORM\Mappers')
+        );
+        
+        foreach($this->dependencies as $name => $value) {
+            $this->method($this->ormBuilder, $name, $value, array());
+        }
+        
         $this->relationships = new \PHPixie\ORM\Relationships($this->ormBuilder);
     }
 
     /**
      * @covers ::get
+     * @covers ::oneToOne
+     * @covers ::oneToMany
+     * @covers ::manyToMany
+     * @covers ::embedsOne
+     * @covers ::embedsMany
      * @covers ::<protected>
      */
     public function testGet()
     {
-        $relationships = array(
-            'oneToOne',
-            'oneToMany',
-            'manyToMany',
-            'embedsOne',
-            'embedsMany'
-        );
-
-        foreach($relationships as $name)
+        foreach($this->classMap as $name => $class)
         {
             $relationship = $this->relationships->get($name);
-            $class = '\PHPixie\ORM\Relationships\Type\\'.ucfirst($name);
-            $this->assertInstanceOf($class, $relationship);
+            $this->assertInstance($relationship, $class, $this->dependencies);
+            
             $this->assertSame($relationship, $this->relationships->get($name));
+            $this->assertSame($relationship, $this->relationships->$name());
         }
-    }
-
-    /**
-     * @covers ::embedsGroupMapper
-     * @covers ::<protected>
-     */
-    public function testEmbedsGroupMapper()
-    {
-        $mapper = $this->relationships->embedsGroupMapper();
-        $this->assertInstanceOf('\PHPixie\ORM\Relationships\Type\Embeds\Mapper\Group', $mapper);
-        $this->assertSame($mapper, $this->relationships->embedsGroupMapper());
     }
 }

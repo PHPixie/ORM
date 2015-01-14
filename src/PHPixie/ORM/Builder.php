@@ -44,7 +44,12 @@ class Builder
     
     }
     
-    public function config()
+    public function configs()
+    {
+    
+    }
+    
+    public function models()
     {
     
     }

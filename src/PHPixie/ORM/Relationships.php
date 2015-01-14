@@ -6,7 +6,13 @@ class Relationships
 {
     protected $ormBuilder;
     protected $relationships = array();
-    protected $embedsGroupMapper;
+    protected $classMap = array(
+        'oneToOne'   => '\PHPixie\ORM\Relationships\Type\OneTo\Type\One',
+        'oneToMany'  => '\PHPixie\ORM\Relationships\Type\OneTo\Type\Many',
+        'manyToMany' => '\PHPixie\ORM\Relationships\Type\ManyToMany',
+        'embedsOne'  => '\PHPixie\ORM\Relationships\Type\Embeds\Type\One',
+        'embedsMany' => '\PHPixie\ORM\Relationships\Type\Embeds\Type\Many',
+    );
 
     public function __construct($ormBuilder)
     {
@@ -15,18 +21,53 @@ class Relationships
 
     public function get($name)
     {
-        if (!array_key_exists($name, $this->relationships)) {
+        if (!array_key_exists($name, $this->relationships))
+        {
             $this->relationships[$name] = $this->buildRelationship($name);
         }
-
+        
         return $this->relationships[$name];
     }
-
-    protected function buildRelationship($name)
+    
+    public function oneToOne()
     {
-        $class = '\PHPixie\ORM\Relationships\Type\\'.ucfirst($name);
-        return new $class($this->ormBuilder);
+        return $this->get('oneToOne');   
     }
     
-    public function map(){}
+    public function oneToMany()
+    {
+        return $this->get('oneToMany');   
+    }
+    
+    public function manyToMany()
+    {
+        return $this->get('manyToMany');   
+    }
+    
+    public function embedsOne()
+    {
+        return $this->get('embedsOne');   
+    }
+    
+    public function embedsMany()
+    {
+        return $this->get('embedsMany');   
+    }
+    
+    protected function buildRelationship($name) {
+        if(!array_key_exists($name, $this->classMap)) {
+            throw new \PHPixie\ORM\Exception\Relationship("Relationship type '$name' does not exist");
+        }
+        
+        $class = $this->classMap[$name];
+        return new $class(
+            $this->ormBuilder->configs(),
+            $this->ormBuilder->models(),
+            $this->ormBuilder->planners(),
+            $this->ormBuilder->plans(),
+            $this->ormBuilder->steps(),
+            $this->ormBuilder->loaders(),
+            $this->ormBuilder->mappers()
+        );
+    }
 }

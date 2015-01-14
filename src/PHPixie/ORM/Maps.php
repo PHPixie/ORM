@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships;
+namespace PHPixie\ORM;
 
 class Maps
 {
@@ -21,17 +21,19 @@ class Maps
 
     public function entity()
     {
-        return $this->entitySides;
+        $this->ensureMaps();
+        return $this->entityMap;
     }
     
     public function query()
     {
-        return $this->querySides;
+        $this->ensureMaps();
+        return $this->queryMap;
     }
     
     protected function ensureMaps()
     {
-        if($this->mapsBuilt) {
+        if(!$this->mapsBuilt) {
             $this->buildMaps();
             $this->mapsBuilt = true;
         }
@@ -40,7 +42,7 @@ class Maps
     protected function buildMaps()
     {
         $this->entityMap = $this->buildEntityMap();
-        $this->queryMap = $this->buildQueryMap();
+        $this->queryMap  = $this->buildQueryMap();
         $this->addSidesFromConfig($this->configSlice);
     }
     
@@ -60,19 +62,19 @@ class Maps
     
     protected function addSide($side)
     {
-        $this->entitySides->add($side);
+        $this->entityMap->add($side);
         if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Database\Query) {
-            $this->querySides->add($side);
+            $this->queryMap->add($side);
         }
     }
     
     protected function buildEntityMap()
     {
-        new Maps\Map\Entity($this->relationships);
+        return new Maps\Map\Entity($this->relationships);
     }
     
     protected function buildQueryMap()
     {
-        new Maps\Map\Query($this->relationships);
+        return new Maps\Map\Query($this->relationships);
     }
 }

@@ -34,7 +34,7 @@ class Planners
 
     public function plannerInstance($name)
     {
-        if (!isset($this->planners[$name])) {
+        if (!array($this->planners[$name])) {
             $steps = $this->ormBuilder->steps();
             $this->planners[$name] = $this->buildPlanner($name, $steps);
         }

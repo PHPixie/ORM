@@ -53,7 +53,7 @@ class ModelsTest extends \PHPixieTests\AbstractORMTest
     public function testDatabaseModel()
     {
         $this->modelTest('database', array(
-            'config',
+            'configs',
             'relationships',
             'database',
             'drivers',
@@ -70,7 +70,7 @@ class ModelsTest extends \PHPixieTests\AbstractORMTest
     public function testEmbeddedModel()
     {
         $this->modelTest('embedded', array(
-            'config',
+            'configs',
             'relationships'
         ));
     }

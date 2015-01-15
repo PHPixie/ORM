@@ -57,4 +57,7 @@ class Strategies
         
         return $this->strategies[$strategy][$type];
     }
+    
+    public function sqlQuery(){}
+    public function mongoQuery(){}
 }

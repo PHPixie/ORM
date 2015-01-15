@@ -5,64 +5,93 @@ namespace PHPixieTests\ORM\Planners\Planner;
 /**
  * @coversDefaultClass \PHPixie\ORM\Planners\Planner\Query
  */
-class QueryTest extends \PHPixieTests\ORM\Planners\PlannerTest
+class QueryTest extends \PHPixieTests\AbstractORMTest
 {
-
+    protected $strategies;
+    
+    protected $queryPlanner;
+    
     protected $sqlStrategy;
     protected $mongoStrategy;
     
+    
+    
     public function setUp()
     {
-        $this->sqlStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query\Strategy\SQL');
+        $this->strategies = $this->quickMock('\PHPixie\ORM\Planners\Strategies');
+        
+        $this->queryPlanner = new \PHPixie\ORM\Planners\Planner\Query($this->strategies);
+        
+        $this->sqlStrategy   = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query\Strategy\SQL');
         $this->mongoStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query\Strategy\Mongo');
-        parent::setUp();
+        
+        $this->method($this->strategies, 'sqlQuery', $this->sqlStrategy, array());
+        $this->method($this->strategies, 'mongoQuery', $this->mongoStrategy, array());
+    }
+    
+
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+        
     }
     
     
     /**
-     * @covers ::<protected>
      * @covers ::setSource
+     * @covers ::<protected>
      */
     public function testSetSource()
     {
-        $this->prepareStrategies();
-        
-        $query = $this->abstractMock('\PHPixie\Database\SQL\Query', array('table'));
-        $this->method($this->sqlStrategy, 'setSource', null, array($query, 'pixie'), 0);
-        $this->assertEquals($query, $this->planner->setSource($query, 'pixie'));
-        
-        $query = $this->abstractMock('\PHPixie\Database\Driver\Mongo\Query', array('collection'));
-        $this->method($this->mongoStrategy, 'setSource', null, array($query, 'pixie'), 0);
-        $this->assertEquals($query, $this->planner->setSource($query, 'pixie'));
-        
+        $this->methodTest('setSource', array('pixie'));
     }
     
     /**
+     * @covers ::setBatchData    
      * @covers ::<protected>
-     * @covers ::setBatchData
      */
     public function testSetBatchData()
     {
-        $this->prepareStrategies();
-        
-        $query = $this->abstractMock('\PHPixie\Database\SQL\Query', array('table'));
-        $this->method($this->sqlStrategy, 'setBatchData', null, array($query, array(1), array(2)), 0);
-        $this->assertEquals($query, $this->planner->setBatchData($query, array(1), array(2)));
-        
-        $query = $this->abstractMock('\PHPixie\Database\Driver\Mongo\Query', array('collection'));
-        $this->method($this->mongoStrategy, 'setBatchData', null, array($query, array(1), array(2)), 0);
-        $this->assertEquals($query, $this->planner->setBatchData($query, array(1), array(2)));
-        
+        $this->methodTest('setBatchData', array(array('t'), array(1)));
     }
     
-    protected function prepareStrategies()
+    protected function methodTest($method, $params)
     {
-        $this->method($this->strategies, 'query', $this->sqlStrategy, array('SQL'), 0);
-        $this->method($this->strategies, 'query', $this->mongoStrategy, array('Mongo'), 1);
+        $sets = array(
+            array($this->sqlStrategy, $this->getSQLQuery()),
+            array($this->mongoStrategy, $this->getMongoQuery())
+        );
+        
+        array_unshift($params, null);
+        
+        foreach($sets as $set) {
+            $params[0] = $set[1];
+            
+            $this->method($set[0], $method, null, $params, 0);
+            $callback = array($this->queryPlanner, $method);
+            $this->assertSame($set[1], call_user_func_array($callback, $params));
+        }
+        
+        $this->setExpectedException('\PHPixie\ORM\Exception\Planner');
+        $params[0] = $this->getQuery();
+        call_user_Func_array(array($this->queryPlanner, $method), $params);
     }
     
-    protected function getPlanner()
+    protected function getQuery()
     {
-        return new \PHPixie\ORM\Planners\Planner\Query($this->strategies);
+        return $this->abstractMock('\PHPixie\Database\Query');
+    }
+    
+    protected function getSQLQuery()
+    {
+        return $this->abstractMock('\PHPixie\Database\Type\SQL\Query');
+    }
+    
+    protected function getMongoQuery()
+    {
+        return $this->abstractMock('\PHPixie\Database\Driver\Mongo\Query');
     }
 }

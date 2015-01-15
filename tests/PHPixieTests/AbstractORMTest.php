@@ -75,4 +75,12 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
             $this->assertAttributeEquals($value, $name, $object);
         }
     }
+    
+    protected function callMethod($object, $method, $params = array())
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+		$method = $reflection->getMethod($method);
+		$method->setAccessible( true );
+ 		return $method->invokeArgs($object, $params);
+    }
 }

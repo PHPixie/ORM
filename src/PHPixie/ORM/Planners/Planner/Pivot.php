@@ -2,13 +2,18 @@
 
 namespace PHPixie\ORM\Planners\Planner;
 
-class Pivot extends \PHPixie\ORM\Planners\Planner
+class Pivot
 {
-    protected $strategies;
+    protected $planners;
+    protected $steps;
     
-    public function __construct($strategies)
+    protected $sqlStrategy;
+    protected $multiqueryStrategy;
+    
+    public function __construct($planners, $steps)
     {
-        $this->strategies = $strategies;    
+        $this->planners = $planners;
+        $this->steps    = $steps;
     }
     
     public function link($pivot, $firstSide, $secondSide, $plan)
@@ -24,18 +29,25 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
     }
 
     public function unlinkAll($pivot, $side, $plan)
-    {}
+    {
+    
+    }
+    
     protected function selectStrategy($pivot, $firstSide, $secondSide)
     {
         $pivotConnection = $pivot->connection();
-        if (!($pivotConnection instanceof \PHPixie\Database\Driver\PDO\Connection))
-            return $this->strategies->pivot('multiquery');
+        
+        if (!($pivotConnection instanceof \PHPixie\Database\Driver\PDO\Connection)) {
+            return $this->multiqueryStrategy();
+        }
+        
+        foreach(array($firstSide, $secondSide) as $side) {
+            if ($side !== null && $side->connection() !== $pivotConnection) {
+                return $this->multiqueryStrategy();
+            }
+        }
 
-        foreach(array($firstSide, $secondSide) as $side)
-            if ($side !== null && $side->connection() !== $pivotConnection)
-                return $this->strategies->pivot('multiquery');
-
-        return $this->strategies->pivot('SQL');
+        return $this->sqlStrategy();
     }
 
     public function pivot($connection, $source)
@@ -53,4 +65,39 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
     {
         return new Pivot\Side($items, $repository, $pivotKey);
     }
+
+    protected function sqlStrategy()
+    {
+        if($this->sqlStrategy === null) {
+            $this->sqlStrategy = $this->buildSqlStrategy(); 
+        }
+        
+        return $this->sqlStrategy;
+    }
+    
+    protected function multiqueryStrategy()
+    {
+        if($this->multiqueryStrategy === null) {
+            $this->multiqueryStrategy = $this->buildMultiqueryStrategy(); 
+        }
+        
+        return $this->multiqueryStrategy;
+    }
+    
+    protected function buildSqlStrategy()
+    {
+        return new \PHPixie\ORM\Planners\Planner\Pivot\Strategy\SQL(
+            $this->planners,
+            $this->steps
+        );
+    }
+    
+    protected function buildMultiqueryStrategy()
+    {
+        return new \PHPixie\ORM\Planners\Planner\Pivot\Strategy\Multiquery(
+            $this->planners,
+            $this->steps
+        );
+    }
+
 }

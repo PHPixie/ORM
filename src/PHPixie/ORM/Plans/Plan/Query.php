@@ -36,7 +36,7 @@ class Query extends \PHPixie\ORM\Plans\Plan
         return $steps;
     }
     
-    protected function queryStep()
+    public function queryStep()
     {
         return $this->queryStep;
     }

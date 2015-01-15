@@ -94,7 +94,7 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
     protected function prepareResultTest($query, $resultStep, $plan, $logic, $negate)
     {
         $placeholder = $this->quickMock('\PHPixie\Database\Conditions\Condition\Placeholder');
-        $builder = $this->quickMock('\PHPixie\Database\Conditions\Builder', array('addPlaceholder'));
+        $builder = $this->abstractMock('\PHPixie\Database\Conditions\Builder', array('addPlaceholder'));
         
         $this->method($query, 'getWhereBuilder', $builder, array(), 0);
         $this->method($builder, 'addPlaceholder', $placeholder, array($logic, $negate), 0);
@@ -129,7 +129,7 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
             $this->method($collection, 'connection', $collectionConnection, array(), 2);
 
             foreach($collectionQueries as $key => $collectionQuery) {
-                $findPlan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Composite\Loader');
+                $findPlan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Query\Loader');
                 $requiredPlan = $this->quickMock('\PHPixie\ORM\Plans\Plan');
                 $this->method($findPlan, 'requiredPlan', $requiredPlan, array(), 0);
 
@@ -139,7 +139,7 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
                 $resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
                 $this->method($resultStep, 'query', $subquery, array(), 0);
 
-                $this->method($findPlan, 'resultStep', $resultStep, array(), 1);
+                $this->method($findPlan, 'queryStep', $resultStep, array(), 1);
                 $this->method($this->$strategy, 'in', null, array($query, 'pixie', $subquery, 'fairy', $plan, 'or', false), $key);
 
             }

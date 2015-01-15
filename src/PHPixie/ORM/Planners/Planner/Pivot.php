@@ -37,7 +37,7 @@ class Pivot
     {
         $pivotConnection = $pivot->connection();
         
-        if (!($pivotConnection instanceof \PHPixie\Database\Driver\PDO\Connection)) {
+        if (!($pivotConnection instanceof \PHPixie\Database\Type\SQL\Connection)) {
             return $this->multiqueryStrategy();
         }
         

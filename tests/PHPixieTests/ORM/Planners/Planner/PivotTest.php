@@ -139,7 +139,7 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
     protected function getConnection($isSQL = false)
     {
         if($isSQL) {
-            return $this->abstractMock('\PHPixie\Database\Driver\PDO\Connection');
+            return $this->abstractMock('\PHPixie\Database\Type\SQL\Connection');
         }
         
         return $this->abstractMock('\PHPixie\Database\Connection');

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Planners\Planner;
 
-class Update extends \PHPixie\ORM\Planners\Planner
+class Update
 {
     protected $steps;
     
@@ -21,7 +21,7 @@ class Update extends \PHPixie\ORM\Planners\Planner
     {
         $fields = $this->requiredFields($map);
         $subquery->fields($fields);
-        $resultStep = $this->steps->result($subquery);
+        $resultStep = $this->steps->iteratorResult($subquery);
         $plan->add($resultStep);
         $this->result($updateQuery, $map, $resultStep, $plan);
     }

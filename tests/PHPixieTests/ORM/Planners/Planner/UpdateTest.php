@@ -5,16 +5,14 @@ namespace PHPixieTests\ORM\Planners\Planner;
 /**
  * @coversDefaultClass \PHPixie\ORM\Planners\Planner\Update
  */
-class UpdateTest extends \PHPixieTests\AbstractORMTest
+class UpdateTest extends \PHPixieTests\ORM\Planners\PlannerTest
 {
     protected $steps;
-    
-    protected $update;
     
     public function setUp()
     {
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
-        $this->update = new \PHPixie\ORM\Planners\Planner\Update($this->steps);
+        parent::setUp();
     }
     
     /**
@@ -43,7 +41,7 @@ class UpdateTest extends \PHPixieTests\AbstractORMTest
         );
         
         $this->prepareResultTest($updateQuery, $map, $resultStep, $plan);
-        $this->update->result($updateQuery, $map, $resultStep, $plan);
+        $this->planner->result($updateQuery, $map, $resultStep, $plan);
         
     }
     
@@ -68,7 +66,7 @@ class UpdateTest extends \PHPixieTests\AbstractORMTest
         $this->method($this->steps, 'iteratorResult', $resultStep, array($subquery), 0);
         $this->method($plan, 'add', null, array($resultStep), 0);
         $this->prepareResultTest($updateQuery, $map, $resultStep, $plan, 1, 1);
-        $this->update->subquery($updateQuery, $map, $subquery, $plan);
+        $this->planner->subquery($updateQuery, $map, $subquery, $plan);
         
     }
     
@@ -103,5 +101,10 @@ class UpdateTest extends \PHPixieTests\AbstractORMTest
     protected function getUpdateMapStep()
     {
         return $this->quickMock('\PHPixie\ORM\Steps\Step\Update\Map');
+    }
+    
+    protected function planner()
+    {
+        return new \PHPixie\ORM\Planners\Planner\Update($this->steps);
     }
 }

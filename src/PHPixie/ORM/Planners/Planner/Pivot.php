@@ -2,13 +2,10 @@
 
 namespace PHPixie\ORM\Planners\Planner;
 
-class Pivot
+class Pivot extends \PHPixie\ORM\Planners\Planner
 {
     protected $planners;
     protected $steps;
-    
-    protected $sqlStrategy;
-    protected $multiqueryStrategy;
     
     public function __construct($planners, $steps)
     {
@@ -38,16 +35,16 @@ class Pivot
         $pivotConnection = $pivot->connection();
         
         if (!($pivotConnection instanceof \PHPixie\Database\Type\SQL\Connection)) {
-            return $this->multiqueryStrategy();
+            return $this->strategy('multiquery');
         }
         
         foreach(array($firstSide, $secondSide) as $side) {
             if ($side !== null && $side->connection() !== $pivotConnection) {
-                return $this->multiqueryStrategy();
+                return $this->strategy('multiquery');
             }
         }
 
-        return $this->sqlStrategy();
+        return $this->strategy('sql');
     }
 
     public function pivot($connection, $source)
@@ -66,24 +63,6 @@ class Pivot
         return new Pivot\Side($items, $repository, $pivotKey);
     }
 
-    protected function sqlStrategy()
-    {
-        if($this->sqlStrategy === null) {
-            $this->sqlStrategy = $this->buildSqlStrategy(); 
-        }
-        
-        return $this->sqlStrategy;
-    }
-    
-    protected function multiqueryStrategy()
-    {
-        if($this->multiqueryStrategy === null) {
-            $this->multiqueryStrategy = $this->buildMultiqueryStrategy(); 
-        }
-        
-        return $this->multiqueryStrategy;
-    }
-    
     protected function buildSqlStrategy()
     {
         return new \PHPixie\ORM\Planners\Planner\Pivot\Strategy\SQL(

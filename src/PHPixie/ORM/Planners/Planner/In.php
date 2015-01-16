@@ -4,18 +4,16 @@ namespace PHPixie\ORM\Planners\Planner;
 
 class In extends \PHPixie\ORM\Planners\Planner
 {
-	
-    protected $strategies;
     protected $steps;
     
-    public function __construct($strategies, $steps)
+    public function __construct($steps)
     {
-        $this->strategies = $strategies;
         $this->steps = $steps;
     }
     
-    public function collection($query, $queryField, $collection, $collectionField, $plan, $logic = 'and', $negate = false)
+    public function items($query, $queryField, $modelName, $items, $itemsField, $plan, $logic = 'and', $negate = false)
     {
+        $this->checkItems($modelName, $items);
         $query->startWhereGroup($logic, $negate);
         $ids = $collection->modelField($collectionField);
         if (!empty($ids))
@@ -47,11 +45,36 @@ class In extends \PHPixie\ORM\Planners\Planner
         $strategy = $this->selectStrategy($query->connection(), $subquery->connection());
         $strategy->in($query, $queryField, $subquery, $subqueryField, $plan, $logic, $negate);
     }
-
+    
+    protected function checkItems($modelName, $items)
+    {
+    
+    }
+    
     protected function selectStrategy($queryConnection, $subqueryConnection)
     {
-        if ($queryConnection instanceof \PHPixie\Database\Driver\PDO\Connection && $queryConnection === $subqueryConnection)
-            return $this->strategies->in('subquery');
-        return $this->strategies->in('multiquery');
+        if (!($queryConnection instanceof \PHPixie\Database\Type\SQL\Connection)) {
+            return $this->strategies->in('multiquery');
+        }
+        
+        if ($queryConnection !== $subqueryConnection) {
+            return $this->strategies->in('multiquery');
+        }
+        
+        return $this->strategies->in('subquery');
+    }
+    
+    protected function buildSubqueryStrategy()
+    {
+        return new \PHPixie\ORM\Planners\Planner\In\Strategy\Subquery(
+            $this->steps
+        );
+    }
+    
+    protected function buildMultiqueryStrategy()
+    {
+        return new \PHPixie\ORM\Planners\Planner\In\Strategy\Multiquery(
+            $this->steps
+        );
     }
 }

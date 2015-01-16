@@ -5,40 +5,18 @@ namespace PHPixieTests\ORM\Planners\Planner;
 /**
  * @coversDefaultClass \PHPixie\ORM\Planners\Planner\Query
  */
-class QueryTest extends \PHPixieTests\AbstractORMTest
+class QueryTest extends \PHPixieTests\ORM\Planners\PlannerTest
 {
-    protected $strategies;
-    
-    protected $queryPlanner;
-    
     protected $sqlStrategy;
     protected $mongoStrategy;
     
-    
-    
     public function setUp()
     {
-        $this->strategies = $this->quickMock('\PHPixie\ORM\Planners\Strategies');
-        
-        $this->queryPlanner = new \PHPixie\ORM\Planners\Planner\Query($this->strategies);
-        
         $this->sqlStrategy   = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query\Strategy\SQL');
         $this->mongoStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query\Strategy\Mongo');
         
-        $this->method($this->strategies, 'sqlQuery', $this->sqlStrategy, array());
-        $this->method($this->strategies, 'mongoQuery', $this->mongoStrategy, array());
+        parent::setUp();
     }
-    
-
-    /**
-     * @covers ::__construct
-     * @covers ::<protected>
-     */
-    public function testConstruct()
-    {
-        
-    }
-    
     
     /**
      * @covers ::setSource
@@ -65,19 +43,39 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
             array($this->mongoStrategy, $this->getMongoQuery())
         );
         
+        $plannerMock = $this->plannerMock();
+        
         array_unshift($params, null);
         
         foreach($sets as $set) {
             $params[0] = $set[1];
             
             $this->method($set[0], $method, null, $params, 0);
-            $callback = array($this->queryPlanner, $method);
+            $callback = array($plannerMock, $method);
             $this->assertSame($set[1], call_user_func_array($callback, $params));
         }
         
         $this->setExpectedException('\PHPixie\ORM\Exception\Planner');
         $params[0] = $this->getQuery();
-        call_user_Func_array(array($this->queryPlanner, $method), $params);
+        call_user_Func_array(array($plannerMock, $method), $params);
+    }
+    
+    /**
+     * @covers ::buildSqlStrategy
+     * @covers ::<protected>
+     */
+    public function testBuildSqlStrategy()
+    {
+        $this->assertStrategy('sql', '\PHPixie\ORM\Planners\Planner\Query\Strategy\SQL');
+    }
+    
+    /**
+     * @covers ::buildMongoStrategy
+     * @covers ::<protected>
+     */
+    public function testBuildMongoStrategy()
+    {
+        $this->assertStrategy('mongo', '\PHPixie\ORM\Planners\Planner\Query\Strategy\Mongo');
     }
     
     protected function getQuery()
@@ -93,5 +91,23 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     protected function getMongoQuery()
     {
         return $this->abstractMock('\PHPixie\Database\Driver\Mongo\Query');
+    }
+    
+    protected function planner()
+    {
+        return new \PHPixie\ORM\Planners\Planner\Query();
+    }
+    
+    protected function plannerMock()
+    {
+        $mock = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query', array(
+            'buildSQLStrategy',
+            'buildMongoStrategy',
+        ));
+        
+        $this->method($mock, 'buildSqlStrategy', $this->sqlStrategy, array());
+        $this->method($mock, 'buildMongoStrategy', $this->mongoStrategy, array());
+        
+        return $mock;
     }
 }

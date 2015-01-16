@@ -2,15 +2,8 @@
 
 namespace PHPixie\ORM\Planners\Planner;
 
-class Query
+class Query extends \PHPixie\ORM\Planners\Planner
 {
-    protected $strategies;
-    
-    public function __construct($strategies)
-    {
-        $this->strategies = $strategies;
-    }
-    
     public function setSource($query, $source)
     {
         $this->selectStrategy($query)->setSource($query, $source);
@@ -26,14 +19,25 @@ class Query
     protected function selectStrategy($query)
     {
         if ($query instanceof \PHPixie\Database\Type\SQL\Query) {
-            return $this->strategies->sqlQuery();
+            return $this->strategy('sql');
         }
         
         if($query instanceof \PHPixie\Database\Driver\Mongo\Query) {
-            return $this->strategies->mongoQuery();
+            return $this->strategy('mongo');
         }
         
         $class = get_class($query);
         throw new \PHPixie\ORM\Exception\Planner("No strategies defined for '$class' queries");
     }
+    
+    protected function buildSqlStrategy()
+    {
+        return new \PHPixie\ORM\Planners\Planner\Query\Strategy\SQL();
+    }
+    
+    protected function buildMongoStrategy()
+    {
+        return new \PHPixie\ORM\Planners\Planner\Query\Strategy\Mongo();
+    }
+    
 }

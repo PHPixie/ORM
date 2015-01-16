@@ -57,13 +57,78 @@ class Conditions
         }
     }
     
-    protected function mapInCondition($builder, $modelName, $collectionCondition, $plan)
+    protected function mapDatabaseQuery($builder, $modelName, $query, $plan)
+    {
+        $builder->startGroup('or', false);
+        $this->mapConditions($builder, $modelName, $query->conditions(), $plan);
+        $builder->endGroup();
+    }
+    
+    protected function addInAllCondition($builder, $modelName, $logic, $negate)
+    {
+        $builder->addInOperatorCondition(
+            $idField,
+            array(),
+            $logic,
+            !$negate
+        );
+    }
+    
+    protected function mapInCondition($builder, $modelName, $inCondition, $plan)
     {
         if(!($builder instanceof \PHPixie\Database\Query))
             throw new \PHPixie\ORM\Exception\Mapper("Collection conditions are not allowed for embedded models");
         
+        
+        $logic  = $inCondition->logic();
+        $negate = $inCondition->isNegated();
+        $items  = $inCondition->items();
+        
+        if($items === null) {
+            $this->addInAllCondition($builder, $modelName, $logic, $negate);
+            
+        }elseif($items === array()) {
+            $this->addInAllCondition($builder, $modelName, $logic, !$negate);
+            
+        }else{
+            
+            $builder->startConditionGroup($inCondition->logic(), $inCondition->isNegated());
+            $ids = array();
+            if($item instanceof \PHPixie\ORM\Models\Type\Database\Query) {
+                $this->mapDatabaseQuery($builder, $modelName, $item, $plan);
+                
+            }else{
+                $ids[]=$item;
+                
+            }
+        }
+        
+        
+        
+        
+        
+        $ids = array();
+        
+        foreach( as $item) {
+            if($item instanceof \PHPixie\ORM\Models\Type\Database\Query) {
+                $this->mapDatabaseQuery($builder, $modelName, $item, $plan);
+                
+            }else{
+                $ids[]=$item;
+                
+            }
+        }
+        
+        if(!empty($ids) || empty($items)) {
+            $idField = $this->databaseModel->config($modelName)->idField;
+            $builder->addInOperatorCondition($idField, $ids, 'or', false);
+        }
+        
+        
+        $this->endGroup();
+        /*
         $collection = $this->planners->collection($modelName, $collectionCondition->items());
-        $idField = $this->databaseModel->config($modelName)->idField;
+        
         
         $this->planners->in()->collection(
             $builder,
@@ -74,6 +139,7 @@ class Conditions
             $collectionCondition->logic(),
             $collectionCondition->isNegated()
         );
+        */
     }
     
     public function map($builder, $modelName, $conditions, $plan)

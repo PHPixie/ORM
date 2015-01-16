@@ -5,15 +5,13 @@ namespace PHPixieTests\ORM\Planners\Planner;
 /**
  * @coversDefaultClass \PHPixie\ORM\Planners\Planner\Pivot
  */
-class PivotTest extends \PHPixieTests\AbstractORMTest
+class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
 {
     protected $planners;
     protected $steps;
     
     protected $sqlStategy;
     protected $multiqueryStrategy;
-    
-    protected $pivotMock;
     
     public function setUp()
     {
@@ -23,11 +21,9 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
         $this->sqlStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot\Strategy\SQL');
         $this->multiqueryStrategy  = $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot\Strategy\Multiquery');
         
-        $this->pivotMock = $this->pivotMock();
+        parent::setUp();
         
-        $this->method($this->pivotMock, 'buildSqlstrategy', $this->sqlStrategy, array());
-        $this->method($this->pivotMock, 'buildMultiqueryStrategy', $this->multiqueryStrategy, array());
-    }
+     }
     
     /**
      * @covers ::pivot
@@ -36,7 +32,7 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
     public function testPivot()
     {
         $connection = $this->getConnection();
-        $pivot = $this->pivotMock->pivot($connection, 'fairies');
+        $pivot = $this->planner()->pivot($connection, 'fairies');
         $this->assertInstanceOf('\PHPixie\ORM\Planners\Planner\Pivot\Pivot', $pivot);
         $this->assertEquals($connection, $pivot->connection());
         $this->assertEquals('fairies', $pivot->source());
@@ -50,7 +46,7 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
     {
         $items = array(5);
         $repository = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Repository');
-        $side = $this->pivotMock->side($items, $repository, 'fairy');
+        $side = $this->planner()->side($items, $repository, 'fairy');
         $this->assertInstanceOf('\PHPixie\ORM\Planners\Planner\Pivot\Side', $side);
         $this->assertEquals($items, $side->items());
         $this->assertEquals($repository, $side->repository());
@@ -81,9 +77,7 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
      */
     public function testBuildSqlStrategy()
     {
-        $pivot = $this->pivot();
-        $sqlStrategy = $this->callMethod($pivot, 'buildSqlStrategy');
-        $this->assertInstance($sqlStrategy, '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\SQL', array(
+        $this->assertStrategy('sql', '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\SQL', array(
             'planners' => $this->planners,
             'steps'    => $this->steps
         ));
@@ -95,9 +89,7 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
      */
     public function testBuildMutiqueryStrategy()
     {
-        $pivot = $this->pivot();
-        $multiqueryStrategy = $this->callMethod($pivot, 'buildMultiqueryStrategy');
-        $this->assertInstance($multiqueryStrategy, '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\Multiquery', array(
+        $this->assertStrategy('multiquery', '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\Multiquery', array(
             'planners' => $this->planners,
             'steps'    => $this->steps
         ));
@@ -132,7 +124,7 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
             $strategy = $params[1].'Strategy';
             
             $this->method($this->$strategy, $type, null, array($pivot, $firstSide, $secondSide, $plan), 0);
-            $this->pivotMock->$type($pivot, $firstSide, $secondSide, $plan);
+            $this->plannerMock()->$type($pivot, $firstSide, $secondSide, $plan);
         }
     }
     
@@ -160,18 +152,23 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
         return $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot\Side');
     }
     
-    protected function pivotMock()
+    protected function plannerMock()
     {
-        return $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot', array(
+        $mock = $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot', array(
             'buildSqlStrategy',
             'buildMultiqueryStrategy'
         ), array(
             $this->planners,
             $this->steps
         ));
+        
+        $this->method($mock, 'buildSqlstrategy', $this->sqlStrategy, array());
+        $this->method($mock, 'buildMultiqueryStrategy', $this->multiqueryStrategy, array());
+        
+        return $mock;
     }
     
-    protected function pivot()
+    protected function planner()
     {
         return new \PHPixie\ORM\Planners\Planner\Pivot(
             $this->planners,

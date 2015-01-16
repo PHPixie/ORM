@@ -4,31 +4,29 @@ namespace PHPixie\ORM\Planners;
 
 class Collection
 {
-    protected $models;
+    protected $modelName;
+    
+    protected $entities;
     protected $queries;
-    protected $requiredModel;
 
-    public function __construct($requiredModel, $items = array())
+    public function __construct($modelName, $items = array())
     {
-        $this->requiredModel = $requiredModel;
-        $this->add($items);
-    }
-
-    public function add($items)
-    {
-        if (!is_array($items)) {
-            $items = array($items);
+        $this->modelName = $modelName;
+        foreach($items as $item) {
+            $his->add($item);
         }
-
-        foreach($items as $item)
-            $this->addItem($item);
     }
 
-    protected function addItem($item, $recurseArray =  true)
+    protected function add($item)
     {
-        if ($item instanceof \PHPixie\ORM\Model) {
+        $itemModel = $item->modelName();
+        if ($item->modelName() !== $this->modelName) {
+            throw new \PHPixie\ORM\Exception\Planner("Item of '$itemModel' cannot be used in a {$this->modelName} collection");
+        }
+        
+        if ($item instanceof \PHPixie\ORM\Models\Type\Database\Entity) {
             if ($item->modelName() !== $this->requiredModel)
-                throw new \PHPixie\ORM\Exception\Mapper("Instance of the '{$item->modelName()}' model passed, but '{$this->requiredModel}' was expected.");
+                throw new \PHPixie\ORM\Exception\Planner("Instance of the '{$item->modelName()}' model passed, but '{$this->requiredModel}' was expected.");
 
             if ($item->isNew())
                 throw new \PHPixie\ORM\Exception\Mapper("You can only use saved models.");

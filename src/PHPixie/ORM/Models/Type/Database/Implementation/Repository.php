@@ -4,13 +4,13 @@ namespace PHPixie\ORM\Models\Type\Database\Implementation;
 
 abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repository
 {
-    protected $model;
+    protected $databaseModel;
     protected $database;
     protected $config;
     
-    public function __construct($model, $database, $config)
+    public function __construct($databaseModel, $database, $config)
     {
-        $this->model = $model;
+        $this->databaseModel = $databaseModel;
         $this->database = $database;
         $this->config = $config;
     }
@@ -22,12 +22,12 @@ abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repositor
     
     public function modelName()
     {
-        return $this->config->modelName;
+        return $this->config->model;
     }
     
     public function query()
     {
-        return $this->model->query($this->modelName());
+        return $this->databaseModel->query($this->modelName());
     }
     
     public function create()
@@ -44,7 +44,7 @@ abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repositor
     {
         $modelName = $this->modelName();
         $data = $this->buildData($data);
-        return $this->model->entity($modelName, $isNew, $data);
+        return $this->databaseModel->entity($modelName, $isNew, $data);
     }
 
     public function connection()

@@ -35,9 +35,15 @@ class Proxy implements \PHPixie\ORM\Conditions\Builder
         $this->builder->buildCondition($logic, $negate, $args);
     }
     
-    public function addWhereCondition($logic, $negate, $parmas)
+    public function addWhereCondition($logic, $negate, $condition)
     {
-        $this->builder->addWhereCondition($logic, $negate, $parmas);
+        $this->builder->addWhereCondition($logic, $negate, $condition);
+        return $this;
+    }
+    
+    public function buildWhereCondition($logic, $negate, $args)
+    {
+        $this->builder->buildWhereCondition($logic, $negate, $args);
         return $this;
     }
 
@@ -95,7 +101,7 @@ class Proxy implements \PHPixie\ORM\Conditions\Builder
         return $this;
     }
 
-    public function addRelatedToCondition($logic, $negate, $relationship, $items)
+    public function addRelatedToCondition($logic, $negate, $relationship, $items = null)
     {
         $this->builder->addRelatedToCondition($logic, $negate, $relationship, $items);
         return $this;
@@ -104,12 +110,6 @@ class Proxy implements \PHPixie\ORM\Conditions\Builder
     public function startRelatedToConditionGroup($relationship, $logic = 'and', $negate = false)
     {
         $this->builder->startRelatedToConditionGroup($relationship, $logic, $negate);
-        return $this;
-    }
-    
-    public function endRelatedToGroup()
-    {
-        $this->builder->endRelatedToGroup();
         return $this;
     }
     
@@ -310,42 +310,42 @@ class Proxy implements \PHPixie\ORM\Conditions\Builder
     }
     
     
-    public function relatedTo($relationship, $items)
+    public function relatedTo($relationship, $items = null)
     {
         return $this->addRelatedToCondition('and', false, $relationship, $items);
     }
     
-    public function andRelatedTo($relationship, $items)
+    public function andRelatedTo($relationship, $items = null)
     {
         return $this->addRelatedToCondition('and', false, $relationship, $items);
     }
     
-    public function orRelatedTo($relationship, $items)
+    public function orRelatedTo($relationship, $items = null)
     {
         return $this->addRelatedToCondition('or', false, $relationship, $items);
     }
     
-    public function xorRelatedTo($relationship, $items)
+    public function xorRelatedTo($relationship, $items = null)
     {
         return $this->addRelatedToCondition('xor', false, $relationship, $items);
     }
     
-    public function notRelatedTo($relationship, $items)
+    public function notRelatedTo($relationship, $items = null)
     {
         return $this->addRelatedToCondition('and', true, $relationship, $items);
     }
     
-    public function andNotRelatedTo($relationship, $items)
+    public function andNotRelatedTo($relationship, $items = null)
     {
         return $this->addRelatedToCondition('and', true, $relationship, $items);
     }
     
-    public function orNotRelatedTo($relationship, $items)
+    public function orNotRelatedTo($relationship, $items = null)
     {
         return $this->addRelatedToCondition('or', true, $relationship, $items);
     }
     
-    public function xorNotrelatedTo($relationship, $items)
+    public function xorNotrelatedTo($relationship, $items = null)
     {
         return $this->addRelatedToCondition('xor', true, $relationship, $items);
     }

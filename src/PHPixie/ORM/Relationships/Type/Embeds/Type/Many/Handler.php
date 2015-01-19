@@ -4,22 +4,26 @@ namespace PHPixie\ORM\Relationships\Type\Embeds\Type\Many;
 
 class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 {
-    protected function mapConditionBuilder($builder, $side, $colletion, $plan)
+    protected function mapConditionBuilder($builder, $side, $collection, $plan)
     {
-        $config = $side->config();
+        $path = $side->config()->path;
+        $builder->startConditionGroup($collection->logic(), $collection->isNegated());
+            
+        $builder->whereNot($path, null);
         $container = $builder->addSubarrayItemPlaceholder(
-            $config->path,
-            $colletion->logic(),
-            $colletion->isNegated()
+            $config->path
         );
-        
+
         $this->mappers->conditions()->map(
             $container,
             $config->itemModel,
-            $colletion->conditions(),
+            $collection->conditions(),
             $plan
         );
+        
+        $builder->endGroup();
     }
+    
     public function offsetSet($entity, $config, $offset, $item)
     {
         $this->assertModelName($item, $config->itemModel);

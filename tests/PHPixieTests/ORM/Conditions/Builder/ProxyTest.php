@@ -27,6 +27,7 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
     
     /**
      * @covers ::addCondition
+     * @covers ::buildCondition
      * @covers ::addOperatorCondition
      * @covers ::addPlaceholder
      * @covers ::startConditionGroup
@@ -49,8 +50,11 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
      */
     public function testShorthand()
     {
-        $this->method($this->builder, 'addCondition', null, array('and', true, array('a', 1)), 0);
-        $this->proxy->addCondition('and', true, array('a', 1));
+        $this->method($this->builder, 'addCondition', null, array('and', true, 'test'), 0);
+        $this->proxy->addCondition('and', true, 'test');
+        
+        $this->method($this->builder, 'buildCondition', null, array('and', true, array('a', 1)), 0);
+        $this->proxy->buildCondition('and', true, array('a', 1));
         
         $this->method($this->builder, 'addOperatorCondition', null, array('or', true, 'a', '>', 1), 0);
         $this->proxy->addOperatorCondition('or', true, 'a', '>', 1);
@@ -105,6 +109,7 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
     
     /**
      * @covers ::addWhereCondition
+     * @covers ::buildWhereCondition
      * @covers ::addWhereOperatorCondition
      * @covers ::addWherePlaceholder
      * @covers ::startWhereConditionGroup
@@ -128,8 +133,11 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
      */
     public function testWhere()
     {
-        $this->method($this->builder, 'addWhereCondition', null, array('or', true, array('a', 1)), 0);
-        $this->proxy->addWhereCondition('or', true, array('a', 1));
+        $this->method($this->builder, 'addWhereCondition', null, array('or', true, 'test'), 0);
+        $this->proxy->addWhereCondition('or', true, 'test');
+        
+        $this->method($this->builder, 'buildWhereCondition', null, array('and', true, array('a', 1)), 0);
+        $this->proxy->buildWhereCondition('and', true, array('a', 1));
         
         $this->method($this->builder, 'addWhereOperatorCondition', null, array('or', true, 'a', '>', 1), 0);
         $this->proxy->addWhereOperatorCondition('or', true, 'a', '>', 1);
@@ -193,7 +201,7 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
      * @covers ::startAndNotRelatedToGroup
      * @covers ::startOrNotRelatedToGroup
      * @covers ::startXorNotRelatedToGroup
-     * @covers ::endRelatedToGroup
+     * @covers ::endGroup
      */
     public function testRelatedTo()
     {
@@ -202,11 +210,11 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
         $this->method($this->builder, 'addRelatedToCondition', null, array('or', true, 'a', $items), 0);
         $this->proxy->addRelatedToCondition('or', true, 'a', $items);
         
+        $this->method($this->builder, 'addRelatedToCondition', null, array('or', true, 'a', null), 0);
+        $this->proxy->addRelatedToCondition('or', true, 'a');
+        
         $this->method($this->builder, 'startRelatedToConditionGroup', null, array('a', 'or', true), 0);
         $this->proxy->startRelatedToConditionGroup('a', 'or', true);
-        
-        $this->method($this->builder, 'endRelatedToGroup', null, array(), 0);
-        $this->proxy->endRelatedToGroup();
         
         foreach(array('and', 'or', 'xor') as $logic) {
             foreach(array(true, false) as $negated) {
@@ -217,6 +225,9 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
                 
                 $this->method($this->builder, 'addRelatedToCondition', null, array($logic, $negated, 'a', $items), 0);
                 $this->proxy->$method('a', $items);
+                
+                $this->method($this->builder, 'addRelatedToCondition', null, array($logic, $negated, 'a', null), 0);
+                $this->proxy->$method('a');
                 
                 $method = 'start'.ucfirst($method).'Group';
                 $this->method($this->builder, 'startRelatedToConditionGroup', null, array('a', $logic, $negated), 0);

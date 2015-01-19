@@ -17,21 +17,6 @@ class EntityTest extends \PHPixieTests\ORM\Models\Model\Implementation\EntityTes
     
     }
     
-    protected function getData()
-    {
-        return $this->quickMock('\PHPixie\ORM\Data\Types\Document');
-    }
-    
-    protected function getConfig()
-    {
-        return $this->quickMock('\PHPixie\ORM\Model\Type\Embedded\Config');
-    }
-    
-    protected function entity()
-    {
-        return new \PHPixie\ORM\Models\Type\Embedded\Implementation\Entity($this->relationshipMap, $this->config, $this->data);
-    }
-    
     /**
      * @covers ::setOwnerRelationship
      * @covers ::owner
@@ -60,5 +45,24 @@ class EntityTest extends \PHPixieTests\ORM\Models\Model\Implementation\EntityTes
     protected function getEntity()
     {
         return $this->abstractMock('\PHPixie\ORM\Models\Type\Embedded\Entity');   
+    }
+    
+    protected function getData()
+    {
+        return $this->quickMock('\PHPixie\ORM\Data\Types\Document');
+    }
+    
+    protected function getConfig()
+    {
+        return $this->quickMock('\PHPixie\ORM\Models\Type\Embedded\Config');
+    }
+    
+    protected function entity()
+    {
+        return new \PHPixie\ORM\Models\Type\Embedded\Implementation\Entity(
+            $this->entityMap,
+            $this->config,
+            $this->data
+        );
     }
 }

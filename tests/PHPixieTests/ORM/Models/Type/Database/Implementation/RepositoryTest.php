@@ -3,25 +3,27 @@
 namespace PHPixieTests\ORM\Models\Type\Database\Implementation;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Model\Type\Database\Implementation\Repository
+ * @coversDefaultClass \PHPixie\ORM\Models\Type\Database\Implementation\Repository
  */
 abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $models;
+    protected $databaseModel;
     protected $database;
-    protected $configData = array(
-        'idField' => 'fairy_id',
-        'connection' => 'test',
-        'modelName'  => 'fairy'
-    );
     protected $config;
     
     protected $repository;
+    
+    protected $configData = array(
+        'idField' => 'fairy_id',
+        'connection' => 'test',
+        'model'  => 'fairy'
+    );
+
     protected $loadData;
     
     public function setUp()
     {
-        $this->models = $this->quickMock('\PHPixie\ORM\Models');
+        $this->databaseModel = $this->quickMock('\PHPixie\ORM\Models\Type\Database');
         $this->database = $this->quickMock('\PHPixie\ORM\Database');
         $this->config = $this->config();
         $this->loadData = new \stdClass;
@@ -31,7 +33,7 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
     
     /**
      * @covers ::__construct
-     * @covers PHPixie\ORM\Models\Implementation\Repository::__construct
+     * @covers PHPixie\ORM\Models\Type\Database\Implementation\Repository::__construct
      * @covers ::<protected>
      */
     public function testConstruct()
@@ -45,7 +47,16 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
      */
     public function testModelName()
     {
-        $this->assertEquals($this->configData['modelName'], $this->repository->modelName());
+        $this->assertEquals($this->configData['model'], $this->repository->modelName());
+    }
+    
+    /**
+     * @covers ::config
+     * @covers ::<protected>
+     */
+    public function testConfig()
+    {
+        $this->assertEquals($this->config, $this->repository->config());
     }
     
     
@@ -57,6 +68,16 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
     {
         $connection = $this->prepareConnection();
         $this->assertSame($connection, $this->repository->connection());
+    }
+    
+    /**
+     * @covers ::load
+     * @covers ::<protected>
+     */
+    public function testLoad()
+    {
+        $entity = $this->prepareEntity(false, $this->loadData);
+        $this->assertSame($entity, $this->repository->load($this->loadData));
     }
     
     /**
@@ -126,7 +147,7 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
     protected function prepareQuery($modelsOffset = 0)
     {
         $query = $this->getQuery();
-        $this->method($this->models, 'query', $query, array($this->configData['modelName']), $modelsOffset);
+        $this->method($this->databaseModel, 'query', $query, array($this->configData['model']), $modelsOffset);
         return $query;
     }
     
@@ -134,7 +155,7 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
     {
         $entity = $this->getEntity();
         $data = $this->prepareBuildData($data);
-        $this->method($this->models, 'entity', $entity, array($this->modelName, $isNew, $data), $modelsOffset);
+        $this->method($this->databaseModel, 'entity', $entity, array($this->configData['model'], $isNew, $data), $modelsOffset);
         return $entity;
     }
     
@@ -224,5 +245,6 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
     abstract protected function getConnection();
     abstract protected function getDatabaseQuery($type);
     abstract protected function prepareSetQuerySource($query);
+    abstract protected function getConfig();
     
 }

@@ -13,6 +13,7 @@
             <directory>./tests/PHPixieTests/ORM/Maps</directory>
             <directory>./tests/PHPixieTests/ORM/Wrappers</directory>
             <directory>./tests/PHPixieTests/ORM/Values</directory>
+            <file>./tests/PHPixieTests/ORM/Conditions</file>
             
             <file>./tests/PHPixieTests/ORM/StepsTest.php</file>
             <file>./tests/PHPixieTests/ORM/LoadersTest.php</file>
@@ -26,7 +27,7 @@
             <file>./tests/PHPixieTests/ORM/ModelsTest.php</file>
             <file>./tests/PHPixieTests/ORM/RepositoriesTest.php</file>
             <file>./tests/PHPixieTests/ORM/RelationshipsTest.php</file>
-            <file>./tests/PHPixieTests/ORM/MapsTest.php</file>
+            <file>./tests/PHPixieTests/ORM/ConditionsTest.php</file>
         </testsuite>
     </testsuites>
     <filter>

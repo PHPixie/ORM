@@ -4,18 +4,18 @@ namespace PHPixie\ORM\Models\Model\Implementation;
 
 abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
 {
-    protected $relationshipMap;
+    protected $entityMap;
     protected $data;
     protected $config;
     protected $relationshipProperties;
 
-    public function __construct($relationshipMap, $config, $data)
+    public function __construct($entityMap, $config, $data)
     {
-        $this->relationshipMap = $relationshipMap;
+        $this->entityMap = $entityMap;
         $this->config = $config;
         $this->data = $data;
         
-        $propertyNames = $this->relationshipMap->entityPropertyNames($this->modelName());
+        $propertyNames = $this->entityMap->getPropertyNames($this->modelName());
         $this->relationshipProperties = array_fill_keys($propertyNames, null);
     }
     
@@ -54,7 +54,7 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
         $property = $this->relationshipProperties[$name];
         
         if($property === null && $createMissing) {
-            $property = $this->relationshipMap->entityProperty($this, $name);
+            $property = $this->entityMap->property($this, $name);
             $this->relationshipProperties[$name] = $property;
         }
         

@@ -37,11 +37,11 @@ class EmbeddedTest extends \PHPixieTests\ORM\Models\ModelTest
     {
         $this->model = new \PHPixie\ORM\Models\Type\Embedded(
             $this->models,
-            $this->config,
-            $this->relationships
+            $this->configs,
+            $this->maps
         );
         $this->method($this->wrappers, 'embeddedEntities', array(), array(), 0);
-        $this->method($this->relationshipMap, 'entityPropertyNames', array(), array('fairy'), 0);
+        $this->method($this->mapMocks['entity'], 'getPropertyNames', array(), array('fairy'), 0);
         
         $data = $this->getData();
         $this->prepareConfigSlice('fairy', $this->type);
@@ -53,7 +53,7 @@ class EmbeddedTest extends \PHPixieTests\ORM\Models\ModelTest
         $this->assertSame('fairy', $config->model);
         
         $this->assertInstanceOf('\PHPixie\ORM\Models\Type\Embedded\Implementation\Entity', $entity);
-        $this->assertAttributeEquals($this->relationshipMap, 'relationshipMap', $entity);
+        $this->assertAttributeEquals($this->mapMocks['entity'], 'entityMap', $entity);
         $this->assertAttributeEquals($config, 'config', $entity);
         $this->assertAttributeEquals($data, 'data', $entity);
     }
@@ -100,7 +100,7 @@ class EmbeddedTest extends \PHPixieTests\ORM\Models\ModelTest
         return $this->getMock(
             '\PHPixie\ORM\Models\Type\Embedded',
             array('buildConfig', 'buildEntity'),
-            array($this->models, $this->config, $this->relationships)
+            array($this->models, $this->configs, $this->maps)
         );
     }
 }

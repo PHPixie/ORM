@@ -9,12 +9,13 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
 {
     protected $models;
     protected $configs;
-    protected $relationships;
+    protected $maps;
     
     protected $model;
 
+    protected $mapMocks = array();
+    
     protected $inflector;
-    protected $relationshipMap;
     protected $wrappers;
     
     protected $type;
@@ -23,13 +24,17 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
     {
         $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->configs = $this->quickMock('\PHPixie\ORM\Configs');
-        $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
+        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
+        
+        $this->mapMocks['entity'] = $this->quickMock('\PHPixie\ORM\Maps\Map\Entity');
+        $this->mapMocks['query'] = $this->quickMock('\PHPixie\ORM\Maps\Map\Query');
+        
+        foreach($this->mapMocks as $type => $mock) {
+            $this->method($this->maps, $type, $this->mapMocks[$type], array());
+        }
         
         $this->inflector = $this->quickMock('\PHPixie\ORM\Configs\Inflector');
-        $this->method($this->config, 'inflector', $this->inflector, array());
-        
-        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
-        $this->method($this->relationships, 'map', $this->relationshipMap, array());
+        $this->method($this->configs, 'inflector', $this->inflector, array());
         
         $this->wrappers = $this->abstractMock('\PHPixie\ORM\Wrappers');
         $this->method($this->models, 'wrappers', $this->wrappers, array());

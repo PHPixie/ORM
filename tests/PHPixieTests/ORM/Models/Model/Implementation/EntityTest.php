@@ -7,21 +7,21 @@ namespace PHPixieTests\ORM\Models\Model\Implementation;
  */
 abstract class EntityTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $relationshipMap;
+    protected $entityMap;
     protected $config;
     protected $data;
     
     protected $entity;
     
     protected $configData = array(
-        'modelName' => 'fairy'
+        'model' => 'fairy'
     );
     
     protected $propertyNames = array();
     
     public function setUp()
     {
-        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
+        $this->entityMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Entity');
         $this->config = $this->config();
         $this->data = $this->getData();
         
@@ -29,7 +29,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
             $this->propertyNames[] = 'test'.$i;
         }
         
-        $this->method($this->relationshipMap, 'entityPropertyNames', $this->propertyNames, array($this->configData['modelName']));
+        $this->method($this->entityMap, 'getPropertyNames', $this->propertyNames, array($this->configData['model']));
         $this->entity = $this->entity();
     }
     
@@ -48,7 +48,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
      */
     public function testModelName()
     {
-        $this->assertSame($this->configData['modelName'], $this->entity->modelName());
+        $this->assertSame($this->configData['model'], $this->entity->modelName());
     }
     
     /**
@@ -201,7 +201,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
         
         $this->method($property, 'isLoaded', $isLoaded, array());
         
-        $this->method($this->relationshipMap, 'entityProperty', $property, array($this->entity, $name), $at, true);
+        $this->method($this->entityMap, 'property', $property, array($this->entity, $name), $at, true);
         return $property;
     }
     

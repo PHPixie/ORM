@@ -95,7 +95,7 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
         $this->method($driver, 'query', $query, array(
             $this->values,
             $this->queryMapper,
-            $this->relationshipMap,
+            $this->mapMocks['query'],
             $container,
             $config
         ), 0);
@@ -119,7 +119,7 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
         
         $entity  = $this->getEntity();
         $this->method($driver, 'entity', $entity, array(
-            $this->relationshipMap,
+            $this->mapMocks['entity'],
             $repository,
             $data,
             $isNew
@@ -225,8 +225,8 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
     {
         return new \PHPixie\ORM\Models\Type\Database(
             $this->models,
-            $this->config,
-            $this->relationships,
+            $this->configs,
+            $this->maps,
             $this->database,
             $this->drivers,
             $this->conditions,

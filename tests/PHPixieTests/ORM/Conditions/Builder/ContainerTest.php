@@ -67,6 +67,7 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
     }
     
     /**
+     * @covers ::buildWhereCondition
      * @covers ::addWhereCondition
      * @covers ::addWhereOperatorCondition
      * @covers ::addWherePlaceholder
@@ -93,11 +94,15 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
     {
         $expected = array();
         
-        $this->container->addWhereCondition('or', true, array('a', 1));
-        $expected[] = array('or', true, 'a', '>', 1);
+        $this->container->buildWhereCondition('or', true, array('a', 1));
+        $expected[] = array('or', true, 'a', '=', array(1));
         
-        $this->container->addWhereOperatorCondition('or', true, 'a', '>', 1);
-        $expected[] = array('or', true, 'a', '>', 1);
+        $condition = $this->conditions->operator('a', '>', array(2));
+        $this->container->addWhereCondition('or', true, $condition);
+        $expected[] = array('or', true, 'a', '>', array(2));
+        
+        $this->container->addWhereOperatorCondition('or', true, 'a', '>', array(1));
+        $expected[] = array('or', true, 'a', '>', array(1));
         
         $this->container->startWhereConditionGroup('or', true);
         $this->container->endWhereGroup();
@@ -114,7 +119,7 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
                     $method.='Not';
                 
                 $this->container->$method('a', 1);
-                $expected[] = array($logic, $negated, 'a', '=', 1);
+                $expected[] = array($logic, $negated, 'a', '=', array(1));
                 
                 $method = 'start'.ucfirst($method).'Group';
                 $this->container->$method();
@@ -129,7 +134,7 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
                 $method.='Not';
             
             $this->container->$method('a', 1);
-            $expected[] = array('and', $negated, 'a', '=', 1);
+            $expected[] = array('and', $negated, 'a', '=', array(1));
             
             $method = 'start'.ucfirst($method).'Group';
             $this->container->$method();
@@ -159,7 +164,6 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
      * @covers ::startAndNotRelatedToGroup
      * @covers ::startOrNotRelatedToGroup
      * @covers ::startXorNotRelatedToGroup
-     * @covers ::endRelatedToGroup
      */
     public function testRelatedTo()
     {
@@ -171,8 +175,13 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
             array('and', false, $items)
         ));
         
+        $this->container->addRelatedToCondition('or', true, 'a');
+        $expected[] = array('or', true, 'a', array(
+            
+        ));
+        
         $this->container->startRelatedToConditionGroup('a', 'or', true);
-        $this->container->endRelatedToGroup();
+        $this->container->endGroup();
         $expected[] = array('or', true, 'a', array());
         
         foreach(array('and', 'or', 'xor') as $logic) {
@@ -190,7 +199,7 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
                 
                 $method = 'start'.ucfirst($method).'Group';
                 $this->container->$method('a');
-                $this->container->endRelatedToGroup();
+                $this->container->endGroup();
                 $expected[] = array($logic, $negated, 'a', array());
             }
         }
@@ -209,12 +218,12 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
                 $c->_and('b', 1);
             });
             $expected[] = array('and', $negated, 'a', array(
-                array('and', false, 'b', '=', 1)
+                array('and', false, 'b', '=', array(1))
             ));
             
             $method = 'start'.ucfirst($method).'Group';
             $this->container->$method('a');
-            $this->container->endRelatedToGroup();
+            $this->container->endGroup();
             $expected[] = array('and', $negated, 'a', array());
         }
         
@@ -269,11 +278,11 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
     
     protected function assertCondition($condition, $expected)
     {
-        if($condition instanceof \PHPixie\ORM\Conditions\Condition\Group\Relationship) {
+        if($condition instanceof \PHPixie\ORM\Conditions\Condition\Collection\RelatedTo\Group) {
             $this->assertEquals($expected[2], $condition->relationship());
             $this->assertConditionArray($condition->conditions(), $expected[3]);
             
-        }elseif($condition instanceof \PHPixie\ORM\Conditions\Condition\Collection){
+        }elseif($condition instanceof \PHPixie\ORM\Conditions\Condition\In){
             $this->assertEquals($expected[2], $condition->items());
             
         }else{

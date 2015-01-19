@@ -7,7 +7,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
 {
     protected $values;
     protected $mapper;
-    protected $relationshipMap;
+    protected $queryMap;
     protected $container;
     protected $config;
     
@@ -18,14 +18,14 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     
     protected $orderBy = array();
 
-    public function __construct($values, $mapper, $relationshipMap, $container, $config)
+    public function __construct($values, $mapper, $queryMap, $container, $config)
     {
         parent::__construct($container);
         
         $this->container        = $container;
         $this->values           = $values;
         $this->mapper           = $mapper;
-        $this->relationshipMap  = $relationshipMap;
+        $this->queryMap         = $queryMap;
         $this->config           = $config;
     }
     
@@ -179,11 +179,15 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     {
         return $this->mapper->mapCount($this);
     }
+    
+    
+    public function getUpdateBuilder(){}
+    public function planUpdateBuilder($b){}
 
     public function getRelationshipProperty($name)
     {
         if(!array_key_exists($name, $this->relationshipProperties)) {
-            $property = $this->relationshipMap->queryProperty($this, $name);
+            $property = $this->queryMap->property($this, $name);
             $this->relationshipProperties[$name] = $property;
         }
         

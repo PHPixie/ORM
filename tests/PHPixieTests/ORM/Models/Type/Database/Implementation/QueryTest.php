@@ -9,11 +9,11 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
 {
     protected $values;
     protected $queryMapper;
-    protected $relationshipMap;
+    protected $queryMap;
     protected $config;
     
     protected $configData = array(
-        'modelName' => 'fairies'
+        'model' => 'fairies'
     );
     
     protected $container;
@@ -23,7 +23,7 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     {
         $this->values = $this->quickMock('\PHPixie\ORM\Values');
         $this->queryMapper = $this->quickMock('\PHPixie\ORM\Mappers\Query');
-        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
+        $this->queryMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Query');
         $this->config = $this->config();
         
         parent::setUp();
@@ -48,7 +48,7 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
      */
     public function testModelName()
     {
-        $this->assertSame($this->configData['modelName'], $this->query->modelName());
+        $this->assertSame($this->configData['model'], $this->query->modelName());
     }
     
     /**
@@ -373,7 +373,7 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     protected function prepareProperty($name, $at = 0)
     {
         $property = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Query');
-        $this->method($this->relationshipMap, 'queryProperty', $property, array($this->query, $name), $at, true);
+        $this->method($this->queryMap, 'property', $property, array($this->query, $name), $at, true);
         return $property;
     }
     

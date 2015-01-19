@@ -11,28 +11,17 @@ class In extends \PHPixie\ORM\Planners\Planner
         $this->steps = $steps;
     }
     
-    public function items($query, $queryField, $modelName, $items, $itemsField, $plan, $logic = 'and', $negate = false)
+    public function in($query, $queryField, $modelQuery, $queryField, $plan, $logic = 'and', $negate = false)
     {
-        $this->checkItems($modelName, $items);
-        $query->startWhereGroup($logic, $negate);
-        $ids = $collection->modelField($collectionField);
-        if (!empty($ids))
-            $query->where($queryField, 'in', $ids);
-
-        $collectionQueries = $collection->queries();
-        if (!empty($collectionQueries)) {
-            $strategy = $this->selectStrategy($query->connection(), $collection->connection());
-            foreach ($collectionQueries as $collectionQuery) {
-                $subplan = $collectionQuery->planFind();
-                $plan->appendPlan($subplan->requiredPlan());
-                $subquery = $subplan->queryStep()->query();
-                $strategy->in($query, $queryField, $subquery, $collectionField, $plan, 'or', false);
-            }
-        }
-
-        $query->endWhereGroup();
+        $queryPlan = $modelQuery->planFind();
+        $plan->appendPlan($queryPlan->preloadPlan());
+        $resultStep = $queryPlan->queryStep();
+        $plan->add($resultStep);
+        
+        $this->result($query, $queryField, $resultStep, $queryField, $plan, $logic, $negate);
+        
     }
-
+    
     public function result($query, $queryField, $resultStep, $resultField, $plan, $logic = 'and', $negate = false)
     {
         $placeholder = $query->getWhereBuilder()->addPlaceholder($logic, $negate);
@@ -44,11 +33,6 @@ class In extends \PHPixie\ORM\Planners\Planner
     {
         $strategy = $this->selectStrategy($query->connection(), $subquery->connection());
         $strategy->in($query, $queryField, $subquery, $subqueryField, $plan, $logic, $negate);
-    }
-    
-    protected function checkItems($modelName, $items)
-    {
-    
     }
     
     protected function selectStrategy($queryConnection, $subqueryConnection)

@@ -12,7 +12,7 @@ class InTest extends \PHPixieTests\ORM\Conditions\Condition\ImplementationTest
     public function setUp()
     {
         for($i=0; $i<3; $i++) {
-            $this->items[] = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
+            $this->items[] = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In', array());
         }
         
         parent::setUp();

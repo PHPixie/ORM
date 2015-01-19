@@ -7,7 +7,8 @@ interface Builder extends \PHPixie\Database\Conditions\Builder
     public function addWhereOperatorCondition($logic, $negate, $field, $operator, $values);
     public function addWherePlaceholder($logic = 'and', $negate = false, $allowEmpty = true);
     public function startWhereConditionGroup($logic = 'and', $negate = false);
-    public function addWhereCondition($logic, $negate, $args);
+    public function addWhereCondition($logic, $negate, $condition);
+    public function buildWhereCondition($logic, $negate, $args);
     
     public function where();
     public function andWhere();
@@ -28,7 +29,7 @@ interface Builder extends \PHPixie\Database\Conditions\Builder
     public function endWhereGroup();
     
     
-    public function addInCondition($logic, $negate, $items, $relationship = null);
+    public function addInCondition($logic, $negate, $items);
     
     public function in($items);
     public function andIn($items);
@@ -40,17 +41,17 @@ interface Builder extends \PHPixie\Database\Conditions\Builder
     public function xorNotIn($items);
     
     
-    public function addRelatedToCondition($logic, $negate, $relationship, $items);
+    public function addRelatedToCondition($logic, $negate, $relationship, $condition = null);
     public function startRelatedToConditionGroup($relationship, $logic = 'and', $negate = false);
     
-    public function relatedTo($relationship, $items);
-    public function andRelatedTo($relationship, $items);
-    public function orRelatedTo($relationship, $items);
-    public function xorRelatedTo($relationship, $items);
-    public function notRelatedTo($relationship, $items);
-    public function andNotRelatedTo($relationship, $items);
-    public function orNotRelatedTo($relationship, $items);
-    public function xorNotRelatedTo($relationship, $items);
+    public function relatedTo($relationship, $items = null);
+    public function andRelatedTo($relationship, $items = null);
+    public function orRelatedTo($relationship, $items = null);
+    public function xorRelatedTo($relationship, $items = null);
+    public function notRelatedTo($relationship, $items = null);
+    public function andNotRelatedTo($relationship, $items = null);
+    public function orNotRelatedTo($relationship, $items = null);
+    public function xorNotRelatedTo($relationship, $items = null);
     
     public function startRelatedToGroup($relationship);
     public function startAndRelatedToGroup($relationship);
@@ -60,5 +61,4 @@ interface Builder extends \PHPixie\Database\Conditions\Builder
     public function startAndNotRelatedToGroup($relationship);
     public function startOrNotRelatedToGroup($relationship);
     public function startXorNotRelatedToGroup($relationship);
-    public function endRelatedToGroup();
 }

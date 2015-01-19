@@ -8,7 +8,7 @@ class Embedded extends \PHPixie\ORM\Models\Model
     protected function buildConfig($modelName, $configSlice)
     {
         return new \PHPixie\ORM\Models\Type\Embedded\Config(
-            $this->config->inflector(),
+            $this->configs->inflector(),
             $modelName,
             $configSlice
         );
@@ -17,7 +17,6 @@ class Embedded extends \PHPixie\ORM\Models\Model
     public function entity($modelName, $data)
     {
         $config = $this->config($modelName);
-        $data = $this->data->document($document);
         
         $entity = $this->buildEntity($config, $data);
         
@@ -41,7 +40,7 @@ class Embedded extends \PHPixie\ORM\Models\Model
     protected function buildEntity($config, $data)
     {
         return new \PHPixie\ORM\Models\Type\Embedded\Implementation\Entity(
-            $this->relationships->map(),
+            $this->maps->entity(),
             $config,
             $data
         );

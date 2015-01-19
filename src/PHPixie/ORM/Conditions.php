@@ -6,7 +6,8 @@ class Conditions
 {
     public function placeholder($defaultOperator = '=', $allowEmpty = true)
     {
-        return new \PHPixie\ORM\Conditions\Condition\Collection\Placeholder($this, $defaultOperator, $allowEmpty);
+        $container = $this->container($defaultOperator);
+        return new \PHPixie\ORM\Conditions\Condition\Collection\Placeholder($container, $allowEmpty);
     }
 
     public function operator($field, $operator, $values)
@@ -19,14 +20,14 @@ class Conditions
         return new \PHPixie\ORM\Conditions\Condition\Collection\Group();
     }
 
-    public function relationshipGroup($relationship)
+    public function relatedToGroup($relationship)
     {
-        return new \PHPixie\ORM\Conditions\Condition\Collection\Group\Relationship($relationship);
+        return new \PHPixie\ORM\Conditions\Condition\Collection\RelatedTo\Group($relationship);
     }
 
-    public function in($collectionItems)
+    public function in($items)
     {
-        return new \PHPixie\ORM\Conditions\Condition\In($collectionItems);
+        return new \PHPixie\ORM\Conditions\Condition\In($items);
     }
     
     public function container($defaultOperator = '=')

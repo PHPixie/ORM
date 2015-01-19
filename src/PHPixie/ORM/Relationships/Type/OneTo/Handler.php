@@ -55,8 +55,8 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         if($queryField === null)
             $queryField = $idField;
         
-        $collection = $this->planners->collection($repository->modelName(), $items);
-        $this->planners->in()->collection($query, $queryField, $collection, $idField, $plan, $logic);
+        $query = $repository->query()->in($items);
+        $this->planners->in()->databaseModelQuery($query, $queryField, $query, $idField, $plan, $logic);
     }
 
     protected function getUnlinkPlan($config, $constrainOwners, $owners, $constrainItems, $items, $logic = 'and')

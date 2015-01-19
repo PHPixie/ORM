@@ -4,22 +4,26 @@ namespace PHPixie\ORM\Relationships\Type\Embeds\Type\One;
 
 class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 {
-    protected function mapConditionBuilder($builder, $side, $colletion, $plan)
+    protected function mapConditionBuilder($builder, $side, $collection, $plan)
     {
-        $config = $side->config();
+        $path = $side->config()->path;
+        $builder->startConditionGroup($collection->logic(), $collection->isNegated());
+            
+        $builder->whereNot($path, null);
         $container = $builder->addSubdocumentPlaceholder(
-            $config->path,
-            $colletion->logic(),
-            $colletion->isNegated()
+            $config->path
         );
-        
+
         $this->mappers->conditions()->map(
             $container,
             $config->itemModel,
-            $colletion->conditions(),
+            $collection->conditions(),
             $plan
         );
+        
+        $builder->endGroup();
     }
+
 
     public function loadProperty($config, $owner)
     {

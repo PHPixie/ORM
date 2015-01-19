@@ -7,16 +7,9 @@ namespace PHPixieTests\ORM\Drivers\Driver\PDO;
  */
 class RepositoryTest extends \PHPixieTests\ORM\Drivers\Driver\SQL\RepositoryTest
 {
-    protected function repository()
+    protected function getConfig()
     {
-        return new \PHPixie\ORM\Drivers\Driver\PDO\Repository(
-            $this->models,
-            $this->database,
-            $this->dataBuilder,
-            $this->inflector,
-            $this->modelName,
-            $this->config
-        );
+        return $this->quickMock('\PHPixie\ORM\Drivers\Driver\PDO\Config');
     }
     
     protected function getConnection()
@@ -37,5 +30,15 @@ class RepositoryTest extends \PHPixieTests\ORM\Drivers\Driver\SQL\RepositoryTest
     protected function getEntity()
     {
         return $this->quickMock('\PHPixie\ORM\Drivers\Driver\PDO\Entity');
+    }
+    
+    protected function repository()
+    {
+        return new \PHPixie\ORM\Drivers\Driver\PDO\Repository(
+            $this->databaseModel,
+            $this->database,
+            $this->dataBuilder,
+            $this->config
+        );
     }
 }

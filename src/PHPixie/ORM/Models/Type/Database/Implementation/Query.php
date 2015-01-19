@@ -31,7 +31,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     
     public function modelName()
     {
-        return $this->config->modelName;
+        return $this->config->model;
     }
     
     public function limit($limit)

@@ -8,9 +8,9 @@ abstract class Config extends \PHPixie\ORM\Models\Model\Config
     public $connection;
     public $driver;
 
-    public function __construct($inflector, $modelName, $configSlice, $driverName)
+    public function __construct($inflector, $modelName, $configSlice)
     {
-        $this->driver = $driverName;
+        $this->driver = $this->driver();
         parent::__construct($inflector, $modelName, $configSlice);
     }
     
@@ -26,4 +26,5 @@ abstract class Config extends \PHPixie\ORM\Models\Model\Config
     }
     
     abstract protected function defaultIdField();
+    abstract protected function driver();
 }

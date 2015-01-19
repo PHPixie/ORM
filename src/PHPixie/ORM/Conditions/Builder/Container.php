@@ -21,6 +21,7 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
 
         $condition = $this->conditions->operator($field, $operator, $values);
         $this->addToRelationship($logic, $negate, $condition, $relationship);
+        return $this;
     }
     
     public function startRelatedToConditionGroup($relationship, $logic = 'and', $negate = false)

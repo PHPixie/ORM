@@ -71,7 +71,7 @@ class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementati
     protected function repository()
     {
         return new \PHPixie\ORM\Drivers\Driver\Mongo\Repository(
-            $this->models,
+            $this->databaseModel,
             $this->database,
             $this->dataBuilder,
             $this->config

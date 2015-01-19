@@ -9,9 +9,9 @@ abstract class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
     protected $isDeleted = false;
     protected $isNew;
 
-    public function __construct($relationshipMap, $repository, $data, $isNew = false)
+    public function __construct($entityMap, $repository, $data, $isNew = false)
     {
-        parent::__construct($relationshipMap, $repository->config(), $data);
+        parent::__construct($entityMap, $repository->config(), $data);
         $this->repository = $repository;
         $this->isNew = $isNew;
     }

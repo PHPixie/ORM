@@ -22,7 +22,7 @@ class QueryTest extends \PHPixieTests\ORM\Drivers\Driver\SQL\QueryTest
         return new \PHPixie\ORM\Drivers\Driver\PDO\Query(
             $this->values,
             $this->queryMapper,
-            $this->relationshipMap,
+            $this->queryMap,
             $this->builder,
             $this->config
         );
@@ -33,7 +33,7 @@ class QueryTest extends \PHPixieTests\ORM\Drivers\Driver\SQL\QueryTest
         return $this->getMock('\PHPixie\ORM\Drivers\Driver\PDO\Query', $methods, array(
             $this->values,
             $this->queryMapper,
-            $this->relationshipMap,
+            $this->queryMap,
             $this->builder,
             $this->config
         ));

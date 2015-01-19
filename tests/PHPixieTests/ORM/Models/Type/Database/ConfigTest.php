@@ -8,6 +8,7 @@ namespace PHPixieTests\ORM\Models\Type\Database;
 abstract class ConfigTest extends \PHPixieTests\ORM\Models\Model\ConfigTest
 {
     protected $type = 'database';
+    protected $driver;
     protected $defaultIdField;
     
     public function setUp()
@@ -19,6 +20,7 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Models\Model\ConfigTest
             array(
                 'idField'    => $this->defaultIdField,
                 'connection' => 'default',
+                'driver'     => $this->driver
             )
         );
         
@@ -30,6 +32,7 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Models\Model\ConfigTest
             array(
                 'idField'    => 'fairy_id',
                 'connection' => 'test',
+                'driver'     => $this->driver
             )
         );
         

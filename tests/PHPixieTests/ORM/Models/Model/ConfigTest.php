@@ -8,7 +8,7 @@ namespace PHPixieTests\ORM\Models\Model;
 abstract class ConfigTest extends \PHPixieTests\ORM\Configs\ConfigTest
 {
     protected $type;
-    protected $modelName = 'fairy';
+    protected $model = 'fairy';
     
     public function setUp()
     {
@@ -18,7 +18,7 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Configs\ConfigTest
             )),
             array(
                 'type'       => $this->type,
-                'modelName'  => $this->modelName,
+                'model'  => $this->model,
             )
         );
         parent::setUp();

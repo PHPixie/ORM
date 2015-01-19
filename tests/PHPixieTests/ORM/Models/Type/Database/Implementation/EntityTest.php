@@ -124,6 +124,14 @@ abstract class EntityTest extends \PHPixieTests\ORM\Models\Model\Implementation\
         );
     }
     
+    protected function config()
+    {
+        $config = parent::config();
+        $this->method($this->repository, 'config', $config, array());
+        
+        return $config;
+    }
+    
     abstract protected function getRepository();
     abstract protected function buildEntity($isNew = false);
 }

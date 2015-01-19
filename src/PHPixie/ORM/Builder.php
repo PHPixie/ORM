@@ -33,6 +33,8 @@ class Builder
 
         return $this->inflector;
     }
+    
+    public function maps(){}
 
     protected function buildInflector()
     {

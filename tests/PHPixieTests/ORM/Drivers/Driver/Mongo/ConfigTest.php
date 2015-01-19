@@ -11,6 +11,7 @@ class ConfigTest extends \PHPixieTests\ORM\Models\Type\Database\ConfigTest
     protected $plural = array(
         'fairy' => 'fairies'
     );
+    protected $driver = 'mongo';
     
     public function setUp()
     {
@@ -49,6 +50,6 @@ class ConfigTest extends \PHPixieTests\ORM\Models\Type\Database\ConfigTest
     
     protected function getConfig($slice)
     {
-        return new \PHPixie\ORM\Drivers\Driver\Mongo\Config($this->inflector, $slice, $this->modelName);
+        return new \PHPixie\ORM\Drivers\Driver\Mongo\Config($this->inflector, $this->model, $slice);
     }
 }

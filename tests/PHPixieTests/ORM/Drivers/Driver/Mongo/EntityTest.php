@@ -31,9 +31,9 @@ class EntityTest extends \PHPixieTests\ORM\Models\Type\Database\Implementation\E
     {
         $class = '\PHPixie\ORM\Drivers\Driver\Mongo\Entity';
         if($isNew) {
-            return new $class($this->relationshipMap, $this->repository, $this->config, $this->data, true);
+            return new $class($this->entityMap, $this->repository, $this->data, true);
         }else{
-            return new $class($this->relationshipMap, $this->repository, $this->config, $this->data);
+            return new $class($this->entityMap, $this->repository, $this->data);
         }
     }
 }

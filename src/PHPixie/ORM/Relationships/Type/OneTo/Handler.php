@@ -30,12 +30,12 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         $ownerRepository = $this->getRepository($config->ownerModel);
         $ownerQuery = $ownerRepository->databaseSelectQuery();
         
-        $this->addCollectionCondition($ownerQuery, $ownerRepository, $owner, $plan);
+        $this->planItemsSubquery($ownerQuery, $ownerRepository, $owner, $plan);
 
         $itemRepository = $this->getRepository($config->itemModel);
         $updateQuery = $itemRepository->databaseUpdateQuery();
         
-        $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
+        $this->planItemsSubquery($updateQuery, $itemRepository, $items, $plan);
 
         $this->planners->update()->subquery(
             $updateQuery,
@@ -49,14 +49,14 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         return $plan;
     }
 
-    protected function addCollectionCondition($query, $repository, $items, $plan, $queryField = null, $logic = 'and')
+    protected function planItemsSubquery($query, $repository, $items, $plan, $queryField = null, $logic = 'and')
     {
         $idField = $this->getIdField($repository);
         if($queryField === null)
             $queryField = $idField;
         
-        $query = $repository->query()->in($items);
-        $this->planners->in()->databaseModelQuery($query, $queryField, $query, $idField, $plan, $logic);
+        $itemsQuery = $repository->query()->in($items);
+        $this->planners->in()->databaseModelQuery($query, $queryField, $itemsQuery, $idField, $plan, $logic);
     }
 
     protected function getUnlinkPlan($config, $constrainOwners, $owners, $constrainItems, $items, $logic = 'and')
@@ -68,11 +68,11 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         $updateQuery->set($config->ownerKey, null);
 
         if ($constrainItems)
-            $this->addCollectionCondition($updateQuery, $itemRepository, $items, $plan);
+            $this->planItemsSubquery($updateQuery, $itemRepository, $items, $plan);
 
         if ($constrainOwners) {
             $ownerRepository = $this->getRepository($config->ownerModel);
-            $this->addCollectionCondition($updateQuery, $ownerRepository, $owners, $plan, $config->ownerKey, $logic);
+            $this->planItemsSubquery($updateQuery, $ownerRepository, $owners, $plan, $config->ownerKey, $logic);
         }
 
 

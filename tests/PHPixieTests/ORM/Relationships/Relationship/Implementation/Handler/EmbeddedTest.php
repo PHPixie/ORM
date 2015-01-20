@@ -54,7 +54,7 @@ abstract class EmbeddedTest extends \PHPixieTests\ORM\Relationships\Relationship
     
     protected function getDocumentConditionContainer()
     {
-        return $this->abstractMock('\PHPixie\Database\Type\Document\Conditions\Builder\Container');
+        return $this->quickMock('\PHPixie\Database\Type\Document\Conditions\Builder\Container');
     }
     
     

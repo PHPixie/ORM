@@ -33,7 +33,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         $this->prepareRepositories();
         
         $plan = $this->prepareUnlinkTest(true, $owner, true, $items, 'or');
-        $linkPlan = $this->prepareLinkPlan($owner, $items, $plansOffset = 1, $ownerRepoOffset = 2, $itemRepoOffset= 3);
+        $linkPlan = $this->prepareLinkPlan($owner, $items, $plansOffset = 1, $inPlannerOffset = 2, $ownerRepoOffset = 2, $itemRepoOffset= 3);
         $this->method($plan, 'appendPlan', null, array($linkPlan), 0);
         $this->assertSame($plan, $this->handler->linkPlan($this->propertyConfig, $owner, $items));
     }

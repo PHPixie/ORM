@@ -16,6 +16,7 @@
             <directory>./tests/PHPixieTests/ORM/Conditions</directory>
             <directory>./tests/PHPixieTests/ORM/Models</directory>
             <directory>./tests/PHPixieTests/ORM/Drivers</directory>
+            <directory>./tests/PHPixieTests/ORM/Planners</directory>
             
             <file>./tests/PHPixieTests/ORM/StepsTest.php</file>
             <file>./tests/PHPixieTests/ORM/LoadersTest.php</file>

@@ -6,13 +6,11 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 {
     protected function mapConditionBuilder($builder, $side, $collection, $plan)
     {
-        $path = $side->config()->path;
+        $config = $side->config();
         $builder->startConditionGroup($collection->logic(), $collection->isNegated());
             
-        $builder->whereNot($path, null);
-        $container = $builder->addSubdocumentPlaceholder(
-            $config->path
-        );
+        $builder->andNot($config->path, null);
+        $container = $builder->addSubdocumentPlaceholder($config->path);
 
         $this->mappers->conditions()->map(
             $container,

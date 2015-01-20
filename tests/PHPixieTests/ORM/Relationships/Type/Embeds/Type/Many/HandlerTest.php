@@ -110,13 +110,21 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
 
     protected function prepareMapConditionBuilder($builder, $side, $collection, $plan)
     {
-        $container = $this->quickMock('\PHPixie\Database\Type\Document\Conditions\Builder\Container');
+        $this->method($builder, 'startConditionGroup', null, array(
+            $collection->logic(),
+            $collection->isNegated()
+        ), 0);
+        
+        $this->method($builder, 'andNot', null, array(
+            $this->configData['path'],
+            null
+        ), 1);
+            
+        $container = $this->getDocumentConditionContainer();
         
         $this->method($builder, 'addSubarrayItemPlaceholder', $container, array(
-            $this->configData['path'],
-            $collection->logic(),
-            $collection->isNegated(),
-        ), 0);
+            $this->configData['path']
+        ), 2);
         
         $this->method($this->mapperMocks['conditions'], 'map', null, array(
             $container,
@@ -124,6 +132,8 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
             $collection->conditions(),
             $plan
         ), 0);
+        
+        $this->method($builder, 'endGroup', null, array(), 3);
         
     }
 

@@ -162,7 +162,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity\Item');
     }
-
+    
     abstract protected function prepareMapConditionBuilder($builder, $side, $collection, $plan);
     abstract protected function getPreloadResult();
     abstract protected function getPreloader();

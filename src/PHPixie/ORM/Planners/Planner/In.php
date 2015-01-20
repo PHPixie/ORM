@@ -11,7 +11,7 @@ class In extends \PHPixie\ORM\Planners\Planner
         $this->steps = $steps;
     }
     
-    public function databaseModelQuery($query, $queryField, $modelQuery, $queryField, $plan, $logic = 'and', $negate = false)
+    public function databaseModelQuery($query, $ff, $modelQuery, $queryField, $plan, $logic = 'and', $negate = false)
     {
         $queryPlan = $modelQuery->planFind();
         $plan->appendPlan($queryPlan->preloadPlan());

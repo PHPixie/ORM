@@ -14,15 +14,6 @@ abstract class PlannerTest extends \PHPixieTests\AbstractORMTest
         $this->planner = $this->planner();
     }
     
-    /**
-     * @covers ::__construct
-     * @covers ::<protected>
-     */
-    public function testConstruct()
-    {
-        
-    }
-    
     protected function assertStrategy($type, $class, $params = array())
     {
         $method = 'build'.ucfirst($type).'Strategy';

@@ -26,6 +26,15 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
      }
     
     /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+        
+    }
+    
+    /**
      * @covers ::pivot
      * @covers ::<protected>
      */

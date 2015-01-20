@@ -11,20 +11,19 @@ class In extends \PHPixie\ORM\Planners\Planner
         $this->steps = $steps;
     }
     
-    public function databaseModelQuery($query, $ff, $modelQuery, $queryField, $plan, $logic = 'and', $negate = false)
+    public function databaseModelQuery($query, $queryField, $modelQuery, $modelQueryField, $plan, $logic = 'and', $negate = false)
     {
         $queryPlan = $modelQuery->planFind();
-        $plan->appendPlan($queryPlan->preloadPlan());
-        $resultStep = $queryPlan->queryStep();
-        $plan->add($resultStep);
+        $plan->appendPlan($queryPlan->requiredPlan());
+        $subquery = $queryPlan->queryStep()->query();
         
-        $this->result($query, $queryField, $resultStep, $queryField, $plan, $logic, $negate);
+        $this->subquery($query, $queryField, $subquery, $modelQueryField, $plan, $logic, $negate);
         
     }
     
     public function result($query, $queryField, $resultStep, $resultField, $plan, $logic = 'and', $negate = false)
     {
-        $placeholder = $query->getWhereBuilder()->addPlaceholder($logic, $negate);
+        $placeholder = $query->addPlaceholder($logic, $negate);
         $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $resultField);
         $plan->add($inStep);
     }
@@ -38,21 +37,19 @@ class In extends \PHPixie\ORM\Planners\Planner
     protected function selectStrategy($queryConnection, $subqueryConnection)
     {
         if (!($queryConnection instanceof \PHPixie\Database\Type\SQL\Connection)) {
-            return $this->strategies->in('multiquery');
+            return $this->strategy('multiquery');
         }
         
         if ($queryConnection !== $subqueryConnection) {
-            return $this->strategies->in('multiquery');
+            return $this->strategy('multiquery');
         }
         
-        return $this->strategies->in('subquery');
+        return $this->strategy('subquery');
     }
     
     protected function buildSubqueryStrategy()
     {
-        return new \PHPixie\ORM\Planners\Planner\In\Strategy\Subquery(
-            $this->steps
-        );
+        return new \PHPixie\ORM\Planners\Planner\In\Strategy\Subquery();
     }
     
     protected function buildMultiqueryStrategy()

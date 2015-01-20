@@ -12,6 +12,9 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
     protected $subqueryStrategy;
     protected $multiqueryStrategy;
     
+    protected $queryField = 'id';
+    protected $subqueryField = 'fairy_id';
+    
     public function setUp()
     {
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
@@ -22,22 +25,41 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
         parent::setUp();
     }
     
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+        
+    }
     
     /**
+     * @covers ::databaseModelQuery
      * @covers ::<protected>
-     * @covers ::collection
      */
-    public function testCollectionSubquery()
+    public function testDatabaseModelQuery()
     {
-        $pdoConnection = $this->quickMock('\PHPixie\Database\Driver\PDO\Connection');
-        $this->collectionTest($pdoConnection, $pdoConnection, 'subquery');
+        $query = $this->getItemsQuery();
+        $modelQuery = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');
+        $plan = $this->getStepsPlan();
         
-        $otherPdoConnection = $this->quickMock('\PHPixie\Database\Driver\PDO\Connection');
-        $this->collectionTest($pdoConnection, $otherPdoConnection, 'multiquery');
+        $callback = array($this->plannerMock(), 'databaseModelQuery');
+        $params = array(
+            $query,
+            $this->queryField,
+            $modelQuery,
+            $this->subqueryField,
+            $plan
+        );
         
-        $mongoConnection = $this->quickMock('\PHPixie\Database\Driver\Mongo\Connection');
-        $this->collectionTest($mongoConnection, $mongoConnection, 'multiquery');
-
+        $this->prepareDatabaseModelQueryTest($query, $modelQuery, $plan, 'and', false);
+        call_user_func_array($callback, $params);
+        
+        $this->prepareDatabaseModelQueryTest($query, $modelQuery, $plan, 'or', true);
+        $params = array_merge($params, array('or', true));
+        call_user_func_array($callback, $params);
+        
     }
     
     /**
@@ -46,9 +68,9 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
      */
     public function testResult()
     {
-		$query = $this->itemsQueryMock();
+		$query = $this->getItemsQuery();
 		$resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
-		$plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
+		$plan = $this->getStepsPlan();
 		
 		$this->prepareResultTest($query, $resultStep, $plan, 'or', true);
         $this->planner->result($query, 'pixie', $resultStep, 'fairy', $plan, 'or', true);
@@ -62,104 +84,130 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
      */
     public function testSubquery()
     {
-		$sqlConnection = $this->getConnection(true);
-        $this->subqueryTest($sqlConnection, $sqlConnection, 'subquery');
-        
-        $otherSqlConnection = $this->getConnection(true);
-        $this->subqueryTest($sqlConnection, $otherSqlConnection, 'multiquery');
-        
-        $connection = $this->getConnection();
-        $this->subqueryTest($connection, $connection, 'multiquery');
+        $this->subqueryTest('subquery');
+        $this->subqueryTest('multiquery', false);
+        $this->subqueryTest('multiquery', true, false);
     }
-
-    protected function subqueryTest($queryConnection, $subqueryConnection, $strategy)
+    
+    /**
+     * @covers ::buildSubqueryStrategy
+     * @covers ::<protected>
+     */
+    public function testBuildSubqueryStrategy()
     {
-        foreach(array(
-            array(array(), array('and', false)),
-            array(array('or', true), array('or', true))
-        ) as $params){
-            $query = $this->itemsQueryMock();
-            $subquery = $this->itemsQueryMock();
-            $plan = $this->quickMock('\PHPixie\ORM\Plans\Plan');
-            $this->method($query, 'connection', $queryConnection);
-            $this->method($subquery, 'connection', $subqueryConnection);
-            $this->method($this->$strategy, 'in', null, array_merge(array($query, 'pixie', $subquery, 'fairy', $plan), $params[1]), 0);
-            call_user_func_array(array($this->planner, 'subquery'), array_merge(array($query, 'pixie', $subquery, 'fairy', $plan), $params[0]));
-        }
+        $this->assertStrategy('subquery', '\PHPixie\ORM\Planners\Planner\In\Strategy\Subquery');
+    }
+    
+    /**
+     * @covers ::buildMultiqueryStrategy
+     * @covers ::<protected>
+     */
+    public function testBuildMultiqueryStrategy()
+    {
+        $this->assertStrategy('multiquery', '\PHPixie\ORM\Planners\Planner\In\Strategy\Multiquery', array(
+            'steps' => $this->steps
+        ));
+    }
+    
+    protected function subqueryTest($strategy, $queryIsSql = true, $subqueryIsSame = true)
+    {
+        $query = $this->getItemsQuery();
+        $subquery = $this->getItemsQuery();
+        $plan = $this->quickMock('\PHPixie\ORM\Plans\Plan');
+        
+        $this->prepareConnections($query, $subquery, $queryIsSql, $subqueryIsSame);
+        
+        $callback = array($this->plannerMock(), 'subquery');
+        $params = array(
+            $query,
+            $this->queryField,
+            $subquery,
+            $this->subqueryField,
+            $plan
+        );
+            
+        $this->prepareSubquery($strategy, $query, $subquery, $plan, 'and', false);
+        call_user_func_array($callback, $params);
+
+        $this->prepareSubquery($strategy, $query, $subquery, $plan, 'or', true);
+        $params = array_merge($params, array('or', true));
+        call_user_func_array($callback, $params);
 	}
     
-    public function subquery($query, $queryField, $subquery, $subqueryField, $plan, $logic = 'and', $negate = false)
+    protected function prepareDatabaseModelQueryTest($query, $modelQuery, $plan, $logic, $negate)
     {
-        $strategy = $this->selectStrategy($dbQuery->connection(), $subqery->connection());
-        $strategy->in($query, $queryField, $subquery, $subqueryField, $plan, $logic, $negate);
+        $loaderPlan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Query\Loader');
+        $this->method($modelQuery, 'planFind', $loaderPlan, array(), 0);
+        
+        $requiredPlan = $this->getStepsPlan();
+        $this->method($loaderPlan, 'requiredPlan', $requiredPlan, array(), 0);
+        
+        $this->method($plan, 'appendPlan', null, array($requiredPlan), 0);
+        
+        $resultStep = $this->abstractMock('\PHPixie\ORM\Steps\Step\Query\Result');
+        
+        $subquery = $this->getItemsQuery();
+        $this->method($loaderPlan, 'queryStep', $resultStep, array(), 1);
+        $this->method($resultStep, 'query', $subquery, array(), 0);
+        
+        $this->prepareConnections($query, $subquery, true, true, 0);
+        $this->prepareSubquery('subquery', $query, $subquery, $plan, $logic, $negate);
+    }
+    
+    protected function prepareConnections($query, $subquery, $queryIsSql = true, $subqueryIsSame = true, $at = null)
+    {
+        $queryConnection = $this->getConnection($queryIsSql);
+        if($subqueryIsSame) {
+            $subqueryConnection = $queryConnection;
+        }else{
+            $subqueryConnection = $this->getConnection();
+        }
+        
+        $this->method($query, 'connection', $queryConnection, array(), $at);
+        $this->method($subquery, 'connection', $subqueryConnection, array(), $at);
     }
     
     protected function prepareResultTest($query, $resultStep, $plan, $logic, $negate)
     {
-        $placeholder = $this->quickMock('\PHPixie\Database\Conditions\Condition\Placeholder');
-        $builder = $this->abstractMock('\PHPixie\Database\Conditions\Builder', array('addPlaceholder'));
+        $placeholder = $this->quickMock('\PHPixie\ORM\Conditions\Condition\Collection\Placeholder');
         
-        $this->method($query, 'getWhereBuilder', $builder, array(), 0);
-        $this->method($builder, 'addPlaceholder', $placeholder, array($logic, $negate), 0);
+        $this->method($query, 'addPlaceholder', $placeholder, array($logic, $negate), 0);
         
         $inStep = $this->quickMock('\PHPixie\ORM\Steps\Step\In');
         $this->method($this->steps, 'in', $inStep, array($placeholder, 'pixie', $resultStep, 'fairy'), 0);
         
         $this->method($plan, 'add', null, array($inStep), 0);
 	}
-	
-    protected function collectionTest($collectionConnection, $queryConnection, $strategy)
+    
+    protected function prepareSubquery($strategy, $query, $subquery, $plan, $logic, $negate)
     {
-        foreach(array(
-            array(array(), array('and', false)),
-            array(array('or', true), array('or', true))
-        ) as $params){
-            $query = $this->itemsQueryMock();
-            $collection = $this->quickMock('\PHPixie\ORM\Planners\Collection');
-            $plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
-            $collectionQueries = array(
-                $this->quickMock('\PHPixie\ORM\Model', array('planFind')),
-                $this->quickMock('\PHPixie\ORM\Model', array('planFind')),
-            );
-
-            $this->method($query, 'startWhereGroup', null, $params[1], 0);
-            $this->method($collection, 'modelField', array(1,2,3), array('fairy'), 0);
-            $this->method($query, 'where', null, array('pixie', 'in', array(1,2,3)), 1);
-            $this->method($query, 'connection', $queryConnection, array(), 2);
-            $this->method($collection, 'queries', $collectionQueries, array(), 1);
-            $this->method($collection, 'connection', $collectionConnection, array(), 2);
-
-            foreach($collectionQueries as $key => $collectionQuery) {
-                $findPlan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Query\Loader');
-                $requiredPlan = $this->quickMock('\PHPixie\ORM\Plans\Plan');
-                $this->method($findPlan, 'requiredPlan', $requiredPlan, array(), 0);
-
-                $this->method($collectionQuery, 'planFind', $findPlan, array(), 0);
-                $this->method($plan, 'appendPlan', null, array($requiredPlan), $key);
-                $subquery = $this->itemsQueryMock();
-                $resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
-                $this->method($resultStep, 'query', $subquery, array(), 0);
-
-                $this->method($findPlan, 'queryStep', $resultStep, array(), 1);
-                $this->method($this->$strategy, 'in', null, array($query, 'pixie', $subquery, 'fairy', $plan, 'or', false), $key);
-
-            }
-
-            $this->method($query, 'endWhereGroup', null, array(), 3);
-            call_user_func_array(array($this->planner, 'collection'), array_merge(array($query, 'pixie', $collection, 'fairy', $plan), $params[0]));
-        }
+        $strategy = $strategy.'Strategy';
+        $this->method($this->$strategy, 'in', null, array(
+            $query,
+            $this->queryField,
+            $subquery,
+            $this->subqueryField,
+            $plan,
+            $logic,
+            $negate
+        ), 0);
+    }
+	
+    protected function getStepsPlan()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Plans\Plan\Steps');
     }
     
     protected function getConnection($isSql = false)
     {
         if($isSql) {
-            return $this->quickMock('\PHPixie\Database\Type\SQL\Connection');
+            return $this->abstractMock('\PHPixie\Database\Type\SQL\Connection');
         }
         
-        return $this->quickMock('\PHPixie\Database\Connection');
+        return $this->abstractMock('\PHPixie\Database\Connection');
     }
     
-    protected function itemsQueryMock()
+    protected function getItemsQuery()
     {
         return $this->abstractMock('\PHPixie\Database\Query\Items');
     }
@@ -175,7 +223,6 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
             'buildSubqueryStrategy',
             'buildMultiqueryStrategy'
         ), array(
-            $this->planners,
             $this->steps
         ));
         

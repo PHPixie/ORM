@@ -68,7 +68,7 @@ abstract class AbstractORMTest extends \PHPUnit_Framework_TestCase
     }
     
     
-    protected function assertInstance($object, $class, $propertyMap)
+    protected function assertInstance($object, $class, $propertyMap = array())
     {
         $this->assertInstanceOf($class, $object);
         foreach($propertyMap as $name => $value) {

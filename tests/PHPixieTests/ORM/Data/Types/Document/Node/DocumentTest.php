@@ -28,6 +28,15 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
     }
 
     /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
+    /**
      * @covers ::get
      * @covers ::<protected>
      */

@@ -21,8 +21,7 @@ class MultiqueryTest extends \PHPixieTests\ORM\Planners\Planner\In\StrategyTest
             $this->method($this->subquery, 'fields', null, array(array('fairy')), 0);
             $this->method($this->steps, 'iteratorResult', $resultStep, array($this->subquery), 0);
             $this->method($this->plan, 'add', null, array($resultStep), 0);
-            $this->method($this->query, 'getWhereBuilder', $this->builder, array(), 0);
-            $this->method($this->builder, 'addPlaceholder', $placeholder, $params[1], 0);
+            $this->method($this->query, 'addPlaceholder', $placeholder, $params[1], 0);
             $this->method($this->steps, 'in', $inStep, array($placeholder, 'pixie', $resultStep, 'fairy'), 1);
             $this->method($this->plan, 'add', null, array($inStep), 1);
             
@@ -30,6 +29,11 @@ class MultiqueryTest extends \PHPixieTests\ORM\Planners\Planner\In\StrategyTest
             call_user_func_array(array($this->strategy, 'in'), $callParams);;
         }
 
+    }
+    
+    protected function getQuery()
+    {
+        return $this->abstractMock('\PHPixie\Database\Query\Items');
     }
     
     protected function getStrategy()

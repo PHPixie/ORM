@@ -6,7 +6,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
             implements \PHPixie\ORM\Models\Type\Database\Query
 {
     protected $values;
-    protected $mapper;
+    protected $queryMapper;
     protected $queryMap;
     protected $container;
     protected $config;
@@ -18,13 +18,13 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     
     protected $orderBy = array();
 
-    public function __construct($values, $mapper, $queryMap, $container, $config)
+    public function __construct($values, $queryMapper, $queryMap, $container, $config)
     {
         parent::__construct($container);
         
         $this->container        = $container;
         $this->values           = $values;
-        $this->mapper           = $mapper;
+        $this->queryMapper      = $queryMapper;
         $this->queryMap         = $queryMap;
         $this->config           = $config;
     }

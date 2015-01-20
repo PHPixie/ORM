@@ -12,7 +12,7 @@ class SQLTest extends \PHPixieTests\ORM\Planners\Planner\Query\StrategyTest
      */
     public function testSetSource()
     {
-        $query = $this->abstractMock('\PHPixie\Database\SQL\Query');
+        $query = $this->abstractMock('\PHPixie\Database\Type\SQL\Query');
         $this->method($query, 'table', null, array('pixie'), 0);
         $this->strategy->setSource($query, 'pixie');
     }
@@ -22,7 +22,7 @@ class SQLTest extends \PHPixieTests\ORM\Planners\Planner\Query\StrategyTest
      */
     public function testSetBatchData()
     {
-        $query = $this->abstractMock('\PHPixie\Database\SQL\Query\Type\Insert');
+        $query = $this->abstractMock('\PHPixie\Database\Type\SQL\Query\Type\Insert');
         
         $this->method($query, 'batchData', null, array(array('a', 'b'), array(
             array(1, 2),

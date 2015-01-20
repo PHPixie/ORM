@@ -60,6 +60,24 @@ class PDOTest extends \PHPixieTests\ORM\Drivers\DriverTest
         ));
     }
     
+    /**
+     * @covers ::entity
+     * @covers ::<protected>
+     */
+    public function testEntity()
+    {
+        $repository = $this->quickMock('\PHPixie\ORM\Drivers\Driver\PDO\Repository');
+        $data = $this->quickMock('\PHPixie\ORM\Data\Types\Map');
+        
+        $entity = $this->driver->entity($repository, $data, true);
+        $this->assertInstance($entity, '\PHPixie\ORM\Drivers\Driver\PDO\Entity', array(
+            'entityMap'  => $this->entityMap,
+            'repository' => $repository,
+            'data'       => $data,
+            'isNew'      => true
+        ));
+    }
+    
     protected function driver()
     {
         return new \PHPixie\ORM\Drivers\Driver\PDO(

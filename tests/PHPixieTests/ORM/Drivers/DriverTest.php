@@ -44,6 +44,9 @@ abstract class DriverTest extends \PHPixieTests\AbstractORMTest
         
         $this->queryMapper = $this->quickMock('\PHPixie\ORM\Mappers\Query');
         $this->method($this->mappers, 'query', $this->queryMapper, array());
+
+        $this->entityMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Entity');
+        $this->method($this->maps, 'entity', $this->entityMap, array());
         
         $this->queryMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Query');
         $this->method($this->maps, 'query', $this->queryMap, array());

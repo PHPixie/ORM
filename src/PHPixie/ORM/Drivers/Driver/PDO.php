@@ -34,9 +34,10 @@ class PDO extends \PHPixie\ORM\Drivers\Driver
         );
     }
 
-    public function entity($repository, $data, $isNew = true)
+    public function entity($repository, $data, $isNew)
     {
         return new PDO\Entity(
+            $this->maps->entity(),
             $repository,
             $data,
             $isNew

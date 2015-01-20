@@ -28,5 +28,5 @@ abstract class Driver
     abstract public function config($modelName, $configSlice);
     abstract public function repository($config);
     abstract public function query($config);
-    abstract public function entity($repository, $data, $isNew = true);
+    abstract public function entity($repository, $data, $isNew);
 }

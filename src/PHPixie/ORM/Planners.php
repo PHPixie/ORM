@@ -5,16 +5,16 @@ namespace PHPixie\ORM;
 class Planners
 {
     protected $ormBulder;
-    protected $planners;
+    protected $planners = array();
 
     public function __construct($ormBuilder)
     {
         $this->ormBuilder = $ormBuilder;
     }
 
-    public function embed()
+    public function in()
     {
-        return $this->plannerInstance('embed');
+        return $this->plannerInstance('in');
     }
 
     public function pivot()
@@ -22,9 +22,9 @@ class Planners
         return $this->plannerInstance('pivot');
     }
 
-    public function in()
+    public function query()
     {
-        return $this->plannerInstance('in');
+        return $this->plannerInstance('query');
     }
     
     public function update()
@@ -32,26 +32,41 @@ class Planners
         return $this->plannerInstance('update');
     }
 
-    public function plannerInstance($name)
+    protected function plannerInstance($name)
     {
-        if (!array($this->planners[$name])) {
-            $steps = $this->ormBuilder->steps();
-            $this->planners[$name] = $this->buildPlanner($name, $steps);
+        if (!array_key_exists($name, $this->planners)) {
+            $method = 'build'.ucfirst($name).'Planner';
+            $this->planners[$name] = $this->$method();
         }
 
         return $this->planners[$name];
     }
-
-    public function collection($modelName, $items)
-    {
     
+    protected function buildInPlanner()
+    {
+        return new Planners\Planner\In(
+            $this->ormBuilder->steps()
+        );
     }
     
-    protected function buildPlanner($name, $steps)
+    protected function buildPivotPlanner()
     {
-        $class = '\PHPixie\ORM\Planners\Planner\\'.ucfirst($name);
-
-        return new $class($steps);
+        return new Planners\Planner\Pivot(
+            $this,
+            $this->ormBuilder->steps()
+        );
     }
 
+    protected function buildQueryPlanner()
+    {
+        return new Planners\Planner\Query();
+    }
+
+    protected function buildUpdatePlanner()
+    {
+        return new Planners\Planner\Update(
+            $this->ormBuilder->steps()
+        );
+    }
+    
 }

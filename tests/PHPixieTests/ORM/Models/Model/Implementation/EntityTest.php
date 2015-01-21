@@ -29,7 +29,6 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
             $this->propertyNames[] = 'test'.$i;
         }
         
-        $this->method($this->entityMap, 'getPropertyNames', $this->propertyNames, array($this->configData['model']));
         $this->entity = $this->entity();
     }
     
@@ -85,15 +84,19 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
     
     /**
      * @covers ::getRelationshipProperty
+     * @covers \PHPixie\ORM\Models\Model\Implementation\Entity::getRelationshipProperty
      * @covers ::<protected>
      */
     public function testGetRelationshipProperty()
     {
+        $this->prepareRequirePropertyNames();
+        
         $this->assertSame(null, $this->entity->getRelationshipProperty('test1', false));
         
         foreach(array(true, false) as $key => $exists) {
             $name = 'test'.$key;
-            $property = $this->prepareProperty($name, $exists);
+            $at = $key === 0 ? 1 : 0;
+            $property = $this->prepareProperty($name, 0, $exists);
             
             $this->assertSame($property, $this->entity->getRelationshipProperty($name));
             $this->assertSame($property, $this->entity->getRelationshipProperty($name));
@@ -127,7 +130,10 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
      */
     public function testGet()
     {
-        $property = $this->prepareProperty('test1');
+        $this->prepareRequirePropertyNames();
+        
+        $property = $this->prepareProperty('test1', 1);
+        $this->assertSame($property, $this->entity->test1);
         $this->assertSame($property, $this->entity->test1);
         
         $this->prepareGetDataField('name', null, 'Blum');
@@ -146,6 +152,8 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
     
     protected function asObjectTest($recursive = false)
     {
+        $this->prepareRequirePropertyNames();
+        
         $expected = array('name' => 'Trixie');
         $data = (object) $expected;
 
@@ -161,7 +169,8 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
 
         foreach($propertyParams as $key => $params) {
             $name = 'test'.$key;
-            $properties[$key] = $this->prepareProperty($name, $params[0], $params[1]);
+            $at = $key === 0 ? 1 : 0;
+            $properties[$key] = $this->prepareProperty($name, $at, $params[0], $params[1]);
             $this->entity->getRelationshipProperty($name);
         }
 
@@ -191,7 +200,12 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
         $this->method($this->data, 'set', null, array($name, $value), 0);
     }
     
-    protected function prepareProperty($name, $withAsData = false, $isLoaded = true, $at = 0)
+    protected function prepareRequirePropertyNames()
+    {
+        $this->method($this->entityMap, 'getPropertyNames', $this->propertyNames, array($this->configData['model']), 0);
+    }
+    
+    protected function prepareProperty($name, $at = 0, $withAsData = false, $isLoaded = true)
     {
         if($withAsData) {
             $property = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity\Data');

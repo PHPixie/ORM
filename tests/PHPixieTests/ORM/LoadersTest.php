@@ -7,20 +7,25 @@ namespace PHPixieTests\ORM;
  */
 class LoadersTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $models;
+    protected $ormBuilder;
     
     protected $loaders;
     
+    protected $models;
     protected $embeddedModel;
     
     public function setUp()
     {
+        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
+        
+        $this->loaders = new \PHPixie\ORM\Loaders($this->ormBuilder);
+        
         $this->models = $this->quickMock('\PHPixie\ORM\Models');
+        $this->method($this->ormBuilder, 'models', $this->models, array());
+        
         $this->embeddedModel = $this->quickMock('\PHPixie\ORM\Models\Type\Embedded');
-        
         $this->method($this->models, 'embedded', $this->embeddedModel, array());
-        
-        $this->loaders = new \PHPixie\ORM\Loaders($this->models);
+
     }
 
     /**

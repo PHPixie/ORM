@@ -14,9 +14,6 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
         $this->entityMap = $entityMap;
         $this->config = $config;
         $this->data = $data;
-        
-        $propertyNames = $this->entityMap->getPropertyNames($this->modelName());
-        $this->relationshipProperties = array_fill_keys($propertyNames, null);
     }
     
     public function modelName()
@@ -42,6 +39,8 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
     
     public function getRelationshipProperty($name, $createMissing = true)
     {
+        $this->requirePropertyNames();
+        
         if (!array_key_exists($name, $this->relationshipProperties)) {
             throw new \PHPixie\ORM\Exception\Relationship("Relationship property '$name' is not defined for '{$this->modelName()}'");
         }
@@ -50,7 +49,7 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
     }
     
     protected function relationshipProperty($name, $createMissing = true)
-    {        
+    {
         $property = $this->relationshipProperties[$name];
         
         if($property === null && $createMissing) {
@@ -78,15 +77,25 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
     
     public function __get($name)
     {
-        if (array_key_exists($name, $this->relationshipProperties))
-            return $this->relationshipProperty($name);
+        $this->requirePropertyNames();
         
+        if (array_key_exists($name, $this->relationshipProperties)) {
+            return $this->relationshipProperty($name);
+        }
         return $this->getField($name);
     }
     
     public function __set($name, $value)
     {
         $this->setField($name, $value);
+    }
+    
+    protected function requirePropertyNames()
+    {
+        if ($this->relationshipProperties === null) {
+            $propertyNames = $this->entityMap->getPropertyNames($this->modelName());
+            $this->relationshipProperties = array_fill_keys($propertyNames, null);
+        }
     }
     
 }

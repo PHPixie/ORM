@@ -231,6 +231,28 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     }
     
     /**
+     * @covers ::getUpdateBuilder
+     * @covers ::<protected>
+     */
+    public function testGetUpdateBuilder()
+    {
+        $update = $this->quickMock('\PHPixie\ORM\Values\Update\Builder');
+        $this->method($this->values, 'updateBuilder', $update, array($this->query), 0);
+        $this->assertSame($update, $this->query->getUpdateBuilder());
+    }
+    
+    /**
+     * @covers ::planUpdateValue
+     * @covers ::<protected>
+     */
+    public function testPlanUpdateValue()
+    {
+        $update = $this->getUpdate();
+        $plan = $this->preparePlanUpdateValue($update);
+        $this->assertSame($plan, $this->query->planUpdateValue($update));
+    }
+    
+    /**
      * @covers ::planDelete
      * @covers ::<protected>
      */
@@ -321,15 +343,21 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     
     protected function preparePlanUpdate($data)
     {
-        $plan = $this->getPlan();
-        $update = $this->quickMock('\PHPixie\ORM\Values\Update');
-        $this->method($this->values, 'update', $update, array(), 0);
+        
+        $update = $this->getUpdate();
+        $this->method($this->values, 'update', $update, array($this->query), 0);
         $key = 0;
         foreach($data as $field => $value) {
             $this->method($update, 'set', null, array($field, $value), $key);
             $key++;
         }
         
+        return $this->preparePlanUpdateValue($update);
+    }
+    
+    protected function preparePlanUpdateValue($update)
+    {
+        $plan = $this->getPlan();
         $this->method($this->queryMapper, 'mapUpdate', $plan, array($this->query, $update), 0);
         return $plan;
     }
@@ -404,6 +432,11 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     protected function getBuilder()
     {
         return $this->quickMock('\PHPixie\ORM\Conditions\Builder\Container');
+    }
+    
+    protected function getUpdate()
+    {
+        return $this->quickMock('\PHPixie\ORM\Values\Update');
     }
     
     abstract protected function getConfig();

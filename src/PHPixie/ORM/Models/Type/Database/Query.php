@@ -30,7 +30,7 @@ interface Query extends \PHPixie\ORM\Conditions\Condition\In\Item,
 
     public function getUpdateBuilder();
     public function planUpdate($data);
-    public function planUpdateBuilder($builder);
+    public function planUpdateValue($update);
     public function update($data);
 
     public function planCount();

@@ -41,7 +41,6 @@ class EmbeddedTest extends \PHPixieTests\ORM\Models\ModelTest
             $this->maps
         );
         $this->method($this->wrappers, 'embeddedEntities', array(), array(), 0);
-        $this->method($this->mapMocks['entity'], 'getPropertyNames', array(), array('fairy'), 0);
         
         $data = $this->getData();
         $this->prepareConfigSlice('fairy', $this->type);

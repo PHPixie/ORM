@@ -4,52 +4,81 @@ namespace PHPixie\ORM;
 
 class Loaders
 {
-    protected $models;
+    protected $ormBuilder;
     
-    public function __construct($models)
+    public function __construct($ormBuilder)
     {
-        $this->models = $models;
+        $this->ormBuilder = $ormBuilder;
     }
     
     public function iterator($loader)
     {
-        return new Loaders\Iterator($loader);
+        return new Loaders\Iterator(
+            $loader
+        );
     }
 
     public function multiplePreloader($resultPreloader, $ids)
     {
-        return new Loaders\Loader\MultiplePreloader($this, $resultPreloader, $ids);
+        return new Loaders\Loader\MultiplePreloader(
+            $this,
+            $resultPreloader,
+            $ids
+        );
     }
     
     public function editableProxy($loader)
     {
-        return new Loaders\Loader\Proxy\Editable($this, $loader);
+        return new Loaders\Loader\Proxy\Editable(
+            $this,
+            $loader
+        );
     }
 
     public function cachingProxy($loader)
     {
-        return new Loaders\Loader\Proxy\Caching($this, $loader);
+        return new Loaders\Loader\Proxy\Caching(
+            $this,
+            $loader
+        );
     }
     
     public function preloadingProxy($loader)
     {
-        return new Loaders\Loader\Proxy\Preloading($this, $loader);
+        return new Loaders\Loader\Proxy\Preloading(
+            $this,
+            $loader
+        );
     }
     
     public function reusableResult($repository, $reusableResultStep)
     {
-        return new Loaders\Loader\Repository\ReusableResult($this, $repository, $reusableResultStep);
+        return new Loaders\Loader\Repository\ReusableResult(
+            $this,
+            $repository,
+            $reusableResultStep
+        );
     }
     
     public function dataIterator($repository, $reusableResultStep)
     {
-        return new Loaders\Loader\Repository\DataIterator($this, $repository, $reusableResultStep);
+        return new Loaders\Loader\Repository\DataIterator(
+            $this,
+            $repository,
+            $reusableResultStep
+        );
     }
     
     public function arrayNode($arrayNode, $owner, $ownerPropertyName)
     {
-        $embeddedModel = $this->models->embedded();
-        return new Loaders\Loader\Embedded\ArrayNode($this, $embeddedModel, $arrayNode, $owner, $ownerPropertyName);
+        $embeddedModel = $this->ormBuilder->models()->embedded();
+        return new Loaders\Loader\Embedded\ArrayNode(
+            $this,
+            $embeddedModel,
+            $arrayNode,
+            $owner,
+            $ownerPropertyName
+        );
     }
 
 }

@@ -4,29 +4,43 @@ namespace PHPixie\ORM\Drivers\Driver;
 
 class Mongo extends \PHPixie\ORM\Drivers\Driver
 {
-    public function repository($modelName, $modelConfig)
+    public function config($modelName, $configSlice)
     {
-        if ($modelConfig->get('type', null) === 'embedded')
-            return $this->embeddedRepository($modelName, $modelConfig);
-
-        return $this->databaseRepository($modelName, $modelConfig);
+        return new Mongo\Config(
+            $this->configs->inflector(),
+            $modelName,
+            $configSlice
+        );
+    }
+    
+    public function repository($config)
+    {
+        return new Mongo\Repository(
+            $this->models->database(),
+            $this->database,
+            $this->data,
+            $config
+        );
+    }
+    
+    public function query($config)
+    {
+        return new Mongo\Query(
+            $this->values,
+            $this->mappers->query(),
+            $this->maps->query(),
+            $this->conditions->container(),
+            $config
+        );
     }
 
-    protected function databaseRepository($modelName, $modelConfig)
+    public function entity($repository, $data, $isNew)
     {
-        return Mongo\Repository\Database($this->orm, $this, $modelName, $modelConfig);
+        return new Mongo\Entity(
+            $this->maps->entity(),
+            $repository,
+            $data,
+            $isNew
+        );
     }
-
-    protected function embeddedRepository($modelName, $modelConfig)
-    {
-        return Mongo\Repository\Embedded($this->orm, $this, $modelName, $modelConfig);
-    }
-
-    public function databaseModel($repository, $data, $isNew = true)
-    {
-        $relationshipMap = $this->ormBuilder->relationshipMap();
-
-        return Mongo\Repository\Database\Model($relationshipMap, $repository, $data, $isNew);
-    }
-
 }

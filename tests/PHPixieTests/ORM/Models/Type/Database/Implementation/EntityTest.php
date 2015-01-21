@@ -34,10 +34,10 @@ abstract class EntityTest extends \PHPixieTests\ORM\Models\Model\Implementation\
      * @covers ::setIsNew
      * @covers ::<protected>
      */
-    public function isNew()
+    public function testIsNew()
     {
         $this->assertSame(false, $this->entity->isNew());
-        $this->setIsNew(true);
+        $this->entity->setIsNew(true);
         $this->assertSame(true, $this->entity->isNew());
     }
     
@@ -46,10 +46,10 @@ abstract class EntityTest extends \PHPixieTests\ORM\Models\Model\Implementation\
      * @covers ::setIsDeleted
      * @covers ::<protected>
      */
-    public function isDeleted()
+    public function testIsDeleted()
     {
         $this->assertSame(false, $this->entity->isDeleted());
-        $this->setIsDeleted(true);
+        $this->entity->setIsDeleted(true);
         $this->assertSame(true, $this->entity->isDeleted());
     }
                             

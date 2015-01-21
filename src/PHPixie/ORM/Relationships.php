@@ -28,32 +28,7 @@ class Relationships
         
         return $this->relationships[$name];
     }
-    
-    public function oneToOne()
-    {
-        return $this->get('oneToOne');   
-    }
-    
-    public function oneToMany()
-    {
-        return $this->get('oneToMany');   
-    }
-    
-    public function manyToMany()
-    {
-        return $this->get('manyToMany');   
-    }
-    
-    public function embedsOne()
-    {
-        return $this->get('embedsOne');   
-    }
-    
-    public function embedsMany()
-    {
-        return $this->get('embedsMany');   
-    }
-    
+
     protected function buildRelationship($name) {
         if(!array_key_exists($name, $this->classMap)) {
             throw new \PHPixie\ORM\Exception\Relationship("Relationship type '$name' does not exist");

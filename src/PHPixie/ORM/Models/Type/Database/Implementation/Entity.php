@@ -21,16 +21,16 @@ abstract class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
         return $this->isNew;
     }
 
+    public function isDeleted()
+    {
+        return $this->isDeleted;
+    }
+    
     public function setIsNew($isNew)
     {
         $this->isNew = $isNew;
     }
     
-    public function isDeleted()
-    {
-        return $this->isDeleted;
-    }
-
     public function setIsDeleted($isDeleted)
     {
         $this->isDeleted = $isDeleted;

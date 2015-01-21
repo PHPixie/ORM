@@ -50,11 +50,6 @@ class RelationshipsTest extends \PHPixieTests\AbstractORMTest
     
     /**
      * @covers ::get
-     * @covers ::oneToOne
-     * @covers ::oneToMany
-     * @covers ::manyToMany
-     * @covers ::embedsOne
-     * @covers ::embedsMany
      * @covers ::<protected>
      */
     public function testGet()
@@ -63,9 +58,7 @@ class RelationshipsTest extends \PHPixieTests\AbstractORMTest
         {
             $relationship = $this->relationships->get($name);
             $this->assertInstance($relationship, $class, $this->dependencies);
-            
             $this->assertSame($relationship, $this->relationships->get($name));
-            $this->assertSame($relationship, $this->relationships->$name());
         }
     }
 }

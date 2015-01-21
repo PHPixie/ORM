@@ -135,7 +135,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
             $preloads->add($item);
         }
         
-        return $this->mapper->mapFind($this, $preloads);
+        return $this->queryMapper->mapFind($this, $preloads);
     }
 
 
@@ -148,16 +148,14 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     
     public function planUpdate($updates)
     {
-        $update = $this->values->update();
+        $update = $this->values->update($this);
         
         foreach($updates as $key => $value) {
             $update->set($key, $value);
         }
         
-        return $this->mapper->mapUpdate($this, $update);
+        return $this->planUpdateValue($update);
     }
-    
-    
     
     public function delete()
     {
@@ -167,7 +165,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     
     public function planDelete()
     {
-        return $this->mapper->mapDelete($this);
+        return $this->queryMapper->mapDelete($this);
     }
     
     public function count()
@@ -177,12 +175,17 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     
     public function planCount()
     {
-        return $this->mapper->mapCount($this);
+        return $this->queryMapper->mapCount($this);
     }
     
+    public function getUpdateBuilder()
+    {
+        return $this->values->updateBuilder($this);
+    }
     
-    public function getUpdateBuilder(){}
-    public function planUpdateBuilder($b){}
+    public function planUpdateValue($update){
+        return $this->queryMapper->mapUpdate($this, $update);
+    }
 
     public function getRelationshipProperty($name)
     {

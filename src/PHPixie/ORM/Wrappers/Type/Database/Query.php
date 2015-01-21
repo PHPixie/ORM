@@ -118,9 +118,9 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
         return $this;
     }
     
-    public function planUpdateBuilder($update)
+    public function planUpdateValue($update)
     {
-        return $this->query->planUpdateBuilder($update);
+        return $this->query->planUpdateValue($update);
     }
     
     public function getUpdateBuilder()

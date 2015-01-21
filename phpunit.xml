@@ -31,6 +31,8 @@
             <file>./tests/PHPixieTests/ORM/RepositoriesTest.php</file>
             <file>./tests/PHPixieTests/ORM/RelationshipsTest.php</file>
             <file>./tests/PHPixieTests/ORM/ConditionsTest.php</file>
+            <file>./tests/PHPixieTests/ORM/PlannersTest.php</file>
+            <file>./tests/PHPixieTests/ORM/DriversTest.php</file>
         </testsuite>
     </testsuites>
     <filter>

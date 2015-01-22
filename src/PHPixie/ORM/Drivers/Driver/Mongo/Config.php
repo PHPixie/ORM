@@ -8,8 +8,11 @@ class Config extends \PHPixie\ORM\Models\Type\Database\Config
     
     protected function processConfig($configSlice, $inflector)
     {
-        if (($this->collection = $configSlice->get('collection', null)) === null)
+        if (($this->collection = $configSlice->get('collection', null)) === null) {
             $this->collection = $inflector->plural($this->model);
+        }
+        
+        parent::processConfig($configSlice, $inflector);
     }
     
     protected function driver()

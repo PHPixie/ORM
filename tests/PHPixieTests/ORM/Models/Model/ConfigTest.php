@@ -17,7 +17,7 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Configs\ConfigTest
                 
             )),
             array(
-                'type'       => $this->type,
+                'type'   => $this->type,
                 'model'  => $this->model,
             )
         );
@@ -25,13 +25,14 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Configs\ConfigTest
     }
     
     /**
+     * @covers \PHPixie\ORM\Configs\Config::__construct
+     * @covers \PHPixie\ORM\Models\Model\Config::__construct
      * @covers ::__construct
-     * @covers PHPixie\ORM\Configs\Config::__construct
      * @covers ::<protected>
      */
     public function testConstruct()
     {
-        
+        parent::testConstruct();
     }
 
 }

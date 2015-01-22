@@ -67,7 +67,8 @@ class Models
         return new \PHPixie\ORM\Models\Type\Embedded(
             $this,
             $this->ormBuilder->configs(),
-            $this->ormBuilder->maps()
+            $this->ormBuilder->maps(),
+            $this->ormBuilder->data()
         );
     }
 }

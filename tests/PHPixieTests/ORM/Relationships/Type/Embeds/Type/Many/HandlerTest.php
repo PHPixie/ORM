@@ -102,8 +102,9 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $loader = $this->getArrayNodeLoader();
         $this->method($this->loaders, 'arrayNode', $loader, array(
             $this->configData['itemModel'],
+            $arrayNode,
             $owner['entity'],
-            $arrayNode
+            $this->configData['ownerItemsProperty'],
         ), 0);
         $this->assertSame($loader, $this->handler->loadProperty($this->propertyConfig, $owner['entity']));
     }

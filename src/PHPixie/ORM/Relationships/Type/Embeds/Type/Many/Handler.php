@@ -122,7 +122,13 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     public function loadProperty($config, $entity)
     {
         $arrayNode = $this->getArrayNode($entity, $config->path);
-        return $this->loaders->arrayNode($config->itemModel, $entity, $arrayNode);
+        
+        return $this->loaders->arrayNode(
+            $config->itemModel,
+            $arrayNode,
+            $entity,
+            $config->ownerItemsProperty
+        );
     }
 
     protected function unsetCachedItemOwner($arrayNodeLoader, $offset)

@@ -11,9 +11,9 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
     protected $cachedEntities = array();
 
 
-    public function __construct($loaders, $embeddedModel, $arrayNode, $owner, $ownerPropertyName)
+    public function __construct($loaders, $embeddedModel, $modelName, $arrayNode, $owner, $ownerPropertyName)
     {
-        parent::__construct($loaders, $embeddedModel);
+        parent::__construct($loaders, $embeddedModel, $modelName);
         $this->arrayNode = $arrayNode;
         $this->owner = $owner;
         $this->ownerPropertyName = $ownerPropertyName;

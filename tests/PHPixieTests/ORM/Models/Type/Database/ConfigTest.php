@@ -40,13 +40,15 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Models\Model\ConfigTest
     }
     
     /**
+     * @covers \PHPixie\ORM\Configs\Config::__construct
+     * @covers \PHPixie\ORM\Models\Model\Config::__construct
+     * @covers \PHPixie\ORM\Models\Type\Database\Config::__construct
      * @covers ::__construct
-     * @covers PHPixie\ORM\Models\Model\Config::__construct
-     * @covers PHPixie\ORM\Configs\Config::__construct
      * @covers ::<protected>
+     * @covers \PHPixie\ORM\Models\Type\Database\Config::<protected>
      */
     public function testConstruct()
     {
-        
+        parent::testConstruct();
     }
 }

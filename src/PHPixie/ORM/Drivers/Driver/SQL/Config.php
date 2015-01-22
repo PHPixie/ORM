@@ -8,8 +8,11 @@ abstract class Config extends \PHPixie\ORM\Models\Type\Database\Config
     
     protected function processConfig($configSlice, $inflector)
     {
-        if (($this->table = $configSlice->get('table', null)) === null)
+        if (($this->table = $configSlice->get('table', null)) === null) {
             $this->table = $inflector->plural($this->model);
+        }
+        
+        parent::processConfig($configSlice, $inflector);
     }
     
     protected function defaultIdField()

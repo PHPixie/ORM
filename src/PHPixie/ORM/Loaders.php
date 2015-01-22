@@ -13,42 +13,27 @@ class Loaders
     
     public function iterator($loader)
     {
-        return new Loaders\Iterator(
-            $loader
-        );
+        return new Loaders\Iterator($loader);
     }
 
     public function multiplePreloader($resultPreloader, $ids)
     {
-        return new Loaders\Loader\MultiplePreloader(
-            $this,
-            $resultPreloader,
-            $ids
-        );
+        return new Loaders\Loader\MultiplePreloader($this, $resultPreloader, $ids);
     }
     
     public function editableProxy($loader)
     {
-        return new Loaders\Loader\Proxy\Editable(
-            $this,
-            $loader
-        );
+        return new Loaders\Loader\Proxy\Editable($this, $loader);
     }
 
     public function cachingProxy($loader)
     {
-        return new Loaders\Loader\Proxy\Caching(
-            $this,
-            $loader
-        );
+        return new Loaders\Loader\Proxy\Caching($this, $loader);
     }
     
     public function preloadingProxy($loader)
     {
-        return new Loaders\Loader\Proxy\Preloading(
-            $this,
-            $loader
-        );
+        return new Loaders\Loader\Proxy\Preloading($this, $loader);
     }
     
     public function reusableResult($repository, $reusableResultStep)
@@ -69,12 +54,14 @@ class Loaders
         );
     }
     
-    public function arrayNode($arrayNode, $owner, $ownerPropertyName)
+    public function arrayNode($modelName, $arrayNode, $owner, $ownerPropertyName)
     {
         $embeddedModel = $this->ormBuilder->models()->embedded();
+        
         return new Loaders\Loader\Embedded\ArrayNode(
             $this,
             $embeddedModel,
+            $modelName,
             $arrayNode,
             $owner,
             $ownerPropertyName

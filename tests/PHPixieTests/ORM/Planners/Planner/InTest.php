@@ -41,7 +41,7 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
     public function testDatabaseModelQuery()
     {
         $query = $this->getItemsQuery();
-        $modelQuery = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');
+        $modelQuery = $this->getDatabaseModelQuery();
         $plan = $this->getStepsPlan();
         
         $callback = array($this->plannerMock(), 'databaseModelQuery');
@@ -57,6 +57,36 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
         call_user_func_array($callback, $params);
         
         $this->prepareDatabaseModelQueryTest($query, $modelQuery, $plan, 'or', true);
+        $params = array_merge($params, array('or', true));
+        call_user_func_array($callback, $params);
+        
+    }
+    
+    /**
+     * @covers ::itemIds
+     * @covers ::<protected>
+     */
+    public function testIemsIDs()
+    {
+        $query = $this->getItemsQuery();
+        $repository = $this->getRepository();
+        $plan = $this->getStepsPlan();
+        
+        $items = array($this->getDatabaseModelQuery());
+        
+        $callback = array($this->plannerMock(), 'itemIds');
+        $params = array(
+            $query,
+            $this->queryField,
+            $repository,
+            $items,
+            $plan
+        );
+        
+        $this->prepareItemIdsTest($query, $repository, $items, $plan, 'and', false);
+        call_user_func_array($callback, $params);
+        
+        $this->prepareItemIdsTest($query, $repository, $items, $plan, 'or', true);
         $params = array_merge($params, array('or', true));
         call_user_func_array($callback, $params);
         
@@ -154,6 +184,14 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
         $this->prepareSubquery('subquery', $query, $subquery, $plan, $logic, $negate);
     }
     
+    protected function prepareItemIdsTest($query, $repository, $items, $plan, $logic, $negate)
+    {
+        $config = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
+        $config->idField = 'id';
+        
+        $this->method($repository, 'config',
+    }
+    
     protected function prepareConnections($query, $subquery, $queryIsSql = true, $subqueryIsSame = true, $at = null)
     {
         $queryConnection = $this->getConnection($queryIsSql);
@@ -210,6 +248,11 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
     protected function getItemsQuery()
     {
         return $this->abstractMock('\PHPixie\Database\Query\Items');
+    }
+    
+    protected function getDatabaseModelQuery()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');
     }
     
     protected function planner()

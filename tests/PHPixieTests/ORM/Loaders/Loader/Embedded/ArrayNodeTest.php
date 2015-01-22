@@ -174,6 +174,7 @@ class ArrayNodeTest extends \PHPixieTests\ORM\Loaders\Loader\EmbeddedTest
         return new \PHPixie\ORM\Loaders\Loader\Embedded\ArrayNode(
             $this->loaders,
             $this->embeddedModel,
+            $this->modelName,
             $this->arrayNode,
             $this->owner,
             $this->ownerPropertyName

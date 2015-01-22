@@ -28,4 +28,9 @@ class Data {
     {
         return new \PHPixie\ORM\Data\Types\Document\Diffable($data);
     }
+    
+    public function documentFromData()
+    {
+    
+    }
 }

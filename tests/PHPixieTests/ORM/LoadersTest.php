@@ -123,16 +123,19 @@ class LoadersTest extends \PHPixieTests\AbstractORMTest
      */
     public function testArrayNode()
     {
+        $modelName = 'pixie';
         $arrayNode = $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode');
         $owner = $this->quickMock('\PHPixie\ORM\Models\Type\Embedded\Entity');
         $ownerPropertyName = 'flowers';
             
-        $loader = $this->loaders->arrayNode($arrayNode, $owner, $ownerPropertyName);
+        $loader = $this->loaders->arrayNode($modelName, $arrayNode, $owner, $ownerPropertyName);
         
         $this->assertInstance($loader,'\PHPixie\ORM\Loaders\Loader\Embedded\ArrayNode', array(
-            'loaders' => $this->loaders,
-            'arrayNode' => $arrayNode,
-            'owner' => $owner,
+            'loaders'       => $this->loaders,
+            'embeddedModel' => $this->embeddedModel,
+            'modelName'     => $modelName,
+            'arrayNode'     => $arrayNode,
+            'owner'         => $owner,
             'ownerPropertyName' => $ownerPropertyName,
         ));
     }

@@ -61,4 +61,14 @@ class RelationshipsTest extends \PHPixieTests\AbstractORMTest
             $this->assertSame($relationship, $this->relationships->get($name));
         }
     }
+    
+    /**
+     * @covers ::get
+     * @covers ::<protected>
+     */
+    public function testGetException()
+    {
+        $this->setExpectedException('\PHPixie\ORM\Exception\Relationship');
+        $this->relationships->get('pixie');
+    }
 }

@@ -11,6 +11,14 @@ class In extends \PHPixie\ORM\Planners\Planner
         $this->steps = $steps;
     }
     
+    public function itemIds($query, $queryField, $repository, $items, $plan, $logic = 'and', $negate = false)
+    {
+        $idField = $repository->config()->idField;
+        $modelQuery = $repository->query()->in($items);
+        
+        $this->databaseModelQuery($query, $queryField, $modelQuery, $idField, $plan, $logic, $negate);
+    }
+    
     public function databaseModelQuery($query, $queryField, $modelQuery, $modelQueryField, $plan, $logic = 'and', $negate = false)
     {
         $queryPlan = $modelQuery->planFind();

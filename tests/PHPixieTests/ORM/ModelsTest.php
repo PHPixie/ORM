@@ -23,6 +23,15 @@ class ModelsTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+        
+    }
+    
+    /**
      * @covers ::wrappers
      * @covers ::<protected>
      */
@@ -71,7 +80,8 @@ class ModelsTest extends \PHPixieTests\AbstractORMTest
     {
         $this->modelTest('embedded', array(
             'configs',
-            'maps'
+            'maps',
+            'data'
         ));
     }
     

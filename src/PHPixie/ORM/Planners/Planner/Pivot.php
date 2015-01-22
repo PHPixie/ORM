@@ -21,13 +21,43 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
 
     public function unlink($pivot, $firstSide, $secondSide, $plan)
     {
-       $strategy = $this->selectStrategy($pivot, $firstSide, $secondSide);
-       $strategy->unlink($pivot, $firstSide, $secondSide, $plan);
+        $this->unlinkSides($pivot, $firstSide, $plan, $secondSide);
     }
 
     public function unlinkAll($pivot, $side, $plan)
     {
+        $this->unlinkSides($pivot, $side, $plan);
+    }
     
+    protected function unlinkSides($pivot, $firstSide, $plan, $secondSide = null)
+    {
+        $sides = array($firstSide);
+        
+        if($secondSide !== null) {
+            $sides[]= $secondSide;
+        }
+        
+        $deleteQuery = $pivot->connection()->deleteQuery();
+        $this->planners->query()->setSource($deleteQuery, $pivot->source());
+
+        foreach ($sides as $side) {
+            
+            $repository = $side->repository();
+            
+            $idField    = $repository->config()->idField;
+            $itemsQuery = $repository->query()->in($side->items());
+            
+            $this->planners->in()->databaseModelQuery(
+                $deleteQuery,
+                $side->pivotKey(),
+                $itemsQuery,
+                $idField,
+                $plan
+            );
+        }
+
+        $deleteStep = $this->steps->query($deleteQuery);
+        $plan->add($deleteStep);
     }
     
     protected function selectStrategy($pivot, $firstSide, $secondSide)

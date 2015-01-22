@@ -55,6 +55,14 @@ class QueryTest extends \PHPixieTests\ORM\Plans\PlanTest
         $this->assertSame(array($this->queryStep), $this->plan->steps());
     }
     
+    /**
+     * @covers ::queryStep
+     * @covers ::<protected>
+     */
+    public function testQueryStep()
+    {
+        $this->assertSame($this->queryStep, $this->plan->queryStep());
+    }
     
     protected function addSteps($withConnections = false)
     {

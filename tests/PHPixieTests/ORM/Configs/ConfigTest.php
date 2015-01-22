@@ -45,8 +45,9 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
     {
         foreach($this->sets as $set) {
             $config = $this->getConfig($set[0]);
-            foreach($set[1] as $key => $value)
+            foreach($set[1] as $key => $value) {
                 $this->assertEquals($value, $config->$key);
+            }
         }
     }
 

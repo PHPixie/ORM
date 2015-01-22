@@ -8,27 +8,28 @@ abstract class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
     protected $repository;
     protected $isDeleted = false;
     protected $isNew;
-
+    
     public function __construct($entityMap, $repository, $data, $isNew = false)
     {
-        parent::__construct($entityMap, $repository->config(), $data);
         $this->repository = $repository;
         $this->isNew = $isNew;
+        
+        parent::__construct($entityMap, $repository->config(), $data);
     }
-
+    
     public function isNew()
     {
         return $this->isNew;
-    }
-
-    public function isDeleted()
-    {
-        return $this->isDeleted;
     }
     
     public function setIsNew($isNew)
     {
         $this->isNew = $isNew;
+    }
+    
+    public function isDeleted()
+    {
+        return $this->isDeleted;
     }
     
     public function setIsDeleted($isDeleted)
@@ -56,7 +57,7 @@ abstract class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
     {
         $this->repository->delete($this);
     }
-
+    
     public function getRelationshipProperty($name, $createMissing = true)
     {
         $this->assertNotDeleted();

@@ -10,6 +10,8 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
     protected $planners;
     protected $steps;
     
+    protected $plannerMocks = array();
+    
     protected $sqlStategy;
     protected $multiqueryStrategy;
     
@@ -17,6 +19,15 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
     {
         $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
+        
+        $this->plannerMocks = array(
+            'query' => $this->quickMock('\PHPixie\ORM\Planners\Planner\Query'),
+            'in'    => $this->quickMock('\PHPixie\ORM\Planners\Planner\In')
+        );
+        
+        foreach($this->plannerMocks as $name => $planner) {
+            $this->method($this->planners, $name, $planner, array());
+        }
         
         $this->sqlStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot\Strategy\SQL');
         $this->multiqueryStrategy  = $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot\Strategy\Multiquery');
@@ -68,44 +79,6 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
      */
     public function testLink()
     {
-        $this->modifyLinkTest('link');
-    }
-    
-    /**
-     * @covers ::unlink
-     * @covers ::<protected>
-     */
-    public function testUnlink()
-    {
-        $this->modifyLinkTest('unlink');
-    }
-    
-    /**
-     * @covers ::buildSqlStrategy
-     * @covers ::<protected>
-     */
-    public function testBuildSqlStrategy()
-    {
-        $this->assertStrategy('sql', '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\SQL', array(
-            'planners' => $this->planners,
-            'steps'    => $this->steps
-        ));
-    }
-    
-    /**
-     * @covers ::buildMultiqueryStrategy
-     * @covers ::<protected>
-     */
-    public function testBuildMutiqueryStrategy()
-    {
-        $this->assertStrategy('multiquery', '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\Multiquery', array(
-            'planners' => $this->planners,
-            'steps'    => $this->steps
-        ));
-    }
-    
-    protected function modifyLinkTest($type)
-    {
         $sqlConnection = $this->getConnection(true);
         $otherSqlConnection = $this->getConnection(true);
         $connection = $this->getConnection();
@@ -132,9 +105,94 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
             
             $strategy = $params[1].'Strategy';
             
-            $this->method($this->$strategy, $type, null, array($pivot, $firstSide, $secondSide, $plan), 0);
-            $this->plannerMock()->$type($pivot, $firstSide, $secondSide, $plan);
+            $this->method($this->$strategy, 'link', null, array($pivot, $firstSide, $secondSide, $plan), 0);
+            $this->plannerMock()->link($pivot, $firstSide, $secondSide, $plan);
         }
+    }
+    
+    /**
+     * @covers ::unlink
+     * @covers ::<protected>
+     */
+    public function testUnlink()
+    {
+        $pivot = $this->getPivot();
+        $firstSide = $this->getSide();
+        $plan = $this->getStepsPlan();
+        $secondSide = $this->getSide();
+        
+        $this->prepareUnlinkSides($pivot, $firstSide, $plan, $secondSide);
+        $this->planner()->unlink($pivot, $firstSide, $secondSide, $plan);
+    }
+    
+    /**
+     * @covers ::buildSqlStrategy
+     * @covers ::<protected>
+     */
+    public function testBuildSqlStrategy()
+    {
+        $this->assertStrategy('sql', '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\SQL', array(
+            'planners' => $this->planners,
+            'steps'    => $this->steps
+        ));
+    }
+    
+    /**
+     * @covers ::buildMultiqueryStrategy
+     * @covers ::<protected>
+     */
+    public function testBuildMutiqueryStrategy()
+    {
+        $this->assertStrategy('multiquery', '\PHPixie\ORM\Planners\Planner\Pivot\Strategy\Multiquery', array(
+            'planners' => $this->planners,
+            'steps'    => $this->steps
+        ));
+    }
+    
+    protected function prepareUnlinkSides($pivot, $firstSide, $plan, $secondSide = null)
+    {
+        $sides = array($firstSide);
+        
+        if($secondSide !== null) {
+            $sides[]= $secondSide;
+        }
+        
+        $connection  = $this->getConnection();
+        $deleteQuery = $this->getDatabaseQuery('delete');
+        
+        $this->method($pivot, 'connection', $connection, array(), 0);
+        $this->method($connection, 'deleteQuery', $deleteQuery, array(), 0);
+        
+        $this->method($pivot, 'source', 'pixie', array(), 1);
+        $this->method($this->plannerMocks['query'], 'setSource', null, array($deleteQuery, 'pixie'), 0);
+        
+        foreach($sides as $key => $side) {
+            $repository = $this->getRepository();
+            $this->method($side, 'repository', $repository, array(), 0);
+            
+            $itemsQuery = $this->getDatabaseModelQuery();
+            $this->method($repository, 'idField', "id_$key", array(), 0);
+            $this->method($repository, 'query', $itemsQuery, array(), 1);
+            
+            $items = array($this->getDatabaseModelQuery());
+            $this->method($side, 'items', $items, array(), 1);
+            
+            $this->method($itemsQuery, 'in', $itemsQuery, array($items), 0);
+            
+            $this->method($side, 'pivotKey', "pivot_$key", array(), 1);
+            $this->method($this->plannerMocks['in'], 'databaseModelQuery', null, array(
+                $deleteQuery,
+                "pivot_$key",
+                $itemsQuery,
+                "id_$key",
+                $plan
+            ), $key);
+        }
+        
+        $deleteStep = $this->getQueryStep();
+        $this->method($this->steps, 'query', $deleteStep, array($deleteQuery), 0);
+        
+        $this->method($plan, 'add', null, array($deleteStep), 0);
     }
     
     protected function getConnection($isSQL = false)
@@ -175,6 +233,26 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
         $this->method($mock, 'buildMultiqueryStrategy', $this->multiqueryStrategy, array());
         
         return $mock;
+    }
+    
+    protected function getDatabaseModelQuery()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');    
+    }
+    
+    protected function getRepository()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Repository');    
+    }
+    
+    protected function getQueryStep()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Steps\Step\Query');    
+    }
+    
+    protected function getDatabaseQuery($type)
+    {
+        return $this->abstractMock('\PHPixie\Database\Type\SQL\Query\Type\\'.ucfirst($type));    
     }
     
     protected function planner()

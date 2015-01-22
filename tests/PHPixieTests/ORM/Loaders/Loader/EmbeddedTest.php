@@ -8,6 +8,7 @@ namespace PHPixieTests\ORM\Loaders\Loader;
 abstract class EmbeddedTest extends \PHPixieTests\ORM\Loaders\LoaderTest
 {
     protected $embeddedModel;
+    protected $modelName = 'pixie';
 
     public function setUp()
     {
@@ -28,7 +29,7 @@ abstract class EmbeddedTest extends \PHPixieTests\ORM\Loaders\LoaderTest
     protected function prepareLoadEntity($document, $at = 0)
     {
         $entity = $this->getEntity();
-        $this->method($this->embeddedModel, 'loadEntity', $entity, array($document), $at);
+        $this->method($this->embeddedModel, 'loadEntity', $entity, array($this->modelName, $document), $at);
         return $entity;
     }
     

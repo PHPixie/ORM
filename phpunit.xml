@@ -17,6 +17,7 @@
             <directory>./tests/PHPixieTests/ORM/Models</directory>
             <directory>./tests/PHPixieTests/ORM/Drivers</directory>
             <directory>./tests/PHPixieTests/ORM/Planners</directory>
+            <directory>./tests/PHPixieTests/ORM/Mappers</directory>
             
             <file>./tests/PHPixieTests/ORM/StepsTest.php</file>
             <file>./tests/PHPixieTests/ORM/LoadersTest.php</file>

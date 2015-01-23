@@ -66,7 +66,7 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
      * @covers ::itemIds
      * @covers ::<protected>
      */
-    public function testIemsIDs()
+    public function testIemsIds()
     {
         $query = $this->getItemsQuery();
         $repository = $this->getRepository();
@@ -164,10 +164,10 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
         call_user_func_array($callback, $params);
 	}
     
-    protected function prepareDatabaseModelQueryTest($query, $modelQuery, $plan, $logic, $negate)
+    protected function prepareDatabaseModelQueryTest($query, $modelQuery, $plan, $logic, $negate, $queryAt = 0)
     {
         $loaderPlan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Query\Loader');
-        $this->method($modelQuery, 'planFind', $loaderPlan, array(), 0);
+        $this->method($modelQuery, 'planFind', $loaderPlan, array(), $queryAt);
         
         $requiredPlan = $this->getStepsPlan();
         $this->method($loaderPlan, 'requiredPlan', $requiredPlan, array(), 0);
@@ -187,9 +187,16 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
     protected function prepareItemIdsTest($query, $repository, $items, $plan, $logic, $negate)
     {
         $config = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
-        $config->idField = 'id';
+        $config->idField = $this->subqueryField;
         
-        $this->method($repository, 'config',
+        $modelQuery = $this->getDatabaseModelQuery();
+        
+        $this->method($repository, 'config', $config, array(), 0);
+        $this->method($repository, 'query', $modelQuery, array(), 1);
+        
+        $this->method($modelQuery, 'in', $modelQuery, array($items), 0);
+        
+        $this->prepareDatabaseModelQueryTest($query, $modelQuery, $plan, $logic, $negate, 1);
     }
     
     protected function prepareConnections($query, $subquery, $queryIsSql = true, $subqueryIsSame = true, $at = null)
@@ -248,6 +255,11 @@ class InTest extends \PHPixieTests\ORM\Planners\PlannerTest
     protected function getItemsQuery()
     {
         return $this->abstractMock('\PHPixie\Database\Query\Items');
+    }
+    
+    protected function getRepository()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Repository');
     }
     
     protected function getDatabaseModelQuery()

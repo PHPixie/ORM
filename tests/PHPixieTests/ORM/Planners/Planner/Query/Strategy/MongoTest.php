@@ -35,7 +35,7 @@ class MultiqueryTest extends \PHPixieTests\ORM\Planners\Planner\Query\StrategyTe
         ));
     }
     
-    protected function getStrategy()
+    protected function strategy()
     {
         return new \PHPixie\ORM\Planners\Planner\Query\Strategy\Mongo();
     }

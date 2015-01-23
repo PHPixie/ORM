@@ -7,15 +7,14 @@ namespace PHPixieTests\ORM\Planners\Planner\Query;
  */
 abstract class StrategyTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $steps;
     protected $strategy;
     
     public function setUp()
     {
-        $this->strategy = $this->getStrategy();
+        $this->strategy = $this->strategy();
     }
     
     abstract public function testSetSource();
     abstract public function testSetBatchData();
-    abstract protected function getStrategy();
+    abstract protected function strategy();
 }

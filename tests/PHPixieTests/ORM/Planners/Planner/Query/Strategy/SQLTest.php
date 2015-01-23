@@ -35,7 +35,7 @@ class SQLTest extends \PHPixieTests\ORM\Planners\Planner\Query\StrategyTest
         ));
     }
     
-    protected function getStrategy()
+    protected function strategy()
     {
         return new \PHPixie\ORM\Planners\Planner\Query\Strategy\SQL();
     }

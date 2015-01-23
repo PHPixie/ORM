@@ -9,6 +9,7 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
 {
     protected $planners;
     protected $steps;
+    protected $database;
     
     protected $plannerMocks = array();
     
@@ -19,6 +20,7 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
     {
         $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
+        $this->database = $this->quickMock('\PHPixie\ORM\Database');
         
         $this->plannerMocks = array(
             'query' => $this->quickMock('\PHPixie\ORM\Planners\Planner\Query'),
@@ -126,6 +128,37 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
     }
     
     /**
+     * @covers ::unlinkAll
+     * @covers ::<protected>
+     */
+    public function testUnlinkAll()
+    {
+        $pivot = $this->getPivot();
+        $side = $this->getSide();
+        $plan = $this->getStepsPlan();
+        
+        $this->prepareUnlinkSides($pivot, $side, $plan);
+        $this->planner()->unlinkAll($pivot, $side, $plan);
+    }
+    
+    /**
+     * @covers ::pivotByConnectionName
+     * @covers ::<protected>
+     */
+    public function testPivotByConnectionName()
+    {
+        $pivot = $this->getPivot();
+        $connection = $this->getConnection();
+        
+        $this->method($this->database, 'connection', $connection, array('pixie'), 0);
+        
+        $pivotMock = $this->plannerMock();
+        $this->method($pivotMock, 'pivot', $pivot, array($connection, 'test'), 0);
+        
+        $pivotMock->pivotByConnectionName('pixie', 'test');
+    }
+    
+    /**
      * @covers ::buildSqlStrategy
      * @covers ::<protected>
      */
@@ -168,23 +201,18 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
         
         foreach($sides as $key => $side) {
             $repository = $this->getRepository();
-            $this->method($side, 'repository', $repository, array(), 0);
-            
-            $itemsQuery = $this->getDatabaseModelQuery();
-            $this->method($repository, 'idField', "id_$key", array(), 0);
-            $this->method($repository, 'query', $itemsQuery, array(), 1);
-            
             $items = array($this->getDatabaseModelQuery());
-            $this->method($side, 'items', $items, array(), 1);
             
-            $this->method($itemsQuery, 'in', $itemsQuery, array($items), 0);
+            $this->method($side, 'pivotKey', "pivot_$key", array(), 0);
+            $this->method($side, 'repository', $repository, array(), 1);
+            $this->method($side, 'items', $items, array(), 2);
             
-            $this->method($side, 'pivotKey', "pivot_$key", array(), 1);
-            $this->method($this->plannerMocks['in'], 'databaseModelQuery', null, array(
+            
+            $this->method($this->plannerMocks['in'], 'itemIds', null, array(
                 $deleteQuery,
                 "pivot_$key",
-                $itemsQuery,
-                "id_$key",
+                $repository,
+                $items,
                 $plan
             ), $key);
         }
@@ -221,12 +249,15 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
     
     protected function plannerMock()
     {
-        $mock = $this->quickMock('\PHPixie\ORM\Planners\Planner\Pivot', array(
+        $mock = $this->getMock('\PHPixie\ORM\Planners\Planner\Pivot', array(
             'buildSqlStrategy',
-            'buildMultiqueryStrategy'
+            'buildMultiqueryStrategy',
+            'pivot',
+            'side'
         ), array(
             $this->planners,
-            $this->steps
+            $this->steps,
+            $this->database
         ));
         
         $this->method($mock, 'buildSqlstrategy', $this->sqlStrategy, array());
@@ -259,7 +290,8 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
     {
         return new \PHPixie\ORM\Planners\Planner\Pivot(
             $this->planners,
-            $this->steps
+            $this->steps,
+            $this->database
         );
     }
 }

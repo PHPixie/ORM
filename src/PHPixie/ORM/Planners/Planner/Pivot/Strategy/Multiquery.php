@@ -9,7 +9,7 @@ class Multiquery extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
         $resultSteps = array();
         foreach (array($firstSide, $secondSide) as $side) {
             $idQuery = $this->idQuery($side, $plan);
-            $resultStep = $this->steps->result($query);
+            $resultStep = $this->steps->iteratorResult($idQuery);
             $plan->add($resultStep);
             $resultSteps[] = $resultStep;
         }
@@ -18,14 +18,15 @@ class Multiquery extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
         $plan->add($cartesianStep);
 
         $insertStep = $this->steps->pivotInsert(
-                                                    $pivot->connection,
-                                                    $pivot->pivot,
-                                                    array(
-                                                        $firstSide->pivotKey,
-                                                        $secondSide->pivotKey
-                                                    ),
-                                                    $cartesianStep
-                                                );
+            $pivot->connection(),
+            $pivot->source(),
+            array(
+                $firstSide->pivotKey(),
+                $secondSide->pivotKey()
+            ),
+            $cartesianStep
+        );
+        
         $plan->add($insertStep);
     }
 }

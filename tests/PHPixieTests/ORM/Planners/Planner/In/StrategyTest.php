@@ -22,10 +22,10 @@ abstract class StrategyTest extends \PHPixieTests\AbstractORMTest
         $this->plan = $this->quickMock('\PHPixie\ORM\Plans\Plan\Steps');
         
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
-        $this->strategy = $this->getStrategy();
+        $this->strategy = $this->strategy();
     }
     
     abstract protected function getQuery();
     abstract public function testIn();
-    abstract protected function getStrategy();
+    abstract protected function strategy();
 }

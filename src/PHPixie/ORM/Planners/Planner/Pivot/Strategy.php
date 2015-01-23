@@ -13,5 +13,18 @@ abstract class Strategy
         $this->steps    = $steps;
     }
 
+    protected function idQuery($side, $plan)
+    {
+        $query = $side->repository()->query();
+        $query->in($side->items());
+        $queryPlan = $query->planFind();
+        
+        $plan->appendPlan($queryPlan->requiredPlan());
+        $query = $queryPlan->queryStep()->query();
+        $idField = $side->repository()->config()->idField;
+        $query->fields(array($idField));
+        return $query;
+    }
+    
     abstract public function link($pivot, $firstSide, $secondSide, $plan);
 }

@@ -6,11 +6,13 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
 {
     protected $planners;
     protected $steps;
+    protected $database;
     
-    public function __construct($planners, $steps)
+    public function __construct($planners, $steps, $database)
     {
         $this->planners = $planners;
         $this->steps    = $steps;
+        $this->database = $database;
     }
     
     public function link($pivot, $firstSide, $secondSide, $plan)
@@ -41,17 +43,11 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
         $this->planners->query()->setSource($deleteQuery, $pivot->source());
 
         foreach ($sides as $side) {
-            
-            $repository = $side->repository();
-            
-            $idField    = $repository->config()->idField;
-            $itemsQuery = $repository->query()->in($side->items());
-            
-            $this->planners->in()->databaseModelQuery(
+            $this->planners->in()->itemIds(
                 $deleteQuery,
                 $side->pivotKey(),
-                $itemsQuery,
-                $idField,
+                $side->repository(),
+                $side->items(),
                 $plan
             );
         }

@@ -9,7 +9,7 @@ class SQL extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
 
     public function link($pivot, $firstSide, $secondSide, $plan)
     {
-        $pivotTable = $pivot->pivot;
+        $pivotTable = $pivot->source();
 
         $sides = array(
             'first' => $firstSide,

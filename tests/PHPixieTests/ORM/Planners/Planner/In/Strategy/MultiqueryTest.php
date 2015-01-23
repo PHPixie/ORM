@@ -36,7 +36,7 @@ class MultiqueryTest extends \PHPixieTests\ORM\Planners\Planner\In\StrategyTest
         return $this->abstractMock('\PHPixie\Database\Query\Items');
     }
     
-    protected function getStrategy()
+    protected function strategy()
     {
         return new \PHPixie\ORM\Planners\Planner\In\Strategy\Multiquery($this->steps);
     }

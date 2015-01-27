@@ -18,45 +18,46 @@ class SQL extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
 
         $sideData = array();
         foreach ($sides as $name => $side) {
+            $idField = $side->repository()->config()->idField;
             $alias = $this->idQueryAliasPrefix.$name;
             $sideData[] = array(
                 'query' => $this->idQuery($side, $plan),
                 'queryAlias' => $alias,
-                'productIdField' => $alias.'.'.$side->repository->idField(),
+                'productIdField' => $alias.'.'.$idField,
                 'productAlias' => $name,
                 'productKey' => $this->productAlias.'.'.$name,
-                'pivotKey' => $pivotTable.'.'.$side->pivotKey,
+                'pivotKey' => $pivotTable.'.'.$side->pivotKey(),
             );
         }
 
-        $productQuery = $pivot->connection->query()
-                                                ->fields(array(
-                                                    $sides[0]['productAlias'] => $sides[0]['productIdField'],
-                                                    $sides[1]['productAlias'] => $sides[1]['productIdField']
-                                                ))
-                                                ->table($sides[0]['query'], $sides[0]['queryAlias'])
-                                                ->join($sides[1]['query'], $sides[1]['queryAlias'], 'cross');
+        $productQuery = $pivot->connection()->selectQuery()
+                            ->fields(array(
+                                $sideData[0]['productAlias'] => $sideData[0]['productIdField'],
+                                $sideData[1]['productAlias'] => $sideData[1]['productIdField']
+                            ))
+                            ->table($sideData[0]['query'], $sideData[0]['queryAlias'])
+                            ->join($sideData[1]['query'], $sideData[1]['queryAlias'], 'cross');
 
-        $filteredQuery = $pivot->connection->query('select')
-                                                ->fields(array($sides[0]['productKey'], $sides[1]['productKey']))
-                                                ->table($productQuery, $this->productAlias)
-                                                ->join($pivotTable, null, 'left_outer')
-                                                    ->on($sides[0]['productKey'], $sideData[0]['pivotKey'])
-                                                    ->on($sides[1]['productKey'], $sideData[1]['pivotKey'])
-                                                ->where($sideData[0]['pivotKey'], null);
+        $filteredQuery = $pivot->connection()->selectQuery()
+                            ->fields(array($sideData[0]['productKey'], $sideData[1]['productKey']))
+                            ->table($productQuery, $this->productAlias)
+                            ->join($pivotTable, null, 'left_outer')
+                                ->on($sideData[0]['productKey'], $sideData[0]['pivotKey'])
+                                ->on($sideData[1]['productKey'], $sideData[1]['pivotKey'])
+                            ->where($sideData[0]['pivotKey'], null);
 
-        $insertQuery = $pivot->connection->query('insert')
-                                                ->table($pivotTable)
-                                                ->batchData(
-                                                    array(
-                                                        $sideData[0]['pivotKey'],
-                                                        $sideData[1]['pivotKey']
-                                                    ),
-                                                    $filteredQuery
-                                                );
+        $insertQuery = $pivot->connection()->insertQuery()
+                            ->table($pivotTable)
+                            ->batchData(
+                                array(
+                                    $sideData[0]['pivotKey'],
+                                    $sideData[1]['pivotKey']
+                                ),
+                                $filteredQuery
+                            );
 
         $queryStep = $this->steps->query($insertQuery);
-        $plan->add($insertQuery);
+        $plan->add($queryStep);
 
     }
 }

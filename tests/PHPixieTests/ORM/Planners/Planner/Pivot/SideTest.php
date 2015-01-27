@@ -33,7 +33,7 @@ class SideTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::items
+     * @covers ::pivotKey
      */
     public function testPivotKey()
     {

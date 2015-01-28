@@ -4,21 +4,16 @@ namespace PHPixie\ORM\Mappers;
 
 class Conditions
 {
+    protected $mappers;
     protected $models;
     protected $relationships;
-    protected $planners;
     
-    protected $databaseModel;
-    protected $relationshipMap;
-
-    public function __construct($models, $relationships, $planners)
+    public function __construct($mappers, $models, $maps, $relationships)
     {
+        $this->mappers = $models;
         $this->models = $models;
+        $this->maps = $maps;
         $this->relationships = $relationships;
-        $this->planners = $planners;
-        
-        $this->databaseModel   = $models->database();
-        $this->relationshipMap = $relationships->map();
     }
     
     protected function mapOperatorCondition($builder, $condition)
@@ -39,14 +34,9 @@ class Conditions
         $builder->endGroup();
     }
     
-    public function mapEmbeddedCollection($builder, $modelName, $embeddedCollection, $plan)
-    {
-        
-    }
-    
     protected function mapRelationshipGroup($builder, $modelName, $group, $plan)
     {
-        $side = $this->relationshipMap->getSide($modelName, $group->relationship());
+        $side = $this->maps->query()->get($modelName, $group->relationship());
         $type = $side->relationshipType();
         $handler = $this->relationships->get($type)->handler();
         
@@ -87,7 +77,7 @@ class Conditions
         }
         
         if(!empty($ids) || empty($items)) {
-            $idField = $this->databaseModel->config($modelName)->idField;
+            $idField = $this->models->database()->config($modelName)->idField;
             $builder->addInOperatorCondition($idField, $ids, 'or', false);
         }
         
@@ -96,6 +86,8 @@ class Conditions
     
     public function map($builder, $modelName, $conditions, $plan)
     {
+        $conditions = $this->mappers->conditionsOptimizer()->optimize($conditions);
+        
         foreach ($conditions as $condition) {
             
             if ($condition instanceof \PHPixie\ORM\Conditions\Condition\Operator) {

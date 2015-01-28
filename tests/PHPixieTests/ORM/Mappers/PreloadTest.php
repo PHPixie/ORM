@@ -8,18 +8,25 @@ namespace PHPixieTests\ORM\Mappers;
 class PreloadTest extends \PHPixieTests\AbstractORMTest
 {
     protected $relationships;
-    protected $relationshipMap;
-    protected $modelName = 'fairy';
+    protected $maps;
     
     protected $preloadMapper;
+    
+    protected $entityMap;
+    protected $modelName = 'fairy';
     
     public function setUp()
     {
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
-        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
-        $this->method($this->relationships, 'map', $this->relationshipMap, array(), 0);
+        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
         
-        $this->preloadMapper = new \PHPixie\ORM\Mappers\Preload($this->relationships);
+        $this->entityMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Entity');
+        $this->method($this->maps, 'entity', $this->entityMap, array());
+        
+        $this->preloadMapper = new \PHPixie\ORM\Mappers\Preload(
+            $this->relationships,
+            $this->maps
+        );
     }
 
     /**
@@ -69,7 +76,7 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
             $this->method($property, 'propertyName', $set[0], array(), 0);
             
             $side = $this->getSide();
-            $this->method($this->relationshipMap, 'getSide', $side, array($this->modelName, $set[0]), $key);
+            $this->method($this->entityMap, 'get', $side, array($this->modelName, $set[0]), $key);
             $this->method($side, 'relationshipType', $set[1], array(), 0);
             
             $relationship = $this->getRelationship();

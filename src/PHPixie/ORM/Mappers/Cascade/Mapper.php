@@ -6,19 +6,19 @@ abstract class Mapper
 {
     protected $mappers;
     protected $relationships;
-    protected $relationshipMap;
+    protected $maps;
     
-    public function __construct($mappers, $relationships)
+    public function __construct($mappers, $relationships, $maps)
     {
         $this->mappers = $mappers;
         $this->relationships = $relationships;
-        $this->relationshipMap = $relationships->map();
+        $this->maps = $maps;
     }
     
     protected function getHandledSides($modelName)
     {
         $sides = array();
-        foreach($this->relationshipMap->modelSides($modelName) as $side) {
+        foreach($this->maps->entity()->getModelSides($modelName) as $side) {
             if($this->isSideHandled($side)) {
                 $sides[]= $side;
             }

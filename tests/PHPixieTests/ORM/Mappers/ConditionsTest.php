@@ -7,9 +7,9 @@ namespace PHPixieTests\ORM\Mappers;
  */
 class GroupTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $repositories;
+    protected $models;
     protected $relationships;
-    protected $relationshipMap;
+    protected $maps;
     protected $planners;
     protected $inPlanner;
     protected $modelName = 'fairy';
@@ -18,11 +18,9 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->repositories = $this->quickMock('\PHPixie\ORM\Repositories');
+        $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
-        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Relationships\Map');
-        $this->method($this->relationships, 'map', $this->relationshipMap, array());
-        
+        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
         $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
         $this->inPlanner = $this->quickMock('\PHPixie\ORM\Planners\Planner\In');
         $this->method($this->planners, 'in', $this->inPlanner, array());

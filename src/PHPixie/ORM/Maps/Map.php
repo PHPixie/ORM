@@ -30,6 +30,11 @@ abstract class Map
         return $this->sides[$modelName][$propertyName];
     }
     
+    public function getModelSides($modelName)
+    {
+        return $this->sides[$modelName];
+    }
+    
     public function getPropertyNames($modelName)
     {
         $this->ensureModel($modelName);

@@ -7,17 +7,21 @@ namespace PHPixieTests\ORM\Mappers\Cascade\Mapper;
  */
 class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
 {
-    protected $repositories;
+    protected $models;
     protected $planners;
     protected $steps;
     
+    protected $databaseModel;
     protected $inPlanner;
     
     public function setUp()
     {
-        $this->repositories = $this->quickMock('\PHPixie\ORM\Repositories');
+        $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
+        
+        $this->databaseModel = $this->quickMock('\PHPixie\ORM\Models\Type\Database');
+        $this->method($this->models, 'database', $this->databaseModel, array());
         
         $this->inPlanner = $this->quickMock('\PHPixie\ORM\Planners\Planner\In');
         $this->method($this->planners, 'in', $this->inPlanner, array());
@@ -162,8 +166,42 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
     protected function prepareRepository()
     {
         $repository = $this->getRepository();
-        $this->method($this->repositories, 'get', $repository, array($this->modelName));
+        $this->method($this->databaseModel, 'repository', $repository, array($this->modelName));
         return $repository;
+    }
+    
+    protected function getHandledSides($relationshipType)
+    {
+        $side = $this->getSide(true);
+        $this->method($side, 'isDeleteHandled', true, array());
+        $this->method($side, 'relationshipType', $relationshipType, array());
+        
+        return array($side);
+    }
+    
+    protected function getNotHandledSides()
+    {
+        $sides = array();
+        $sides[] = $this->getSide();
+        
+        $side = $this->getSide(true);
+        $this->method($side, 'isDeleteHandled', false, array());
+        
+        return $sides;
+    }
+    
+    protected function getSide($cascadeDelete = false)
+    {
+        if($cascadeDelete) {
+            return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete');
+        }
+        
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side');
+    }
+    
+    protected function getHandler()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Handler\Cascading\Delete');
     }
     
     protected function getDatabaseQuery($type)
@@ -200,7 +238,8 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
         return new \PHPixie\ORM\Mappers\Cascade\Mapper\Delete(
             $this->mappers,
             $this->relationships,
-            $this->repositories,
+            $this->maps,
+            $this->models,
             $this->planners,
             $this->steps
         );

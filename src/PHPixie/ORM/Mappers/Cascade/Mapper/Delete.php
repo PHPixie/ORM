@@ -8,11 +8,9 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
     protected $planners;
     protected $steps;
     
-    protected $databaseModel;
-    
-    public function __construct($mappers, $relationships, $models, $planners, $steps)
+    public function __construct($mappers, $relationships, $maps, $models, $planners, $steps)
     {
-        parent::__construct($mappers, $relationships);
+        parent::__construct($mappers, $relationships, $maps);
         $this->models = $models;
         $this->planners = $planners;
         $this->steps = $steps;
@@ -22,6 +20,9 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
     
     protected function isSideHandled($side)
     {
+        if(!($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete))
+            return false;
+        
         return $side->isDeleteHandled();
     }
     
@@ -41,7 +42,7 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
     
     public function handleQuery($selectQuery, $modelName, $plan, $path)
     {
-        $repository = $this->databaseModel->repository($modelName);
+        $repository  = $this->models->database()->repository($modelName);
         $deleteQuery = $repository->databaseDeleteQuery();
         
         $this->mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan, $path);
@@ -62,7 +63,7 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
         $plan->add($resultStep);
         $this->handleResult($resultStep, $modelName, $plan, $path); 
         
-        $repository = $this->repositories->get($modelName);
+        $repository = $this->models->database()->repository($modelName);
         $idField = $repository->config()->idField;
         $this->planners->in()->result(
             $deleteQuery,

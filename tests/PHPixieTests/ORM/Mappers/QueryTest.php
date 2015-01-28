@@ -7,22 +7,21 @@ namespace PHPixieTests\ORM\Mappers;
  */
 class QueryTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $models;
     protected $mappers;
     protected $plans;
     protected $steps;
     protected $loaders;
-    protected $repositories;
         
     protected $queryMapper;
     
     protected $modelName = 'fairy';
     
-    protected $groupMapper;
+    protected $datbaseModel;
+    protected $conditionsMapper;
     protected $preloadMapper;
     protected $updateMapper;
     protected $cascadeDeleteMapper;
-    protected $groupOptimizer;
-    
     
     protected $stepClasses = array(
         'query' => 'Query',
@@ -45,30 +44,31 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
+        $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
         $this->plans = $this->quickMock('\PHPixie\ORM\Plans');
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
         $this->loaders = $this->quickMock('\PHPixie\ORM\Loaders');
-        $this->repositories = $this->quickMock('\PHPixie\ORM\Repositories');
         
-        $this->groupMapper = $this->quickMock('\PHPixie\ORM\Mappers\Group');
+        $this->databaseModel = $this->quickMock('\PHPixie\ORM\Models\Type\Database');
+        $this->method($this->models, 'database', $this->databaseModel, array());
+        
+        $this->conditionsMapper = $this->quickMock('\PHPixie\ORM\Mappers\Conditions');
         $this->preloadMapper = $this->quickMock('\PHPixie\ORM\Mappers\Preload');
         $this->updateMapper = $this->quickMock('\PHPixie\ORM\Mappers\Update');
         $this->cascadeDeleteMapper = $this->quickMock('\PHPixie\ORM\Mappers\Cascade\Mapper\Delete');
-        $this->groupOptimizer = $this->quickMock('\PHPixie\ORM\Mappers\Group\Optimizer');
         
-        $this->method($this->mappers, 'group', $this->groupMapper, array());
+        $this->method($this->mappers, 'conditions', $this->conditionsMapper, array());
         $this->method($this->mappers, 'preload', $this->preloadMapper, array());
         $this->method($this->mappers, 'update', $this->updateMapper, array());
         $this->method($this->mappers, 'cascadeDelete', $this->cascadeDeleteMapper, array());
-        $this->method($this->mappers, 'groupOptimizer', $this->groupOptimizer, array());
         
         $this->queryMapper = new \PHPixie\ORM\Mappers\Query(
+            $this->models,
             $this->mappers,
             $this->plans,
             $this->steps,
-            $this->loaders,
-            $this->repositories
+            $this->loaders
         );
     }
     
@@ -202,15 +202,12 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $conditions = array('test');
         $this->method($query, 'getConditions', $conditions, array());
         
-        $optimized = array('test2');
-        $this->method($this->groupOptimizer, 'optimize', $optimized, array($conditions), 0);
-        
         $requiredPlan = $this->getPlan('Steps');
         $this->method($plan, 'requiredPlan', $requiredPlan, array(), 0);
         
-        $this->method($this->groupMapper, 'mapDatabaseQuery', null, array(
+        $this->method($this->conditionsMapper, 'map', null, array(
             $databaseQuery,
-            $optimized,
+            $conditions,
             $this->modelName,
             $requiredPlan
         ), 0);
@@ -250,7 +247,7 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     protected function prepareRepository($name)
     {
         $repository=$this->getRepository();
-        $this->method($this->repositories, 'get', $repository, array($name), 0);
+        $this->method($this->databaseModel, 'repository', $repository, array($name), 0);
         return $repository;
     }
     

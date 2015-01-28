@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Relationship\Side\Cascade;
 
-interface Delete
+interface Delete extends \PHPixie\ORM\Relationships\Relationship\Side
 {
     public function isDeleteHandled();
 }

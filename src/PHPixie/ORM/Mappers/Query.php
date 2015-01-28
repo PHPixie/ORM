@@ -14,10 +14,10 @@ class Query
 
     public function __construct($models, $mappers, $plans, $steps, $loaders)
     {
-        $this->models = $models;
+        $this->models  = $models;
         $this->mappers = $mappers;
-        $this->plans = $plans;
-        $this->steps = $steps;
+        $this->plans   = $plans;
+        $this->steps   = $steps;
         $this->loaders = $loaders;
         
         $this->databaseModel = $models->database();
@@ -26,7 +26,7 @@ class Query
     public function mapCount($query)
     {
         $modelName = $query->modelName();
-        $repository = $this->repositories->get($modelName);
+        $repository = $this->databaseModel->repository($modelName);
         $databaseQuery = $repository->databaseCountQuery();
         $step = $this->steps->count($databaseQuery);
         $plan = $this->plans->count($step);
@@ -39,7 +39,7 @@ class Query
     public function mapUpdate($query, $update)
     {
         $modelName = $query->modelName();
-        $repository = $this->repositories->get($modelName);
+        $repository = $this->databaseModel->repository($modelName);
         $databaseQuery = $repository->databaseUpdateQuery();
         
         $step = $this->steps->query($databaseQuery);
@@ -54,7 +54,7 @@ class Query
     public function mapFind($query, $preload = null)
     {
         $modelName = $query->modelName();
-        $repository = $this->repositories->get($modelName);
+        $repository = $this->databaseModel->repository($modelName);
         $databaseQuery = $repository->databaseSelectQuery();
         
         $resultStep = $this->steps->reusableResult($databaseQuery);
@@ -87,10 +87,7 @@ class Query
         $conditions          = $query->getConditions();
         $requiredPlan        = $queryPlan->requiredPlan();
         
-        $conditionsOptimizer = $this->mappers->conditionsOptimizer();
-        $conditions = $conditionsOptimizer->optimize($conditions);
-        
-        $this->mappers->conditions()->mapDatabaseQuery(
+        $this->mappers->conditions()->map(
             $databaseQuery,
             $conditions,
             $modelName,
@@ -103,7 +100,7 @@ class Query
     {
         $deleteMapper = $this->mappers->cascadeDelete();
         $modelName = $query->modelName();
-        $repository = $this->repositories->get($modelName);
+        $repository = $this->databaseModel->repository($modelName);
     
         $deleteQuery = $repository->databaseDeleteQuery();
         $step = $this->steps->query($deleteQuery);

@@ -53,7 +53,8 @@ class Planners
     {
         return new Planners\Planner\Pivot(
             $this,
-            $this->ormBuilder->steps()
+            $this->ormBuilder->steps(),
+            $this->ormBuilder->database()
         );
     }
 

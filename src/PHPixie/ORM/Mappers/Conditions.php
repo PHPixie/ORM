@@ -56,32 +56,8 @@ class Conditions
 
     protected function mapInCondition($builder, $modelName, $inCondition, $plan)
     {
-        if(!($builder instanceof \PHPixie\Database\Query))
-            throw new \PHPixie\ORM\Exception\Mapper("Collection conditions are not allowed for embedded models");
-        
-        $items  = $inCondition->items();
-        
-        $builder->startConditionGroup($inCondition->logic(), $inCondition->isNegated());
-        
-        $ids = array();
-        foreach($items as $item) {
-            if($item instanceof \PHPixie\ORM\Models\Type\Database\Query) {
-                $builder->startGroup('or', false);
-                $this->mapConditions($builder, $modelName, $query->conditions(), $plan);
-                $builder->endGroup();
-
-            }else{
-                $ids[]=$item;
-
-            }
-        }
-        
-        if(!empty($ids) || empty($items)) {
-            $idField = $this->models->database()->config($modelName)->idField;
-            $builder->addInOperatorCondition($idField, $ids, 'or', false);
-        }
-        
-        $this->endGroup();
+        $group = $this->normalizer->normalizeIn($inCondition, $modelName);
+        $this->mapRelationshipGroup($builder, $modelName, $condition, $plan);
     }
     
     public function map($builder, $modelName, $conditions, $plan)

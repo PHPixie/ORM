@@ -11,6 +11,7 @@ class PlannersTest extends \PHPixieTests\AbstractORMTest
     protected $planners;
     
     protected $steps;
+    protected $database;
     
     public function setUp()
     {
@@ -20,6 +21,9 @@ class PlannersTest extends \PHPixieTests\AbstractORMTest
         
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
         $this->method($this->ormBuilder, 'steps', $this->steps, array());
+        
+        $this->database = $this->quickMock('\PHPixie\ORM\Database');
+        $this->method($this->ormBuilder, 'database', $this->database, array());
     }
 
     /**
@@ -56,7 +60,8 @@ class PlannersTest extends \PHPixieTests\AbstractORMTest
         
         $this->assertInstance($planner, '\PHPixie\ORM\Planners\Planner\Pivot', array(
             'planners' => $this->planners,
-            'steps'    => $this->steps
+            'steps'    => $this->steps,
+            'database' => $this->database,
         ));
     }
     

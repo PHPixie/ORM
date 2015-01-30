@@ -13,20 +13,20 @@ class Normalizer
         $this->models     = $models;
     }
     
-    public function normalizeInCondition($inCondition)
+    public function normalizeIn($inCondition, $modelName)
     {
         $items  = $inCondition->items();
         
-        $inGroup = $this->conditions->relationshipGroup();
+        $inGroup = $this->conditions->relatedToGroup($modelName);
         $this->copyLogicAndNegated($inCondition, $inGroup);
         
         $ids = array();
         foreach($items as $item) {
             
             if($item instanceof \PHPixie\ORM\Models\Type\Database\Query) {
-                $queryGroup = $this->condition->group();
+                $queryGroup = $this->conditions->group();
                 $this->setLogicAndNegated($queryGroup, 'or', false);
-                $queryGroup->setConditions($item->conditions());
+                $queryGroup->setConditions($item->getConditions());
                 $inGroup->add($queryGroup);            
             }else{
                 $ids[]=$item->id();
@@ -48,7 +48,7 @@ class Normalizer
         $this->setLogicAndNegated(
             $target,
             $source->logic(),
-            $source->isNegated(),
+            $source->isNegated()
         );
     }
     

@@ -17,6 +17,7 @@
             <directory>./tests/PHPixieTests/ORM/Models</directory>
             <directory>./tests/PHPixieTests/ORM/Drivers</directory>
             <directory>./tests/PHPixieTests/ORM/Planners</directory>
+            <directory>./tests/PHPixieTests/ORM/Mappers/Cascade</directory>
             
             <file>./tests/PHPixieTests/ORM/StepsTest.php</file>
             <file>./tests/PHPixieTests/ORM/LoadersTest.php</file>
@@ -33,6 +34,11 @@
             <file>./tests/PHPixieTests/ORM/ConditionsTest.php</file>
             <file>./tests/PHPixieTests/ORM/PlannersTest.php</file>
             <file>./tests/PHPixieTests/ORM/DriversTest.php</file>
+            
+            <file>./tests/PHPixieTests/ORM/Mappers/PreloadTest.php</file>
+            <file>./tests/PHPixieTests/ORM/Mappers/UpdateTest.php</file>
+            <file>./tests/PHPixieTests/ORM/Mappers/QueryTest.php</file>
+            <file>./tests/PHPixieTests/ORM/Mappers/Conditions/NormalizerTest.php</file>
         </testsuite>
     </testsuites>
     <filter>

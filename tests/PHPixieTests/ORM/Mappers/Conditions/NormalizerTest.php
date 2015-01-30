@@ -19,13 +19,22 @@ class NormalizerTest extends \PHPixieTests\AbstractORMTest
         $this->conditions = $this->quickMock('\PHPixie\ORM\Conditions');
         $this->models = $this->quickMock('\PHPixie\ORM\Models');
         
-        $this->normalizer = \PHPixie\ORM\Mappers\Conditions\Normalizer(
+        $this->normalizer = new \PHPixie\ORM\Mappers\Conditions\Normalizer(
             $this->conditions,
             $this->models
         );
         
         $this->databaseModel = $this->quickMock('\PHPixie\ORM\Models\Type\Database');
-        $this->model($this->models, 'database', $this->databaseModel, array());
+        $this->method($this->models, 'database', $this->databaseModel, array());
+    }
+
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+        
     }
     
     /**
@@ -34,59 +43,73 @@ class NormalizerTest extends \PHPixieTests\AbstractORMTest
      */
     public function testNormalizeIn()
     {
-        $inCondition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
-        $queries = array(
-            $this->getDatabaseQuery(),
-            $this->getDatabaseQuery()
-        );
+        $this->normalizeInTest(false, false);
+        $this->normalizeInTest(false, true);
+        $this->normalizeInTest(true, false);
+        $this->normalizeInTest(true, true);
+    }
+    
+    protected function normalizeInTest($withQueries, $withEntities)
+    {
+        $modelName = 'pixie';
         
-        $entities = array(
-            $this->getDatabaseEntity(),
-            $this->getDatabaseEntity(),
-        );
+        $inCondition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
+        
+        $queries = array();
+        if($withQueries) {
+            $queries[]= $this->getDatabaseQuery();
+            $queries[]= $this->getDatabaseQuery();
+        }
+        
+        $entities = array();
+        if($withEntities) {
+            $entities[5]= $this->getDatabaseEntity();
+            $entities[6]= $this->getDatabaseEntity();
+            $ids = array(5, 6);
+        }
         
         $items = array_merge($queries, $entities);
         $this->method($inCondition, 'items', $items, array(), 0);
         
         $inGroup = $this->getRelationshipGroup();
-        $this->method($this->conditions, 'relationshipGroup', $inGroup, array(), 0);
+        $this->method($this->conditions, 'relatedToGroup', $inGroup, array($modelName), 0);
         
-        $this->prepareCopyLogicAndNegated($inCondition, $inGroup);
-        
-        $ids = array(5, 6);
+        $this->prepareCopyLogicAndNegated($inCondition, $inGroup, 1);
         
         foreach($queries as $key => $query) {
             $queryGroup = $this->getGroup();
-            $this->method($this->conditions, 'group', $queryGroup, array(), 1 + $key*3);
+            $this->method($this->conditions, 'group', $queryGroup, array(), 1+$key);
             
             $this->prepareSetLogicAndNegated($queryGroup, 'or', false);
             
             $conditions = array($this->getGroup());
-            $this->method($query, 'conditions', $conditions, array(), 0);
+            $this->method($query, 'getConditions', $conditions, array(), 0);
             $this->method($queryGroup, 'setConditions', null, array($conditions), 2);
             
-            $this->method($inGroup, 'add', null, array($queryGroup), 3 + $key*3);
+            $this->method($inGroup, 'add', null, array($queryGroup), 2+$key);
         }
         
         foreach($entities as $key => $entity) {
-            $this->method($entity, 'id', $ids[$key], array(), 0);
+            $this->method($entity, 'id', $key, array(), 0);
         }
         
-        $config = $this->getDatabaseConfig();
-        $this->method($this->databaseModel, 'config', $config, array($modelName), 0);
-        $config->idField = 'id';
+        if(!empty($entities) || empty($items)) {
+            $config = $this->getDatabaseConfig();
+            $this->method($this->databaseModel, 'config', $config, array($modelName), 0);
+            $config->idField = 'id';
+            
+            $operatorCondition = $this->getOperatorCondition();
+            $this->method($this->conditions, 'operator', $operatorCondition, array(
+                'id',
+                'in',
+                array(array_keys($entities))
+            ), count($queries)+1);
+            
+            $this->prepareSetLogicAndNegated($operatorCondition, 'or', false);
+            $this->method($inGroup, 'add', null, array($operatorCondition), count($queries)+2);
+        }
         
-        $operatorCondition = $this->getOperatorCondition();
-        $this->method($this->conditions, 'operator', $operatorCondition, array(
-            'id',
-            'in',
-            array($ids)
-        ), 5);
-        
-        $this->prepareSetLogicAndNegated($operatorCondition, 'or', false);
-        $this->method($inGroup, 'add', null, array($queryGroup), 3 + $key*3);
-        
-        $this->assertSame($inGroup, $this->normalizer->normalizeIn($inCondition));
+        $this->assertSame($inGroup, $this->normalizer->normalizeIn($inCondition, $modelName));
     }
     
     protected function prepareCopyLogicAndNegated($source, $target, $sourceAt = 0, $targetAt = 0)
@@ -99,8 +122,8 @@ class NormalizerTest extends \PHPixieTests\AbstractORMTest
     
     protected function prepareSetLogicAndNegated($condition, $logic, $negated, $at = 0)
     {
-        $this->method($target, 'setLogic', null, array($logic), $at++);
-        $this->method($target, 'setIsNegated', null, array($negated), $at++);
+        $this->method($condition, 'setLogic', null, array($logic), $at++);
+        $this->method($condition, 'setIsNegated', null, array($negated), $at++);
     }
     
     protected function getGroup()
@@ -108,9 +131,19 @@ class NormalizerTest extends \PHPixieTests\AbstractORMTest
         return $this->quickMock('\PHPixie\ORM\Conditions\Condition\Collection\Group');
     }
     
+    protected function getOperatorCondition()
+    {
+        return $this->quickMock('\PHPixie\ORM\Conditions\Condition\Field\Operator');
+    }
+    
     protected function getRelationshipGroup()
     {
-        return $this->quickMock('\PHPixie\ORM\Conditions\Condition\Collection\Group\Relationship');
+        return $this->quickMock('\PHPixie\ORM\Conditions\Condition\Collection\RelatedTo\Group');
+    }
+    
+    protected function getDatabaseConfig()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
     }
     
     protected function getDatabaseQuery()

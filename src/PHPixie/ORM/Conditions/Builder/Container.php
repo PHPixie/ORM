@@ -5,9 +5,15 @@ namespace PHPixie\ORM\Conditions\Builder;
 class Container extends \PHPixie\Database\Conditions\Builder\Container
                 implements \PHPixie\ORM\Conditions\Builder
 {
-    public function __construct($conditions, $defaultOperator = '=')
+    protected $relationshipMap;
+    protected $modelNameStack = array();
+    protected $currentModelName;
+    
+    public function __construct($conditions, $relationshipMap, $modelName, $defaultOperator = '=')
     {
+        $this->relationshipMap = $relationshipMap;
         parent::__construct($conditions, $defaultOperator);
+        $this->pushModelNameToStack($modelName);
     }
 
     public function addOperatorCondition($logic, $negate, $field, $operator, $values)
@@ -30,7 +36,12 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
         $root = null;
         $current = null;
         
+        $modelName = $this->currentModelName;
+        
         foreach ($path as $key => $step) {
+            $side = $this->relationshipMap->get($modelName, $step);
+            $modelName = $side->relatedModelName();
+            
             $group = $this->conditions->relatedToGroup($step);
             
             if ($key == 0) {
@@ -44,6 +55,7 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
         
         $this->addCondition($logic, $negate, $root);
         $this->pushGroupToStack($current);
+        $this->pushModelNameToStack($modelName);
         return $this;
     }
     
@@ -64,7 +76,7 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
 
     public function addInCondition($logic, $negate, $items)
     {
-        $condition = $this->conditions->in($items);
+        $condition = $this->conditions->in($this->currentModelName, $items);
         return $this->addCondition($logic, $negate, $condition);
     }
 
@@ -77,7 +89,38 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
         }else{
             $this->addCondition($logic, $negate, $condition);
         }
-    }    
+    }
+    
+    protected function pushModelNameToStack($modelName)
+    {
+        $this->modelNameStack[] = $modelName;
+        $this->currentModelName = $modelName;
+    }
+    
+    public function endGroup()
+    {
+        $oldGroup = $this->currentGroup;
+        parent::endGroup();
+        
+        if($oldGroup instanceof \PHPixie\ORM\Conditions\Condition\Collection\RelatedTo) {
+            array_pop($this->modelNameStack);
+            $this->currentModelName = end($this->modelNameStack);
+        }
+        return $this;
+    }
+    
+    public function addPlaceholder($logic = 'and', $negate = false, $allowEmpty = true)
+    {
+        $placeholder = $this->conditions->placeholder(
+            $this->currentModelName,
+            $this->defaultOperator,
+            $allowEmpty
+        );
+        
+        $this->addCondition($logic, $negate, $placeholder);
+        
+        return $placeholder->container();
+    }
     
     public function addWhereOperatorCondition($logic, $negate, $field, $operator, $values)
     {

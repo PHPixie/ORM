@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Sides\Map;
+namespace PHPixieTests\ORM\Sides\Map\Property;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Maps\Map\Query
+ * @coversDefaultClass \PHPixie\ORM\Maps\Map\Property\Query
  */
-class QueryTest extends \PHPixieTests\ORM\Maps\MapTest
+class QueryTest extends \PHPixieTests\ORM\Maps\Map\PropertyTest
 {
     
     /**
@@ -43,8 +43,13 @@ class QueryTest extends \PHPixieTests\ORM\Maps\MapTest
         return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Type\Database');
     }
     
+    protected function getSide()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Property\Query');
+    }
+    
     protected function map()
     {
-        return new \PHPixie\ORM\Maps\Map\Query($this->relationships);
+        return new \PHPixie\ORM\Maps\Map\Property\Query($this->relationships);
     }
 }

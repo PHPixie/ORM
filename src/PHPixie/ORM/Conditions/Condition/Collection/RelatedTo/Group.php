@@ -2,7 +2,8 @@
 
 namespace PHPixie\ORM\Conditions\Condition\Collection\RelatedTo;
 
-class Group extends \PHPixie\ORM\Conditions\Condition\Collection\Group
+class Group extends    \PHPixie\ORM\Conditions\Condition\Collection\Group
+            implements \PHPixie\ORM\Conditions\Condition\Collection\RelatedTo
 {
     protected $relationship;
 

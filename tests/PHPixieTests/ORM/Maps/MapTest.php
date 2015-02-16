@@ -7,15 +7,12 @@ namespace PHPixieTests\ORM\Maps;
  */
 abstract class MapTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $relationships;
     protected $map;
     
     public function setUp()
     {
-        $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
         $this->map = $this->map();
     }
-
     
     /**
      * @covers ::__construct
@@ -73,22 +70,6 @@ abstract class MapTest extends \PHPixieTests\AbstractORMTest
         return $side;
     }
     
-    protected function prepareRelationship($type, $relationshipsAt = 0)
-    {
-        $relationship = $this->getRelationship();
-        $this->method($this->relationships, 'get', $relationship, array($type), $relationshipsAt);
-        return $relationship;
-    }
-    
-    protected function getSide()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side');
-    }
-    
-    protected function getRelationship()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship');
-    }
-    
+    abstract protected function getSide();
     abstract protected function map();
 }

@@ -12,4 +12,5 @@ class Mappers
     public function entity(){}
     public function query(){}
     public function conditionsOptimizer(){}
+    public function conditionsNormalizer(){}
 }

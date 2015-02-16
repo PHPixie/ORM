@@ -14,23 +14,13 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
         $this->models = $models;
         $this->planners = $planners;
         $this->steps = $steps;
-        
-        $this->databaseModel = $models->database();
-    }
-    
-    protected function isSideHandled($side)
-    {
-        if(!($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete))
-            return false;
-        
-        return $side->isDeleteHandled();
     }
     
     public function handleResult($reusableResult, $modelName, $plan, $path)
     {
         $this->assertDirectionalPath($path, $modelName);
         
-        $sides = $this->getHandledSides($modelName);
+        $sides = $this->maps->cascadeDelete()->getModelSides($modelName);
         foreach($sides as $side) {
             $sidePath = $path->copy();
             $sidePath->addSide($side);

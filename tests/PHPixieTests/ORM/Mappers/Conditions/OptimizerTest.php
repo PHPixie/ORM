@@ -1,19 +1,45 @@
 <?php
 
-namespace PHPixieTests\ORM\Mappers\Group;
+namespace PHPixieTests\ORM\Mappers\Con;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Mappers\Group\Optimizer
+ * @coversDefaultClass \PHPixie\ORM\Mappers\Conditions\Optimizer
  */
 class OptimizerTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $maps;
+    protected $relationshipMap;
     protected $conditions;
-    protected $merger;
+    
+    protected $optimizer;
+    
+    protected $modelName = 'pixie';
 
     public function setUp()
     {
-        $this->conditions = new \PHPixie\ORM\Conditions();
-        $this->optimizer = new \PHPixie\ORM\Mappers\Group\Optimizer($this->conditions, $this->merger);
+        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
+        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
+        
+        $this->method($this->maps, 'relationship', $this->relationshipMap, array());
+        
+        $self = $this;
+        
+        $this->method($this->relationshipMap, 'get', function($model, $property) use($self) {
+            $models = array(
+                'pixie' => 'fairy',
+                'fairy' => 'pixie'
+            );
+
+            $side = $self->getMock('\PHPixie\ORM\Relationships\Relationship\Side\Relationship', array());
+            $side
+                ->expects($this->any())
+                ->method('relatedModelName')
+                ->will($this->returnValue($models[$model]));
+
+            return $side;
+        });
+        $this->conditions = new \PHPixie\ORM\Conditions($this->maps);
+        $this->optimizer = new \PHPixie\ORM\Mappers\Conditions\Optimizer($this->conditions);
     }
 
     /**
@@ -256,18 +282,18 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
 
         foreach ($conds as $cond) {
             $prefix = $cond->logic();
-            if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group\Relationship) {
+            if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Collection\RelatedTo) {
                 $prefix.= $prefix?'_':'';
                 $prefix .= $cond->relationship();
             }
 
-            $negated = $cond->negated() ? '!':'';
+            $negated = $cond->isNegated() ? '!':'';
 
-            if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Group) {
+            if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
                 $arr[] = array(
                     $negated.$prefix => $this->extractConditions($cond->conditions()));
             } else {
-                $arr[] = $prefix.'.'.$negated.$cond->field;
+                $arr[] = $prefix.'.'.$negated.$cond->field();
             }
         }
 
@@ -284,16 +310,15 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
         $res = $this->extractConditions($conds);
         print_r($res);
         
-        $conds = $this->optimizer->optimize($conds);
-        $res = $this->extractConditions($conds);
-        print_r($res);
-        var_export($res);
-
-        $this->assertEquals($expected, $res);
+        for($i=0; $i<2; $i++) {
+            $optimized = $this->optimizer->optimize($conds);
+            $res = $this->extractConditions($optimized);
+            $this->assertEquals($expected, $res);
+        }
     }
 
     protected function builder()
     {
-        return new \PHPixie\ORM\Conditions\Builder\Container($this->conditions);
+        return $this->conditions->container($this->modelName);
     }
 }

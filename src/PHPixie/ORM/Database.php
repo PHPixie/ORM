@@ -13,16 +13,11 @@ class Database
     
     public function connection($name)
     {
-        return $this->database->connection($name);
+        return $this->database->get($name);
     }
 
-    public function subdocumentCondition()
-    {
-        return $this->database->subdocumentCondition();
-    }
-    
     public function connectionDriverName($connectionName)
     {
-        return $this->database->subdocumentCondition();
+        return $this->database->connectionDriverName($connectionName);
     }
 }

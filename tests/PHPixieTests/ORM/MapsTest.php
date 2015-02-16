@@ -12,8 +12,9 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
     
     protected $mapsMock;
     
-    protected $entityMap;
-    protected $queryMap;
+    protected $relationshipMap;
+    protected $entityPropertyMap;
+    protected $queryPropertyMap;
         
     public function setUp()
     {
@@ -22,11 +23,13 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
         
         $this->mapsMock = $this->mapsMock();
         
-        $this->entityMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Entity');
-        $this->queryMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Query');
+        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
+        $this->entityPropertyMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Entity');
+        $this->queryPropertyMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Query');
         
-        $this->method($this->mapsMock, 'buildEntityMap', $this->entityMap, array());
-        $this->method($this->mapsMock, 'buildQueryMap', $this->queryMap, array());
+        $this->method($this->mapsMock, 'buildRelationshipMap', $this->relationshipMap, array());
+        $this->method($this->mapsMock, 'buildEntityPropertyMap', $this->entityPropertyMap, array());
+        $this->method($this->mapsMock, 'buildQueryPropertyMap', $this->queryPropertyMap, array());
     }
     
     /**
@@ -48,43 +51,60 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
         $this->prepareBuildMaps();
         
         for($i=0; $i<2; $i++) {
-            $this->assertSame($this->entityMap, $this->mapsMock->entity());
-            $this->assertSame($this->queryMap, $this->mapsMock->query());
+            $this->assertSame($this->relationshipMap, $this->mapsMock->relationship());
+            $this->assertSame($this->entityPropertyMap, $this->mapsMock->entityProperty());
+            $this->assertSame($this->queryPropertyMap, $this->mapsMock->queryProperty());
         }
     }
+
     
     /**
-     * @covers ::entity
+     * @covers ::relationship
      * @covers ::<protected>
      */
-    public function testEntity()
+    public function testRelationship()
     {
         $maps = $this->maps();
         $this->prepareBuildMaps(true);
         
-        $entity = $maps->entity();
-        $this->assertInstance($entity, '\PHPixie\ORM\Maps\Map\Entity', array(
-            'relationships' => $this->relationships
-        ));
+        $relationshipMap = $maps->relationship();
+        $this->assertInstance($relationshipMap, '\PHPixie\ORM\Maps\Map\Relationship');
         
-        $this->assertSame($entity, $maps->entity());
+        $this->assertSame($relationshipMap, $maps->relationship());
     }
     
     /**
-     * @covers ::query
+     * @covers ::entityProperty
      * @covers ::<protected>
      */
-    public function testQuery()
+    public function testEntityProperty()
     {
         $maps = $this->maps();
         $this->prepareBuildMaps(true);
         
-        $query = $maps->query();
-        $this->assertInstance($query, '\PHPixie\ORM\Maps\Map\Query', array(
+        $entityPropertyMap = $maps->entityProperty();
+        $this->assertInstance($entityPropertyMap, '\PHPixie\ORM\Maps\Map\Property\Entity', array(
             'relationships' => $this->relationships
         ));
         
-        $this->assertSame($query, $maps->query());
+        $this->assertSame($entityPropertyMap, $maps->entityProperty());
+    }
+    
+    /**
+     * @covers ::queryProperty
+     * @covers ::<protected>
+     */
+    public function testQueryProperty()
+    {
+        $maps = $this->maps();
+        $this->prepareBuildMaps(true);
+        
+        $queryPropertyMap = $maps->queryProperty();
+        $this->assertInstance($queryPropertyMap, '\PHPixie\ORM\Maps\Map\Property\Query', array(
+            'relationships' => $this->relationships
+        ));
+        
+        $this->assertSame($queryPropertyMap, $maps->queryProperty());
     }
     
     protected function prepareBuildMaps($empty = false)
@@ -92,7 +112,7 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
         if(!$empty) {
             $types = array(
                 'oneToMany',
-                'embedsOne'
+                'manyToMany'
             );
         }else{
             $types = array();
@@ -109,18 +129,16 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
             $this->method($this->relationships, 'get', $relationship, array($type), $key);
             
             $sides = array(
-                $this->getSide(),
-                $this->getSide(true)
+                'relationship'   => $this->getSide('relationship'),
+                'entityProperty' => $this->getSide('entity'),
+                'queryProperty'  => $this->getSide('query')
             );
             
             $this->method($relationship, 'getSides', $sides, array($slice), 0);
             
-            foreach($sides as $sideKey => $side) {
-                $this->method($this->entityMap, 'add', null, array($side), $key*2+$sideKey);
-                
-                if($sideKey === 1) {
-                    $this->method($this->queryMap, 'add', null, array($side), $key);
-                }
+            foreach($sides as $mapName => $side) {
+                $mapName.='Map';
+                $this->method($this->$mapName, 'add', null, array($side), $key);
             }
         }
     }
@@ -135,21 +153,32 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
         return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship');
     }
     
-    protected function getSide($isQuery = false)
+    protected function getSide($type = 'relationship')
     {
-        if($isQuery) {
-            return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Database\Query');
+        if($type === 'entity') {
+            return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Property\Entity');
         }
         
-        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side');
+        if($type === 'query') {
+            return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Property\Query');
+        }
+        
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Relationship');
     }
     
     protected function mapsMock()
     {
         return $this->getMock(
             '\PHPixie\ORM\Maps',
-            array('buildEntityMap', 'buildQueryMap'),
-            array($this->relationships, $this->configSlice)
+            array(
+                'buildEntityPropertyMap',
+                'buildQueryPropertyMap',
+                'buildRelationshipMap',
+            ),
+            array(
+                $this->relationships,
+                $this->configSlice
+            )
         );
     }
     

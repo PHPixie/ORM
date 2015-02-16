@@ -3,33 +3,42 @@
 namespace PHPixieTests\ORM\Mappers;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Mappers\Group
+ * @coversDefaultClass \PHPixie\ORM\Mappers\Conditions
  */
-class GroupTest extends \PHPixieTests\AbstractORMTest
+class ConditionsTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $mappers;
     protected $models;
-    protected $relationships;
     protected $maps;
-    protected $planners;
-    protected $inPlanner;
-    protected $modelName = 'fairy';
+    protected $relationships;
+        
+    protected $conditionsMapper;
     
-    protected $groupMapper;
+    protected $mapperMocks = array();
+    protected $relationshipMap;
+    protected $modelName = 'fairy';
     
     public function setUp()
     {
-        $this->models = $this->quickMock('\PHPixie\ORM\Models');
-        $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
+        $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
         $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
-        $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
-        $this->inPlanner = $this->quickMock('\PHPixie\ORM\Planners\Planner\In');
-        $this->method($this->planners, 'in', $this->inPlanner, array());
+        $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
         
-        $this->groupMapper = new \PHPixie\ORM\Mappers\Group(
-            $this->repositories,
-            $this->relationships,
-            $this->planners
+        $this->conditionsMapper = new \PHPixie\ORM\Mappers\Conditions(
+            $this->mappers,
+            $this->maps,
+            $this->relationships
         );
+        
+        foreach(array('optimizer', 'normalizer') as $type) {
+            $method = 'conditions'.ucfirst($type);
+            $mapper = $this->quickMock('\PHPixie\ORM\Mappers\Conditions\\'.ucfirst($type));
+            $this->mapperMocks[$method] = $mapper;
+            $this->method($this->mappers, $method, $mapper, array());
+        }
+        
+        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
+        $this->method($this->maps, 'relationship', $this->relationshipMap, array());
     }
     
     /**
@@ -42,105 +51,118 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::mapDatabaseQuery
+     * @covers ::map
      * @covers ::<protected>
      */
-    
     public function testMapDatabaseQuery()
     {
-        $query = $this->getDatabaseQuery();
-        $plan = $this->getStepsPlan();
-        $conditions = $this->prepareMapConditions($query, $plan);
-        $this->groupMapper->mapDatabaseQuery($query, $this->modelName, $conditions, $plan);
-        
-        $this->setExpectedException('\PHPixie\ORM\Exception\Mapper');
-        $this->groupMapper->mapDatabaseQuery($query, $this->modelName, array('test'), $plan);
+        $this->mapTest('query');
+        $this->mapTest('embedded');
     }
     
-    /**
-     * @covers ::mapEmbeddedContainer
-     * @covers ::<protected>
-     */
-    public function testMapSubdocument()
+    protected function mapTest($type = 'query')
     {
-        $prefix = 'trixie';
-        $subdocument = $this->getEmbeddedContainer();
-        $plan = $this->getStepsPlan();
-        $conditions = $this->prepareMapConditions($subdocument, $plan, true);
-        $this->groupMapper->mapEmbeddedContainer($subdocument, $this->modelName, $conditions, $plan, $prefix);
-        
-        $invalid = array('test', $this->inCondition('and', false, array(5)));
-        foreach($invalid as $condition) {
-            $except = false;
-            try{
-                $this->groupMapper->mapEmbeddedContainer($subdocument, $this->modelName, array($condition), $plan, $prefix);        
-            }catch(\PHPixie\ORM\Exception\Mapper $e) {
-                $except = true;
-            }
-            
-            $this->assertEquals(true, $except);
+        if($type === 'query') {
+            $builder = $this->getDatabaseQuery();
+        }else{
+            $builder = $this->getEmbeddedContainer();
         }
         
+        $plan = $this->getStepsPlan();
+        $conditions = $this->prepareMap($builder, $plan, $type === 'query');
+        $this->conditionsMapper->map($builder, $this->modelName, $conditions, $plan);
+        
+        $conditions = $this->prepareInvalidCondition();
+        
+        try{
+            $this->conditionsMapper->map($builder, $this->modelName, $conditions, $plan);
+        }catch(\PHPixie\ORM\Exception\Mapper $e) {
+            $except = true;
+        }
+
+        $this->assertEquals(true, $except);
     }
     
-    protected function prepareMapConditions($builder, $plan, $isEmbeddedContainer = false)
+    protected function prepareMap($builder, $plan, $isQuery = true)
     {
         $operatorParams = array('or', false, 'a', '>', array(1));
         $operator = call_user_func_array(array($this, 'operatorCondition'), $operatorParams);
         
-        $conditions = array();
+        $optimizedConditions = array();
         
-        
-        $conditions[] = $operator;
+        $optimizedConditions[] = $operator;
         $this->method($builder, 'addOperatorCondition', null, $operatorParams, 0);
         
-        
-        $conditions[] = $this->groupCondition('and', true, array($operator));
+        $optimizedConditions[] = $this->conditionCollection('and', true, array($operator));
         $this->method($builder, 'startGroup', null, array('and', true), 1);
         $this->method($builder, 'addOperatorCondition', null, $operatorParams, 2);
         $this->method($builder, 'endGroup', null, array(), 3);
         
-        $relationshipGroup = $this->relationshipCondition('and', true, 'pixie', array($operator));
+        $relatedToCondition = $this->relatedToCollection('and', true, 'pixie', array($operator));
         
-        $conditions[] = $relationshipGroup;
+        $optimizedConditions[] = $relatedToCondition;
         $side = $this->getSide();
-        $this->method($this->relationshipMap, 'getSide', $side, array($this->modelName, 'pixie'), 0);
+        $this->method($this->relationshipMap, 'get', $side, array($this->modelName, 'pixie'), 0);
         $this->method($side, 'relationshipType', 'oneToOne', array(), 0);
         
         $relationship = $this->getRelationship();
         $this->method($this->relationships, 'get', $relationship, array('oneToOne'), 0);
         
-        $handler = $this->getHandler($isEmbeddedContainer);
+        $handler = $this->getHandler(!$isQuery);
         $this->method($relationship, 'handler', $handler, array(), 0);
         
-        if(!$isEmbeddedContainer) {
-            $this->method($handler, 'mapQuery', null, array($builder, $side, $relationshipGroup, $plan), 0);
+        if($isQuery) {
+            $this->method($handler, 'mapDatabaseQuery', null, array($builder, $side, $relatedToCondition, $plan), 0);
+            
         }else{
-            $this->method($handler, 'mapEmbeddedContainer', null, array($builder, $side, $relationshipGroup, $plan), 0);
-        
+            $this->method($handler, 'mapEmbeddedContainer', null, array($builder, $side, $relatedToCondition, $plan), 0);
         }
         
-        if(!$isEmbeddedContainer) {
-            $items = array(5);
-            $repository = $this->getRepository();
-            $this->method($this->repositories, 'get', $repository, array($this->modelName), 0);
+        if($isQuery) {
+            $items = array($this->getDatabaseQuery());
+            $inCondition = $this->inCondition('or', true, $items);
             
-            $config = $this->getDatabaseModelConfig();
-            $config->idField = 'id';
-            $this->method($repository, 'config', $config, array(), 0);
+            $optimizedConditions[] = $inCondition;
             
-            $conditions[] = $this->inCondition('or', true, $items);
-            $collection = $this->getCollection();
-            $this->method($this->planners, 'collection', $collection, array($this->modelName, $items), 0);
-            $this->method($this->inPlanner, 'collection', null, array($builder, 'id', $collection, 'id', $plan, 'or', true), 0);
+            $normalizedCondition = $this->conditionCollection('and', true, array($operator));
+            $this->method($builder, 'startGroup', null, array('and', true), 4);
+            $this->method($builder, 'addOperatorCondition', null, $operatorParams, 5);
+            $this->method($builder, 'endGroup', null, array(), 6);
+            
+            $this->method(
+                $this->mapperMocks['conditionsNormalizer'],
+                'normalizeIn',
+                $normalizedCondition,
+                array($inCondition),
+                0
+            );
         }
+        
+        $conditions = array($this->conditionCollection('and', false, array()));
+        $this->method(
+            $this->mapperMocks['conditionsOptimizer'],
+            'optimize',
+            $optimizedConditions,
+            array($conditions),
+            0
+        );
+        
+        return $conditions;
+    }
+    
+    protected function prepareInvalidCondition()
+    {
+        $optimizedConditions = array(new \stdClass());
+        $conditions = array($this->conditionCollection('and', false, array()));
+        
+        $this->method($this->mapperMocks['conditionsOptimizer'], 'optimize', $optimizedConditions, array($conditions), 0);
         
         return $conditions;
     }
     
     protected function operatorCondition($logic, $negated, $field, $operator, $values)
     {
-        $condition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\Operator');
+        $condition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\Field\Operator');
 
         $this->method($condition, 'field', $field, array());
         $this->method($condition, 'operator', $operator, array());
@@ -151,20 +173,20 @@ class GroupTest extends \PHPixieTests\AbstractORMTest
     
     protected function inCondition($logic, $negated, $items)
     {
-        $group = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
-        $this->method($group, 'items', $items);
-        return $this->prepareCondition($group, $logic, $negated);
+        $inCondition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
+        $this->method($inCondition, 'items', $items);
+        return $this->prepareCondition($inCondition, $logic, $negated);
     }
     
-    protected function groupCondition($logic, $negated, $conditions)
+    protected function conditionCollection($logic, $negated, $conditions)
     {
-        $group = $this->quickMock('\PHPixie\ORM\Conditions\Condition\Group');
+        $group = $this->abstractMock('\PHPixie\ORM\Conditions\Condition\Collection');
         return $this->prepareGroup($group, $logic, $negated, $conditions);
     }
     
-    protected function relationshipCondition($logic, $negated, $relationship, $conditions)
+    protected function relatedToCollection($logic, $negated, $relationship, $conditions)
     {
-        $group = $this->quickMock('\PHPixie\ORM\Conditions\Condition\Group\Relationship');
+        $group = $this->quickMock('\PHPixie\ORM\Conditions\Condition\Collection\RelatedTo');
         $this->method($group, 'relationship', $relationship, array());
         return $this->prepareGroup($group, $logic, $negated, $conditions);
     }

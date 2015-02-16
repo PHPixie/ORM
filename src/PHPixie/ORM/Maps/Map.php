@@ -4,13 +4,7 @@ namespace PHPixie\ORM\Maps;
 
 abstract class Map
 {
-    protected $relationships;
     protected $sides = array();
-    
-    public function __construct($relationships)
-    {
-        $this->relationships = $relationships;
-    }
     
     public function add($side)
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Side\Database;
+namespace PHPixie\ORM\Relationships\Relationship\Side\Property;
 
 interface Query extends \PHPixie\ORM\Relationships\Relationship\Side
 {

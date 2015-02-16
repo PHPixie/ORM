@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Mappers\Conditions;
 
-use \PHPixie\ORM\Conditions\Condition\Group;
+use \PHPixie\ORM\Conditions\Condition\Collection;
 
 class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
 {
@@ -15,7 +15,7 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
     
     public function optimize($conditions)
     {
-        return $this->extractGroups($conditions, true);
+        return $this->extractCollections($conditions, true);
     }
     
     protected function normalize($condition)
@@ -23,19 +23,24 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         return array($condition);
     }
     
-    protected function extractGroups($conditions, $parseLogic = false)
+    protected function extractCollections($conditions, $parseLogic = false)
     {
         $extracted = array();
         $count = count($conditions);
         
         foreach($conditions as $key => $condition) {
             
-            if($condition instanceof Group) {
-                $optimized = $this->optimize($condition->conditions());
-                $condition->setConditions($optimized);
+            if($condition instanceof \PHPixie\ORM\Conditions\Condition\In) {
+                $condition = $this->mappers->conditionsNormalizer()->normalizeIn($inCondition);
+                $this->optimizeCollectionConditions($condition);
+                
+            }elseif($condition instanceof Collection) {
+                $condition = $this->cloneCollectionCondition($condition);
+                $this->optimizeCollectionConditions($condition);
+                
             }
-               
-            if(!$this->isConditionGroup($condition) || $condition->negated()) {
+            
+            if(!$this->isConditionCollection($condition) || $condition->isNegated()) {
                 $extracted[] = $condition;
                 continue;
             } 
@@ -59,8 +64,9 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
             $parseLogic = true;
             
             foreach($condition->conditions() as $key => $groupCondition) {
-                if($key == 0)
+                if($key == 0) {
                     $groupCondition->setLogic($condition->logic());
+                }
                 $extracted[]= $groupCondition;
             }
         }
@@ -71,12 +77,12 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         return $extracted;
     }
     
-    protected function isConditionGroup($condition)
+    protected function isConditionCollection($condition)
     {
-        if(!($condition instanceof Group))
+        if(!($condition instanceof Collection))
             return false;
         
-        if($condition instanceof Group\Relationship)
+        if($condition instanceof Collection\RelatedTo)
             return false;
         
         return true;
@@ -103,10 +109,11 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         
         $rightCondition = current($right);
         
-        if ($rightCondition instanceof Group\Relationship) {
+        if ($rightCondition instanceof Collection\RelatedTo) {
             
             if(($target = $this->findMergeTarget($left, $rightCondition)) !== null) {
-                $this->mergeRelationshipGroups($left[$target], $rightCondition);
+                $this->mergeRelatedToCollections($left[$target], $rightCondition);
+                
             
             }else{
                 $left[]= $rightCondition;
@@ -148,7 +155,7 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
             if (!$isNextFree || !$isCurrentFree)
                 continue;
 
-            if ($current instanceof Group\Relationship && $this->areMergeable($current, $newCondition)) {
+            if ($current instanceof Collection\RelatedTo && $this->areMergeable($current, $newCondition)) {
                 return $i;
             }
 
@@ -165,7 +172,7 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         if ($left->relationship() !== $right->relationship())
             return false;
         
-        if($left->negated() !== $right->negated())
+        if($left->isNegated() !== $right->isNegated())
             return false;
         
         if($right->logic() === 'xor')
@@ -174,7 +181,7 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         return true;
     }
 
-    protected function mergeRelationshipGroups($left, $right)
+    protected function mergeRelatedToCollections($left, $right)
     {
         $newLeft = $this->conditions->group();
         $newRight = $this->conditions->group();
@@ -183,17 +190,37 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         $newRight->setConditions($right->conditions());
         
         $newRight->setLogic($right->logic());
-        if($left->negated()) {
+        if($left->isNegated()) {
             if($right->logic() === 'and') {
                 $newRight->setLogic('or');
             }else{
                 $newRight->setLogic('and');
             }
         }
-            
-        $conditions = $this->extractGroups(array($newLeft, $newRight));
-        $left->setConditions($conditions);
         
+        $conditions = $this->extractCollections(array($newLeft, $newRight));
+        $left->setConditions($conditions);
     }
+    
+    protected function cloneCollectionCondition($condition)
+    {
+        if($condition instanceof Collection\RelatedTo) {
+            $group = $this->conditions->relatedToGroup($condition->relationship());
+        }else{
+            $group = $this->conditions->group();
+        }
 
+        $group->setLogic($condition->logic());
+        $group->setIsNegated($condition->isNegated());
+        $group->setConditions($condition->conditions());
+        
+        return $group;
+    }
+    
+    protected function optimizeCollectionConditions($collection)
+    {
+        $optimized = $this->optimize($collection->conditions());
+        $collection->setConditions($optimized);
+    }
+    
 }

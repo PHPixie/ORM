@@ -4,9 +4,16 @@ namespace PHPixie\ORM;
 
 class Conditions
 {
-    public function placeholder($defaultOperator = '=', $allowEmpty = true)
+    protected $maps;
+    
+    public function __construct($maps)
     {
-        $container = $this->container($defaultOperator);
+        $this->maps = $maps;
+    }
+    
+    public function placeholder($modelName, $defaultOperator = '=', $allowEmpty = true)
+    {
+        $container = $this->container($modelName, $defaultOperator);
         return new \PHPixie\ORM\Conditions\Condition\Collection\Placeholder($container, $allowEmpty);
     }
 
@@ -25,14 +32,19 @@ class Conditions
         return new \PHPixie\ORM\Conditions\Condition\Collection\RelatedTo\Group($relationship);
     }
 
-    public function in($items)
+    public function in($modelName, $items)
     {
-        return new \PHPixie\ORM\Conditions\Condition\In($items);
+        return new \PHPixie\ORM\Conditions\Condition\In($modelName, $items);
     }
     
-    public function container($defaultOperator = '=')
+    public function container($modelName, $defaultOperator = '=')
     {
-        return new \PHPixie\ORM\Conditions\Builder\Container($this, $defaultOperator);
+        return new \PHPixie\ORM\Conditions\Builder\Container(
+            $this,
+            $this->maps->relationship(),
+            $modelName,
+            $defaultOperator
+        );
     }
 
 }

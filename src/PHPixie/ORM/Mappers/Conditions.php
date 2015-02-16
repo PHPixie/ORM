@@ -5,14 +5,13 @@ namespace PHPixie\ORM\Mappers;
 class Conditions
 {
     protected $mappers;
-    protected $models;
+    protected $maps;    
     protected $relationships;
     
-    public function __construct($mappers, $models, $maps, $relationships)
+    public function __construct($mappers, $maps, $relationships)
     {
-        $this->mappers = $models;
-        $this->models = $models;
-        $this->maps = $maps;
+        $this->mappers       = $mappers;
+        $this->maps          = $maps;
         $this->relationships = $relationships;
     }
     
@@ -27,60 +26,57 @@ class Conditions
         );
     }
     
-    protected function mapConditionGroup($builder, $modelName, $group, $plan)
+    protected function mapConditionCollection($builder, $modelName, $collection, $plan)
     {
-        $builder->startGroup($group->logic(), $group->isNegated());
-        $this->mapConditions($builder, $modelName, $group->conditions(), $plan);
+        $builder->startGroup($collection->logic(), $collection->isNegated());
+        $this->mapConditions($builder, $modelName, $collection->conditions(), $plan);
         $builder->endGroup();
     }
     
-    protected function mapRelationshipGroup($builder, $modelName, $group, $plan)
+    protected function mapRelatedToCollection($builder, $modelName, $collection, $plan)
     {
-        $side = $this->maps->query()->get($modelName, $group->relationship());
+        $side = $this->maps->relationship()->get($modelName, $collection->relationship());
         $type = $side->relationshipType();
         $handler = $this->relationships->get($type)->handler();
         
         if($builder instanceof \PHPixie\Database\Query) {
-            $handler->mapDatabaseQuery($builder, $side, $group, $plan);
+            $handler->mapDatabaseQuery($builder, $side, $collection, $plan);
         }else{
-            $handler->mapEmbeddedContainer($builder, $side, $group, $plan);
+            $handler->mapEmbeddedContainer($builder, $side, $collection, $plan);
         }
     }
     
-    protected function mapDatabaseQuery($builder, $modelName, $query, $plan)
-    {
-        $builder->startGroup('or', false);
-        $this->mapConditions($builder, $modelName, $query->conditions(), $plan);
-        $builder->endGroup();
-    }
-
     protected function mapInCondition($builder, $modelName, $inCondition, $plan)
     {
-        $group = $this->normalizer->normalizeIn($inCondition, $modelName);
-        $this->mapRelationshipGroup($builder, $modelName, $condition, $plan);
+        $collectionCondition = $this->mappers->conditionsNormalizer()->normalizeIn($inCondition);
+        $this->mapConditionCollection($builder, $modelName, $collectionCondition, $plan);
     }
     
-    public function map($builder, $modelName, $conditions, $plan)
+    protected function mapConditions($builder, $modelName, $conditions, $plan)
     {
-        $conditions = $this->mappers->conditionsOptimizer()->optimize($conditions);
-        
         foreach ($conditions as $condition) {
             
-            if ($condition instanceof \PHPixie\ORM\Conditions\Condition\Operator) {
+            if ($condition instanceof \PHPixie\ORM\Conditions\Condition\Field\Operator) {
                 $this->mapOperatorCondition($builder, $condition);
                 
             }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\In) {
                 $this->mapInCondition($builder, $modelName, $condition, $plan);
 
-            }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\Group\Relationship) {
-                $this->mapRelationshipGroup($builder, $modelName, $condition, $plan);
+            }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\Collection\RelatedTo) {
+                $this->mapRelatedToCollection($builder, $modelName, $condition, $plan);
 
-            }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\Group) {
-                $this->mapConditionGroup($builder, $modelName, $condition, $plan);
+            }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
+                $this->mapConditionCollection($builder, $modelName, $condition, $plan);
 
             }else {
                 throw new \PHPixie\ORM\Exception\Mapper("Unexpected condition encountered");
             }
         }
+    }
+    
+    public function map($builder, $modelName, $conditions, $plan)
+    {
+        $conditions = $this->mappers->conditionsOptimizer()->optimize($conditions);
+        $this->mapConditions($builder, $modelName, $conditions, $plan);
     }
 }

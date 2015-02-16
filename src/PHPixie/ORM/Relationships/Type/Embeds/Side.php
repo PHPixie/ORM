@@ -2,7 +2,9 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embeds;
 
-abstract class Side extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side
+abstract class Side extends    \PHPixie\ORM\Relationships\Relationship\Implementation\Side
+                    implements \PHPixie\ORM\Relationships\Relationship\Side\Relationship,
+                               \PHPixie\ORM\Relationships\Relationship\Side\Property\Entity
 {
     public function modelName()
     {
@@ -12,5 +14,10 @@ abstract class Side extends \PHPixie\ORM\Relationships\Relationship\Implementati
     public function propertyName()
     {
         return $this->config->ownerProperty();
+    }
+                          
+    public function relatedModelName()
+    {
+        return $this->config->itemModel;
     }
 }

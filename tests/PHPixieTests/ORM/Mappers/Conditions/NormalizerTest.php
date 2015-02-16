@@ -54,6 +54,7 @@ class NormalizerTest extends \PHPixieTests\AbstractORMTest
         $modelName = 'pixie';
         
         $inCondition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
+        $this->method($inCondition, 'modelName', $modelName, array(), 0);
         
         $queries = array();
         if($withQueries) {
@@ -69,12 +70,12 @@ class NormalizerTest extends \PHPixieTests\AbstractORMTest
         }
         
         $items = array_merge($queries, $entities);
-        $this->method($inCondition, 'items', $items, array(), 0);
+        $this->method($inCondition, 'items', $items, array(), 1);
         
         $inGroup = $this->getRelationshipGroup();
         $this->method($this->conditions, 'relatedToGroup', $inGroup, array($modelName), 0);
         
-        $this->prepareCopyLogicAndNegated($inCondition, $inGroup, 1);
+        $this->prepareCopyLogicAndNegated($inCondition, $inGroup, 2);
         
         foreach($queries as $key => $query) {
             $queryGroup = $this->getGroup();
@@ -109,7 +110,7 @@ class NormalizerTest extends \PHPixieTests\AbstractORMTest
             $this->method($inGroup, 'add', null, array($operatorCondition), count($queries)+2);
         }
         
-        $this->assertSame($inGroup, $this->normalizer->normalizeIn($inCondition, $modelName));
+        $this->assertSame($inGroup, $this->normalizer->normalizeIn($inCondition));
     }
     
     protected function prepareCopyLogicAndNegated($source, $target, $sourceAt = 0, $targetAt = 0)

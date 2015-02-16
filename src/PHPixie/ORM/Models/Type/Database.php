@@ -26,7 +26,8 @@ class Database extends \PHPixie\ORM\Models\Model
     
     protected function buildConfig($modelName, $configSlice)
     {
-        $driverName = $this->database->connectionDriverName($configSlice->get('connection', 'default'));
+        $connectionName = $configSlice->get('connection', 'default');
+        $driverName = $this->database->connectionDriverName($connectionName);
         $driver = $this->drivers->get($driverName);
         return $driver->config($this->configs->inflector(), $modelName, $configSlice);
     }

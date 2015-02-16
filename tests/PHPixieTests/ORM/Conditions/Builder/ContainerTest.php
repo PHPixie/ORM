@@ -7,6 +7,43 @@ namespace PHPixieTests\ORM\Conditions\Builder;
  */
 class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerTest
 {
+    protected $maps;
+    protected $relationshipMap;
+    protected $modelName = 'pixie';
+    
+    public function setUp()
+    {
+        $this->maps = $this->getMock('\PHPixie\ORM\Maps', array(), array(), '', false);
+        $this->relationshipMap = $this->getMock('\PHPixie\ORM\Maps\Map\Relationship', array(), array(), '', false);
+        
+        $this->maps
+            ->expects($this->any())
+            ->method('relationship')
+            ->will($this->returnValue($this->relationshipMap));
+        
+        $self = $this;
+        
+        $this->relationshipMap
+            ->expects($this->any())
+            ->method('get')
+            ->will($this->returnCallback(function($model, $property) use($self) {
+                $models = array(
+                    'pixie' => 'fairy',
+                    'fairy' => 'pixie'
+                );
+                
+                $side = $self->getMock('\PHPixie\ORM\Relationships\Relationship\Side\Relationship', array());
+                $side
+                    ->expects($this->any())
+                    ->method('relatedModelName')
+                    ->will($this->returnValue($models[$model]));
+                
+                return $side;
+            }));
+        
+        parent::setUp();
+    }
+    
     /**
      * @covers ::addOperatorCondition
      * @covers ::startConditionGroup
@@ -39,18 +76,20 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
      * @covers ::addRelatedToCondition
      * @covers ::addInCondition
      * @covers ::startConditionGroup
+     * @covers ::endGroup
      * @covers ::<protected>
      */
     public function testRelatedConditions()
     {
-        $items = array('items');
+        $pixieItems = array($this->getInItem('pixie'));
+        $fairyItems = array($this->getInItem('fairy'));
     
         $this->container
                     ->relatedTo('a.b', function($container){
                         $container->orNot('c', '>', 1);
                     })
-                    ->relatedTo('c', $items)
-                    ->orIn($items);
+                    ->relatedTo('c', $fairyItems)
+                    ->orIn($pixieItems);
         
         $this->assertConditions(array(
             array('and', false, 'a', array(
@@ -59,9 +98,9 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
                 ))
             )),
             array('and', false, 'c', array(
-                array('and', false, $items)
+                array('and', false, $fairyItems)
             )),
-            array('or', false, $items)
+            array('or', false, $pixieItems)
         ));
         
     }
@@ -89,6 +128,7 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
      * @covers ::startOrWhereNotGroup
      * @covers ::startXorWhereNotGroup
      * @covers ::endWhereGroup
+     * @covers ::endGroup
      */
     public function testWhere()
     {
@@ -164,10 +204,12 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
      * @covers ::startAndNotRelatedToGroup
      * @covers ::startOrNotRelatedToGroup
      * @covers ::startXorNotRelatedToGroup
+     * @covers ::endGroup
      */
     public function testRelatedTo()
     {
-        $items = array('items');
+        $items = array($this->getInItem('fairy'));
+        
         $expected = array();
         
         $this->container->addRelatedToCondition('or', true, 'a', $items);
@@ -239,10 +281,11 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
      * @covers ::andNotIn
      * @covers ::orNotIn
      * @covers ::xorNotIn
+     * @covers ::endGroup
      */
     public function testIn()
     {
-        $items = array('items');
+        $items = array($this->getInItem('pixie'));
         $expected = array();
         
          
@@ -253,10 +296,8 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
                     $method.='Not';
                 $method.='In';
                 
-                $this->container->$method('a', $items);
-                $expected[] = array($logic, $negated, 'a', array(
-                    array('and', false, $items)
-                ));
+                $this->container->$method($items);
+                $expected[] = array($logic, $negated, $items);
                 
             }
         }
@@ -266,14 +307,24 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
             if($negated)
                 $method = 'not'.ucfirst($method);
             
-            $this->container->$method('a', $items);
-            $expected[] = array('and', $negated, 'a', array(
-                array('and', false, $items)
-            ));
+            $this->container->$method($items);
+            $expected[] = array('and', $negated, $items);
             
         }
         
         $this->assertConditions($expected);
+    }
+    
+    protected function assertPlaceholder($container, $logic, $negated, $allowEmpty, $modelName = null)
+    {
+        parent::assertPlaceholder($container, $logic, $negated, $allowEmpty);
+        
+        $placeholder = $this->getLastCondition();
+        
+        if($modelName === null) {
+            $modelName = $this->modelName;
+        }
+        $this->assertAttributeSame($modelName, 'currentModelName', $placeholder->container());
     }
     
     protected function assertCondition($condition, $expected)
@@ -292,11 +343,24 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
     
     protected function conditions()
     {
-        return new \PHPixie\ORM\Conditions;
+        return new \PHPixie\ORM\Conditions($this->maps);
+    }
+    
+    protected function getInItem($modelName)
+    {
+        $item = $this->getMock('\PHPixie\ORM\Conditions\Condition\In\Item', array());
+        $item
+            ->expects($this->any())
+            ->method('modelName')
+            ->will($this->returnValue($modelName));
+        return $item;
     }
     
     protected function container($defaultOperator = '=')
     {
-        return new \PHPixie\ORM\Conditions\Builder\Container($this->conditions, $defaultOperator);
+        return $this->conditions->container(
+            $this->modelName,
+            $defaultOperator
+        );
     }
 }

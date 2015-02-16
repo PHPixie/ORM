@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Maps\Map;
+namespace PHPixie\ORM\Maps\Map\Property;
 
-class Entity extends \PHPixie\ORM\Maps\Map
+class Entity extends \PHPixie\ORM\Maps\Map\Property
 {
     public function property($entity, $propertyName)
     {

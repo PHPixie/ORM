@@ -4,6 +4,8 @@ namespace PHPixie\ORM;
 
 class Data {
     
+    protected $documentBuilder;
+    
     public function diff($set)
     {
         return new \PHPixie\ORM\Data\Diff($set);    
@@ -19,9 +21,9 @@ class Data {
         return new \PHPixie\ORM\Data\Types\Map($data);
     }
     
-    public function document($data = null)
+    public function document($document = null)
     {
-        return new \PHPixie\ORM\Data\Types\Document($data);
+        return new \PHPixie\ORM\Data\Types\Document($document);
     }
     
     public function diffableDocument($data = null)
@@ -29,8 +31,24 @@ class Data {
         return new \PHPixie\ORM\Data\Types\Document\Diffable($data);
     }
     
-    public function documentFromData()
+    public function documentFromData($data = null)
     {
+        $document = $this->documentBuilder()->document($data);
+        return 
+    }
     
+    public function documentBuilder()
+    {
+        if ($this->documentBuilder === null) {
+            $this->documentBuilder = $thus->buildDocumentBuilder();
+        }
+        
+        return $this->documentBuilder;
+    }
+    }
+    
+    protected function buildDocumentBuilder()
+    {
+        return \PHPixie\ORM\Data\Document\Builder();
     }
 }

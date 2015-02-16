@@ -9,8 +9,9 @@ class Maps
     
     protected $mapsBuilt = false;
     
-    protected $entityMap;
-    protected $queryMap;
+    protected $relationshipMap;
+    protected $entityPropertyMap;
+    protected $queryPropertyMap;
     
 
     public function __construct($relationships, $configSlice)
@@ -19,16 +20,34 @@ class Maps
         $this->configSlice = $configSlice;
     }
 
-    public function entity()
+    public function relationship()
     {
         $this->ensureMaps();
-        return $this->entityMap;
+        return $this->relationshipMap;
     }
     
-    public function query()
+    public function entityProperty()
     {
         $this->ensureMaps();
-        return $this->queryMap;
+        return $this->entityPropertyMap;
+    }
+    
+    public function queryProperty()
+    {
+        $this->ensureMaps();
+        return $this->queryPropertyMap;
+    }
+    
+    public function preload()
+    {
+        $this->ensureMaps();
+        return $this->queryPropertyMap;
+    }
+    
+    public function cascadeDelete()
+    {
+        $this->ensureMaps();
+        return $this->queryPropertyMap;
     }
     
     protected function ensureMaps()
@@ -41,8 +60,9 @@ class Maps
     
     protected function buildMaps()
     {
-        $this->entityMap = $this->buildEntityMap();
-        $this->queryMap  = $this->buildQueryMap();
+        $this->entityPropertyMap = $this->buildEntityPropertyMap();
+        $this->queryPropertyMap  = $this->buildQueryPropertyMap();
+        $this->relationshipMap  = $this->buildRelationshipMap();
         $this->addSidesFromConfig($this->configSlice);
     }
     
@@ -62,19 +82,39 @@ class Maps
     
     protected function addSide($side)
     {
-        $this->entityMap->add($side);
-        if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Database\Query) {
-            $this->queryMap->add($side);
+        if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Relationship) {
+            $this->relationshipMap->add($side);
+        }
+        
+        if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Property\Entity) {
+            $this->entityPropertyMap->add($side);
+        }
+        
+        if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Property\Query) {
+            $this->queryPropertyMap->add($side);
+        }
+        
+        if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Preload) {
+            $this->preloadMap->add($side);
+        }
+        
+        if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete && $side->isDeleteHandled()) {
+            $this->preloadMap->add($side);
         }
     }
-    
-    protected function buildEntityMap()
+
+    protected function buildRelationshipMap()
     {
-        return new Maps\Map\Entity($this->relationships);
+        return new Maps\Map\Relationship();
     }
     
-    protected function buildQueryMap()
+    protected function buildEntityPropertyMap()
     {
-        return new Maps\Map\Query($this->relationships);
+        return new Maps\Map\Property\Entity($this->relationships);
+    }
+    
+    protected function buildQueryPropertyMap()
+    {
+        return new Maps\Map\Property\Query($this->relationships);
     }
 }

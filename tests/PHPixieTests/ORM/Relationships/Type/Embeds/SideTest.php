@@ -29,6 +29,17 @@ abstract class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Imp
             'owner' => 'fairy'
         ));
     }
+    
+    /**
+     * @covers ::relatedModelName
+     * @covers ::<protected>
+     */
+    public function testRelatedModelName()
+    {
+        $this->assertSidesMethod('relatedModelName', array(
+            'owner' => 'flower'
+        ));
+    }
 
     /**
      * @covers ::propertyName

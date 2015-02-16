@@ -13,8 +13,9 @@ class Normalizer
         $this->models     = $models;
     }
     
-    public function normalizeIn($inCondition, $modelName)
+    public function normalizeIn($inCondition)
     {
+        $modelName = $inCondition->modelName();
         $items  = $inCondition->items();
         
         $inGroup = $this->conditions->relatedToGroup($modelName);

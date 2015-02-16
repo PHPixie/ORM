@@ -12,7 +12,7 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
     
     protected $preloadMapper;
     
-    protected $entityMap;
+    protected $preloadMap;
     protected $modelName = 'fairy';
     
     public function setUp()
@@ -20,8 +20,8 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
         $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
         
-        $this->entityMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Entity');
-        $this->method($this->maps, 'entity', $this->entityMap, array());
+        $this->preloadMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Entity');
+        $this->method($this->maps, 'preload', $this->preloadMap, array());
         
         $this->preloadMapper = new \PHPixie\ORM\Mappers\Preload(
             $this->relationships,
@@ -76,7 +76,7 @@ class PreloadTest extends \PHPixieTests\AbstractORMTest
             $this->method($property, 'propertyName', $set[0], array(), 0);
             
             $side = $this->getSide();
-            $this->method($this->entityMap, 'get', $side, array($this->modelName, $set[0]), $key);
+            $this->method($this->preloadMap, 'get', $side, array($this->modelName, $set[0]), $key);
             $this->method($side, 'relationshipType', $set[1], array(), 0);
             
             $relationship = $this->getRelationship();

@@ -9,10 +9,20 @@ class EmbeddedTest extends \PHPixieTests\ORM\Models\ModelTest
 {
     protected $type = 'embedded';
     
+    protected $maps;
     protected $data;
     
     public function setUp()
     {
+        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
+        
+        $this->mapMocks['entityProperty'] = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Entity');
+        $this->mapMocks['queryProperty'] = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Query');
+        
+        foreach($this->mapMocks as $type => $mock) {
+            $this->method($this->maps, $type, $this->mapMocks[$type], array());
+        }
+        
         $this->data = $this->quickMock('\PHPixie\ORM\Data');
         
         parent::setUp();
@@ -81,8 +91,8 @@ class EmbeddedTest extends \PHPixieTests\ORM\Models\ModelTest
         $this->model = new \PHPixie\ORM\Models\Type\Embedded(
             $this->models,
             $this->configs,
-            $this->maps,
-            $this->data
+            $this->data,
+            $this->maps
         );
         
         $this->method($this->wrappers, 'embeddedEntities', array(), array(), 0);
@@ -97,7 +107,7 @@ class EmbeddedTest extends \PHPixieTests\ORM\Models\ModelTest
         $this->assertSame('fairy', $config->model);
         
         $this->assertInstanceOf('\PHPixie\ORM\Models\Type\Embedded\Implementation\Entity', $entity);
-        $this->assertAttributeEquals($this->mapMocks['entity'], 'entityMap', $entity);
+        $this->assertAttributeEquals($this->mapMocks['entityProperty'], 'entityPropertyMap', $entity);
         $this->assertAttributeEquals($config, 'config', $entity);
         $this->assertAttributeEquals($data, 'data', $entity);
     }
@@ -166,8 +176,8 @@ class EmbeddedTest extends \PHPixieTests\ORM\Models\ModelTest
             array(
                 $this->models,
                 $this->configs,
-                $this->maps,
-                $this->data
+                $this->data,
+                $this->maps
             )
         );
     }

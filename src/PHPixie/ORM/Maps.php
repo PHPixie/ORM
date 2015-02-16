@@ -7,7 +7,15 @@ class Maps
     protected $relationships;
     protected $configSlice;
     
-    protected $mapsBuilt = false;
+    protected $maps = array(
+        'relationship',
+        'queryProperty',
+        'entityProperty',
+        'preload',
+        'cascadeDelete'
+    );
+    
+    protected $mapInstances = null;
     
     protected $relationshipMap;
     protected $entityPropertyMap;
@@ -19,50 +27,41 @@ class Maps
         $this->relationships = $relationships;
         $this->configSlice = $configSlice;
     }
-
+    
     public function relationship()
     {
-        $this->ensureMaps();
-        return $this->relationshipMap;
+        return $this->getMap('relationship');
     }
     
     public function entityProperty()
     {
-        $this->ensureMaps();
-        return $this->entityPropertyMap;
+        return $this->getMap('entityProperty');
     }
     
     public function queryProperty()
     {
-        $this->ensureMaps();
-        return $this->queryPropertyMap;
+        return $this->getMap('queryProperty');
     }
     
     public function preload()
     {
-        $this->ensureMaps();
-        return $this->queryPropertyMap;
+        return $this->getMap('preload');
     }
     
     public function cascadeDelete()
     {
-        $this->ensureMaps();
-        return $this->queryPropertyMap;
-    }
-    
-    protected function ensureMaps()
-    {
-        if(!$this->mapsBuilt) {
-            $this->buildMaps();
-            $this->mapsBuilt = true;
-        }
+        return $this->getMap('cascadeDelete');
     }
     
     protected function buildMaps()
     {
-        $this->entityPropertyMap = $this->buildEntityPropertyMap();
-        $this->queryPropertyMap  = $this->buildQueryPropertyMap();
-        $this->relationshipMap  = $this->buildRelationshipMap();
+        $this->mapInstances = array();
+        
+        foreach($this->maps as $name)
+        {
+            $method = 'build'.ucfirst($name).'Map';
+            $this->mapInstances[$name] = $this->$method();
+        }
         $this->addSidesFromConfig($this->configSlice);
     }
     
@@ -83,24 +82,33 @@ class Maps
     protected function addSide($side)
     {
         if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Relationship) {
-            $this->relationshipMap->add($side);
+            $this->mapInstances['relationship']->add($side);
         }
         
         if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Property\Entity) {
-            $this->entityPropertyMap->add($side);
+            $this->mapInstances['entityProperty']->add($side);
         }
         
         if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Property\Query) {
-            $this->queryPropertyMap->add($side);
+            $this->mapInstances['queryProperty']->add($side);
         }
         
         if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Preload) {
-            $this->preloadMap->add($side);
+            $this->mapInstances['preload']->add($side);
         }
         
         if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete && $side->isDeleteHandled()) {
-            $this->preloadMap->add($side);
+            $this->mapInstances['cascadeDelete']->add($side);
         }
+    }
+    
+    protected function getMap($name)
+    {
+        if($this->mapInstances === null) {
+            $this->buildMaps();
+        }
+        
+        return $this->mapInstances[$name];
     }
 
     protected function buildRelationshipMap()
@@ -116,5 +124,15 @@ class Maps
     protected function buildQueryPropertyMap()
     {
         return new Maps\Map\Property\Query($this->relationships);
+    }
+    
+    protected function buildPreloadMap()
+    {
+        return new Maps\Map\Preload();
+    }
+    
+    protected function buildCascadeDeleteMap()
+    {
+        return new Maps\Map\Cascade\Delete();
     }
 }

@@ -9,25 +9,24 @@ class ConditionsTest extends \PHPixieTests\AbstractORMTest
 {
     protected $mappers;
     protected $models;
-    protected $maps;
     protected $relationships;
-        
+    protected $relationshipMap;
+    
     protected $conditionsMapper;
     
     protected $mapperMocks = array();
-    protected $relationshipMap;
     protected $modelName = 'fairy';
     
     public function setUp()
     {
         $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
-        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
+        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
         
         $this->conditionsMapper = new \PHPixie\ORM\Mappers\Conditions(
             $this->mappers,
-            $this->maps,
-            $this->relationships
+            $this->relationships,
+            $this->relationshipMap
         );
         
         foreach(array('optimizer', 'normalizer') as $type) {
@@ -36,9 +35,6 @@ class ConditionsTest extends \PHPixieTests\AbstractORMTest
             $this->mapperMocks[$method] = $mapper;
             $this->method($this->mappers, $method, $mapper, array());
         }
-        
-        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
-        $this->method($this->maps, 'relationship', $this->relationshipMap, array());
     }
     
     /**

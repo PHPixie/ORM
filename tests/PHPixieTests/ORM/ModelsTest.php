@@ -63,12 +63,8 @@ class ModelsTest extends \PHPixieTests\AbstractORMTest
     {
         $this->modelTest('database', array(
             'configs',
-            'maps',
             'database',
             'drivers',
-            'conditions',
-            'mappers',
-            'values'
         ));
     }
     
@@ -80,8 +76,8 @@ class ModelsTest extends \PHPixieTests\AbstractORMTest
     {
         $this->modelTest('embedded', array(
             'configs',
-            'maps',
-            'data'
+            'data',
+            'maps'
         ));
     }
     

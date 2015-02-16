@@ -34,7 +34,13 @@ class Data {
     public function documentFromData($data = null)
     {
         $document = $this->documentBuilder()->document($data);
-        return 
+        return $this->document($document);
+    }
+    
+    public function diffableDocumentFromData($data = null)
+    {
+        $document = $this->documentBuilder()->document($data);
+        return $this->diffableDocument($document);
     }
     
     public function documentBuilder()
@@ -44,7 +50,6 @@ class Data {
         }
         
         return $this->documentBuilder;
-    }
     }
     
     protected function buildDocumentBuilder()

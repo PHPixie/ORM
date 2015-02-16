@@ -53,12 +53,8 @@ class Models
         return new \PHPixie\ORM\Models\Type\Database(
             $this,
             $this->ormBuilder->configs(),
-            $this->ormBuilder->maps(),
             $this->ormBuilder->database(),
-            $this->ormBuilder->drivers(),
-            $this->ormBuilder->conditions(), 
-            $this->ormBuilder->mappers(),
-            $this->ormBuilder->values()
+            $this->ormBuilder->drivers()
         );
     }
     
@@ -67,8 +63,8 @@ class Models
         return new \PHPixie\ORM\Models\Type\Embedded(
             $this,
             $this->ormBuilder->configs(),
-            $this->ormBuilder->maps(),
-            $this->ormBuilder->data()
+            $this->ormBuilder->data(),
+            $this->ormBuilder->maps()
         );
     }
 }

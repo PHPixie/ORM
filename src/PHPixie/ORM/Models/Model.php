@@ -6,17 +6,15 @@ abstract class Model
 {
     protected $models;
     protected $configs;
-    protected $maps;
     protected $wrappers;
     
     protected $modelConfigs = array();
     protected $wrapped = array();
     
-    public function __construct($models, $configs, $maps)
+    public function __construct($models, $configs)
     {
         $this->models        = $models;
         $this->configs       = $configs;
-        $this->maps          = $maps;
         $this->wrappers      = $this->models->wrappers();
     }
     

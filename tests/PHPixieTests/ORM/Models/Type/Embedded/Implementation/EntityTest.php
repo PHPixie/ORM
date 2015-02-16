@@ -60,7 +60,7 @@ class EntityTest extends \PHPixieTests\ORM\Models\Model\Implementation\EntityTes
     protected function entity()
     {
         return new \PHPixie\ORM\Models\Type\Embedded\Implementation\Entity(
-            $this->entityMap,
+            $this->entityPropertyMap,
             $this->config,
             $this->data
         );

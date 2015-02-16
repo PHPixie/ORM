@@ -7,16 +7,19 @@ namespace PHPixieTests\ORM\Mappers\Con;
  */
 class OptimizerTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $mappers;
     protected $maps;
     protected $relationshipMap;
     protected $conditions;
     
     protected $optimizer;
     
+    protected $normalizer;
     protected $modelName = 'pixie';
 
     public function setUp()
     {
+        $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
         $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
         $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
         
@@ -30,16 +33,16 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                 'fairy' => 'pixie'
             );
 
-            $side = $self->getMock('\PHPixie\ORM\Relationships\Relationship\Side\Relationship', array());
-            $side
-                ->expects($this->any())
-                ->method('relatedModelName')
-                ->will($this->returnValue($models[$model]));
+            $side = $self->quickMock('\PHPixie\ORM\Relationships\Relationship\Side\Relationship');
+            $self->method($side, 'relatedModelName', $models[$model], array());
 
             return $side;
         });
         $this->conditions = new \PHPixie\ORM\Conditions($this->maps);
-        $this->optimizer = new \PHPixie\ORM\Mappers\Conditions\Optimizer($this->conditions);
+        $this->optimizer = new \PHPixie\ORM\Mappers\Conditions\Optimizer($this->mappers, $this->conditions);
+        
+        $this->normalizer = $this->quickMock('\PHPixie\ORM\Mappers\Conditions\Normalizer');
+        $this->method($this->mappers, 'conditionsNormalizer', $this->normalizer, array());
     }
 
     /**
@@ -275,6 +278,36 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
         );
         
     }
+    
+    /**
+     * @covers ::optimize
+     * @covers ::<protected>
+     */
+    public function testOptimizeIn()
+    {
+        $inCondition = $this->conditions->in('pixie');
+        
+        $group = $this->conditions->container('pixie')
+                    ->startConditionGroup('or', true)
+                        ->_and('f1', 1)
+                    ->endGroup()
+                    ->getConditions();
+        
+        $group = current($group);
+                    
+        $this->method($this->normalizer, 'normalizeIn', $group, array($inCondition), 0);
+        $this->method($this->normalizer, 'normalizeIn', $group, array($inCondition), 1);
+            
+        $this->assertOptimize(array(
+            array(
+                '!or' => array(
+                    'and.f1',
+                )
+            )
+        ), $this->builder()
+            ->addCondition('or', true,  $inCondition)
+        );
+    }
 
     protected function extractConditions($conds)
     {
@@ -291,7 +324,12 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
 
             if ($cond instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
                 $arr[] = array(
-                    $negated.$prefix => $this->extractConditions($cond->conditions()));
+                    $negated.$prefix => $this->extractConditions($cond->conditions())
+                );
+            } elseif ($cond instanceof \PHPixie\ORM\Conditions\Condition\In) {
+                $arr[] = array(
+                    $negated.$prefix => 'in'
+                );
             } else {
                 $arr[] = $prefix.'.'.$negated.$cond->field();
             }
@@ -308,7 +346,6 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
 
         $conds = $builder->getConditions();
         $res = $this->extractConditions($conds);
-        print_r($res);
         
         for($i=0; $i<2; $i++) {
             $optimized = $this->optimizer->optimize($conds);

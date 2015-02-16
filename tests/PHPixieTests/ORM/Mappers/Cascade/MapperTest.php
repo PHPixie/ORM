@@ -8,8 +8,8 @@ namespace PHPixieTests\ORM\Mappers\Cascade;
 abstract class MapperTest extends \PHPixieTests\AbstractORMTest
 {
     protected $mappers;
-    protected $maps;
     protected $relationships;
+    protected $cascadeMap;
     
     protected $cascadeMapper;
     
@@ -18,8 +18,8 @@ abstract class MapperTest extends \PHPixieTests\AbstractORMTest
     public function setUp()
     {
         $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
-        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
+        $this->cascadeMap = $this->cascadeMap();
         
         $this->cascadeMapper = $this->cascadeMapper();
     }
@@ -31,6 +31,18 @@ abstract class MapperTest extends \PHPixieTests\AbstractORMTest
     public function testConstruct()
     {
     
+    }
+    
+    /**
+     * @covers ::isModelHandled
+     * @covers ::<protected>
+     */
+    public function testIsModelHandled()
+    {
+        foreach(array(true, false) as $isModelHandled) {
+            $this->method($this->cascadeMap, 'hasModelSides', $isModelHandled, array('pixie'), 0);
+            $this->assertSame($isModelHandled, $this->cascadeMapper->isModelHandled('pixie'));
+        }
     }
     
     protected function getReusableResult()

@@ -8,24 +8,20 @@ namespace PHPixieTests\ORM\Mappers;
 class PreloadTest extends \PHPixieTests\AbstractORMTest
 {
     protected $relationships;
-    protected $maps;
+    protected $preloadMap;
     
     protected $preloadMapper;
     
-    protected $preloadMap;
     protected $modelName = 'fairy';
     
     public function setUp()
     {
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
-        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
-        
         $this->preloadMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Entity');
-        $this->method($this->maps, 'preload', $this->preloadMap, array());
-        
+    
         $this->preloadMapper = new \PHPixie\ORM\Mappers\Preload(
             $this->relationships,
-            $this->maps
+            $this->preloadMap
         );
     }
 

@@ -42,7 +42,7 @@ abstract class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Imp
     {
         $this->assertSidesMethod('relatedModelName', array(
             'owner'  => 'fairy',
-            $this->itemSideName => 'owner'
+            $this->itemSideName => 'flower'
         ));
     }
 

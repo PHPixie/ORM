@@ -40,11 +40,11 @@ class EntityTest extends \PHPixieTests\ORM\Maps\Map\PropertyTest
     
     protected function getSide()
     {
-        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Entity');
+        return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Property\Entity');
     }
     
     protected function map()
     {
-        return new \PHPixie\ORM\Maps\Map\Entity($this->relationships);
+        return new \PHPixie\ORM\Maps\Map\Property\Entity($this->relationships);
     }
 }

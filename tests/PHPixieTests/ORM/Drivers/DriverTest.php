@@ -20,8 +20,9 @@ abstract class DriverTest extends \PHPixieTests\AbstractORMTest
     
     protected $inflector;
     protected $databaseModel;
-    protected $queryMapper;
-    protected $queryMap;
+    protected $queryPropertyMapper;
+    protected $queryPropertyMap;
+    protected $entityPropertyMap;
     
     public function setUp()
     {
@@ -45,11 +46,11 @@ abstract class DriverTest extends \PHPixieTests\AbstractORMTest
         $this->queryMapper = $this->quickMock('\PHPixie\ORM\Mappers\Query');
         $this->method($this->mappers, 'query', $this->queryMapper, array());
 
-        $this->entityMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Entity');
-        $this->method($this->maps, 'entity', $this->entityMap, array());
+        $this->entityPropertyMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Entity');
+        $this->method($this->maps, 'entityProperty', $this->entityPropertyMap, array());
         
-        $this->queryMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Query');
-        $this->method($this->maps, 'query', $this->queryMap, array());
+        $this->queryPropertyMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Query');
+        $this->method($this->maps, 'queryProperty', $this->queryPropertyMap, array());
 
     }
     
@@ -62,10 +63,10 @@ abstract class DriverTest extends \PHPixieTests\AbstractORMTest
     
     }
     
-    protected function prepareContainer()
+    protected function prepareContainer($modelName)
     {
         $container = $this->quickMock('\PHPixie\ORM\Conditions\Container');
-        $this->method($this->conditions, 'container', $container, array(), 0);
+        $this->method($this->conditions, 'container', $container, array($modelName), 0);
         
         return $container;
     }

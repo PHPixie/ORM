@@ -8,8 +8,8 @@ namespace PHPixieTests\ORM\Models\Type\Database\Implementation;
 abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
 {
     protected $values;
-    protected $queryMapper;
-    protected $queryMap;
+    protected $queryPropertyMapper;
+    protected $queryPropertyMap;
     protected $config;
     
     protected $configData = array(
@@ -23,7 +23,7 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     {
         $this->values = $this->quickMock('\PHPixie\ORM\Values');
         $this->queryMapper = $this->quickMock('\PHPixie\ORM\Mappers\Query');
-        $this->queryMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Query');
+        $this->queryPropertyMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Query');
         $this->config = $this->config();
         
         parent::setUp();
@@ -401,7 +401,7 @@ abstract class QueryTest extends \PHPixieTests\ORM\Conditions\Builder\ProxyTest
     protected function prepareProperty($name, $at = 0)
     {
         $property = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Property\Query');
-        $this->method($this->queryMap, 'property', $property, array($this->query, $name), $at, true);
+        $this->method($this->queryPropertyMap, 'property', $property, array($this->query, $name), $at, true);
         return $property;
     }
     

@@ -9,11 +9,6 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
 {
     protected $database;
     protected $drivers;
-    protected $conditions;
-    protected $mappers;
-    protected $values;
-    
-    protected $queryMapper;
     
     protected $preparedDrivers = array();
     
@@ -23,13 +18,6 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
     {
         $this->database   = $this->quickMock('\PHPixie\ORM\Database');
         $this->drivers    = $this->quickMock('\PHPixie\ORM\Drivers');
-        $this->conditions = $this->quickMock('\PHPixie\ORM\Conditions');
-        $this->mappers    = $this->quickMock('\PHPixie\ORM\Mappers');
-        $this->values     = $this->quickMock('\PHPixie\ORM\Values');
-        
-        $this->queryMapper = $this->quickMock('\PHPixie\ORM\Mappers\Query');
-        $this->method($this->mappers, 'query', $this->queryMapper, array());
-        
         parent::setUp();
     }
     
@@ -88,15 +76,8 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
     {
         $config = $this->config($modelName, 'PDO');
         
-        $container = $this->getConditionsContainer();
-        $this->method($this->conditions, 'container', $container, array(), 0);
-        
         $query  = $this->getQuery();
         $this->method($driver, 'query', $query, array(
-            $this->values,
-            $this->queryMapper,
-            $this->mapMocks['query'],
-            $container,
             $config
         ), 0);
         
@@ -119,8 +100,7 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
         
         $entity  = $this->getEntity();
         $this->method($driver, 'entity', $entity, array(
-            $this->mapMocks['entity'],
-            $repository,
+            $config,
             $data,
             $isNew
         ), 0);
@@ -142,8 +122,6 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
         $repository = $this->getRepository();
         
         $this->method($driver, 'repository', $repository, array(
-            $this->database,
-            $this->model,
             $config
         ), 1);
         
@@ -210,11 +188,6 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
     {
         return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Repository');
     }
-
-    protected function getConditionsContainer()
-    {
-        return $this->quickMock('\PHPixie\ORM\Conditions\Builder\Container');
-    }
     
     protected function getDriver()
     {
@@ -226,12 +199,8 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
         return new \PHPixie\ORM\Models\Type\Database(
             $this->models,
             $this->configs,
-            $this->maps,
             $this->database,
-            $this->drivers,
-            $this->conditions,
-            $this->mappers,
-            $this->values
+            $this->drivers
         );
     }
 }

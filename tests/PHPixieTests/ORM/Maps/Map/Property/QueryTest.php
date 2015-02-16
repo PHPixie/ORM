@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixieTests\ORM\Sides\Map\Property;
+namespace PHPixieTests\ORM\Maps\Map\Property;
 
 /**
  * @coversDefaultClass \PHPixie\ORM\Maps\Map\Property\Query

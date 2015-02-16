@@ -15,6 +15,23 @@ class ConditionsTest extends \PHPixieTests\Database\ConditionsTest
     protected $relatedToGroupClass = '\PHPixie\ORM\Conditions\Condition\Collection\RelatedTo\Group';
     protected $inClass             = '\PHPixie\ORM\Conditions\Condition\In';
     
+    protected $maps;
+    protected $relationshipMap;
+    
+    public function setUp()
+    {
+        $this->maps = $this->getMock('\PHPixie\ORM\Maps', array(), array(), '', false);
+        $this->relationshipMap = $this->getMock('\PHPixie\ORM\Maps\Map\Relationship', array(), array(), '', false);
+        
+        $this->maps
+            ->expects($this->any())
+            ->method('relationship')
+            ->will($this->returnValue($this->relationshipMap));
+        
+        parent::setUp();
+    }
+    
+    
     /**
      * @covers ::relatedToGroup
      * @covers ::<protected>
@@ -32,15 +49,22 @@ class ConditionsTest extends \PHPixieTests\Database\ConditionsTest
      */
     public function testIn()
     {
-        $item = $this->quickMock('\PHPixie\ORM\Relationship\Conditions\Condition\In\Item', array());
-        $items = array($item);
-        $in = $this->conditions->in($items);
+        $modelName = 'pixie';
+        $item = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In\Item', array());
+        $item
+            ->expects($this->any())
+            ->method('modelName')
+            ->with()
+            ->will($this->returnValue($modelName));
+        
+        $in = $this->conditions->in($modelName, $item);
         $this->assertInstanceOf($this->inClass, $in);
-        $this->assertSame($items, $in->items());
+        $this->assertSame($modelName, $in->modelName());
+        $this->assertSame(array($item), $in->items());
     }
     
     protected function conditions()
     {
-        return new \PHPixie\ORM\Conditions();
+        return new \PHPixie\ORM\Conditions($this->relationshipMap);
     }
 }

@@ -25,7 +25,7 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
 
     protected function buildData($data = null)
     {
-        return $this->dataBuilder->diffableDocument($data);
+        return $this->dataBuilder->diffableDocumentFromData($data);
     }
     
     protected function setQuerySource($query)

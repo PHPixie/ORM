@@ -12,6 +12,7 @@
             <directory>./tests/PHPixieTests/ORM/Configs</directory>
             <directory>./tests/PHPixieTests/ORM/Maps</directory>
             <directory>./tests/PHPixieTests/ORM/Wrappers</directory>
+            <directory>./tests/PHPixieTests/ORM/Mappers</directory>
             <directory>./tests/PHPixieTests/ORM/Values</directory>
             <directory>./tests/PHPixieTests/ORM/Conditions</directory>
             <directory>./tests/PHPixieTests/ORM/Models</directory>

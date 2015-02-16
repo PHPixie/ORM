@@ -54,7 +54,7 @@ class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementati
     protected function prepareBuildData($data)
     {
         $entityData = $this->getData();
-        $this->method($this->dataBuilder, 'diffableDocument', $entityData, array($data), 0);
+        $this->method($this->dataBuilder, 'diffableDocumentFromData', $entityData, array($data), 0);
         return $entityData;
     }
     

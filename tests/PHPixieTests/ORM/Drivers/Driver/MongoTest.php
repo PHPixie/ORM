@@ -47,14 +47,15 @@ class MongoTest extends \PHPixieTests\ORM\Drivers\DriverTest
     public function testQuery()
     {
         $config = $this->quickMock('\PHPixie\ORM\Drivers\Driver\Mongo\Config');
+        $config->model = 'pixie';
         
-        $container = $this->prepareContainer();
+        $container = $this->prepareContainer('pixie');
         
-        $repository = $this->driver->query($config);
-        $this->assertInstance($repository, '\PHPixie\ORM\Drivers\Driver\Mongo\Query', array(
+        $query = $this->driver->query($config);
+        $this->assertInstance($query, '\PHPixie\ORM\Drivers\Driver\Mongo\Query', array(
             'values'      => $this->values,
             'queryMapper' => $this->queryMapper,
-            'queryMap'    => $this->queryMap,
+            'queryPropertyMap'    => $this->queryPropertyMap,
             'container'   => $container,
             'config'      => $config
         ));
@@ -71,7 +72,7 @@ class MongoTest extends \PHPixieTests\ORM\Drivers\DriverTest
         
         $entity = $this->driver->entity($repository, $data, true);
         $this->assertInstance($entity, '\PHPixie\ORM\Drivers\Driver\Mongo\Entity', array(
-            'entityMap'  => $this->entityMap,
+            'entityPropertyMap'  => $this->entityPropertyMap,
             'repository' => $repository,
             'data'       => $data,
             'isNew'      => true

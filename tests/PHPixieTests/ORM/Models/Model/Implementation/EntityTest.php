@@ -7,7 +7,7 @@ namespace PHPixieTests\ORM\Models\Model\Implementation;
  */
 abstract class EntityTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $entityMap;
+    protected $entityPropertyMap;
     protected $config;
     protected $data;
     
@@ -21,7 +21,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->entityMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Entity');
+        $this->entityPropertyMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Entity');
         $this->config = $this->config();
         $this->data = $this->getData();
         
@@ -202,7 +202,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
     
     protected function prepareRequirePropertyNames()
     {
-        $this->method($this->entityMap, 'getPropertyNames', $this->propertyNames, array($this->configData['model']), 0);
+        $this->method($this->entityPropertyMap, 'getPropertyNames', $this->propertyNames, array($this->configData['model']), 0);
     }
     
     protected function prepareProperty($name, $at = 0, $withAsData = false, $isLoaded = true)
@@ -215,7 +215,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
         
         $this->method($property, 'isLoaded', $isLoaded, array());
         
-        $this->method($this->entityMap, 'property', $property, array($this->entity, $name), $at, true);
+        $this->method($this->entityPropertyMap, 'property', $property, array($this->entity, $name), $at, true);
         return $property;
     }
     

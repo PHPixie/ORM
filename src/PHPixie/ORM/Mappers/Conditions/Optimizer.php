@@ -8,8 +8,9 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
 {
     protected $conditions;
 
-    public function __construct($conditions)
+    public function __construct($mappers, $conditions)
     {
+        $this->mappers    = $mappers;
         $this->conditions = $conditions;
     }
     
@@ -25,13 +26,15 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
     
     protected function extractCollections($conditions, $parseLogic = false)
     {
+
         $extracted = array();
         $count = count($conditions);
         
         foreach($conditions as $key => $condition) {
             
             if($condition instanceof \PHPixie\ORM\Conditions\Condition\In) {
-                $condition = $this->mappers->conditionsNormalizer()->normalizeIn($inCondition);
+                
+                $condition = $this->mappers->conditionsNormalizer()->normalizeIn($condition);
                 $this->optimizeCollectionConditions($condition);
                 
             }elseif($condition instanceof Collection) {

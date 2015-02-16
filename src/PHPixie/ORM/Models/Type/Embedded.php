@@ -5,18 +5,14 @@ namespace PHPixie\ORM\Models\Type;
 class Embedded extends \PHPixie\ORM\Models\Model
 {
     protected $data;
-    protected $drivers;
-    protected $conditions;
-    protected $mappers;
-    protected $values;
+    protected $maps;
     
-    protected $repositories = array();
-    
-    public function __construct($models, $maps, $configs, $data)
+    public function __construct($models, $configs, $data, $maps)
     {
         $this->data = $data;
+        $this->maps = $maps;
         
-        parent::__construct($models, $maps, $configs);
+        parent::__construct($models, $configs);
     }
     
     protected function buildConfig($modelName, $configSlice)
@@ -56,7 +52,7 @@ class Embedded extends \PHPixie\ORM\Models\Model
     protected function buildEntity($config, $data)
     {
         return new \PHPixie\ORM\Models\Type\Embedded\Implementation\Entity(
-            $this->maps->entity(),
+            $this->maps->entityProperty(),
             $config,
             $data
         );

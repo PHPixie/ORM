@@ -32,7 +32,7 @@ class Conditions
         return new \PHPixie\ORM\Conditions\Condition\Collection\RelatedTo\Group($relationship);
     }
 
-    public function in($modelName, $items)
+    public function in($modelName, $items = array())
     {
         return new \PHPixie\ORM\Conditions\Condition\In($modelName, $items);
     }

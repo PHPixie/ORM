@@ -28,8 +28,8 @@ class Mongo extends \PHPixie\ORM\Drivers\Driver
         return new Mongo\Query(
             $this->values,
             $this->mappers->query(),
-            $this->maps->query(),
-            $this->conditions->container(),
+            $this->maps->queryProperty(),
+            $this->conditions->container($config->model),
             $config
         );
     }
@@ -37,7 +37,7 @@ class Mongo extends \PHPixie\ORM\Drivers\Driver
     public function entity($repository, $data, $isNew)
     {
         return new Mongo\Entity(
-            $this->maps->entity(),
+            $this->maps->entityProperty(),
             $repository,
             $data,
             $isNew

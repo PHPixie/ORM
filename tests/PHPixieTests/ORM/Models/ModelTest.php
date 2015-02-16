@@ -9,7 +9,6 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
 {
     protected $models;
     protected $configs;
-    protected $maps;
     
     protected $model;
 
@@ -24,14 +23,6 @@ abstract class ModelTest extends \PHPixieTests\AbstractORMTest
     {
         $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->configs = $this->quickMock('\PHPixie\ORM\Configs');
-        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
-        
-        $this->mapMocks['entity'] = $this->quickMock('\PHPixie\ORM\Maps\Map\Entity');
-        $this->mapMocks['query'] = $this->quickMock('\PHPixie\ORM\Maps\Map\Query');
-        
-        foreach($this->mapMocks as $type => $mock) {
-            $this->method($this->maps, $type, $this->mapMocks[$type], array());
-        }
         
         $this->inflector = $this->quickMock('\PHPixie\ORM\Configs\Inflector');
         $this->method($this->configs, 'inflector', $this->inflector, array());

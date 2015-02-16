@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixieTests\ORM\Sides\Map;
+namespace PHPixieTests\ORM\Maps\Map;
 
 /**
  * @coversDefaultClass \PHPixie\ORM\Maps\Map\Property
@@ -13,6 +13,15 @@ abstract class PropertyTest extends \PHPixieTests\ORM\Maps\MapTest
     {
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
         parent::setUp();
+    }
+    
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+        
     }
     
     protected function prepareRelationship($type, $relationshipsAt = 0)

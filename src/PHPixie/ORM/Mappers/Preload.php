@@ -5,12 +5,12 @@ namespace PHPixie\ORM\Mappers;
 class Preload
 {
     protected $relationships;
-    protected $maps;
+    protected $preloadMap;
     
-    public function __construct($relationships, $maps)
+    public function __construct($relationships, $preloadMap)
     {
         $this->relationships = $relationships;
-        $this->maps = $maps;
+        $this->preloadMap = $preloadMap;
     }
     
     public function map($preloadable, $modelName, $preload, $result, $plan)
@@ -18,7 +18,7 @@ class Preload
         foreach($preload->properties() as $property) {
             
             $propertyName = $property->propertyName();
-            $side = $this->maps->preload()->get($modelName, $propertyName);
+            $side = $this->preloadMap->get($modelName, $propertyName);
             
             $relationship = $this->relationships->get($side->relationshipType());
             $handler = $relationship->handler();

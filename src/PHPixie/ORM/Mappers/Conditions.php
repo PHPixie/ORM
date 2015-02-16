@@ -5,14 +5,14 @@ namespace PHPixie\ORM\Mappers;
 class Conditions
 {
     protected $mappers;
-    protected $maps;    
     protected $relationships;
+    protected $relationshipMap;
     
-    public function __construct($mappers, $maps, $relationships)
+    public function __construct($mappers, $relationships, $relationshipMap)
     {
-        $this->mappers       = $mappers;
-        $this->maps          = $maps;
-        $this->relationships = $relationships;
+        $this->mappers         = $mappers;
+        $this->relationships   = $relationships;
+        $this->relationshipMap = $relationshipMap;
     }
     
     protected function mapOperatorCondition($builder, $condition)
@@ -35,7 +35,7 @@ class Conditions
     
     protected function mapRelatedToCollection($builder, $modelName, $collection, $plan)
     {
-        $side = $this->maps->relationship()->get($modelName, $collection->relationship());
+        $side = $this->relationshipMap->get($modelName, $collection->relationship());
         $type = $side->relationshipType();
         $handler = $this->relationships->get($type)->handler();
         

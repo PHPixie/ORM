@@ -15,17 +15,9 @@ abstract class MapTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::__construct
-     * @covers ::<protected>
-     */
-    public function testConstruct()
-    {
-        
-    }
-    
-    /**
      * @covers ::add
      * @covers ::get
+     * @covers ::getModelSides
      * @covers ::getPropertyNames
      * @covers ::<protected>
      */
@@ -44,6 +36,14 @@ abstract class MapTest extends \PHPixieTests\AbstractORMTest
         foreach($sides as $side) {
             $this->assertSame($side, $this->map->get($side->modelName(), $side->propertyName()));
         }
+        
+        $this->assertSame(array(
+            'flowers' => $sides[0],
+            'trees'   => $sides[1]
+        ), $this->map->getModelSides('fairy'));
+        $this->assertSame(array(
+            'trees' => $sides[2]
+        ), $this->map->getModelSides('pixie'));
         
         $this->assertSame(array('flowers', 'trees'), $this->map->getPropertyNames('fairy'));
         $this->assertSame(array('trees'), $this->map->getPropertyNames('pixie'));

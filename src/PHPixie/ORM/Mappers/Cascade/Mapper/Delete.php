@@ -8,9 +8,9 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
     protected $planners;
     protected $steps;
     
-    public function __construct($mappers, $relationships, $maps, $models, $planners, $steps)
+    public function __construct($mappers, $relationships, $models, $planners, $steps, $cascadeDeletMap)
     {
-        parent::__construct($mappers, $relationships, $maps);
+        parent::__construct($mappers, $relationships, $cascadeDeletMap);
         $this->models = $models;
         $this->planners = $planners;
         $this->steps = $steps;
@@ -20,7 +20,7 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
     {
         $this->assertDirectionalPath($path, $modelName);
         
-        $sides = $this->maps->cascadeDelete()->getModelSides($modelName);
+        $sides = $this->cascadeMap->getModelSides($modelName);
         foreach($sides as $side) {
             $sidePath = $path->copy();
             $sidePath->addSide($side);
@@ -46,7 +46,7 @@ class Delete extends \PHPixie\ORM\Mappers\Cascade\Mapper
         $path = $this->mappers->cascadePath();
         $this->mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan, $path);
     }
-    
+
     protected function mapDeleteQuery($deleteQuery, $selectQuery, $modelName, $plan, $path)
     {
         $resultStep = $this->steps->reusableResult($selectQuery);

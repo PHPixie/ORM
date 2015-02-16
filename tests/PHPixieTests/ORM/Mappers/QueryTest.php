@@ -13,7 +13,7 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     protected $steps;
     protected $loaders;
         
-    protected $queryMapper;
+    protected $queryPropertyMapper;
     
     protected $modelName = 'fairy';
     

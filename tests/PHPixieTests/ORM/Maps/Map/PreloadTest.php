@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixieTests\ORM\Sides\Map;
+namespace PHPixieTests\ORM\Maps\Map;
 
 /**
  * @coversDefaultClass \PHPixie\ORM\Maps\Map\Preload

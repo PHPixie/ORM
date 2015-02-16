@@ -28,8 +28,8 @@ class PDO extends \PHPixie\ORM\Drivers\Driver
         return new PDO\Query(
             $this->values,
             $this->mappers->query(),
-            $this->maps->query(),
-            $this->conditions->container(),
+            $this->maps->queryProperty(),
+            $this->conditions->container($config->model),
             $config
         );
     }
@@ -37,7 +37,7 @@ class PDO extends \PHPixie\ORM\Drivers\Driver
     public function entity($repository, $data, $isNew)
     {
         return new PDO\Entity(
-            $this->maps->entity(),
+            $this->maps->entityProperty(),
             $repository,
             $data,
             $isNew

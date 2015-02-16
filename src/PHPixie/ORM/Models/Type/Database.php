@@ -12,16 +12,12 @@ class Database extends \PHPixie\ORM\Models\Model
     
     protected $repositories = array();
     
-    public function __construct($models, $maps, $configs, $database, $drivers, $conditions, $mappers, $values)
+    public function __construct($models, $configs, $database, $drivers)
     {
-        parent::__construct($models, $maps, $configs);
+        parent::__construct($models, $configs);
         
         $this->database = $database;
         $this->drivers = $drivers;
-        $this->conditions = $conditions;
-        $this->mappers = $mappers;
-        $this->values = $values;
-        
     }
     
     protected function buildConfig($modelName, $configSlice)
@@ -37,7 +33,7 @@ class Database extends \PHPixie\ORM\Models\Model
         $config = $this->config($modelName);
         $driver = $this->drivers->get($config->driver);
         
-        $repository = $driver->repository($this->database, $this, $config);
+        $repository = $driver->repository($config);
         
         if($this->hasWrapper('databaseRepositories', $config->model)) {
             $repository = $this->wrappers->databaseRepositoryWrapper($repository);
@@ -61,8 +57,7 @@ class Database extends \PHPixie\ORM\Models\Model
         $driver = $this->drivers->get($config->driver);
         
         $entity = $driver->entity(
-            $this->maps->entity(),
-            $repository,
+            $config,
             $data,
             $isNew
         );
@@ -77,14 +72,7 @@ class Database extends \PHPixie\ORM\Models\Model
     public function query($config)
     {
         $driver = $this->drivers->get($config->driver);
-        
-        $query = $driver->query(
-            $this->values,
-            $this->mappers->query(),
-            $this->maps->query(),
-            $this->conditions->container(),
-            $config
-        );
+        $query = $driver->query($config);
         
         if($this->hasWrapper('databaseQueries', $config->model)) {
             $query = $this->wrappers->databaseQueryWrapper($query);

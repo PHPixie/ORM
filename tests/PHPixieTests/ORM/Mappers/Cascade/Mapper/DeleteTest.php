@@ -13,7 +13,6 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
     
     protected $databaseModel;
     protected $inPlanner;
-    protected $cascadeDeleteMap;
     
     public function setUp()
     {
@@ -28,9 +27,6 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
         $this->method($this->planners, 'in', $this->inPlanner, array());
 
         parent::setUp();
-        
-        $this->cascadeDeleteMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Cascade\Delete');
-        $this->method($this->maps, 'cascadeDelete', $this->cascadeDeleteMap, array());
     }
     
     /**
@@ -153,7 +149,7 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
             $this->getSide()
         );
         
-        $this->method($this->cascadeDeleteMap, 'getModelSides', $sides, array($this->modelName), 0);
+        $this->method($this->cascadeMap, 'getModelSides', $sides, array($this->modelName), 0);
         
         foreach($sides as $key => $side) {
             $this->method($side, 'relationshipType', $relationshipTypes[$key], array());
@@ -218,7 +214,7 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
 
     protected function cascadeMap()
     {
-        return $this->quickMock('\PHPixie\ORM\Maps\Cascade\Delete');
+        return $this->quickMock('\PHPixie\ORM\Maps\Map\Cascade\Delete');
     }
     
     protected function cascadeMapper()
@@ -226,10 +222,10 @@ class DeleteTest extends \PHPixieTests\ORM\Mappers\Cascade\MapperTest
         return new \PHPixie\ORM\Mappers\Cascade\Mapper\Delete(
             $this->mappers,
             $this->relationships,
-            $this->maps,
             $this->models,
             $this->planners,
-            $this->steps
+            $this->steps,
+            $this->cascadeMap
         );
     }
     

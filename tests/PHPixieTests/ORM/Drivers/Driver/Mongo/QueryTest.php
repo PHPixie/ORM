@@ -22,7 +22,7 @@ class QueryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementation\Qu
         return new \PHPixie\ORM\Drivers\Driver\Mongo\Query(
             $this->values,
             $this->queryMapper,
-            $this->queryMap,
+            $this->queryPropertyMap,
             $this->builder,
             $this->config
         );
@@ -33,7 +33,7 @@ class QueryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementation\Qu
         return $this->getMock('\PHPixie\ORM\Drivers\Driver\Mongo\Query', $methods, array(
             $this->values,
             $this->queryMapper,
-            $this->queryMap,
+            $this->queryPropertyMap,
             $this->builder,
             $this->config
         ));

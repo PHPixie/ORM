@@ -15,6 +15,8 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
     protected $relationshipMap;
     protected $entityPropertyMap;
     protected $queryPropertyMap;
+    protected $preloadMap;
+    protected $cascadeDeleteMap;
         
     public function setUp()
     {
@@ -23,13 +25,17 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
         
         $this->mapsMock = $this->mapsMock();
         
-        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
+        $this->relationshipMap   = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
         $this->entityPropertyMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Entity');
-        $this->queryPropertyMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Query');
+        $this->queryPropertyMap  = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Query');
+        $this->preloadMap        = $this->quickMock('\PHPixie\ORM\Maps\Map\Preload');
+        $this->cascadeDeleteMap  = $this->quickMock('\PHPixie\ORM\Maps\Map\Cascade\Delete');
         
         $this->method($this->mapsMock, 'buildRelationshipMap', $this->relationshipMap, array());
         $this->method($this->mapsMock, 'buildEntityPropertyMap', $this->entityPropertyMap, array());
         $this->method($this->mapsMock, 'buildQueryPropertyMap', $this->queryPropertyMap, array());
+        $this->method($this->mapsMock, 'buildPreloadMap', $this->preloadMap, array());
+        $this->method($this->mapsMock, 'buildCascadeDeleteMap', $this->cascadeDeleteMap, array());
     }
     
     /**
@@ -42,8 +48,9 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::entity
-     * @covers ::query
+     * @covers ::entityProperty
+     * @covers ::queryProperty
+     * @covers ::relationship
      * @covers ::<protected>
      */
     public function testMaps()
@@ -54,6 +61,8 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
             $this->assertSame($this->relationshipMap, $this->mapsMock->relationship());
             $this->assertSame($this->entityPropertyMap, $this->mapsMock->entityProperty());
             $this->assertSame($this->queryPropertyMap, $this->mapsMock->queryProperty());
+            $this->assertSame($this->preloadMap, $this->mapsMock->preload());
+            $this->assertSame($this->cascadeDeleteMap, $this->mapsMock->cascadeDelete());
         }
     }
 
@@ -69,8 +78,6 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
         
         $relationshipMap = $maps->relationship();
         $this->assertInstance($relationshipMap, '\PHPixie\ORM\Maps\Map\Relationship');
-        
-        $this->assertSame($relationshipMap, $maps->relationship());
     }
     
     /**
@@ -86,8 +93,6 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
         $this->assertInstance($entityPropertyMap, '\PHPixie\ORM\Maps\Map\Property\Entity', array(
             'relationships' => $this->relationships
         ));
-        
-        $this->assertSame($entityPropertyMap, $maps->entityProperty());
     }
     
     /**
@@ -103,9 +108,34 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
         $this->assertInstance($queryPropertyMap, '\PHPixie\ORM\Maps\Map\Property\Query', array(
             'relationships' => $this->relationships
         ));
-        
-        $this->assertSame($queryPropertyMap, $maps->queryProperty());
     }
+    
+    /**
+     * @covers ::preload
+     * @covers ::<protected>
+     */
+    public function testPreload()
+    {
+        $maps = $this->maps();
+        $this->prepareBuildMaps(true);
+        
+        $preloadMap = $maps->preload();
+        $this->assertInstance($preloadMap, '\PHPixie\ORM\Maps\Map\Preload');
+    }
+    
+    /**
+     * @covers ::cascadeDelete
+     * @covers ::<protected>
+     */
+    public function testCascadeDelete()
+    {
+        $maps = $this->maps();
+        $this->prepareBuildMaps(true);
+        
+        $cascadeDeleteMap = $maps->cascadeDelete();
+        $this->assertInstance($cascadeDeleteMap, '\PHPixie\ORM\Maps\Map\Cascade\Delete');
+    }
+    
     
     protected function prepareBuildMaps($empty = false)
     {
@@ -128,13 +158,19 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
             $relationship = $this->getRelationship();
             $this->method($this->relationships, 'get', $relationship, array($type), $key);
             
+            $skip = array(
+                $this->getCascadeDeleteSide(false)
+            );
+            
             $sides = array(
                 'relationship'   => $this->getSide('relationship'),
                 'entityProperty' => $this->getSide('entity'),
-                'queryProperty'  => $this->getSide('query')
+                'queryProperty'  => $this->getSide('query'),
+                'preload'        => $this->getSide('preload'),
+                'cascadeDelete'  => $this->getCascadeDeleteSide(),
             );
             
-            $this->method($relationship, 'getSides', $sides, array($slice), 0);
+            $this->method($relationship, 'getSides', array_merge($skip, $sides), array($slice), 0);
             
             foreach($sides as $mapName => $side) {
                 $mapName.='Map';
@@ -163,7 +199,19 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
             return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Property\Query');
         }
         
+        if($type === 'preload') {
+            return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Preload');
+        }
+        
         return $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Relationship');
+    }
+    
+    protected function getCascadeDeleteSide($isDeleteHandled = true)
+    {
+        $side = $this->abstractMock('\PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete');
+        $this->method($side, 'isDeleteHandled', $isDeleteHandled, array(), 0);
+        
+        return $side;
     }
     
     protected function mapsMock()
@@ -174,6 +222,8 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
                 'buildEntityPropertyMap',
                 'buildQueryPropertyMap',
                 'buildRelationshipMap',
+                'buildPreloadMap',
+                'buildCascadeDeleteMap',
             ),
             array(
                 $this->relationships,

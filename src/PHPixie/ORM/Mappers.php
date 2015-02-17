@@ -4,6 +4,12 @@ namespace PHPixie\ORM;
 
 class Mappers
 {
+    protected $ormBuilder;
+    
+    public function __construct($ormBuilder)
+    {
+        $this->ormBuilder = $ormBuilder;
+    }
     public function cascadePath(){}
     public function cascadeDelete(){}
     public function preload(){}

@@ -4,11 +4,11 @@ namespace PHPixie\ORM;
 
 class Conditions
 {
-    protected $maps;
+    protected $ormBuilder;
     
-    public function __construct($maps)
+    public function __construct($ormBuilder)
     {
-        $this->maps = $maps;
+        $this->ormBuilder = $ormBuilder;
     }
     
     public function placeholder($modelName, $defaultOperator = '=', $allowEmpty = true)
@@ -41,7 +41,7 @@ class Conditions
     {
         return new \PHPixie\ORM\Conditions\Builder\Container(
             $this,
-            $this->maps->relationship(),
+            $this->ormBuilder->maps()->relationship(),
             $modelName,
             $defaultOperator
         );

@@ -5,16 +5,16 @@ namespace PHPixie\ORM;
 class Builder
 {
     protected $database;
-    protected $config;
+    protected $configSlice;
     protected $wrappers;
     
     protected $instances = array();
 
-    public function __construct($database, $config, $wrappers = null)
+    public function __construct($database, $configSlice, $wrappers = null)
     {
-        $this->database = $database;
-        $this->config   = $config;
-        $this->wrappers = $wrappers;
+        $this->database    = $database;
+        $this->configSlice = $configSlice;
+        $this->wrappers    = $wrappers;
     }
     
     public function conditions()
@@ -101,79 +101,84 @@ class Builder
         return $this->instances[$name];
     }
     
-    public function buildConditions()
+    protected function buildConditions()
     {
-        return new Conditions(
-            $this->maps()
-        );
+        return new Conditions($this);
     }
     
-    public function buildConfigs()
+    protected function buildConfigs()
     {
         return new Configs();
     }
     
-    public function buildData()
+    protected function buildData()
     {
-        return $this->instance('data');
+        return new Data();
     }
     
-    public function buildDatabase()
+    protected function buildDatabase()
     {
-        return $this->instance('database');
+        return new Database($this->database);
     }
     
-    public function bildDrivers()
+    protected function buildDrivers()
     {
-        return $this->instance('drivers');
+        return new Drivers($this);
     }
     
-    public function buildLoaders()
+    protected function buildLoaders()
     {
-        return $this->instance('loaders');
+        return new Loaders($this);
     }
     
-    public function buildMappers()
+    protected function buildMappers()
     {
-        return $this->instance('mappers');
+        return new Mappers($this);
     }
     
-    public function builMaps() {
-        return $this->instance('maps');
+    protected function buildMaps() {
+        return new Maps(
+            $this,
+            $this->configSlice->slice('relationships')
+        );
     }
     
-    public function buildModels()
+    protected function buildModels()
     {
-        return $this->instance('models');
+        return new Models(
+            $this,
+            $this->configSlice->slice('models'),
+            $this->wrappers
+        );
     }
     
-    public function buildPlanners()
+    protected function buildPlanners()
     {
-        return $this->instance('planners');
+        return new Planners($this);
     }
     
-    public function buildPlans()
+    protected function buildPlans()
     {
-        return $this->instance('plans');
+        return new Plans();
     }
     
-    public function buildRelationships()
+    protected function buildRelationships()
     {
-        return $this->instance('relationships');
+        return new Relationships($this);
     }
     
-    public function buildRepositories()
+    protected function buildRepositories()
     {
-        return $this->instance('repositories');
+        return new Repositories($this->models());
     }
         
-    public function buildSteps()
+    protected function buildSteps()
     {
-        return $this->instance('steps');
+        return new Steps($this);
     }
     
-    public function buildValues()
+    protected function buildValues()
     {
-        return $this->instance('values');
+        return new Values();
     }
 }

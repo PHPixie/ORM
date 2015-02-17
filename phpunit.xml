@@ -36,6 +36,7 @@
             <file>./tests/PHPixieTests/ORM/PlannersTest.php</file>
             <file>./tests/PHPixieTests/ORM/DriversTest.php</file>
             <file>./tests/PHPixieTests/ORM/ConfigsTest.php</file>
+            <file>./tests/PHPixieTests/ORM/BuilderTest.php</file>
             
             
             <file>./tests/PHPixieTests/ORM/Mappers/PreloadTest.php</file>

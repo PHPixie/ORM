@@ -18,17 +18,17 @@ class Data {
     
     public function map($data = null)
     {
-        return new \PHPixie\ORM\Data\Types\Map($data);
+        return new \PHPixie\ORM\Data\Types\Map($this, $data);
     }
     
-    public function document($document = null)
+    public function document($documentNode)
     {
-        return new \PHPixie\ORM\Data\Types\Document($document);
+        return new \PHPixie\ORM\Data\Types\Document($documentNode);
     }
     
-    public function diffableDocument($data = null)
+    public function diffableDocument($documentNode)
     {
-        return new \PHPixie\ORM\Data\Types\Document\Diffable($data);
+        return new \PHPixie\ORM\Data\Types\Document\Diffable($this, $documentNode);
     }
     
     public function documentFromData($data = null)
@@ -43,10 +43,10 @@ class Data {
         return $this->diffableDocument($document);
     }
     
-    public function documentBuilder()
+    protected function documentBuilder()
     {
         if ($this->documentBuilder === null) {
-            $this->documentBuilder = $thus->buildDocumentBuilder();
+            $this->documentBuilder = $this->buildDocumentBuilder();
         }
         
         return $this->documentBuilder;
@@ -54,6 +54,6 @@ class Data {
     
     protected function buildDocumentBuilder()
     {
-        return \PHPixie\ORM\Data\Document\Builder();
+        return new \PHPixie\ORM\Data\Types\Document\Builder();
     }
 }

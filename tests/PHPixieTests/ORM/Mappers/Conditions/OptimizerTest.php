@@ -7,9 +7,11 @@ namespace PHPixieTests\ORM\Mappers\Con;
  */
 class OptimizerTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $mappers;
+    protected $ormBuilder;
     protected $maps;
     protected $relationshipMap;
+    
+    protected $mappers;
     protected $conditions;
     
     protected $optimizer;
@@ -19,14 +21,14 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
 
     public function setUp()
     {
-        $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
+        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
         $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
         $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
         
+        $this->method($this->ormBuilder, 'maps', $this->maps, array());
         $this->method($this->maps, 'relationship', $this->relationshipMap, array());
         
         $self = $this;
-        
         $this->method($this->relationshipMap, 'get', function($model, $property) use($self) {
             $models = array(
                 'pixie' => 'fairy',
@@ -38,7 +40,10 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
 
             return $side;
         });
-        $this->conditions = new \PHPixie\ORM\Conditions($this->maps);
+        
+        $this->conditions = new \PHPixie\ORM\Conditions($this->ormBuilder);
+        $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
+
         $this->optimizer = new \PHPixie\ORM\Mappers\Conditions\Optimizer($this->mappers, $this->conditions);
         
         $this->normalizer = $this->quickMock('\PHPixie\ORM\Mappers\Conditions\Normalizer');

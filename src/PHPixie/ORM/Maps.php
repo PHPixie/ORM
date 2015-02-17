@@ -4,7 +4,7 @@ namespace PHPixie\ORM;
 
 class Maps
 {
-    protected $relationships;
+    protected $ormBuilder;
     protected $configSlice;
     
     protected $maps = array(
@@ -22,9 +22,9 @@ class Maps
     protected $queryPropertyMap;
     
 
-    public function __construct($relationships, $configSlice)
+    public function __construct($ormBuilder, $configSlice)
     {
-        $this->relationships = $relationships;
+        $this->ormBuilder  = $ormBuilder;
         $this->configSlice = $configSlice;
     }
     
@@ -67,10 +67,12 @@ class Maps
     
     protected function addSidesFromConfig($configSlice)
     {
+        $relationships = $this->ormBuilder->relationships();
+        
         foreach ($configSlice->keys() as $key) {
             $relationshipConfig = $configSlice->slice($key);
             $type = $relationshipConfig->getRequired('type');
-            $relationship = $this->relationships->get($type);
+            $relationship = $relationships->get($type);
             $sides = $relationship->getSides($relationshipConfig);
             
             foreach($sides as $side) {
@@ -118,12 +120,16 @@ class Maps
     
     protected function buildEntityPropertyMap()
     {
-        return new Maps\Map\Property\Entity($this->relationships);
+        return new Maps\Map\Property\Entity(
+            $this->ormBuilder->relationships()
+        );
     }
     
     protected function buildQueryPropertyMap()
     {
-        return new Maps\Map\Property\Query($this->relationships);
+        return new Maps\Map\Property\Query(
+            $this->ormBuilder->relationships()
+        );
     }
     
     protected function buildPreloadMap()

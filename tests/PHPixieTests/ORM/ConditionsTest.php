@@ -15,13 +15,20 @@ class ConditionsTest extends \PHPixieTests\Database\ConditionsTest
     protected $relatedToGroupClass = '\PHPixie\ORM\Conditions\Condition\Collection\RelatedTo\Group';
     protected $inClass             = '\PHPixie\ORM\Conditions\Condition\In';
     
+    protected $ormBuilder;
     protected $maps;
     protected $relationshipMap;
     
     public function setUp()
     {
+        $this->ormBuilder = $this->getMock('\PHPixie\ORM\Builder', array(), array(), '', false);
         $this->maps = $this->getMock('\PHPixie\ORM\Maps', array(), array(), '', false);
         $this->relationshipMap = $this->getMock('\PHPixie\ORM\Maps\Map\Relationship', array(), array(), '', false);
+
+        $this->ormBuilder
+            ->expects($this->any())
+            ->method('maps')
+            ->will($this->returnValue($this->maps));
         
         $this->maps
             ->expects($this->any())
@@ -65,6 +72,6 @@ class ConditionsTest extends \PHPixieTests\Database\ConditionsTest
     
     protected function conditions()
     {
-        return new \PHPixie\ORM\Conditions($this->relationshipMap);
+        return new \PHPixie\ORM\Conditions($this->ormBuilder);
     }
 }

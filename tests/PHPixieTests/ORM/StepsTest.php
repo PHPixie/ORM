@@ -7,13 +7,20 @@ namespace PHPixieTests\ORM;
  */
 class StepsTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $planners;
+    protected $ormBuilder;
+    
     protected $steps;
+    
+    protected $planners;
     
     public function setUp()
     {
-        $this->planners = $this->quickMock('\PHPixie\ORM\Planners', array('query'));
-        $this->steps = new \PHPixie\ORM\Steps($this->planners);
+        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
+        
+        $this->steps = new \PHPixie\ORM\Steps($this->ormBuilder);
+        
+        $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
+        $this->method($this->ormBuilder, 'planners', $this->planners, array());
     }
     
     /**

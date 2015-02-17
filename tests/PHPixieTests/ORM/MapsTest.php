@@ -7,10 +7,12 @@ namespace PHPixieTests\ORM;
  */
 class MapsTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $relationships;
+    protected $ormBuilder;
     protected $configSlice;
     
     protected $mapsMock;
+    
+    protected $relationships;
     
     protected $relationshipMap;
     protected $entityPropertyMap;
@@ -20,10 +22,13 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
         
     public function setUp()
     {
-        $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
+        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
         $this->configSlice = $this->getConfigSlice();
         
         $this->mapsMock = $this->mapsMock();
+        
+        $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
+        $this->method($this->ormBuilder, 'relationships', $this->relationships, array());
         
         $this->relationshipMap   = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
         $this->entityPropertyMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Property\Entity');
@@ -226,7 +231,7 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
                 'buildCascadeDeleteMap',
             ),
             array(
-                $this->relationships,
+                $this->ormBuilder,
                 $this->configSlice
             )
         );
@@ -234,6 +239,6 @@ class MapsTest extends \PHPixieTests\AbstractORMTest
     
     protected function maps()
     {
-        return new \PHPixie\ORM\Maps($this->relationships, $this->configSlice);
+        return new \PHPixie\ORM\Maps($this->ormBuilder, $this->configSlice);
     }
 }

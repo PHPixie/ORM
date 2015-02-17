@@ -89,6 +89,23 @@ class MapTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
      */
     public function testDiff()
     {
+        $this->diffTest();
+    }
+    
+    /**
+     * @covers ::diff
+     * @covers ::originalData
+     * @covers ::<protected>
+     */
+    public function testNull()
+    {
+        $this->data = null;
+        $this->type = $this->getType();
+        $this->diffTest();
+    }
+    
+    protected function diffTest()
+    {
         $this->assertDiff((object) array());
         
         $this->type

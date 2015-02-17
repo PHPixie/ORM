@@ -4,11 +4,11 @@ namespace PHPixie\ORM;
 
 class Steps
 {
-    protected $planners;
+    protected $ormBuilder;
 
-    public function __construct($planners)
+    public function __construct($ormBuilder)
     {
-        $this->planners = $planners;
+        $this->ormBuilder = $ormBuilder;
     }
 
     public function query($query)
@@ -43,7 +43,7 @@ class Steps
 
     public function pivotInsert($insertQuery, $fields, $cartesianStep)
     {
-        $queryPlanner = $this->planners->query();
+        $queryPlanner = $this->ormBuilder->planners()->query();
         return new Steps\Step\Pivot\Insert($queryPlanner, $insertQuery, $fields, $cartesianStep);
     }
     

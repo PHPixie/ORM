@@ -3,6 +3,9 @@
         <testsuite>
             <directory>./tests</directory>
         </testsuite>
+        <testsuite name="functional">
+            <file>./tests/PHPixieTests/ORM/FunctionalTest.php</file>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist>

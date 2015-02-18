@@ -4,15 +4,21 @@ namespace PHPixie\ORM\Relationships\Relationship\Implementation\Preloader;
 
 abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader
 {
+    protected $side;
+    protected $modelConfig;
+    protected $result;
     protected $loader;
+    
     protected $idOffsets;
     protected $mapped = false;
-    protected $side;
+    
 
-    public function __construct($side, $loader)
+    public function __construct($side, $modelConfig, $result, $loader)
     {
-        $this->loader = $loader;
         $this->side = $side;
+        $this->modelConfig = $modelConfig;
+        $this->result = $result;
+        $this->loader = $loader;
     }
 
     public function getEntity($id)
@@ -40,10 +46,9 @@ abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Implementa
 
     protected function mapIdOffsets()
     {
-        $repository = $this->loader->repository();
-        $idField = $repository->config()->idField;
+        $idField = $$this->modelConfig->idField;
         
-        $this->idOffsets = array_flip($this->loader->reusableResult()->getField($idField));
+        $this->idOffsets = array_flip($this->result->getField($idField));
     }
 
     abstract protected function mapItems();

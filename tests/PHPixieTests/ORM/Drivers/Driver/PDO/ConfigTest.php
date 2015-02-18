@@ -7,7 +7,7 @@ namespace PHPixieTests\ORM\Drivers\Driver\PDO;
  */
 class ConfigTest extends \PHPixieTests\ORM\Drivers\Driver\SQL\ConfigTest
 {
-    protected $driver = 'PDO';
+    protected $driver = 'pdo';
     
     protected function getConfig($slice)
     {

@@ -25,17 +25,18 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
 
     public function linkPlan($config, $owner, $items)
     {
-        $plan = $this->plans->steps();
-
         $ownerRepository = $this->getRepository($config->ownerModel);
         $ownerQuery = $ownerRepository->databaseSelectQuery();
         
-        $this->planItemsSubquery($ownerQuery, $ownerRepository, $owner, $plan);
-
         $itemRepository = $this->getRepository($config->itemModel);
         $updateQuery = $itemRepository->databaseUpdateQuery();
         
-        $this->planItemsSubquery($updateQuery, $itemRepository, $items, $plan);
+        $queryStep = $this->steps->query($updateQuery);
+        $plan = $this->plans->query($queryStep);
+        $requiredPlan = $plan->requiredPlan();
+        
+        $this->planItemsSubquery($ownerQuery, $ownerRepository, $owner, $requiredPlan);
+        $this->planItemsSubquery($updateQuery, $itemRepository, $items, $requiredPlan);
 
         $this->planners->update()->subquery(
             $updateQuery,
@@ -43,7 +44,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
                 $config->ownerKey => $this->getIdField($ownerRepository)
             ),
             $ownerQuery,
-            $plan
+            $requiredPlan
         );
         
         return $plan;
@@ -114,7 +115,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         );
     }
 
-    public function handleDelete($modelName, $side, $resultStep, $plan)
+    public function handleDelete($side, $reusableResult, $plan, $sidePath)
     {
         $config = $side->config();
         $itemKey = $config->itemKey;
@@ -183,7 +184,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
             $plan
         );
         
-        return $this->relationship->preloader($side, $cachingProxy);
+        return $this->relationship->preloader($side, $preloadRepository->config(), $preloadStep, $cachingProxy);
     }
     
     protected function getRepository($modelName)

@@ -20,9 +20,9 @@ abstract class Side extends    \PHPixie\ORM\Relationships\Relationship\Implement
     public function propertyName()
     {
         if ($this->type === 'owner')
-            return $this->config->ownerProperty();
+            return $this->config->itemOwnerProperty;
 
-        return $this->config->itemOwnerProperty;
+        return $this->config->ownerProperty();
     }
                                    
     public function relatedModelName()
@@ -35,6 +35,6 @@ abstract class Side extends    \PHPixie\ORM\Relationships\Relationship\Implement
     
     public function isDeleteHandled()
     {
-        return $this->type !== 'owner';
+        return false;//$this->type !== 'owner';
     }
 }

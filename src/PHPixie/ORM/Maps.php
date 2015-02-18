@@ -68,7 +68,6 @@ class Maps
     protected function addSidesFromConfig($configSlice)
     {
         $relationships = $this->ormBuilder->relationships();
-        
         foreach ($configSlice->keys() as $key) {
             $relationshipConfig = $configSlice->slice($key);
             $type = $relationshipConfig->getRequired('type');
@@ -100,6 +99,7 @@ class Maps
         }
         
         if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete && $side->isDeleteHandled()) {
+            var_dump($side->isDeleteHandled());die;
             $this->mapInstances['cascadeDelete']->add($side);
         }
     }

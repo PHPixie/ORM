@@ -29,12 +29,6 @@ abstract class Map
         return $this->sides[$modelName];
     }
     
-    public function getPropertyNames($modelName)
-    {
-        $this->ensureModel($modelName);
-        return array_keys($this->sides[$modelName]);
-    }
-    
     protected function ensureModel($modelName)
     {
         if (!array_key_exists($modelName, $this->sides)) {

@@ -29,7 +29,6 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
 
         $extracted = array();
         $count = count($conditions);
-        
         foreach($conditions as $key => $condition) {
             
             if($condition instanceof \PHPixie\ORM\Conditions\Condition\In) {
@@ -74,8 +73,12 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
             }
         }
         
-        if($parseLogic)
+        if($parseLogic) {
             $extracted = $this->parseLogic($extracted);
+            if($extracted === null) {
+                $extracted = array ( );
+            }
+        }
         
         return $extracted;
     }

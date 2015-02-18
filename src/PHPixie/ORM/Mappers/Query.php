@@ -75,7 +75,7 @@ class Query
         if($preload !== null) {
             $preloadPlan = $plan->preloadPlan();
             $preloadMapper = $this->mappers->preload();
-            $preloadMapper->map($preloadingProxy, $modelName, $preload, $resultStep, $plan);
+            $preloadMapper->map($preloadingProxy, $modelName, $preload, $resultStep, $preloadPlan);
         }
         
         return $plan;
@@ -89,8 +89,8 @@ class Query
         
         $this->mappers->conditions()->map(
             $databaseQuery,
-            $conditions,
             $modelName,
+            $conditions,
             $requiredPlan
         );
     }

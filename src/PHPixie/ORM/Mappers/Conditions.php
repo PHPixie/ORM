@@ -55,7 +55,7 @@ class Conditions
     protected function mapConditions($builder, $modelName, $conditions, $plan)
     {
         foreach ($conditions as $condition) {
-            
+   
             if ($condition instanceof \PHPixie\ORM\Conditions\Condition\Field\Operator) {
                 $this->mapOperatorCondition($builder, $condition);
                 

@@ -21,7 +21,7 @@ class Config extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side
 
         foreach ($sides as $side) {
             $property = $side.'Model';
-            $this->$property = $configSlice->get($side);
+            $this->$property = $configSlice->getRequired($side);
         }
 
         foreach ($sides as $side => $opposing) {

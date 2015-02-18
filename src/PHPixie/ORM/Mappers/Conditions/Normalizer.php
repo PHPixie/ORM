@@ -18,7 +18,7 @@ class Normalizer
         $modelName = $inCondition->modelName();
         $items  = $inCondition->items();
         
-        $inGroup = $this->conditions->relatedToGroup($modelName);
+        $inGroup = $this->conditions->group();
         $this->copyLogicAndNegated($inCondition, $inGroup);
         
         $ids = array();

@@ -13,8 +13,8 @@ abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Implementa
         $itemOptionName = $this->itemOptionName();
         $itemPropertyName = $this->ownerPropertyName();
         
-        $this->ownerModel = $config->get('owner');
-        $this->itemModel = $config->get($itemOptionName);
+        $this->ownerModel = $config->getRequired('owner');
+        $this->itemModel = $config->getRequired($itemOptionName);
         
         $itemProperty = $config->get('ownerOptions.'.$itemOptionName.'Property', null);
         if ($itemProperty === null)

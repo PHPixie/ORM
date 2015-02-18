@@ -6,10 +6,10 @@ abstract class Multiple extends \PHPixie\ORM\Relationships\Relationship\Implemen
 {
     protected $loaders;
     
-    public function __construct($loaders, $side, $loader)
+    public function __construct($loaders, $side, $modelConfig, $result, $loader)
     {
         $this->loaders = $loaders;
-        parent::__construct($side, $loader);
+        parent::__construct($side, $modelConfig, $result, $loader);
     }
     
     protected function buildLoader($ids)

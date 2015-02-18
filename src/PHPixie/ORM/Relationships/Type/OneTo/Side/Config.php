@@ -15,8 +15,8 @@ abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Implementa
         $itemOptionName = $this->itemOptionName();
         $itemPropertyName = $this->ownerPropertyName();
         
-        $this->ownerModel = $configSlice->get('owner');
-        $this->itemModel = $configSlice->get($itemOptionName);
+        $this->ownerModel = $configSlice->getRequired('owner');
+        $this->itemModel = $configSlice->getRequired($itemOptionName);
 
         $itemOptionsPrefix = $itemOptionName.'Options';
         $this->itemOwnerProperty = $configSlice->get($itemOptionsPrefix.'.ownerProperty', $this->ownerModel);

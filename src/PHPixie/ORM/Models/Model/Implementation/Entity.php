@@ -62,6 +62,8 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
     
     public function asObject($recursive = false)
     {
+        $this->requirePropertyNames();
+            
         $data = $this->data->data();
 
         if($recursive) {
@@ -83,6 +85,12 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
             return $this->relationshipProperty($name);
         }
         return $this->getField($name);
+    }
+    
+    public function __call($name, $params)
+    {
+        $property = $this->getRelationshipProperty($name);
+        return call_user_func_array($property, $params);
     }
     
     public function __set($name, $value)

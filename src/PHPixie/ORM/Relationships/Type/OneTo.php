@@ -6,5 +6,5 @@ abstract class OneTo extends \PHPixie\ORM\Relationships\Relationship\Implementat
                  implements \PHPixie\ORM\Relationships\Relationship\Type\Database
 {
     abstract public function queryProperty($side, $query);
-    abstract public function preloader($side, $loader);
+    abstract public function preloader($side, $modelConfig, $result, $loader);
 }

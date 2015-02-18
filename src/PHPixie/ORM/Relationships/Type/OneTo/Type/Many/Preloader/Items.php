@@ -6,11 +6,10 @@ class Items extends \PHPixie\ORM\Relationships\Relationship\Implementation\Prelo
 {
     protected function mapItems()
     {
-        $repository = $this->loader->repository();
-        $idField = $repository->config()->idField;
+        $idField  = $this->modelConfig->idField;
         $ownerKey = $this->side->config()->ownerKey;
 
-        $fields = $this->loader->reusableResult()->getFields(array($idField, $ownerKey));
+        $fields = $this->result->getFields(array($idField, $ownerKey));
         foreach ($fields as $offset => $itemData) {
             $id = $itemData[$idField];
             $ownerId = $itemData[$ownerKey];

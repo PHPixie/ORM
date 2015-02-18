@@ -44,7 +44,7 @@ abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repositor
     {
         $modelName = $this->modelName();
         $data = $this->buildData($data);
-        return $this->databaseModel->entity($modelName, $isNew, $data);
+        return $this->databaseModel->entity($modelName, $data, $isNew);
     }
 
     public function connection()

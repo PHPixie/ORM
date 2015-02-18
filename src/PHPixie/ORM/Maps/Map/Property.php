@@ -10,4 +10,10 @@ abstract class Property extends \PHPixie\ORM\Maps\Map
     {
         $this->relationships = $relationships;
     }
+    
+    public function getPropertyNames($modelName)
+    {
+        $this->ensureModel($modelName);
+        return array_keys($this->sides[$modelName]);
+    }
 }

@@ -23,13 +23,13 @@ class Many extends \PHPixie\ORM\Relationships\Type\OneTo
         return $this->itemsQueryProperty($side, $query);
     }
     
-    public function preloader($side, $loader)
+    public function preloader($side, $modelConfig, $result, $loader)
     {
         if ($side->type() === 'owner') {
-            return $this->ownerPreloader($side, $loader);
+            return $this->ownerPreloader($side, $modelConfig, $result, $loader);
         }
         
-        return $this->itemsPreloader($side, $loader);
+        return $this->itemsPreloader($side, $modelConfig, $result, $loader);
     }
     
     public function ownerPreloadValue($propertyName, $owner)
@@ -90,14 +90,14 @@ class Many extends \PHPixie\ORM\Relationships\Type\OneTo
         return new Many\Property\Query\Items($this->handler(), $side, $query);
     }
     
-    protected function ownerPreloader($side, $loader)
+    protected function ownerPreloader($side, $modelConfig, $result, $loader)
     {
-        return new Many\Preloader\Owner($side, $loader);
+        return new Many\Preloader\Owner($side, $modelConfig, $result, $loader);
     }
     
-    protected function itemsPreloader($side, $loader)
+    protected function itemsPreloader($side, $modelConfig, $result, $loader)
     {
-        return new Many\Preloader\Items($this->loaders, $side, $loader);
+        return new Many\Preloader\Items($this->loaders, $side, $modelConfig, $result, $loader);
     }
     
 }

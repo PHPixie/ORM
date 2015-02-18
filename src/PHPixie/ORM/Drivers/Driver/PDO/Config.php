@@ -6,6 +6,6 @@ class Config extends \PHPixie\ORM\Drivers\Driver\SQL\Config
 {
     protected function driver()
     {
-        return 'PDO';
+        return 'pdo';
     }
 }

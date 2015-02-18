@@ -29,10 +29,10 @@ class In extends \PHPixie\ORM\Planners\Planner
         
     }
     
-    public function result($query, $queryField, $resultStep, $resultField, $plan, $logic = 'and', $negate = false)
+    public function result($query, $queryField, $reusableResult, $resultField, $plan, $logic = 'and', $negate = false)
     {
         $placeholder = $query->addPlaceholder($logic, $negate);
-        $inStep = $this->steps->in($placeholder, $queryField, $resultStep, $resultField);
+        $inStep = $this->steps->in($placeholder, $queryField, $reusableResult, $resultField);
         $plan->add($inStep);
     }
 

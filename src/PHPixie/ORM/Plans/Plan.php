@@ -19,8 +19,9 @@ abstract class Plan
         $transaction->begin($connections);
 
         try {
-            foreach($steps as $step)
+            foreach($steps as $step) {
                 $step->execute();
+            }
             $transaction->commit($connections);
 
         } catch (\Exception $exception) {

@@ -25,12 +25,28 @@ abstract class Result extends \PHPixie\ORM\Steps\Step\Query
 
     public function getField($field, $skipNulls = true)
     {
-        return $this->result->getField($field, $skipNulls);
+        $values = array();
+        foreach($this as $item) {
+            $value = $this->result()->getItemField($item, $field);
+            if ($value !== null || !$skipNulls) {
+                $values[] = $value;
+            }
+        }
+        
+        return $values;
     }
     
     public function getFields($fields)
     {
-        return $this->result->getFields($fields);
+        $data = array();
+        foreach($this as $item){
+            $values = array();
+            foreach($fields as $field)
+                $values[$field] = $this->result()->getItemField($item, $field);
+            $data[]=$values;
+        }
+        
+        return $data;
     }
 
     abstract public function getIterator();

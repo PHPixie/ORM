@@ -101,7 +101,7 @@ class Mappers
     protected function buildPreload()
     {
         return new \PHPixie\ORM\Mappers\Preload(
-            $this->ormBuilder->relationships,
+            $this->ormBuilder->relationships(),
             $this->ormBuilder->maps()->preload()
         );
     }
@@ -115,10 +115,10 @@ class Mappers
     {
         return new \PHPixie\ORM\Mappers\Cascade\Mapper\Delete(
             $this,
-            $this->ormBuilder->relationships,
-            $this->ormBuilder->models,
-            $this->ormBuilder->planners,
-            $this->ormBuilder->steps,
+            $this->ormBuilder->relationships(),
+            $this->ormBuilder->models(),
+            $this->ormBuilder->planners(),
+            $this->ormBuilder->steps(),
             $this->ormBuilder->maps()->cascadeDelete()
         );
     }

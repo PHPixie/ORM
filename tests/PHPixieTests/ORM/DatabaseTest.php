@@ -43,9 +43,9 @@ class DatabaseTest extends \PHPixieTests\AbstractORMTest
      */
     public function testConnectionDriverName()
     {
-        $this->method($this->database, 'connectionDriverName', 'PDO', array('pixie'), 0);
+        $this->method($this->database, 'connectionDriverName', 'pdo', array('pixie'), 0);
         
-        $this->assertSame('PDO', $this->ormDatabase->connectionDriverName('pixie'));
+        $this->assertSame('pdo', $this->ormDatabase->connectionDriverName('pixie'));
     }
        
     protected function getConnection()

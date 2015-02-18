@@ -25,7 +25,7 @@ class Database extends \PHPixie\ORM\Models\Model
         $connectionName = $configSlice->get('connection', 'default');
         $driverName = $this->database->connectionDriverName($connectionName);
         $driver = $this->drivers->get($driverName);
-        return $driver->config($this->configs->inflector(), $modelName, $configSlice);
+        return $driver->config($modelName, $configSlice);
     }
     
     protected function buildRepository($modelName)
@@ -51,13 +51,15 @@ class Database extends \PHPixie\ORM\Models\Model
         return $this->repositories[$modelName];
     }
     
-    public function entity($repository, $data, $isNew)
+    public function entity($modelName, $data, $isNew)
     {
+        $repository = $this->repository($modelName);
         $config = $repository->config();
+        
         $driver = $this->drivers->get($config->driver);
         
         $entity = $driver->entity(
-            $config,
+            $repository,
             $data,
             $isNew
         );
@@ -69,8 +71,9 @@ class Database extends \PHPixie\ORM\Models\Model
         return $entity;
     }
     
-    public function query($config)
+    public function query($modelName)
     {
+        $config = $this->config($modelName);
         $driver = $this->drivers->get($config->driver);
         $query = $driver->query($config);
         

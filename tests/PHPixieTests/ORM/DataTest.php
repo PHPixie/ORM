@@ -20,15 +20,6 @@ class DataTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
-     * @covers ::__construct
-     * @covers ::<protected>
-     */
-    public function testConstruct()
-    {
-    
-    }
-    
-    /**
      * @covers ::diff
      * @covers ::<protected>
      */
@@ -78,47 +69,73 @@ class DataTest extends \PHPixieTests\AbstractORMTest
     
     /**
      * @covers ::document
+     * @covers ::diffableDocument
      * @covers ::<protected>
      */
     public function testDocument()
     {
-        $documentNode = $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\Document');
-        
-        $document = $this->data->document($documentNode);
-        $this->assertInstance($document, '\PHPixie\ORM\Data\Types\Document');
-        
-        $this->assertSame($documentNode, $document->document());
-    }
-    
-    /**
-     * @covers ::diffableDocument
-     * @covers ::<protected>
-     */
-    public function testDiffableDocument()
-    {
-        $documentNode = $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\Document');
-        
-        $document = $this->data->diffableDocument($documentNode);
-        $this->assertInstance($document, '\PHPixie\ORM\Data\Types\Document\Diffable', array(
-            'dataBuilder' => $this->data
-        ));
-        
-        $this->assertSame($documentNode, $document->document());
+        $this->documentTest();
+        $this->documentTest(true);
     }
     
     /**
      * @covers ::documentFromData
+     * @covers ::diffableDocumentFromData
      * @covers ::<protected>
      */
     public function testDocumentFromData()
     {
-        $data - new \stdClass();
         $this->prepareBuildDocumentBuilder();
+        $this->documentFromDataTest();
+        $this->documentFromDataTest(true);
+    }
+    
+    protected function documentTest($diffable = false)
+    {
+        $documentNode = $this->getDocumentNode();
+        
+        if($diffable) {
+            $method = 'diffableDocument';
+            $class = '\PHPixie\ORM\Data\Types\Document\Diffable';
+            $properties = array(
+                'dataBuilder' => $this->data
+            );
+        }else{
+            $method = 'document';
+            $class = '\PHPixie\ORM\Data\Types\Document';
+            $properties = array();
+        }
+        
+        $document = $this->data->$method($documentNode);
+        $this->assertInstance($document, $class, $properties);
+        
+        $this->assertSame($documentNode, $document->document());
+    }
+    
+    protected function documentFromDataTest($diffable = false)
+    {
+        $data = new \stdClass();
         $documentNode = $this->prepareDocumentNode($data);
         
-        $document = $this->data->documentFromData($data);
-        $this->assertInstance($document, '\PHPixie\ORM\Data\Types\Document');
+        if($diffable) {
+            $method = 'diffableDocumentFromData';
+            $class = '\PHPixie\ORM\Data\Types\Document\Diffable';
+            $properties = array(
+                'dataBuilder' => $this->data
+            );
+        }else{
+            $method = 'documentFromData';
+            $class = '\PHPixie\ORM\Data\Types\Document';
+            $properties = array();
+        }
         
+        $document = $this->data->$method($data);
+        $this->assertInstance($document, $class, $properties);
+        
+        $this->assertSame($documentNode, $document->document());
+        
+        $documentNode = $this->prepareDocumentNode(null);
+        $document = $this->data->$method();
         $this->assertSame($documentNode, $document->document());
     }
     
@@ -144,9 +161,14 @@ class DataTest extends \PHPixieTests\AbstractORMTest
     
     protected function prepareDocumentNode($data)
     {
-        $documentNode = $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\Document');
-        $this->method($thid->documentBuilder, 'document', $documentNode, array($data), 0);
+        $documentNode = $this->getDocumentNode();
+        $this->method($this->documentBuilder, 'document', $documentNode, array($data), 0);
         return $documentNode;
+    }
+    
+    protected function getDocumentNode()
+    {
+        return $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\Document');
     }
     
 }

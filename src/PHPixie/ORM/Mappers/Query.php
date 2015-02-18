@@ -4,21 +4,21 @@ namespace PHPixie\ORM\Mappers;
 
 class Query
 {
-    protected $models;
     protected $mappers;
+    protected $loaders;
+    protected $models;
     protected $plans;
     protected $steps;
-    protected $loaders;
     
     protected $databaseModel;
 
-    public function __construct($models, $mappers, $plans, $steps, $loaders)
+    public function __construct($mappers, $loaders, $models, $plans, $steps)
     {
-        $this->models  = $models;
         $this->mappers = $mappers;
+        $this->loaders = $loaders;
+        $this->models  = $models;
         $this->plans   = $plans;
         $this->steps   = $steps;
-        $this->loaders = $loaders;
         
         $this->databaseModel = $models->database();
     }

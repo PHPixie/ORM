@@ -7,17 +7,17 @@ namespace PHPixieTests\ORM\Mappers;
  */
 class QueryTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $models;
     protected $mappers;
+    protected $loaders;
+    protected $models;
     protected $plans;
     protected $steps;
-    protected $loaders;
         
     protected $queryPropertyMapper;
     
     protected $modelName = 'fairy';
     
-    protected $datbaseModel;
+    protected $databaseModel;
     protected $conditionsMapper;
     protected $preloadMapper;
     protected $updateMapper;
@@ -44,11 +44,11 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
+        $this->loaders = $this->quickMock('\PHPixie\ORM\Loaders');
+        $this->models = $this->quickMock('\PHPixie\ORM\Models');
         $this->plans = $this->quickMock('\PHPixie\ORM\Plans');
         $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
-        $this->loaders = $this->quickMock('\PHPixie\ORM\Loaders');
         
         $this->databaseModel = $this->quickMock('\PHPixie\ORM\Models\Type\Database');
         $this->method($this->models, 'database', $this->databaseModel, array());
@@ -64,11 +64,11 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $this->method($this->mappers, 'cascadeDelete', $this->cascadeDeleteMapper, array());
         
         $this->queryMapper = new \PHPixie\ORM\Mappers\Query(
-            $this->models,
             $this->mappers,
+            $this->loaders,
+            $this->models,
             $this->plans,
-            $this->steps,
-            $this->loaders
+            $this->steps
         );
     }
     

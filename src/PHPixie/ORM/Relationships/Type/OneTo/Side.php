@@ -35,6 +35,6 @@ abstract class Side extends    \PHPixie\ORM\Relationships\Relationship\Implement
     
     public function isDeleteHandled()
     {
-        return false;//$this->type !== 'owner';
+        return $this->type !== 'owner';
     }
 }

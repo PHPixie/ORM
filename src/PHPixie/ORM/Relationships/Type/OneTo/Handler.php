@@ -62,18 +62,21 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
 
     protected function getUnlinkPlan($config, $constrainOwners, $owners, $constrainItems, $items, $logic = 'and')
     {
-        $plan = $this->plans->steps();
-
         $itemRepository = $this->getRepository($config->itemModel);
         $updateQuery = $itemRepository->databaseUpdateQuery();
+        
+        $queryStep = $this->steps->query($updateQuery);
+        $plan = $this->plans->query($queryStep);
+        $requiredPlan = $plan->requiredPlan();
+        
         $updateQuery->set($config->ownerKey, null);
 
         if ($constrainItems)
-            $this->planItemsSubquery($updateQuery, $itemRepository, $items, $plan);
+            $this->planItemsSubquery($updateQuery, $itemRepository, $items, $requiredPlan);
 
         if ($constrainOwners) {
             $ownerRepository = $this->getRepository($config->ownerModel);
-            $this->planItemsSubquery($updateQuery, $ownerRepository, $owners, $plan, $config->ownerKey, $logic);
+            $this->planItemsSubquery($updateQuery, $ownerRepository, $owners, $requiredPlan, $config->ownerKey, $logic);
         }
 
 
@@ -118,23 +121,24 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
     public function handleDelete($side, $reusableResult, $plan, $sidePath)
     {
         $config = $side->config();
-        $itemKey = $config->itemKey;
+        $itemKey = $config->ownerKey;
         $itemModel = $config->itemModel;
 
-        $itemRepository = $this->repositoryRegistry->get($itemModel);
-        $ownerRepository = $this->repositoryRegistry->get($modelName);
+        $itemRepository = $this->getRepository($itemModel);
+        $ownerRepository = $this->getRepository($config->ownerModel);
 
         $hasHandledSides = false;
 
         if ($config->onDelete === 'update') {
-            $query = $repository->databaseQuery('update')->data(array($itemKey => null));
+            $query = $itemRepository->databaseUpdateQuery();
+            $query->set($config->ownerKey, null);
         } else {
             $handledSides = $this->cascadeMapper->deletionSides($itemModel);
             $hasHandledSides = !empty($handlesSides);
             $query = $repository->databaseQuery($hasHandledSides ? 'select' : 'delete');
         }
         
-        $this->planners->in()->result($query, $itemKey, $resultStep, $this->getIdField($ownerRepository));
+        $this->planners->in()->result($query, $config->ownerKey, $reusableResult, $this->getIdField($ownerRepository), $plan);
 
         if ($hasHandledSides)
             $query = $this->cascadeMapper->deletion($query, $handledSides, $itemRepository, $plan);

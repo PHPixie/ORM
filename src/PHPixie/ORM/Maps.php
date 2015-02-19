@@ -99,7 +99,6 @@ class Maps
         }
         
         if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete && $side->isDeleteHandled()) {
-            var_dump($side->isDeleteHandled());die;
             $this->mapInstances['cascadeDelete']->add($side);
         }
     }

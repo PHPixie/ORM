@@ -46,7 +46,7 @@ abstract class Result extends \PHPixie\ORM\Relationships\Relationship\Implementa
 
     protected function mapIdOffsets()
     {
-        $idField = $$this->modelConfig->idField;
+        $idField = $this->modelConfig->idField;
         
         $this->idOffsets = array_flip($this->result->getField($idField));
     }

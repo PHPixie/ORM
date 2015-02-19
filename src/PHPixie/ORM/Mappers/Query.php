@@ -31,7 +31,7 @@ class Query
         $step = $this->steps->count($databaseQuery);
         $plan = $this->plans->count($step);
         
-        $this->mapConditions($query, $databaseQuery, $plan);
+        $this->mapCommon($query, $databaseQuery, $plan);
         
         return $plan;
     }
@@ -45,7 +45,7 @@ class Query
         $step = $this->steps->query($databaseQuery);
         $plan = $this->plans->query($step);
         
-        $this->mapConditions($query, $databaseQuery, $plan);
+        $this->mapCommon($query, $databaseQuery, $plan);
         $this->mappers->update()->map($databaseQuery, $update);
         
         return $plan;
@@ -70,7 +70,7 @@ class Query
         $loader = $this->loaders->cachingProxy($loader);
         
         $plan = $this->plans->loader($resultStep, $loader);
-        $this->mapConditions($query, $databaseQuery, $plan);
+        $this->mapCommon($query, $databaseQuery, $plan);
         
         if($preload !== null) {
             $preloadPlan = $plan->preloadPlan();
@@ -81,7 +81,7 @@ class Query
         return $plan;
     }
     
-    protected function mapConditions($query, $databaseQuery, $queryPlan)
+    protected function mapCommon($query, $databaseQuery, $queryPlan)
     {
         $modelName           = $query->modelName();
         $conditions          = $query->getConditions();
@@ -93,6 +93,28 @@ class Query
             $conditions,
             $requiredPlan
         );
+        
+        $offset = $query->getOffset();
+        if($offset !== null) {
+            $databaseQuery->offset($offset);
+        }
+        
+        $limit = $query->getLimit();
+        if($limit !== null) {
+            $databaseQuery->limit($limit);
+        }
+        
+        foreach($query->getOrderBy() as $orderBy) {
+            if($orderBy->direction() === 'asc') {
+                $databaseQuery->orderAscendingBy(
+                    $orderBy->field()
+                );
+            }else{
+                $databaseQuery->orderDescendingBy(
+                    $orderBy->field()
+                );
+            }
+        }
     }
     
     
@@ -108,12 +130,12 @@ class Query
         
         if($deleteMapper->isModelHandled($modelName)) {
             $selectQuery = $repository->databaseSelectQuery();
-            $this->mapConditions($query, $selectQuery, $plan);
+            $this->mapCommon($query, $selectQuery, $plan);
             $requiredPlan = $plan->requiredPlan();
             $deleteMapper->map($deleteQuery, $selectQuery, $modelName, $requiredPlan);
             
         }else{
-            $this->mapConditions($query, $deleteQuery, $plan);
+            $this->mapCommon($query, $deleteQuery, $plan);
         }
         
         return $plan;

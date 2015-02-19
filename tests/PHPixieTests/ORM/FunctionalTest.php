@@ -2,7 +2,7 @@
 
 namespace PHPixieTests\ORM;
 
-class FunctionalTest extends \PHPixieTests\AbstractORMTest
+abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
 {
     protected $databaseConfigData = array(
         'default' => array(
@@ -11,23 +11,7 @@ class FunctionalTest extends \PHPixieTests\AbstractORMTest
         )
     );
     
-    protected $ormConfigData = array(
-        'models' => array(
-            'fairy' => array(
-
-            ),
-            'flower' => array(
-
-            ),
-        ),
-        'relationships' => array(
-            array(
-                'type' => 'oneToMany',
-                'owner' => 'fairy',
-                'items'  => 'flower'
-            )
-        )
-    );
+    protected $ormConfigData = array();
     protected $database;
     protected $wrappers;
     
@@ -53,29 +37,6 @@ class FunctionalTest extends \PHPixieTests\AbstractORMTest
     }
     
 
-    
-    protected function createFairy($name, $id = null)
-    {
-        $data = array('name' => $name);
-        if($id !== null) {
-            $data['id'] = $id;
-        }
-        
-        return $this->createEntity('fairy', $data);
-    }
-    
-    protected function createFlower($name, $fairy_id = null, $id = null)
-    {
-        $data = array('name' => $name);
-        foreach(array('id', 'fairy_id') as $field) {
-            if($$field !== null) {
-                $data[$field] = $$field;
-            }
-        }
-        
-        return $this->createEntity('flower', $data);
-    }
-    
     protected function createEntity($name, $data)
     {
         $entity = $this->orm->get($name)->create();
@@ -87,12 +48,8 @@ class FunctionalTest extends \PHPixieTests\AbstractORMTest
         return $entity;
     }
     
-    protected function assertEntities($modelName, $data, $idField = 'id')
+    protected function assertEntities($data, $entities, $idField = null)
     {
-        $entities = $this->orm->get($modelName)->query()
-                        ->find()
-                        ->asArray();
-        
         $this->assertSame(count($data), count($entities));
         
         foreach($entities as $key => $entity) {
@@ -100,33 +57,27 @@ class FunctionalTest extends \PHPixieTests\AbstractORMTest
         }
     }
     
-    protected function assertEntity($entity, $data, $idField = 'id')
+    protected function assertData($modelName, $data, $idField = null)
     {
-        $id = $data[$idField];
-        $this->assertEquals($id, $entity->id());
+        $entities = $this->orm->get($modelName)->query()
+                        ->find()
+                        ->asArray();
+        
+        $this->assertEntities($data, $entities);
+    }
+    
+    protected function assertEntity($entity, $data, $idField = null)
+    {
+        if($idField) {
+            $id = $data[$idField];
+            $this->assertEquals($id, $entity->id());
+        }
 
         foreach($data as $field => $value) {
             $this->assertEquals($value, $entity->$field);
         }
     }
     
-    protected function createDatabase()
-    {
-        $connection = $this->database->get('default');
-        $connection->execute('
-            CREATE TABLE fairies (
-              id INTEGER PRIMARY KEY,
-              name VARCHAR(255)
-            )
-        ');
-        
-        $connection->execute('
-            CREATE TABLE flowers (
-              id INTEGER PRIMARY KEY,
-              name VARCHAR(255),
-              fairy_id INTEGER
-            )
-        ');
-    }
+    abstract protected function createDatabase();
 
 }

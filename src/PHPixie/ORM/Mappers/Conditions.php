@@ -28,7 +28,7 @@ class Conditions
     
     protected function mapConditionCollection($builder, $modelName, $collection, $plan)
     {
-        $builder->startGroup($collection->logic(), $collection->isNegated());
+        $builder->startConditionGroup($collection->logic(), $collection->isNegated());
         $this->mapConditions($builder, $modelName, $collection->conditions(), $plan);
         $builder->endGroup();
     }

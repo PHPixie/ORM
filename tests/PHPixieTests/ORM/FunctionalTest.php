@@ -12,6 +12,8 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
     );
     
     protected $ormConfigData = array();
+    
+    protected $config;
     protected $database;
     protected $wrappers;
     
@@ -19,21 +21,16 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $config = new \PHPixie\Config();
+        $this->config = new \PHPixie\Config();
         
-        $dbConfig = $config->dataStorage($this->databaseConfigData);
-        $ormConfig = $config->dataStorage($this->ormConfigData);
-        
+        $dbConfig = $this->config->dataStorage($this->databaseConfigData);
         $this->database = new \PHPixie\Database($dbConfig);
-        $this->orm = new \PHPixie\ORM(
-            $this->database,
-            $ormConfig,
-            $this->wrappers
-        );
+        
+        $this->orm = $this->orm();
         
         $this->createDatabase();
         
-        $this->fairiesRepository = $this->orm->geT('fairy');
+        $this->fairiesRepository = $this->orm->get('fairy');
     }
     
 
@@ -76,6 +73,16 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
         foreach($data as $field => $value) {
             $this->assertEquals($value, $entity->$field);
         }
+    }
+    
+    protected function orm()
+    {
+        $ormConfig = $this->config->dataStorage($this->ormConfigData);
+        return new \PHPixie\ORM(
+            $this->database,
+            $ormConfig,
+            $this->wrappers
+        );
     }
     
     abstract protected function createDatabase();

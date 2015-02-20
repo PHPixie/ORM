@@ -133,18 +133,31 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
             $query = $itemRepository->databaseUpdateQuery();
             $query->set($config->ownerKey, null);
         } else {
-            $handledSides = $this->cascadeMapper->deletionSides($itemModel);
-            $hasHandledSides = !empty($handlesSides);
-            $query = $repository->databaseQuery($hasHandledSides ? 'select' : 'delete');
+            $deleteMapper = $this->mappers->cascadeDelete();
+            $hasHandledSides = $deleteMapper->isModelHandled($itemModel);
+            
+            if($hasHandledSides) {
+                $query = $itemRepository->databaseSelectQuery();
+            }else{
+                $query = $itemRepository->databaseDeleteQuery();
+            }
         }
         
-        $this->planners->in()->result($query, $config->ownerKey, $reusableResult, $this->getIdField($ownerRepository), $plan);
-
-        if ($hasHandledSides)
-            $query = $this->cascadeMapper->deletion($query, $handledSides, $itemRepository, $plan);
-
-        $deleteStep = $this->steps->query($query);
-        $plan->add($deleteStep);
+        $this->planners->in()->result(
+            $query,
+            $config->ownerKey,
+            $reusableResult,
+            $this->getIdField($ownerRepository),
+            $plan
+        );
+        
+        if($hasHandledSides) {
+            $this->cascadeMapper->handleQuery($query, $itemModel, $plan, $sidePath);
+            
+        }else{
+            $step = $this->steps->query($query);
+            $plan->add($step);
+        }
     }
 
     public function mapPreload($side, $preloadProperty, $reusableResult, $plan)

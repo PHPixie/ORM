@@ -25,14 +25,16 @@ class Proxy implements \PHPixie\ORM\Conditions\Builder
         return call_user_func_array(array($this, $this->aliases[$method]), $params);
     }
     
-    public function addCondition($logic, $negate, $parmas)
+    public function addCondition($logic, $negate, $condition)
     {
-        $this->builder->addCondition($logic, $negate, $parmas);
+        $this->builder->addCondition($logic, $negate, $condition);
+        return $this;
     }
     
     public function buildCondition($logic, $negate, $args)
     {
         $this->builder->buildCondition($logic, $negate, $args);
+        return $this;
     }
     
     public function addWhereCondition($logic, $negate, $condition)
@@ -117,37 +119,37 @@ class Proxy implements \PHPixie\ORM\Conditions\Builder
 
     public function _and()
     {
-        return $this->addCondition('and', false, func_get_args());
+        return $this->buildCondition('and', false, func_get_args());
     }
 
     public function _or()
     {
-        return $this->addCondition('or', false, func_get_args());
+        return $this->buildCondition('or', false, func_get_args());
     }
 
     public function _xor()
     {
-        return $this->addCondition('xor', false, func_get_args());
+        return $this->buildCondition('xor', false, func_get_args());
     }
 
     public function _not()
     {
-        return $this->addCondition('and', true, func_get_args());
+        return $this->buildCondition('and', true, func_get_args());
     }
 
     public function andNot()
     {
-        return $this->addCondition('and', true, func_get_args());
+        return $this->buildCondition('and', true, func_get_args());
     }
 
     public function orNot()
     {
-        return $this->addCondition('or', true, func_get_args());
+        return $this->buildCondition('or', true, func_get_args());
     }
 
     public function xorNot()
     {
-        return $this->addCondition('xor', true, func_get_args());
+        return $this->buildCondition('xor', true, func_get_args());
     }
 
     public function startGroup()
@@ -191,42 +193,42 @@ class Proxy implements \PHPixie\ORM\Conditions\Builder
     }
     public function where()
     {
-        return $this->addCondition('and', false, func_get_args());
+        return $this->buildCondition('and', false, func_get_args());
     }
 
     public function andWhere()
     {
-        return $this->addCondition('and', false, func_get_args());
+        return $this->buildCondition('and', false, func_get_args());
     }
 
     public function orWhere()
     {
-        return $this->addCondition('or', false, func_get_args());
+        return $this->buildCondition('or', false, func_get_args());
     }
 
     public function xorWhere()
     {
-        return $this->addCondition('xor', false, func_get_args());
+        return $this->buildCondition('xor', false, func_get_args());
     }
 
     public function whereNot()
     {
-        return $this->addCondition('and', true, func_get_args());
+        return $this->buildCondition('and', true, func_get_args());
     }
 
     public function andWhereNot()
     {
-        return $this->addCondition('and', true, func_get_args());
+        return $this->buildCondition('and', true, func_get_args());
     }
 
     public function orWhereNot()
     {
-        return $this->addCondition('or', true, func_get_args());
+        return $this->buildCondition('or', true, func_get_args());
     }
 
     public function xorWhereNot()
     {
-        return $this->addCondition('xor', true, func_get_args());
+        return $this->buildCondition('xor', true, func_get_args());
     }
 
     public function startWhereGroup()

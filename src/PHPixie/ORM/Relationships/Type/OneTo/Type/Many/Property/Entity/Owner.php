@@ -6,8 +6,7 @@ class Owner extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Entity\Single
 {
     protected function load()
     {
-        $owner = $this->handler->loadOwnerProperty($this->side, $this->entity);
-        $this->handler->addOwnerItems($this->side->config(), $owner, $this->entity);
+        $this->handler->loadOwnerProperty($this->side, $this->entity);
     }
     
     protected function linkPlan($owner)

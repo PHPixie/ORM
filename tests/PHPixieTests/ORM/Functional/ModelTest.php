@@ -2,102 +2,27 @@
 
 namespace PHPixieTests\ORM\Functional;
 
-class ModelTest extends \PHPixieTests\ORM\FunctionalTest
+abstract class ModelTest extends \PHPixieTests\ORM\FunctionalTest
 {
-    public function testCreate()
+    protected $repository;
+    
+    public function setUp()
     {
-        $fairy = $this->createEntity('fairy', array(
-            'name' => 'Trixie'
-        ));
-        
-        $data = array(
-            'id' => 1,
-            'name' => 'Trixie'
-        );
-        
-        $this->assertData('fairy', array(
-            $data
-        ));
+        parent::setUp();
+        $this->repository = $this->orm->get('fairy');
     }
     
-    public function testFind()
+    protected function createFairies($names)
     {
-        $names = array('Trixie', 'Blum', 'Pixie');
+        $fairies = array();
         
         foreach($names as $name) {
-            $this->createEntity('fairy', array(
+            $fairies[] = $this->createEntity('fairy', array(
                 'name' => $name
             ));
         }
         
-        $fairyRepository = $this->orm->get('fairy');
-        
-        $this->assertFairyNames(
-            array('Trixie', 'Blum', 'Pixie'),
-            $fairyRepository->query()
-                ->find()->asArray()
-        );
-        
-        $this->assertFairyNames(
-            array('Trixie'),
-            $fairyRepository->query()
-                ->limit(1)
-                ->find()->asArray()
-        );
-        
-        $this->assertFairyNames(
-            array('Blum', 'Pixie'),
-            $fairyRepository->query()
-                ->offset(1)
-                ->limit(2)
-                ->find()->asArray()
-        );
-        
-        $this->assertFairyNames(
-            array('Blum', 'Pixie', 'Trixie'),
-            $fairyRepository->query()
-                ->orderAscendingBy('name')
-                ->find()->asArray()
-        );
-        
-        $this->assertFairyNames(
-            array('Pixie', 'Blum'),
-            $fairyRepository->query()
-                ->orderDescendingBy('name')
-                ->offset(1)
-                ->find()->asArray()
-        );
-    }
-    
-    public function testUpdate()
-    {
-        $fairy = $this->createEntity('fairy', array(
-            'name' => 'Trixie'
-        ));
-        
-        $fairy->name ='Blum';
-        $fairy->save();
-        
-        $this->assertData('fairy', array(
-            array( 'id' => 1, 'name' => 'Blum')
-        ));
-    }
-    
-    public function testDelete()
-    {
-        $fairy = $this->createEntity('fairy', array(
-            'name' => 'Trixie'
-        ));
-        
-        $this->createEntity('fairy', array(
-            'name' => 'Blum'
-        ));
-        
-        $fairy->delete();
-        
-        $this->assertData('fairy', array(
-            array( 'id' => 2, 'name' => 'Blum')
-        ));
+        return $fairies;
     }
     
     protected function assertFairyNames($names, $fairies)

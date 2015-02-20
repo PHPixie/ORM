@@ -108,7 +108,7 @@ class Mappers
     
     protected function buildUpdate()
     {
-        return new \PHPixie\ORM\Mappers\Upload();
+        return new \PHPixie\ORM\Mappers\Update();
     }
     
     protected function buildCascadeDelete()

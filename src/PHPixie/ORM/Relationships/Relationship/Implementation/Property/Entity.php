@@ -39,9 +39,9 @@ abstract class Entity extends \PHPixie\ORM\Relationships\Relationship\Implementa
 
     public function value()
     {
-        if (!$this->isLoaded)
+        if ($this->isLoaded === false) {
             $this->reload();
-
+        }
         return $this->value;
     }
 

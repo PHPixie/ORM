@@ -7,6 +7,7 @@ abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Ent
     public function value()
     {
         $value = parent::value();
+        
         if ($value !== null && $value->isDeleted()) {
             $this->setValue(null);
             return null;
@@ -26,9 +27,14 @@ abstract class Single extends \PHPixie\ORM\Relationships\Type\OneTo\Property\Ent
 
     public function set($value)
     {
-        if($value === null || $value->isDeleted())
+        if($value === null) {
             return $this->remove();
-
+        }
+        
+        if($value instanceof \PHPixie\ORM\Models\Type\Database\Entity && $value->isDeleted()) {
+            return $this->remove();
+        }
+        
         $plan = $this->linkPlan($value);
         $plan->execute();
         $this->setProperties($value);

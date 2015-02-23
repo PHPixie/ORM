@@ -16,5 +16,6 @@ class Insert extends \PHPixie\ORM\Steps\Step\Insert\Batch
     protected function prepareBatchData()
     {
         $this->data = $this->cartesianStep->product();
+        var_dump($this->data);
     }
 }

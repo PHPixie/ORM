@@ -25,6 +25,46 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     
     public function testPreloadOwner()
     {
+        $this->runTests('preloadOwner');
+    }
+    
+    public function testSetOwner()
+    {
+        $this->runTests('setOwner');
+    }
+    
+    public function testLoadOwner()
+    {
+        $this->runTests('loadOwner');
+    }
+    
+    public function testRemoveOwner()
+    {
+        $this->runTests('removeOwner');
+    }
+    
+    public function testItemsConditions()
+    {
+        $this->runTests('itemsConditions');
+    }
+    
+    public function testOwnerCondtions()
+    {
+        $this->runTests('ownerCondtions');
+    }
+    
+    public function testCascadeDeleteUpdate()
+    {
+        $this->runTests('cascadeDeleteUpdate');
+    }
+    
+    public function testCascadeDelete()
+    {
+        $this->runTests('cascadeDelete');
+    }
+    
+    protected function preloadOwnerTest()
+    {
         $map = $this->prepareEntities();
         
         $flowers = $this->orm->get('flower')->query()
@@ -50,7 +90,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         }
     }
     
-    public function testLoadOwner()
+    protected function loadOwnerTest()
     {
         $this->prepareEntities();
         
@@ -65,7 +105,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->assertEquals(null, $purple->fairy());
     }
     
-    public function testSetOwner()
+    protected function setOwnerTest()
     {
         $trixie = $this->createEntity('fairy', array(
             'name' => 'Trixie'
@@ -91,7 +131,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         ));
     }
     
-    public function testRemoveOwner()
+    protected function removeOwnerTest()
     {
         $trixie = $this->createEntity('fairy', array(
             'name' => 'Trixie'
@@ -111,7 +151,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         ));
     }
     
-    public function testItemsConditions()
+    protected function itemsConditionsTest()
     {
         $this->prepareEntities();
         
@@ -165,7 +205,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
 
     }
     
-    public function testOwnerCondtions()
+    protected function ownerCondtionsTest()
     {
         $map = $this->prepareEntities();
         
@@ -226,7 +266,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
     }
     
-    public function testCascadeDeleteUpdate()
+    protected function cascadeDeleteUpdateTest()
     {
         $this->prepareEntities(false);
         $this->orm->get('fairy')->query()
@@ -239,8 +279,8 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertEquals(null, $yellow->fairy_id);
     }
-
-    public function testCascadeDelete()
+    
+    protected function cascadeDeleteTest()
     {
         $this->ormConfigData['relationships'][0][$this->itemKey.'Options'] = array(
             'onOwnerDelete' => 'delete'
@@ -260,7 +300,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->assertEquals(null, $yellow);
     }
     
-    protected function createDatabase()
+    protected function createDatabase($multipleConnections = false)
     {
         $connection = $this->database->get('default');
         $connection->execute('
@@ -269,6 +309,10 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
               name VARCHAR(255)
             )
         ');
+        
+        if($multipleConnections) {
+            $connection = $this->database->get('second');
+        }
         
         $connection->execute('
             CREATE TABLE flowers (

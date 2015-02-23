@@ -27,4 +27,9 @@ class Pivot
     {
         return $this->connection->selectQuery()->table($this->source);
     }
+    
+    public function databaseInsertQuery()
+    {
+        return $this->connection->insertQuery()->table($this->source);
+    }
 }

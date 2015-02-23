@@ -30,6 +30,11 @@ class Steps
     {
         return new Steps\Step\Query\Result\Reusable($query);
     }
+    
+    public function resultFilter($result, $fields)
+    {
+        return new Steps\ResultFilter($result, $fields);
+    }
 
     public function in($placeholder, $placeholderField, $resultStep, $resultField)
     {

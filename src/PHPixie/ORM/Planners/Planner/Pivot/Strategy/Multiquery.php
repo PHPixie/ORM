@@ -6,20 +6,21 @@ class Multiquery extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
 {
     public function link($pivot, $firstSide, $secondSide, $plan)
     {
-        $resultSteps = array();
+        $resultFilters = array();
         foreach (array($firstSide, $secondSide) as $side) {
             $idQuery = $this->idQuery($side, $plan);
             $resultStep = $this->steps->iteratorResult($idQuery);
+            $resultFilter = $this->steps->resultFilter($resultStep, array($side->repository()->config()->idField));
             $plan->add($resultStep);
-            $resultSteps[] = $resultStep;
+            $resultFilters[] = $resultFilter;
         }
 
-        $cartesianStep = $this->steps->pivotCartesian($resultSteps);
+        $cartesianStep = $this->steps->pivotCartesian($resultFilters);
         $plan->add($cartesianStep);
 
+        $insertQuery = $pivot->databaseInsertQuery();
         $insertStep = $this->steps->pivotInsert(
-            $pivot->connection(),
-            $pivot->source(),
+            $insertQuery,
             array(
                 $firstSide->pivotKey(),
                 $secondSide->pivotKey()
@@ -28,5 +29,8 @@ class Multiquery extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
         );
         
         $plan->add($insertStep);
+        $queryStep = $this->steps->query($insertQuery);
+        
+        $plan->add($queryStep);
     }
 }

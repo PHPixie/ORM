@@ -7,8 +7,33 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
     protected $relationshipName = 'oneToMany';
     protected $itemKey = 'items';
     protected $itemProperty = 'flowers';
-    
+
     public function testAddItem()
+    {
+        $this->runTests('addItem');
+    }
+    
+    public function testRemoveItems()
+    {
+        $this->runTests('removeItems');
+    }
+    
+    public function testMultipleItemsCondtions()
+    {
+        $this->runTests('multipleItemsCondtions');
+    }
+    
+    public function testLoadItems()
+    {
+        $this->runTests('loadItems');
+    }
+    
+    public function testPreloadItems()
+    {
+        $this->runTests('preloadItems');
+    }
+        
+    protected function addItemTest()
     {
         $trixie = $this->createEntity('fairy', array(
             'name' => 'Trixie'
@@ -58,7 +83,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         }
     }
 
-    public function testRemoveItems()
+    protected function removeItemsTest()
     {
         $trixie = $this->createEntity('fairy', array(
             'name' => 'Trixie'
@@ -100,7 +125,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
     }
     
     
-    public function testMultipleItemsCondtions()
+    protected function multipleItemsCondtionsTest()
     {
         $this->prepareEntities();
         
@@ -122,7 +147,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
 
     }
     
-    public function testLoadItems()
+    protected function loadItemsTest()
     {
         $this->prepareEntities();
         
@@ -147,7 +172,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         );
     }
     
-    public function testPreloadItems()
+    protected function preloadItemsTest()
     {
         $map = $this->prepareEntities();
         

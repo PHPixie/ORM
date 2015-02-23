@@ -31,8 +31,11 @@ class Cartesian extends \PHPixie\ORM\Steps\Step
             return array();
         
         $product = array(array());
+        var_dump($this->resultFilters);
         foreach ($this->resultFilters as $resultFilter) {
             $rows = $resultFilter->getFilteredData();
+            var_dump($rows);
+            var_dump(2222);
             $product = $this->updateProduct($product, $rows);
             if (empty($product))
                 break;
@@ -47,7 +50,7 @@ class Cartesian extends \PHPixie\ORM\Steps\Step
         $updatedProduct = array();
         foreach($product as $productRow)
             foreach($rows as $item)
-                $updatedProduct[] = array_merge($productRow, array_values(get_object_vars($item)));
+                $updatedProduct[] = array_merge($productRow, array_values($item));
         return $updatedProduct;
     }
 

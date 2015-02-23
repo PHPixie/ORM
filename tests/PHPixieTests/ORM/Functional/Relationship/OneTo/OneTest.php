@@ -10,6 +10,26 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
     
     public function testSetItem()
     {
+        $this->runTests('setItem');
+    }
+    
+    public function testRemoveItem()
+    {
+        $this->runTests('removeItem');
+    }
+    
+    public function testLoadItems()
+    {
+        $this->runTests('loadItems');
+    }
+    
+    public function testPreloadItems()
+    {
+        $this->runTests('preloadItems');
+    }
+    
+    protected function setItemTest()
+    {
         $red = $this->createEntity('flower', array(
             'name' => 'Red'
         ));
@@ -38,7 +58,7 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         ));
     }
     
-    public function testRemoveOwner()
+    protected function removeItemTest()
     {
         $trixie = $this->createEntity('fairy', array(
             'name' => 'Trixie'
@@ -59,7 +79,7 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         ));
     }
     
-    public function testLoadItems()
+    protected function loadItemsTest()
     {
         $this->prepareEntities();
         
@@ -76,7 +96,7 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         $this->assertEquals(null, $pixie->flower());
     }
     
-    public function testPreloadItems()
+    protected function preloadItemsTest()
     {
         $map = $this->prepareEntities();
         

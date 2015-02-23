@@ -23,9 +23,7 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
     {
         $this->config = new \PHPixie\Config();
         
-        $dbConfig = $this->config->dataStorage($this->databaseConfigData);
-        $this->database = new \PHPixie\Database($dbConfig);
-        
+        $this->database = $this->database();
         $this->orm = $this->orm();
         
         $this->createDatabase();
@@ -83,6 +81,12 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
         }
         
         $this->assertEntities($data, $entities);
+    }
+    
+    protected function database()
+    {
+        $dbConfig = $this->config->dataStorage($this->databaseConfigData);
+        return new \PHPixie\Database($dbConfig);
     }
     
     protected function orm()

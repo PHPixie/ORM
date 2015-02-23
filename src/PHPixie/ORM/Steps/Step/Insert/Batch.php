@@ -17,6 +17,8 @@ abstract class Batch extends \PHPixie\ORM\Steps\Step\Insert
     public function execute()
     {
         $this->prepareBatchData();
+        var_dump($this->data);
+        var_dump(1111);
         $this->queryPlanner->setBatchData($this->insertQuery, $this->fields, $this->data);
     }
     

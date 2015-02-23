@@ -21,6 +21,36 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
 
     public function testItemsConditions()
     {
+        $this->runTests('itemsConditions');
+    }
+    
+    public function testMultipleItemsCondtions()
+    {
+        $this->runTests('multipleItemsCondtions');
+    }
+    
+    public function testLoadItems()
+    {
+        $this->runTests('loadItems');
+    }
+    
+    public function testPreloadItems()
+    {
+        $this->runTests('preloadItems');
+    }
+    
+    public function testAddItems()
+    {
+        $this->runTests('addItems');
+    }
+    
+    public function testRemoveItems()
+    {
+        $this->runTests('removeItems');
+    }
+    
+    protected function itemsConditionsTest()
+    {
         $this->prepareEntities();
         
         $this->assertNames(
@@ -73,7 +103,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
 
     }
 
-    public function testMultipleItemsCondtions()
+    protected function multipleItemsCondtionsTest()
     {
         $this->prepareEntities();
         
@@ -117,7 +147,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     }
 
     
-    public function testLoadItems()
+    protected function loadItemsTest()
     {
         list($map, $flowerMap) = $this->prepareEntities();
         
@@ -129,7 +159,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         }
     }
     
-    public function testPreloadItems()
+    protected function preloadItemsTest()
     {
         list($map, $flowerMap) = $this->prepareEntities();
         
@@ -142,7 +172,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         }
     }
     
-    public function testAddItems()
+    protected function addItemsTest()
     {
         list($trixie, $blum, $red, $green) = $this->getEntities();
         
@@ -181,7 +211,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         }
     }
     
-    public function testRemoveItems()
+    protected function removeItemsTest()
     {
         list($trixie, $blum, $red, $green) = $this->getEntities();
         
@@ -329,7 +359,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         }
     }
     
-    protected function createDatabase()
+    protected function createDatabase($multipleConnections = false)
     {
         $connection = $this->database->get('default');
         $connection->execute('
@@ -340,16 +370,20 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         ');
         
         $connection->execute('
-            CREATE TABLE flowers (
-              id INTEGER PRIMARY KEY,
-              name VARCHAR(255)
-            )
-        ');
-        
-        $connection->execute('
             CREATE TABLE fairies_flowers (
               fairy_id INTEGER,
               flower_id INTEGER
+            )
+        ');
+        
+        if($multipleConnections) {
+            $connection = $this->database->get('second');
+        }
+        
+        $connection->execute('
+            CREATE TABLE flowers (
+              id INTEGER PRIMARY KEY,
+              name VARCHAR(255)
             )
         ');
     }

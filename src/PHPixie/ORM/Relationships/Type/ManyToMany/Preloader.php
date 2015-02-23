@@ -6,10 +6,10 @@ class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\P
 {
     protected $pivotResult;
 
-    public function __construct($loaders, $side, $loader, $pivotResult)
+    public function __construct($loaders, $side, $modelConfig, $result, $loader, $pivotResult)
     {
         $this->pivotResult = $pivotResult;
-        parent::__construct($loaders, $side, $loader);
+        parent::__construct($loaders, $side, $modelConfig, $result, $loader);
     }
 
     protected function mapItems()

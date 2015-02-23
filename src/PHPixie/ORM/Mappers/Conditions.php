@@ -76,7 +76,7 @@ class Conditions
     
     public function map($builder, $modelName, $conditions, $plan)
     {
-        $conditions = $this->mappers->conditionsOptimizer()->optimize($conditions);
+        //$conditions = $this->mappers->conditionsOptimizer()->optimize($conditions);
         $this->mapConditions($builder, $modelName, $conditions, $plan);
     }
 }

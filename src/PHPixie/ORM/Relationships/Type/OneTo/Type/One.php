@@ -15,13 +15,13 @@ class One extends \PHPixie\ORM\Relationships\Type\OneTo
         return new One\Property\Query($this->handler(), $side, $query);
     }
     
-    public function preloader($side, $loader)
+    public function preloader($side, $modelConfig, $result, $loader)
     {
         if ($side->type() === 'owner') {
-            return $this->ownerPreloader($side, $loader);
+            return $this->ownerPreloader($side, $modelConfig, $result, $loader);
         }
         
-        return $this->itemPreloader($side, $loader);
+        return $this->itemPreloader($side, $modelConfig, $result, $loader);
     }
     
     protected function config($configSlice)
@@ -52,14 +52,14 @@ class One extends \PHPixie\ORM\Relationships\Type\OneTo
         );
     }
     
-    protected function ownerPreloader($side, $loader)
+    protected function ownerPreloader($side, $modelConfig, $result, $loader)
     {
-        return new One\Preloader\Owner($side, $loader);
+        return new One\Preloader\Owner($side, $modelConfig, $result, $loader);
     }
     
-    protected function itemPreloader($side, $loader)
+    protected function itemPreloader($side, $modelConfig, $result, $loader)
     {
-        return new One\Preloader\Item($side, $loader);
+        return new One\Preloader\Item($side, $modelConfig, $result, $loader);
     }
     
 }

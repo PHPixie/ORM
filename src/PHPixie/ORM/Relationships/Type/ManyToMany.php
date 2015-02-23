@@ -15,9 +15,9 @@ class ManyToMany extends \PHPixie\ORM\Relationships\Relationship\Implementation
         return new ManyToMany\Property\Query($this->handler(), $side, $query);
     }
     
-    public function preloader($side, $loader, $pivotResult)
+    public function preloader($side, $modelConfig, $result, $loader, $pivotResult)
     {
-        return new ManyToMany\Preloader($this->loaders, $side, $loader, $pivotResult);
+        return new ManyToMany\Preloader($this->loaders, $side, $modelConfig, $result, $loader, $pivotResult);
     }
     
     protected function config($configSlice)

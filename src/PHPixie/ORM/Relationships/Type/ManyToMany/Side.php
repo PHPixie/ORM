@@ -12,17 +12,17 @@ class Side extends    \PHPixie\ORM\Relationships\Relationship\Implementation\Sid
     public function modelName()
     {
         if ($this->type === 'left')
-            return $this->config->leftModel;
+            return $this->config->rightModel;
 
-        return $this->config->rightModel;
+        return $this->config->leftModel;
     }
 
     public function propertyName()
     {
         if ($this->type === 'left')
-            return $this->config->leftProperty;
+            return $this->config->rightProperty;
 
-        return $this->config->rightProperty;
+        return $this->config->leftProperty;
     }
 
     public function relationshipType()
@@ -33,9 +33,9 @@ class Side extends    \PHPixie\ORM\Relationships\Relationship\Implementation\Sid
     public function relatedModelName()
     {
         if ($this->type === 'left')
-            return $this->config->rightModel;
+            return $this->config->leftModel;
 
-        return $this->config->leftModel;
+        return $this->config->rightModel;
     }
     
     public function isDeleteHandled()

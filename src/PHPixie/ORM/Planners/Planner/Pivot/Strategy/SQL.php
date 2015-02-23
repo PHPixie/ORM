@@ -26,7 +26,8 @@ class SQL extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
                 'productIdField' => $alias.'.'.$idField,
                 'productAlias' => $name,
                 'productKey' => $this->productAlias.'.'.$name,
-                'pivotKey' => $pivotTable.'.'.$side->pivotKey(),
+                'pivotKey' => $side->pivotKey(),
+                'fullPivotKey' => $pivotTable.'.'.$side->pivotKey(),
             );
         }
 
@@ -42,9 +43,9 @@ class SQL extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
                             ->fields(array($sideData[0]['productKey'], $sideData[1]['productKey']))
                             ->table($productQuery, $this->productAlias)
                             ->join($pivotTable, null, 'left_outer')
-                                ->on($sideData[0]['productKey'], $sideData[0]['pivotKey'])
-                                ->on($sideData[1]['productKey'], $sideData[1]['pivotKey'])
-                            ->where($sideData[0]['pivotKey'], null);
+                                ->on($sideData[0]['productKey'], $sideData[0]['fullPivotKey'])
+                                ->on($sideData[1]['productKey'], $sideData[1]['fullPivotKey'])
+                            ->where($sideData[0]['fullPivotKey'], null);
 
         $insertQuery = $pivot->connection()->insertQuery()
                             ->table($pivotTable)

@@ -25,6 +25,6 @@ class Pivot
     
     public function databaseSelectQuery()
     {
-        return $this->connection->selectQuery();
+        return $this->connection->selectQuery()->table($this->source);
     }
 }

@@ -69,10 +69,20 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
             $id = $data[$idField];
             $this->assertEquals($id, $entity->id());
         }
-
+        
         foreach($data as $field => $value) {
             $this->assertEquals($value, $entity->$field);
         }
+    }
+    
+    protected function assertNames($names, $entities)
+    {
+        $data = array();
+        foreach($names as $name) {
+            $data[] = array('name' => $name);
+        }
+        
+        $this->assertEntities($data, $entities);
     }
     
     protected function orm()

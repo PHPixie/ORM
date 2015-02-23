@@ -5,74 +5,145 @@ namespace PHPixieTests\ORM\Functional\Relationship\OneTo;
 class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
 {
     protected $relationshipName = 'oneToMany';
+    protected $itemKey = 'items';
+    protected $itemProperty = 'flowers';
     
-    public function testItemsCondtions()
+    public function testAddItem()
+    {
+        $trixie = $this->createEntity('fairy', array(
+            'name' => 'Trixie'
+        ));
+        
+        $red = $this->createEntity('flower', array(
+            'name' => 'Red'
+        ));
+        
+        $green = $this->createEntity('flower', array(
+            'name' => 'Green'
+        ));
+        
+        $trixie->flowers();
+        
+        $trixie->flowers->add($red);
+        $trixie->flowers->add($green);
+        
+        $this->assertSame($trixie, $red->fairy());
+        $this->assertSame($trixie, $green->fairy());
+        
+        $this->assertSame(array($red, $green), $trixie->flowers()->asArray());
+
+        $this->assertData('flower', array(
+            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => 1),
+            array( 'id' => 2, 'name' => 'Green', 'fairy_id' => 1),
+        ));
+
+        
+        $blum = $this->createEntity('fairy', array(
+            'name' => 'Blum'
+        ));
+        
+        $blum->flowers();
+        
+        for($i=0;$i<2;$i++) {
+            $blum->flowers->add($green);
+            $this->assertSame(array($green), $blum->flowers()->asArray());
+            
+            $this->assertSame($trixie, $red->fairy());
+            $this->assertSame($blum, $green->fairy());
+            
+            $this->assertData('flower', array(
+                array( 'id' => 1, 'name' => 'Red', 'fairy_id' => 1),
+                array( 'id' => 2, 'name' => 'Green', 'fairy_id' => 2),
+            ));
+        }
+    }
+
+    public function testRemoveItems()
+    {
+        $trixie = $this->createEntity('fairy', array(
+            'name' => 'Trixie'
+        ));
+        
+        $red = $this->createEntity('flower', array(
+            'name' => 'Red'
+        ));
+        
+        $green = $this->createEntity('flower', array(
+            'name' => 'Green'
+        ));
+        
+        $trixie->flowers();
+        
+        $trixie->flowers->add($red);
+        $trixie->flowers->add($green);
+        
+        $trixie->flowers->remove($green);
+        $this->assertSame(array($red), $trixie->flowers()->asArray());
+        
+        $this->assertSame($trixie, $red->fairy());
+        $this->assertSame(null, $green->fairy());
+
+        $this->assertData('flower', array(
+            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => 1),
+            array( 'id' => 2, 'name' => 'Green', 'fairy_id' => null),
+        ));
+        
+        $trixie->flowers->removeAll();
+        $this->assertSame(array(), $trixie->flowers()->asArray());
+        
+        $this->assertSame(null, $red->fairy());
+
+        $this->assertData('flower', array(
+            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => null),
+            array( 'id' => 2, 'name' => 'Green', 'fairy_id' => null),
+        ));
+    }
+    
+    
+    public function testMultipleItemsCondtions()
     {
         $this->prepareEntities();
         
-        $this->assertEntities(
-            array(
-                array('name' => 'Red'),
-                array('name' => 'Green')
-            ),
-            $this->orm->get('flower')->query()
-                ->relatedTo('fairy', function($b) {
-                    $b->and('name', 'Trixie');
-                })
-                ->find()->asArray()
-        );
+        $red = $this->orm->get('flower')->query()
+            ->where('name', 'Red')
+            ->findOne();
         
-        $this->assertEntities(
-            array(
-                array('name' => 'Yellow'),
-                array('name' => 'Purple')
-            ),
-            $this->orm->get('flower')->query()
-                ->notRelatedTo('fairy', function($b) {
-                    $b->and('name', 'Trixie');
-                })
+        $green = $this->orm->get('flower')->query()
+            ->where('name', 'Green')
+            ->findOne();
+
+        $this->assertNames(
+            array('Trixie'),
+            $this->orm->get('fairy')->query()
+                ->relatedTo('flowers', $red)
+                ->relatedTo('flowers', $green)
                 ->find()->asArray()
         );
+
+    }
+    
+    public function testLoadItems()
+    {
+        $this->prepareEntities();
         
-        $this->assertEntities(
-            array(
-                array('name' => 'Red'),
-                array('name' => 'Green')
-            ),
-            $this->orm->get('flower')->query()
-                ->where('fairy.name', 'Trixie')
-                ->find()->asArray()
-        );
+        $trixie = $this->orm->get('fairy')->query()
+                    ->where('name', 'Trixie')
+                    ->findOne();
         
         $this->assertEntities(
             array(
                 array('name' => 'Red'),
                 array('name' => 'Green'),
-                array('name' => 'Yellow'),
             ),
-            $this->orm->get('flower')->query()
-                ->relatedTo('fairy')
-                ->find()->asArray()
+            $trixie->flowers()->asArray()
         );
         
+        $pixie = $this->orm->get('fairy')->query()
+                    ->where('name', 'Pixie')
+                    ->findOne();
         $this->assertEntities(
-            array(
-                array('name' => 'Purple'),
-            ),
-            $this->orm->get('flower')->query()
-                ->notRelatedTo('fairy')
-                ->find()->asArray()
-        );
-        
-        $trixie = $this->orm->get('fairy')->query()->findOne();
-        $this->assertEntities(
-            array(
-                array('name' => 'Red'),
-                array('name' => 'Green'),
-            ),
-            $this->orm->get('flower')->query()
-                ->relatedTo('fairy', $trixie)
-                ->find()->asArray()
+            array(),
+            $pixie->flowers()->asArray()
         );
     }
     
@@ -93,6 +164,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
             $fairy = $fairies[$key];
             $this->assertSame($fairyName, $fairy->name);
             
+            $this->assertEquals(true, $fairy->flowers->isLoaded());
             $this->assertEquals(count($flowerNames), count($fairy->flowers()->asArray()));
 
             foreach($fairy->flowers() as $flowerKey => $flower) {
@@ -124,7 +196,6 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
             
             $flowers = array();
             foreach($flowerNames as $flowerName) {
-                var_dump($flowerName);
                 $flowers[] = $this->createEntity('flower', array(
                     'name' => $flowerName
                 ));

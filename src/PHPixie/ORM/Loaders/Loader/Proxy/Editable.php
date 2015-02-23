@@ -23,12 +23,17 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
     {
         $offset = count($this->addedEntities);
         foreach ($entities as $entity) {
-            $this->skipId($entity->id());
-            $this->addedEntities[$offset]=$entity;
-            
             $id = $entity->id();
-            $this->addedIdsOffsets[$id]=$offset;
-            $this->addedOffsetsIds[$offset]=$id;
+            if(array_key_exists($id, $this->addedIdsOffsets)) {
+                $offset = $this->addedIdsOffsets[$id];
+                $this->addedEntities[$offset]=$entity;    
+            }else{
+                $this->skipId($id);
+                $this->addedEntities[$offset]=$entity;
+            
+                $this->addedIdsOffsets[$id]=$offset;
+                $this->addedOffsetsIds[$offset]=$id;
+            }
         }
     }
     
@@ -37,14 +42,21 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
         foreach ($entities as $entity) {
             $id = $entity->id();
             $this->skipId($id);
-            if(array_key_exists($id, $this->addedIdsOffsets))
+            if(array_key_exists($id, $this->addedIdsOffsets)) {
+                $offset = $this->addedIdsOffsets[$id];
+                $this->loaderItemsCount--;
+                if($offset <= $this->maxAccessedOffset) {
+                    $this->maxAccessedOffset--;
+                }
                 $this->removeAddedById($id);
+            }
         }
         $this->updateSkippedOffsets();
     }
     
     public function accessedEntities()
     {
+        var_dump($this->maxAccessedOffset);
         $entities = array();
         for($i=0; $i<=$this->maxAccessedOffset; $i++)
             $entities[]=$this->getByOffset($i);
@@ -95,21 +107,23 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
     {
         $this->assertAllowedOffset($offset);
         $loaderOffset = $this->loaderOffset($offset);
-        if ($this->loaderItemsCount !== null && $loaderOffset >= $this->loaderItemsCount) {
-            return $this->getAddedByOffset($loaderOffset - $this->loaderItemsCount);
-        }else{
-            return $this->getLoadedByOffset($loaderOffset, $offset);
-        }
         
+        if ($this->loaderItemsCount !== null && $loaderOffset >= $this->loaderItemsCount) {
+            $entity = $this->getAddedByOffset($loaderOffset - $this->loaderItemsCount);
+        }else{
+            $entity = $this->getLoadedByOffset($loaderOffset, $offset);
+        }
+
+        if ($entity !== null && $offset === $this->maxAccessedOffset+1)
+            $this->maxAccessedOffset++;
+        
+        return $entity;
     }
 
     protected function assertAllowedOffset($offset)
     {
         if ($offset > $this->maxAccessedOffset+1)
             throw new \PHPixie\ORM\Exception\Loader("Items can only be accessed in sequential order");
-
-        if ($offset === $this->maxAccessedOffset+1)
-            $this->maxAccessedOffset++;
     }
     
     protected function getAddedByOffset($addedOffset)

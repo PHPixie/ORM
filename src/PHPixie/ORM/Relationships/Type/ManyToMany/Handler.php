@@ -18,9 +18,14 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
 
     public function loadProperty($side, $entity)
     {
+        $config = $side->config();
         $loader = $this->query($side, $entity)->find();
         $editable = $this->loaders->editableProxy($loader);
-        return $editable;
+        
+        $opposing = $this->getOpposing($side->type());
+        
+        $property = $entity->getRelationshipProperty($config->{$opposing.'Property'});
+        $property->setValue($editable);
     }
 
     public function linkPlan($config, $leftItems, $rightItems)
@@ -47,7 +52,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
     {
         $config = $side->config();
         $plan = $this->plans->steps();
-        $plannerSide = $this->plannerSide($config, $side->type(), $items);
+        $opposing = $this->getOpposing($side->type());
+        $plannerSide = $this->plannerSide($config, $opposing, $items);
         $pivot = $this->plannerPivot($config);
         $this->planners->pivot()->unlinkAll($pivot, $plannerSide, $plan);
 
@@ -104,7 +110,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
 
         $sideIdField = $this->getIdField($sideRepository);
 
-        $sideQuery = $sideRepository->databaseSelectQuery()->fields(array($sideIdField));
+        $sideQuery = $sideRepository->databaseSelectQuery();
         $this->mappers->conditions()->map(
             $sideQuery,
             $sideRepository->modelName(),
@@ -179,7 +185,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             $plan
         );
 
-        return $this->relationship->preloader($side, $cachingProxy, $pivotResult);
+        return $this->relationship->preloader($side, $sideRepository->config(), $preloadStep, 
+                                              $cachingProxy, $pivotResult);
 
     }
 
@@ -226,8 +233,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         if ($property !== null) {
             $loader = $property->value();
             $items = $loader->accessedEntities();
-            $opposing = $this->getOpposing($side->type());
-            $itemsProperty = $side->config()->get($opposing.'Property');
+            $type = $side->type();
+            $itemsProperty = $side->config()->get($type.'Property');
             $this->processProperties('remove', $items, $itemsProperty, $entity);
             $loader->removeAll();
         }

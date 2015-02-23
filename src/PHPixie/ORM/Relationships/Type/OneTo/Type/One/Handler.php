@@ -21,8 +21,12 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
     
     public function linkPlan($config, $owner, $item)
     {
-        $plan = $this->getUnlinkPlan($config, true, $owner, true, $item, 'or');
+        $plan = $this->plans->steps();
+        
+        $unlinkPlan = $this->getUnlinkPlan($config, true, $owner, true, $item, 'or');
         $linkPlan = parent::linkPlan($config, $owner, $item);
+        
+        $plan->appendPlan($unlinkPlan);
         $plan->appendPlan($linkPlan);
 
         return $plan;

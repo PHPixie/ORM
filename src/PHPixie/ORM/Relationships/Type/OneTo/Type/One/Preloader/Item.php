@@ -9,8 +9,8 @@ class Item extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloa
     protected function mapItems()
     {
         $ownerKey = $this->side->config()->ownerKey;
-        $idField = $this->loader->repository()->config()->idField;
-        $fields = $this->loader->reusableResult()->getFields(array($idField, $ownerKey));
+        $idField = $this->modelConfig->idField;
+        $fields = $this->result->getFields(array($idField, $ownerKey));
         foreach($fields as $offset => $row) {
             $id = $row[$idField];
             $ownerId = $row[$ownerKey];
@@ -18,11 +18,16 @@ class Item extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloa
             $this->idOffsets[$id] = $offset;
             $this->map[$ownerId] = $id;
         }
-        
     }
 
-    public function getMappedIdFor($model)
+    public function getMappedIdFor($entity)
     {
-        return $this->map[$model->id()];
+        $id = $entity->id();
+        
+        if(!array_key_exists($id, $this->map)) {
+            return null;
+        }
+        
+        return $this->map[$id];
     }
 }

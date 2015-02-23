@@ -98,24 +98,55 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
             $queryField = $this->getIdField($ownerRepository);
             $subqueryField = $config->ownerKey;
         }
-
+        
         $subquery = $subqueryRepository->databaseSelectQuery();
-        $this->mappers->conditions()->map(
-            $subquery,
-            $subqueryRepository->modelName(),
-            $collectionCondition->conditions(),
-            $plan
-        );
+        
+        $conditions = $collectionCondition->conditions();
+        $hasConditions = !empty($conditions);
+        
+        $skipNulls = $side->type() !== 'owner';
+        
+        if($skipNulls) {
+            $subquery->whereNot($config->ownerKey, null);
+        }
+        
+        if($hasConditions) {
+            
+            if($skipNulls) {
+                $subquery->startGroup();
+            }   
 
+            $this->mappers->conditions()->map(
+                $subquery,
+                $subqueryRepository->modelName(),
+                $collectionCondition->conditions(),
+                $plan
+            );
+            
+            if($skipNulls) {
+                $subquery->endGroup();
+            }   
+        }
+
+        $query->startConditionGroup(
+            $collectionCondition->logic(),
+            $collectionCondition->isNegated()
+        );
+        
+        if($side->type() === 'owner') {
+            $query->whereNot($config->ownerKey, null);
+        }
+        
         $this->planners->in()->subquery(
             $query,
             $queryField,
             $subquery,
             $subqueryField,
-            $plan,
-            $collectionCondition->logic(),
-            $collectionCondition->isNegated()
+            $plan
         );
+        
+        $query->endGroup();
+        
     }
 
     public function handleDelete($side, $reusableResult, $plan, $sidePath)

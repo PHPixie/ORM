@@ -5,6 +5,8 @@ namespace PHPixieTests\ORM\Functional\Relationship;
 abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
 {
     protected $relationshipName;
+    protected $itemKey;
+    protected $itemProperty;
     
     public function setUp()
     {
@@ -13,7 +15,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
                 array(
                     'type'  => $this->relationshipName,
                     'owner' => 'fairy',
-                    'items' => 'flower'
+                    $this->itemKey => 'flower'
                 )
             )
         );
@@ -35,6 +37,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
                 $flower = $flowers[$key];
                 
                 $this->assertEquals($flowerName, $flower->name);
+                $this->assertEquals(true, $flower->fairy->isLoaded());
                 
                 if($fairyName !== '') {
                     $this->assertEquals($fairyName, $flower->fairy()->name);
@@ -62,7 +65,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->assertEquals(null, $purple->fairy());
     }
     
-    public function testAddOwner()
+    public function testSetOwner()
     {
         $trixie = $this->createEntity('fairy', array(
             'name' => 'Trixie'
@@ -108,81 +111,119 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         ));
     }
     
-    public function testOwnerCondtions()
+    public function testItemsConditions()
     {
         $this->prepareEntities();
-        /*
-        $this->assertEntities(
-            array(
-                array('name' => 'Trixie')
-            ),
+        
+        $this->assertNames(
+            array('Trixie'),
             $this->orm->get('fairy')->query()
-                ->relatedTo('flowers', function($b) {
+                ->relatedTo($this->itemProperty, function($b) {
                     $b->and('name', 'Red');
                 })
                 ->find()->asArray()
         );
         
-        $this->assertEntities(
-            array(
-                array('name' => 'Blum'),
-                array('name' => 'Pixie'),
-            ),
+        
+        $this->assertNames(
+            array('Blum', 'Pixie'),
             $this->orm->get('fairy')->query()
-                ->notRelatedTo('flowers', function($b) {
+                ->notRelatedTo($this->itemProperty, function($b) {
                     $b->and('name', 'Red');
                 })
                 ->find()->asArray()
         );
         
-        $this->assertEntities(
-            array(
-                array('name' => 'Blum'),
-            ),
+        $this->assertNames(
+            array('Blum'),
             $this->orm->get('fairy')->query()
-                ->where('flowers.name', 'Yellow')
+                ->where($this->itemProperty.'.name', 'Yellow')
                 ->find()->asArray()
         );
         
-        $this->assertEntities(
-            array(
-                array('name' => 'Trixie'),
-                array('name' => 'Blum'),
-            ),
+        $this->assertNames(
+            array('Trixie', 'Blum'),
             $this->orm->get('fairy')->query()
-                ->relatedTo('flowers')
+                ->relatedTo($this->itemProperty)
                 ->find()->asArray()
         );
-        */
-        
-        print_r($this->database->get()->selectQuery()->table('flowers')->execute()->asArray());
-        print_r($this->database->get()->execute('
-            SELECT "fairy_id" FROM "flowers"
-        ')->asArray());
-        print_r($this->database->get()->execute('
-             SELECT "id" FROM "fairies" WHERE "id" NOT IN ( 1, 1, 2, NULL )
-        ')->asArray());
-
-
-        
-        $this->assertEntities(
-            array(
-                array('name' => 'Pixie'),
-            ),
+                
+        $this->assertNames(
+            array('Pixie'),
             $this->orm->get('fairy')->query()
-                ->notRelatedTo('flowers')
+                ->notRelatedTo($this->itemProperty)
                 ->find()->asArray()
         );
         
         $red = $this->orm->get('flower')->query()->findOne();
-        $this->assertEntities(
-            array(
-                array('name' => 'Trixie')
-            ),
+        $this->assertNames(
+            array('Trixie'),
             $this->orm->get('fairy')->query()
-                ->relatedTo('flowers', $red)
+                ->relatedTo($this->itemProperty, $red)
                 ->find()->asArray()
         );
+
+    }
+    
+    public function testOwnerCondtions()
+    {
+        $map = $this->prepareEntities();
+        
+        $this->assertNames(
+            $map['Trixie'],
+            $this->orm->get('flower')->query()
+                ->relatedTo('fairy', function($b) {
+                    $b->and('name', 'Trixie');
+                })
+                ->find()->asArray()
+        );
+        
+        $this->assertNames(
+            array_merge(
+                $map['Blum'],
+                $map['Pixie'],
+                $map['']
+            ),
+            $this->orm->get('flower')->query()
+                ->notRelatedTo('fairy', function($b) {
+                    $b->and('name', 'Trixie');
+                })
+                ->find()->asArray()
+        );
+        
+        $this->assertNames(
+            $map['Trixie'],
+            $this->orm->get('flower')->query()
+                ->where('fairy.name', 'Trixie')
+                ->find()->asArray()
+        );
+        
+        $this->assertNames(
+            array_merge(
+                $map['Trixie'],
+                $map['Blum'],
+                $map['Pixie']
+            ),
+            $this->orm->get('flower')->query()
+                ->relatedTo('fairy')
+                ->find()->asArray()
+        );
+        
+        $this->assertNames(
+            $map[''],
+            $this->orm->get('flower')->query()
+                ->notRelatedTo('fairy')
+                ->find()->asArray()
+        );
+        
+        $trixie = $this->orm->get('fairy')->query()->findOne();
+        $this->assertNames(
+            $map['Trixie'],
+            $this->orm->get('flower')->query()
+                ->relatedTo('fairy', $trixie)
+                ->find()->asArray()
+        );
+        
     }
     
     public function testCascadeDeleteUpdate()
@@ -201,7 +242,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
 
     public function testCascadeDelete()
     {
-        $this->ormConfigData['relationships'][0]['itemsOptions'] = array(
+        $this->ormConfigData['relationships'][0][$this->itemKey.'Options'] = array(
             'onOwnerDelete' => 'delete'
         );
         
@@ -218,7 +259,6 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertEquals(null, $yellow);
     }
-
     
     protected function createDatabase()
     {

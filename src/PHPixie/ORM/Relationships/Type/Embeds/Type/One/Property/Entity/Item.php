@@ -8,7 +8,8 @@ class Item extends \PHPixie\ORM\Relationships\Type\Embeds\Property\Entity
     public function create($data = null)
     {
         $config = $this->side->config();
-        return $this->handler->createItem($this->entity, $config, $data);
+        $this->handler->createItem($this->entity, $config, $data);
+        return $this->value();
     }
 
     public function set($item)

@@ -6,12 +6,29 @@ class EntityTest extends \PHPixieTests\ORM\Functional\ModelTest
 {
     public function testCreate()
     {
+        $this->runTests('create');
+    }
+    
+    public function testUpdate()
+    {
+        $this->runTests('update');
+    }
+    
+    public function testDelete()
+    {
+        $this->runTests('delete');
+    }
+    
+    protected function createTest()
+    {
         $fairy = $this->createEntity('fairy', array(
             'name' => 'Trixie'
         ));
         
+        $this->assertSame(false, $fairy->isNew());
+        $this->assertSame(true, $fairy->id() != null);
+        
         $data = array(
-            'id' => 1,
             'name' => 'Trixie'
         );
         
@@ -20,7 +37,7 @@ class EntityTest extends \PHPixieTests\ORM\Functional\ModelTest
         ));
     }
     
-    public function testUpdate()
+    protected function updateTest()
     {
         $fairy = $this->createEntity('fairy', array(
             'name' => 'Trixie'
@@ -30,11 +47,11 @@ class EntityTest extends \PHPixieTests\ORM\Functional\ModelTest
         $fairy->save();
         
         $this->assertData('fairy', array(
-            array( 'id' => 1, 'name' => 'Blum')
+            array( 'name' => 'Blum')
         ));
     }
     
-    public function testDelete()
+    protected function deleteTest()
     {
         $fairy = $this->createEntity('fairy', array(
             'name' => 'Trixie'
@@ -45,9 +62,10 @@ class EntityTest extends \PHPixieTests\ORM\Functional\ModelTest
         ));
         
         $fairy->delete();
+        $this->assertSame(true, $fairy->isDeleted());
         
         $this->assertData('fairy', array(
-            array( 'id' => 2, 'name' => 'Blum')
+            array( 'name' => 'Blum')
         ));
     }
 

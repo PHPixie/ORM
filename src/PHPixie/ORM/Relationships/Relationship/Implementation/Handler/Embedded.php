@@ -9,14 +9,15 @@ abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Implemen
         return explode('.', $path);
     }
     
-    protected function getDocument($model, $path, $createMissing = true)
+    protected function getDocument($entity, $path, $createMissing = true)
     {
         $explodedPath = $this->explodePath($path);
-        return $this->getDocumentByExplodedPath($model, $explodedPath, $createMissing);
+        return $this->getDocumentByExplodedPath($entity, $explodedPath, $createMissing);
     }
-    protected function getArrayNode($model, $path, $createMissing = true)
+    
+    protected function getArrayNode($entity, $path, $createMissing = true)
     {
-        list($document, $key) = $this->getParentDocumentAndKey($model, $path);
+        list($document, $key) = $this->getParentDocumentAndKey($entity, $path);
         if($document === null)
             return null;
         $property = $document->get($key);
@@ -30,16 +31,16 @@ abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Implemen
         }
         return $document->get($key);
     }
-    protected function getParentDocumentAndKey($model, $path, $createMissing = true)
+    protected function getParentDocumentAndKey($entity, $path, $createMissing = true)
     {
         $explodedPath = $this->explodePath($path);
         $key = array_pop($explodedPath);
-        $document = $this->getDocumentByExplodedPath($model, $explodedPath, $createMissing);
+        $document = $this->getDocumentByExplodedPath($entity, $explodedPath, $createMissing);
         return array($document, $key);
     }
-    protected function getDocumentByExplodedPath($model, $explodedPath, $createMissing = true)
+    protected function getDocumentByExplodedPath($entity, $explodedPath, $createMissing = true)
     {
-        $document = $model->data()->document();
+        $document = $entity->data()->document();
         $last = count($explodedPath) - 1;
         foreach($explodedPath as $i => $key) {
             $property = $document->get($key);

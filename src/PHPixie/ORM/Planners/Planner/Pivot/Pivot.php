@@ -4,11 +4,13 @@ namespace PHPixie\ORM\Planners\Planner\Pivot;
 
 class Pivot
 {
+    protected $queryPlanner;
     protected $connection;
     protected $source;
 
-    public function __construct($connection, $source)
+    public function __construct($queryPlanner, $connection, $source)
     {
+        $this->queryPlanner = $queryPlanner;
         $this->connection = $connection;
         $this->source = $source;
     }
@@ -25,11 +27,15 @@ class Pivot
     
     public function databaseSelectQuery()
     {
-        return $this->connection->selectQuery()->table($this->source);
+        $query = $this->connection->selectQuery();
+        $this->queryPlanner->setSource($query, $this->source);
+        return $query;
     }
     
     public function databaseInsertQuery()
     {
-        return $this->connection->insertQuery()->table($this->source);
+        $query = $this->connection->insertQuery();
+        $this->queryPlanner->setSource($query, $this->source);
+        return $query;
     }
 }

@@ -4,16 +4,40 @@ namespace PHPixieTests\ORM\Functional\Model;
 
 class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
 {
-    protected $fairies;
-    
-    public function setUp()
-    {
-        parent::setUp();
-        $this->fairies = $this->createFairies(array('Trixie', 'Blum', 'Pixie'));
-    }
-    
     public function testFind()
     {
+        $this->runTests('find');
+    }
+    
+    public function testConditions()
+    {
+        $this->runTests('conditions');
+    }
+    
+    public function testInConditions()
+    {
+        $this->runTests('inConditions');
+    }
+    
+    public function testCount()
+    {
+        $this->runTests('count');
+    }
+    
+    public function testDelete()
+    {
+        $this->runTests('delete');
+    }
+    
+    public function testUpdate()
+    {
+        $this->runTests('update');
+    }
+    
+    protected function findTest()
+    {
+        $this->createFairies(array('Trixie', 'Blum', 'Pixie'));
+        
         $this->assertFairyNames(
             array('Trixie', 'Blum', 'Pixie'),
             $this->query()
@@ -51,19 +75,22 @@ class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
         );
     }
     
-    public function testConditions()
+    protected function conditionsTest()
     {
+        $fairies = $this->createFairies(array('Trixie', 'Blum', 'Pixie'));
+        $this->idField('fairy');
+        
         $this->assertFairyNames(
             array('Blum', 'Pixie'),
             $this->query()
-                ->where('id', '>', 1)
+                ->where($idField, '>', $fairies[0]->id())
                 ->find()->asArray()
         );
         
         $this->assertFairyNames(
             array('Trixie'),
             $this->query()
-                ->whereNot('id', '>', 1)
+                ->whereNot($idField, '>', $fairies[0]->id())
                 ->find()->asArray()
         );
         
@@ -97,33 +124,42 @@ class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
                         ->and('name', 'Trixie')
                         ->or('name', 'Blum');
                 })
-                ->orNot('id', '=', 3)
+                ->orNot($idField, '=', 3)
                 ->find()->asArray()
         );
         
         $this->assertFairyNames(
             array('Trixie', 'Blum'),
             $this->query()
-                ->where('id', 'in', array(1, 2))
+                ->where($idField, 'in', array(
+                    $fairies[0]->id(),
+                    $fairies[1]->id()
+                ))
                 ->find()->asArray()
         );
         
         $this->assertFairyNames(
             array('Blum'),
             $this->query()
-                ->where('id', 'in', array(1, 2))
-                ->and('id', 2)
+                ->where($idField, 'in', array(
+                    $fairies[0]->id(),
+                    $fairies[1]->id()
+                ))
+                ->and($idField, $fairies[1]->id())
                 ->find()->asArray()
         );
+        
     }
     
-    public function testInConditions()
+    protected function inConditionsTest()
     {
+        $fairies = $this->createFairies(array('Trixie', 'Blum', 'Pixie'));
+        
         $this->assertFairyNames(
             array('Trixie', 'Blum'),
             $this->query()
                 ->where('name', 'Trixie')
-                ->orIn($this->fairies[1])
+                ->orIn($fairies[1])
                 ->find()->asArray()
         );
         
@@ -142,8 +178,10 @@ class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
         );
     }
         
-    public function testCount()
+    protected function countTest()
     {
+        $this->createFairies(array('Trixie', 'Blum', 'Pixie'));
+        
         $this->assertEquals(
             3,
             $this->query()
@@ -153,20 +191,22 @@ class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
         $this->assertEquals(
             2,
             $this->query()
-                ->where('id', '>', 1)
+                ->where('name', '!=', 'Blum')
                 ->count()
         );
         
         $this->assertEquals(
             0,
             $this->query()
-                ->where('id', '>', 3)
+                ->where('name', 'Stella')
                 ->count()
         );
     }
     
-    public function testDelete()
+    protected function deleteTest()
     {
+        $this->createFairies(array('Trixie', 'Blum', 'Pixie'));
+        
         $this->query()
                 ->where('name', 'Trixie')
                 ->delete();
@@ -182,8 +222,10 @@ class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
         $this->assertData('fairy', array());
     }
     
-    public function testUpdate()
+    protected function updateTest()
     {
+        $this->createFairies(array('Trixie', 'Blum', 'Pixie'));
+        
         $this->query()
                 ->where('name', 'Trixie')
                 ->update(array(
@@ -211,7 +253,7 @@ class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
     
     protected function query()
     {
-        return $this->repository->query();
+        return $this->orm->get('fairy')->query();
     }
 
 }

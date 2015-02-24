@@ -189,8 +189,8 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->assertSame(array($trixie, $blum), $red->fairies()->asArray());
 
         $this->assertPivot(array(
-            array(1, 1),
-            array(2, 1)
+            array($trixie->id(), $red->id()),
+            array($blum->id(), $red->id())
         ));
             
         for($i=0;$i<2;$i++) {
@@ -203,10 +203,10 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
             $this->assertSame(array($trixie, $blum), $red->fairies()->asArray());
 
             $this->assertPivot(array(
-                array(1, 1),
-                array(2, 1),
-                array(1, 2),
-                array(2, 2),
+                array($trixie->id(), $red->id()),
+                array($blum->id(), $red->id()),
+                array($trixie->id(), $green->id()),
+                array($blum->id(), $green->id())
             ));
         }
     }
@@ -234,8 +234,8 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->assertSame(array($trixie), $green->fairies()->asArray());
 
         $this->assertPivot(array(
-            array(2, 1),
-            array(1, 2)
+            array($blum->id(), $red->id()),
+            array($trixie->id(), $green->id()),
         ));
         
         $blum->flowers->removeAll();
@@ -243,7 +243,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->assertSame(array(), $blum->flowers()->asArray());
         $this->assertSame(array(), $red->fairies()->asArray());  
         $this->assertPivot(array(
-            array(1, 2)
+            array($trixie->id(), $green->id()),
         ));
         
         $green->fairies->removeAll();
@@ -333,7 +333,6 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
                         'name' => $name
                     ));
                 }
-                
                 $instances[$name]->fairies->add($fairies);
             }
         }
@@ -344,22 +343,24 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     
     protected function assertPivot($data)
     {
+        $isMongo = $this->databaseConfigData['default']['driver'] === 'mongo';
+        
+        $setSourceMethod = $isMongo ? 'collection' : 'table';
+        
         $pivotData = $this->database->get()
                         ->selectQuery()
-                        ->table('fairies_flowers')
+                        ->$setSourceMethod('fairies_flowers')
                         ->execute()->asArray();
         
         $this->assertEquals(count($data), count($pivotData));
         
         foreach($pivotData as $key => $row) {
-            $this->assertEquals(array(
-                'fairy_id' => $data[$key][0],
-                'flower_id' => $data[$key][1]
-            ), (array) $row);
+            $this->assertEquals($data[$key][0], $row->fairy_id);
+            $this->assertEquals($data[$key][1], $row->flower_id);
         }
     }
     
-    protected function createDatabase($multipleConnections = false)
+    protected function prepareSQLDatabase($multipleConnections = false)
     {
         $connection = $this->database->get('default');
         $connection->execute('
@@ -386,5 +387,17 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
               name VARCHAR(255)
             )
         ');
+    }
+    
+    protected function prepareMongoDatabase()
+    {
+        $connection = $this->database->get('default');
+        $collections = array('fairies', 'flowers', 'fairies_flowers');
+        
+        foreach($collections as $collection) {
+            $connection->deleteQuery()
+                        ->collection($collection)
+                        ->execute();
+        }
     }
 }

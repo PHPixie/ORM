@@ -75,7 +75,7 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
 
     public function pivot($connection, $source)
     {
-        return new Pivot\Pivot($connection, $source);
+        return new Pivot\Pivot($this->planners->query(), $connection, $source);
     }
     
     public function pivotByConnectionName($connectionName, $source)

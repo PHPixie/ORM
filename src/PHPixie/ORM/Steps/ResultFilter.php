@@ -4,22 +4,22 @@ namespace PHPixie\ORM\Steps;
 
 class ResultFilter
 {
-    protected $resultStep;
+    protected $result;
     protected $fields;
     
-    public function __construct($resultStep, $fields)
+    public function __construct($result, $fields)
     {
-        $this->resultStep = $resultStep;
+        $this->result = $result;
         $this->fields = $fields;
     }
     
     public function getFirstFieldValues()
     {
-        return $this->resultStep->getField($this->fields[0]);
+        return $this->result->getField($this->fields[0]);
     }
     
     public function getFilteredData()
     {
-        return $this->resultStep->getFields($this->fields);
+        return $this->result->getFields($this->fields);
     }
 }

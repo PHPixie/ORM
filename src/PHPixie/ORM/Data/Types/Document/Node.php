@@ -13,12 +13,14 @@ abstract class Node
 
     protected function convertValue($value)
     {
-        if ($value instanceof \stdClass) {
+        $isArray = is_array($value);
+        
+        if ($value instanceof \stdClass || ($isArray && !is_numeric(current($value)))) {
             $value = $this->documentBuilder->document($value);
-        } elseif (is_array($value)) {
+        } elseif ($isArray) {
             $value = $this->documentBuilder->arrayNode($value);
         }
-
+        
         return $value;
     }
 

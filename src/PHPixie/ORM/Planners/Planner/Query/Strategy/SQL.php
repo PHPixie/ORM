@@ -11,8 +11,7 @@ class SQL extends \PHPixie\ORM\Planners\Planner\Query\Strategy
 
     public function setBatchData($query, $fields, $data)
     {
-        var_dump($fields);
-        var_dump($data);
+        print_r([111111, $fields, $data]);
         $query->batchData($fields, $data);
     }
 }

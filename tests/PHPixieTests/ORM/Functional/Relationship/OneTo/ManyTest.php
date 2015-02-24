@@ -56,10 +56,11 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         $this->assertSame($trixie, $green->fairy());
         
         $this->assertSame(array($red, $green), $trixie->flowers()->asArray());
-
+        
+        $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => 1),
-            array( 'id' => 2, 'name' => 'Green', 'fairy_id' => 1),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
         ));
 
         
@@ -76,9 +77,10 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
             $this->assertSame($trixie, $red->fairy());
             $this->assertSame($blum, $green->fairy());
             
+            $idField = $this->idField('flower');
             $this->assertData('flower', array(
-                array( 'id' => 1, 'name' => 'Red', 'fairy_id' => 1),
-                array( 'id' => 2, 'name' => 'Green', 'fairy_id' => 2),
+                array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
+                array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $blum->id()),
             ));
         }
     }
@@ -107,10 +109,12 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         
         $this->assertSame($trixie, $red->fairy());
         $this->assertSame(null, $green->fairy());
-
+        
+        $idField = $this->idField('flower');
+        
         $this->assertData('flower', array(
-            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => 1),
-            array( 'id' => 2, 'name' => 'Green', 'fairy_id' => null),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => null),
         ));
         
         $trixie->flowers->removeAll();
@@ -119,8 +123,8 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         $this->assertSame(null, $red->fairy());
 
         $this->assertData('flower', array(
-            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => null),
-            array( 'id' => 2, 'name' => 'Green', 'fairy_id' => null),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => null),
         ));
     }
     

@@ -125,9 +125,10 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $red->fairy->set($blum);
         $this->assertSame($blum, $red->fairy());
-
+        
+        $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => 2),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $blum->id()),
         ));
     }
     
@@ -146,8 +147,9 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertSame(null, $red->fairy());
         
+        $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => null),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
         ));
     }
     
@@ -300,7 +302,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->assertEquals(null, $yellow);
     }
     
-    protected function createDatabase($multipleConnections = false)
+    protected function prepareSQLDatabase($multipleConnections = false)
     {
         $connection = $this->database->get('default');
         $connection->execute('
@@ -321,5 +323,17 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
               fairy_id INTEGER
             )
         ');
+    }
+    
+    protected function prepareMongoDatabase()
+    {
+        $connection = $this->database->get('default');
+        $collections = array('fairies', 'flowers');
+        
+        foreach($collections as $collection) {
+            $connection->deleteQuery()
+                        ->collection($collection)
+                        ->execute();
+        }
     }
 }

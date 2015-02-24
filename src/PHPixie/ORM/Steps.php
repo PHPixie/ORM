@@ -41,15 +41,20 @@ class Steps
         return new Steps\Step\In($placeholder, $placeholderField, $resultStep, $resultField);
     }
 
-    public function pivotCartesian($resultFiters)
+    public function pivotCartesian($fields, $resultFiters)
     {
-        return new Steps\Step\Pivot\Cartesian($resultFiters);
+        return new Steps\Step\Pivot\Cartesian($fields, $resultFiters);
     }
 
-    public function pivotInsert($insertQuery, $fields, $cartesianStep)
+    public function batchInsert($insertQuery, $dataStep)
     {
         $queryPlanner = $this->ormBuilder->planners()->query();
-        return new Steps\Step\Pivot\Insert($queryPlanner, $insertQuery, $fields, $cartesianStep);
+        return new Steps\Step\Query\Insert\Batch($queryPlanner, $insertQuery, $dataStep);
+    }
+    
+    public function uniqueDataInsert($dataStep, $selectQuery)
+    {
+        return new Steps\Step\Query\Insert\Batch\Data\Unique($dataStep, $selectQuery);
     }
     
     public function updateMap($updateQuery, $map, $resultStep)

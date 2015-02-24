@@ -51,10 +51,11 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         $this->assertSame($green, $trixie->flower());
         $this->assertSame($trixie, $green->fairy());
         $this->assertSame(null, $red->fairy());
-
+        
+        $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => null),
-            array( 'id' => 2, 'name' => 'Green', 'fairy_id' => 1),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
         ));
     }
     
@@ -74,8 +75,9 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
         $this->assertSame(null, $red->fairy());
         $this->assertSame(null, $trixie->flower());
         
+        $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( 'id' => 1, 'name' => 'Red', 'fairy_id' => null),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
         ));
     }
     

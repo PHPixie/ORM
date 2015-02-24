@@ -15,22 +15,24 @@ class Multiquery extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
             $resultFilters[] = $resultFilter;
         }
 
-        $cartesianStep = $this->steps->pivotCartesian($resultFilters);
-        $plan->add($cartesianStep);
-
-        $insertQuery = $pivot->databaseInsertQuery();
-        $insertStep = $this->steps->pivotInsert(
-            $insertQuery,
+        $cartesianStep = $this->steps->pivotCartesian(
             array(
                 $firstSide->pivotKey(),
                 $secondSide->pivotKey()
             ),
-            $cartesianStep
+            $resultFilters
         );
         
-        $plan->add($insertStep);
-        $queryStep = $this->steps->query($insertQuery);
+        $plan->add($cartesianStep);
         
-        $plan->add($queryStep);
+        $selectQuery = $pivot->dataBaseSelectQuery();
+        $uniqueDataStep  = $this->steps->uniqueDataInsert($cartesianStep, $selectQuery);
+        
+        $plan->add($uniqueDataStep);
+        
+        $insertQuery = $pivot->databaseInsertQuery();
+        $insertStep = $this->steps->batchInsert($insertQuery, $uniqueDataStep);
+        
+        $plan->add($insertStep);
     }
 }

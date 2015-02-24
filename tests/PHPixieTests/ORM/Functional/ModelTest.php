@@ -35,7 +35,28 @@ abstract class ModelTest extends \PHPixieTests\ORM\FunctionalTest
         $this->assertEntities($data, $fairies);
     }
     
-    protected function createDatabase()
+    protected function runTests($name)
+    {
+        //$this->prepareSQLDatabase();
+        $method = $name.'Test';
+        ///$this->$method();
+        
+        $this->databaseConfigData['default'] = array(
+            'driver'   => 'mongo',
+            'database' => 'phpixieormtest',
+            'user' => 'pixie',
+            'password' => 'pixie',
+        );
+        
+        $this->database = $this->database();
+        $this->orm = $this->orm();
+        
+        $this->prepareMongoDatabase();
+        
+        $this->$method();
+    }
+    
+    protected function prepareSQLDatabase()
     {
         $connection = $this->database->get('default');
         $connection->execute('
@@ -44,5 +65,13 @@ abstract class ModelTest extends \PHPixieTests\ORM\FunctionalTest
               name VARCHAR(255)
             )
         ');
+    }
+    
+    protected function prepareMongoDatabase()
+    {
+        $connection = $this->database->get('default');
+        $connection->deleteQuery()
+                        ->collection('fairies')
+                        ->execute();
     }
 }

@@ -56,7 +56,6 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
     
     public function accessedEntities()
     {
-        var_dump($this->maxAccessedOffset);
         $entities = array();
         for($i=0; $i<=$this->maxAccessedOffset; $i++)
             $entities[]=$this->getByOffset($i);

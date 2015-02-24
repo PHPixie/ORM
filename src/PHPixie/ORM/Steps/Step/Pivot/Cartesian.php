@@ -2,40 +2,35 @@
 
 namespace PHPixie\ORM\Steps\Step\Pivot;
 
-class Cartesian extends \PHPixie\ORM\Steps\Step
+class Cartesian extends \PHPixie\ORM\Steps\Step\Query\Insert\Batch\Data
 {
+    protected $fields;
     protected $resultFilters;
-    protected $product;
 
-    public function __construct($resultFilters)
+    public function __construct($fields, $resultFilters)
     {
+        $this->fields = $fields;
         $this->resultFilters = $resultFilters;
     }
 
+    public function fields()
+    {
+        return $this->fields;
+    }
+    
     public function execute()
     {
-        $this->product = $this->buildProduct();
+        $this->data = $this->buildProduct();
     }
-
-    public function product()
-    {
-        if ($this->product === null)
-            throw new \PHPixie\ORM\Exception\Plan("This plan step has not been executed yet.");
-
-        return $this->product;
-    }
-
+    
     protected function buildProduct()
     {
         if (empty($this->resultFilters))
             return array();
         
         $product = array(array());
-        var_dump($this->resultFilters);
         foreach ($this->resultFilters as $resultFilter) {
             $rows = $resultFilter->getFilteredData();
-            var_dump($rows);
-            var_dump(2222);
             $product = $this->updateProduct($product, $rows);
             if (empty($product))
                 break;

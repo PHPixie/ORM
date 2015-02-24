@@ -25,10 +25,13 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 
     public function loadProperty($config, $owner)
     {
-        $document = $this->getDocument($owner, $config->path);
-        $item = $this->models->embedded()->loadEntity($config->itemModel, $document);
-        $item->setOwnerRelationship($owner, $config->ownerItemProperty);
-        return $item;
+        $item = $this->getDocument($owner, $config->path, false);
+        if($item !== null) {
+            $item = $this->models->embedded()->loadEntity($config->itemModel, $item);
+            $item->setOwnerRelationship($owner, $config->ownerItemProperty);
+        }
+        $property = $owner->getRelationshipProperty($config->ownerItemProperty);
+        $property->setValue($item);
     }
 
     public function setItem($model, $config, $item)

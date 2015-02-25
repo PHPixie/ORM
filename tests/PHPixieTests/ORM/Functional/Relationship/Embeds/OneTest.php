@@ -1,12 +1,14 @@
 <?php
 
-namespace PHPixieTests\ORM\Functional\Relationship\OneTo;
+namespace PHPixieTests\ORM\Functional\Relationship\Embeds;
 
 class OneTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
 {
     protected $relationshipName = 'embedsOne';
+    
     protected $itemKey = 'item';
-    protected $itemProperty = 'flower';
+    protected $itemProperty = 'magic';
+    protected $subItemProperty = 'spell';
     
     
     public function testCreateItem()
@@ -19,25 +21,20 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
         $this->runTests('setItem');
     }
     
-    /*
-    
     public function testRemoveItem()
     {
         $this->runTests('removeItem');
     }
-    */
     
     public function testLoadItems()
     {
         $this->runTests('loadItems');
     }
-    /*
+    
     public function testPreloadItems()
     {
         $this->runTests('preloadItems');
     }
-    */
-    
     
     protected function createItemTest()
     {
@@ -45,21 +42,106 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
             'name' => 'Trixie'
         ));
         
-        $red = $trixie->flower->create(array('name' => 'Red'));
+        $nature = $trixie->magic->create(array('name' => 'Nature'));
+        $rain = $nature->spell->create(array('name' => 'Rain'));
         
-        $this->assertSame('Red', $trixie->flower()->name);
-        $this->assertSame($red, $trixie->flower());
-        $this->assertSame($trixie, $red->owner());
-        $this->assertSame($this->itemProperty, $red->ownerPropertyName());
+        $this->assertSame('Nature', $trixie->magic()->name);
+        $this->assertSame(true, $trixie->magic->isLoaded());
+        $this->assertSame($nature, $trixie->magic());
+        $this->assertSame($trixie, $nature->owner());
+        $this->assertSame($this->itemProperty, $nature->ownerPropertyName());
+        
+        
+        $this->assertSame('Rain', $nature->spell()->name);
+        $this->assertSame(true, $nature->spell->isLoaded());
+        $this->assertSame($rain, $nature->spell());
+        $this->assertSame($nature, $rain->owner());
+        $this->assertSame($this->subItemProperty, $rain->ownerPropertyName());
         
         $trixie->save();
         
         $idField = $this->idField('fairy');
         $this->assertDataAsObject('fairy', array(
-            (object) array( $idField => $trixie->id(), 'name' => 'Trixie', 'flower' => (object) array(
-                'name' => 'Red'
-            )),
+            (object) array( 
+                $idField => $trixie->id(),
+                'name' => 'Trixie',
+                'magic' => (object) array(
+                    'name' => 'Nature',
+                    'spell' => (object) array(
+                        'name' => 'Rain'
+                    )
+                )
+            )
         ));
+    }
+    
+    protected function loadItemsTest()
+    {
+        $this->prepareEntities();
+        
+        $trixie = $this->orm->get('fairy')->query()
+                    ->where('name', 'Trixie')
+                    ->findOne();
+        
+        $this->assertEquals('Nature', $trixie->magic()->name);
+        $this->assertSame(true, $trixie->magic->isLoaded());
+        
+        $this->assertEquals('Rain', $trixie->magic()->spell()->name);
+        $this->assertSame(true, $trixie->magic()->spell->isLoaded());
+        
+        $pixie = $this->orm->get('fairy')->query()
+                    ->where('name', 'Pixie')
+                    ->findOne();
+        
+        $this->assertEquals('Trick', $pixie->magic()->name);
+        $this->assertEquals(null, $pixie->magic()->spell());
+        
+        $stella = $this->orm->get('fairy')->query()
+                    ->where('name', 'Stella')
+                    ->findOne();
+        
+        $this->assertEquals(null, $stella->magic());
+    }
+    
+    protected function preloadItemsTest()
+    {
+        $map = $this->prepareEntities();
+        
+        $fairies = $this->orm->get('fairy')->query()
+                        ->find(array('magic.spell'))
+                        ->asArray();
+        
+        $key = 0;
+        foreach($map as $fairyName => $magicMap) {
+            if($fairyName === '') {
+                continue;
+            }
+            
+            $fairy = $fairies[$key];
+            $this->assertSame($fairyName, $fairy->name);
+            $this->assertEquals(true, $fairy->magic->isLoaded());
+            
+            $magic = $fairy->magic();
+            
+            if(empty($magicMap)) {
+                $this->assertEquals(null, $magic);
+                
+            }else{
+                $this->assertSame(key($magicMap), $magic->name);
+                $this->assertEquals(true, $magic->spell->isLoaded());
+                
+                $spellMap = current($magicMap);
+                
+                if(empty($spellMap)) {
+                    $this->assertEquals(null, $magic->spell());
+                    
+                }else{
+                    $this->assertSame(current($spellMap), $magic->spell()->name);
+                }
+            }
+                
+            $key++;
+        }
     }
     
     protected function setItemTest()
@@ -72,66 +154,141 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
             'name' => 'Blum'
         ));
         
-        $red = $trixie->flower->create(array('name' => 'Red'));
-        $green = $blum->flower->create(array('name' => 'Green'));
+        $pixie = $this->createEntity('fairy', array(
+            'name' => 'Pixie'
+        ));
         
-        $trixie->flower->set($green);
+        $nature = $trixie->magic->create(array('name' => 'Nature'));
+        $charm = $blum->magic->create(array('name' => 'Charm'));
+        $trick = $pixie->magic->create(array('name' => 'Trick'));
         
-        $this->assertSame('Green', $trixie->flower()->name);
-        $this->assertSame($green, $trixie->flower());
-        $this->assertSame($trixie, $green->owner());
-        $this->assertSame($this->itemProperty, $green->ownerPropertyName());
+        $love = $charm->spell->create(array('name' => 'Love'));
         
-        $this->assertSame(null, $blum->flower());
-        $this->assertSame(null, $red->owner());
-        $this->assertSame(null, $red->ownerPropertyName());
+        $trick->spell->set($love);
+        $trixie->magic->set($trick);
         
+        $this->assertSame('Trick', $trixie->magic()->name);
+        $this->assertSame($trick, $trixie->magic());
+        $this->assertSame($trixie, $trick->owner());
+        $this->assertSame($this->itemProperty, $trick->ownerPropertyName());
+        
+        $this->assertSame('Love', $trixie->magic()->spell()->name);
+        $this->assertSame($trick, $love->owner());
+        $this->assertSame($this->subItemProperty, $love->ownerPropertyName());
+
+        
+        $this->assertSame(null, $pixie->magic());
+        $this->assertSame(null, $nature->owner());
+        $this->assertSame(null, $nature->ownerPropertyName());
+        
+        
+        $trixie->save();
+        $blum->save();
+        $pixie->save();
+        
+        $idField = $this->idField('fairy');
+        $this->assertDataAsObject('fairy', array(
+            (object) array( $idField => $pixie->id(), 'name' => 'Pixie'),
+            (object) array( 
+                $idField => $trixie->id(),
+                'name' => 'Trixie',
+                'magic' => (object) array(
+                    'name' => 'Trick',
+                    'spell' => (object) array(
+                        'name' => 'Love'
+                    )
+                )
+            ),
+            (object) array(
+                $idField => $blum->id(),
+                'name' => 'Blum',
+                'magic' => (object) array(
+                    'name' => 'Charm'
+                )
+            )
+        ));
+    }
+    
+    protected function removeItemTest()
+    {
+        $trixie = $this->createEntity('fairy', array(
+            'name' => 'Trixie'
+        ));
+        
+        $blum = $this->createEntity('fairy', array(
+            'name' => 'Blum'
+        ));
+        
+        $nature = $trixie->magic->create(array('name' => 'Nature'));
+        $charm = $blum->magic->create(array('name' => 'Charm'));
+        
+        $love = $blum->magic()->spell->create(array('name' => 'Love'));
+        
+        $trixie->save();
+        $blum->save();
+        
+        $trixie = $this->orm->get('fairy')->query()
+            ->where('name', 'Trixie')
+            ->findOne();
+        
+        $blum = $this->orm->get('fairy')->query()
+                    ->where('name', 'Blum')
+                    ->findOne();
+        
+        $this->assertSame('Nature', $trixie->magic()->name);
+        $trixie->magic->remove();
+        $this->assertSame(null, $trixie->magic());
+
+        $this->assertSame('Love', $blum->magic()->spell()->name);
+        $blum->magic()->spell->remove();
+        $this->assertSame(null, $blum->magic()->spell());
+
         $trixie->save();
         $blum->save();
         
         $idField = $this->idField('fairy');
         $this->assertDataAsObject('fairy', array(
-            (object) array( $idField => $blum->id(), 'name' => 'Blum'),
-            (object) array( $idField => $trixie->id(), 'name' => 'Trixie', 'flower' => (object) array(
-                'name' => 'Green'
-            )),
+            (object) array($idField => $trixie->id(), 'name' => 'Trixie'),
+            (object) array(
+                $idField => $blum->id(),
+                'name' => 'Blum',
+                'magic' => (object) array(
+                    'name' => 'Charm'
+                )
+            )
         ));
-    }
-    
-    
-    protected function loadItemsTest()
-    {
-        $this->prepareEntities();
-        
-        $trixie = $this->orm->get('fairy')->query()
-                    ->where('name', 'Trixie')
-                    ->findOne();
-        
-        $this->assertEquals('Red', $trixie->flower()->name);
-        
-        $pixie = $this->orm->get('fairy')->query()
-                    ->where('name', 'Pixie')
-                    ->findOne();
-        
-        $this->assertEquals(null, $pixie->flower());
     }
     
     protected function prepareEntities()
     {
         $map = array(
-            'Trixie' => array('Red'),
-            'Blum'   => array('Yellow'),
-            'Pixie'  => array()
+            'Trixie' => array(
+                'Nature' => array('Rain')
+            ),
+            'Blum'   => array(
+                'Charm' => array('Love')
+            ),
+            'Pixie'  => array(
+                'Trick' => array()
+            ),
+            'Stella'  => array()
         );
         
-        foreach($map as $fairyName => $flowerName) {
+        foreach($map as $fairyName => $magicMap) {
             
             $fairy = $this->orm->get('fairy')->create();
             $fairy->name = $fairyName;
             
-            if(!empty($flowerName)) {
-                $flower = $fairy->flower->create();
-                $flower->name = $flowerName[0];
+            if(!empty($magicMap)) {
+                $magic = $fairy->magic->create();
+                $magic->name = key($magicMap);
+                
+                $spellMap = current($magicMap);
+                
+                if(!empty($spellMap)) {
+                    $spell = $magic->spell->create();
+                    $spell->name = $spellMap[0];
+                }
             }
             
             $fairy->save();

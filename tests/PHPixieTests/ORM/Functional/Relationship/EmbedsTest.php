@@ -5,14 +5,19 @@ namespace PHPixieTests\ORM\Functional\Relationship;
 abstract class EmbedsTest extends \PHPixieTests\ORM\Functional\RelationshipTest
 {
     protected $relationshipName;
+    
     protected $itemKey;
     protected $itemProperty;
+    protected $subItemProperty;
     
     public function setUp()
     {
         $this->ormConfigData = array(
             'models' => array(
-                'flower' => array(
+                'magic' => array(
+                    'type' => 'embedded'
+                ),
+                'spell' => array(
                     'type' => 'embedded'
                 )
             ),
@@ -20,7 +25,12 @@ abstract class EmbedsTest extends \PHPixieTests\ORM\Functional\RelationshipTest
                 array(
                     'type'  => $this->relationshipName,
                     'owner' => 'fairy',
-                    $this->itemKey => 'flower'
+                    $this->itemKey => 'magic'
+                ),
+                array(
+                    'type'  => $this->relationshipName,
+                    'owner' => 'magic',
+                    $this->itemKey => 'spell'
                 )
             )
         );

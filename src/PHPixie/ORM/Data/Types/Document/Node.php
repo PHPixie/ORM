@@ -15,7 +15,7 @@ abstract class Node
     {
         $isArray = is_array($value);
         
-        if ($value instanceof \stdClass || ($isArray && !is_numeric(current($value)))) {
+        if ($value instanceof \stdClass || ($isArray && !is_numeric(key($value)))) {
             $value = $this->documentBuilder->document($value);
         } elseif ($isArray) {
             $value = $this->documentBuilder->arrayNode($value);

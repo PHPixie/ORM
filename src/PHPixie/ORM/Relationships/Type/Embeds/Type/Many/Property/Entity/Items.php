@@ -39,7 +39,7 @@ class Items extends \PHPixie\ORM\Relationships\Type\Embeds\Property\Entity
         $this->handler->offsetUnset($this->entity, $config, $key);
     }
 
-    public function create($key = null, $data = null)
+    public function create($data = null, $key = null)
     {
         $config = $this->side->config();
         return $this->handler->offsetCreate($this->entity, $config, $key, $data);

@@ -13,10 +13,6 @@ abstract class Preloader extends \PHPixie\ORM\Relationships\Relationship\Impleme
 
     public function loadProperty($property)
     {
-        if(empty($this->preloaders)) {
-            return;
-        }
-        
         $entities = $this->getEntities($property);
         foreach($entities as $entity) {
             foreach($this->preloaders as $relationship => $preloader) {

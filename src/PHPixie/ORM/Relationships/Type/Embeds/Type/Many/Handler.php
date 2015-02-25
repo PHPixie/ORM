@@ -37,6 +37,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         $embeddedModel = $this->models->embedded();
         $item = $embeddedModel->loadEntityFromData($config->itemModel, $data);
         $this->setItem($entity, $config, $offset, $item);
+        return $item;
     }
 
     public function removeItems($entity, $config, $items) {
@@ -62,6 +63,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 
     protected function setItem($entity, $config, $offset, $item)
     {
+        $this->checkNode($entity, $config, $arrayNode);
         $arrayNode = $this->getArrayNode($entity, $config->path);
         $count = $arrayNode->count();
 
@@ -77,7 +79,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         if($offset < $count) {
             $this->unsetCachedItemOwner($arrayNodeLoader, $offset);
         }
-
+        
         $arrayNodeLoader->cacheEntity($offset, $item);
 
         $document  = $item->data()->document();
@@ -103,6 +105,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
             $arrayNode->offsetUnset($adjustedOffset);
             $arrayNodeLoader->shiftCachedEntities($adjustedOffset);
         }
+        
+        $this->checkNode($entity, $config, $arrayNode);
     }
 
     public function removeAllItems($entity, $config) {
@@ -117,25 +121,42 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         $arrayNodeLoader->clearCachedEntities();
         $arrayNode = $this->getArrayNode($entity, $config->path);
         $arrayNode->clear();
+        $this->checkNode($entity, $config, $arrayNode);
+        
     }
 
     public function loadProperty($config, $entity)
     {
         $arrayNode = $this->getArrayNode($entity, $config->path);
+        $this->checkNode($entity, $config, $arrayNode);
         
-        return $this->loaders->arrayNode(
+        $loader = $this->loaders->arrayNode(
             $config->itemModel,
             $arrayNode,
             $entity,
             $config->ownerItemsProperty
         );
+        
+        $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
+        $property->setValue($loader);
     }
-
+    
     protected function unsetCachedItemOwner($arrayNodeLoader, $offset)
     {
         $oldItem = $arrayNodeLoader->getCachedEntity($offset);
         if($oldItem !== null) {
             $oldItem->unsetOwnerRelationship();
+        }
+    }
+    
+    protected function checkNode($entity, $config, $arrayNode)
+    {
+        list($parent, $key) = $this->getParentDocumentAndKey($entity, $config->path);
+        
+        if($arrayNode->count() === 0) {
+            $parent->remove($key);
+        }else{
+            $parent->set($key, $arrayNode);
         }
     }
 }

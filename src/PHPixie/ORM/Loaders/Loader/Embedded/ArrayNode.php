@@ -85,4 +85,9 @@ class ArrayNode extends \PHPixie\ORM\Loaders\Loader\Embedded
         return $this->arrayNode->count();
     }
     
+    public function arrayNode()
+    {
+        return $this->arrayNode;
+    }
+    
 }

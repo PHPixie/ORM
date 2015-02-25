@@ -111,7 +111,7 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
             if($fairyName === '') {
                 continue;
             }
-                
+            
             $fairy = $fairies[$key];
             $this->assertSame($fairyName, $fairy->name);
             $this->assertEquals(true, $fairy->flower->isLoaded());

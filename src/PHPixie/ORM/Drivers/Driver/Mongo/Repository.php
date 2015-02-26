@@ -52,7 +52,6 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
     protected function insertEntityData($data)
     {
         $data = $data->data();
-        print_r($data);
         
         $this->databaseInsertQuery()
             ->data((array) $data)

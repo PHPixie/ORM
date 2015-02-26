@@ -4,6 +4,8 @@ namespace PHPixieTests\ORM\Functional\Relationship;
 
 abstract class EmbedsTest extends \PHPixieTests\ORM\Functional\RelationshipTest
 {
+    protected $testCases = array('mongo');
+    
     protected $relationshipName;
     
     protected $itemKey;
@@ -37,47 +39,72 @@ abstract class EmbedsTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         parent::setUp();
     }
-    /*
-    public function testPreloadOwner()
-    {
-        $this->runTests('preloadOwner');
-    }
-    
-    public function testSetOwner()
-    {
-        $this->runTests('setOwner');
-    }
-    
-    public function testLoadOwner()
-    {
-        $this->runTests('loadOwner');
-    }
-    
-    public function testRemoveOwner()
-    {
-        $this->runTests('removeOwner');
-    }
     
     public function testItemsConditions()
     {
         $this->runTests('itemsConditions');
     }
     
-    public function testOwnerCondtions()
+    protected function itemsConditionsTest()
     {
-        $this->runTests('ownerCondtions');
+        $this->prepareEntities();
+        
+        $subProperty = $this->itemProperty.'.'.$this->subItemProperty;
+        
+        $this->assertNames(
+            array('Trixie'),
+            $this->orm->get('fairy')->query()
+                ->relatedTo($this->itemProperty, function($b) {
+                    $b->and('name', 'Nature');
+                })
+                ->find()->asArray()
+        );
+        
+        $this->assertNames(
+            array('Blum', 'Pixie', 'Stella'),
+            $this->orm->get('fairy')->query()
+                ->notRelatedTo($subProperty, function($b) {
+                    $b->and('name', 'Rain');
+                })
+                ->find()->asArray()
+        );
+        
+        $this->assertNames(
+            array('Blum'),
+            $this->orm->get('fairy')->query()
+                ->where($this->itemProperty.'.name', 'Charm')
+                ->find()->asArray()
+        );
+        
+        $this->assertNames(
+            array('Trixie', 'Blum', 'Pixie'),
+            $this->orm->get('fairy')->query()
+                ->relatedTo($this->itemProperty)
+                ->find()->asArray()
+        );
+        
+        $this->assertNames(
+            array('Trixie', 'Blum'),
+            $this->orm->get('fairy')->query()
+                ->relatedTo($subProperty)
+                ->find()->asArray()
+        );
+                
+        $this->assertNames(
+            array('Stella'),
+            $this->orm->get('fairy')->query()
+                ->notRelatedTo($this->itemProperty)
+                ->find()->asArray()
+        );
+        
+        $this->assertNames(
+            array('Pixie', 'Stella'),
+            $this->orm->get('fairy')->query()
+                ->notRelatedTo($subProperty)
+                ->find()->asArray()
+        );
+
     }
-    
-    public function testCascadeDeleteUpdate()
-    {
-        $this->runTests('cascadeDeleteUpdate');
-    }
-    
-    public function testCascadeDelete()
-    {
-        $this->runTests('cascadeDelete');
-    }
-    */
     
     protected function prepareMongoDatabase()
     {
@@ -91,7 +118,7 @@ abstract class EmbedsTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         }
     }
     
-    protected function prepareSQLDatabase($multipleConnections = false)
+    protected function prepareSqlDatabase($multipleConnections = false)
     {
         
     }

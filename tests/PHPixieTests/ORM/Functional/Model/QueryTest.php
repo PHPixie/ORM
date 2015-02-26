@@ -78,7 +78,7 @@ class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
     protected function conditionsTest()
     {
         $fairies = $this->createFairies(array('Trixie', 'Blum', 'Pixie'));
-        $this->idField('fairy');
+        $idField = $this->idField('fairy');
         
         $this->assertFairyNames(
             array('Blum', 'Pixie'),

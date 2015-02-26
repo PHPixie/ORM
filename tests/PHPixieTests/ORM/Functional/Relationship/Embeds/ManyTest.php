@@ -20,13 +20,10 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
         $this->runTests('addItem');
     }
     
-    /*
     public function testRemoveItem()
     {
         $this->runTests('removeItem');
     }
-    
-    */
 
     public function testAddToEmpty()
     {
@@ -249,7 +246,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
                         'name' => 'Charm',
                     )
                 )
-            ),
+            )
         ));
     }
     
@@ -298,10 +295,10 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
             'name' => 'Blum'
         ));
         
-        $nature = $trixie->magic->create(array('name' => 'Nature'));
-        $charm = $blum->magic->create(array('name' => 'Charm'));
+        $nature = $trixie->magics->create(array('name' => 'Nature'));
+        $charm = $blum->magics->create(array('name' => 'Charm'));
         
-        $love = $blum->magic()->spell->create(array('name' => 'Love'));
+        $love = $blum->magics[0]->spells->create(array('name' => 'Love'));
         
         $trixie->save();
         $blum->save();
@@ -314,13 +311,13 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
                     ->where('name', 'Blum')
                     ->findOne();
         
-        $this->assertSame('Nature', $trixie->magic()->name);
-        $trixie->magic->remove();
-        $this->assertSame(null, $trixie->magic());
+        $this->assertSame('Nature', $trixie->magics[0]->name);
+        $trixie->magics->offsetUnset(0);
+        $this->assertSame(0, $trixie->magics->count());
 
-        $this->assertSame('Love', $blum->magic()->spell()->name);
-        $blum->magic()->spell->remove();
-        $this->assertSame(null, $blum->magic()->spell());
+        $this->assertSame('Love', $blum->magics[0]->spells[0]->name);
+        $blum->magics[0]->spells->removeAll();
+        $this->assertSame(0, $blum->magics[0]->spells->count());
 
         $trixie->save();
         $blum->save();
@@ -331,8 +328,10 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
             (object) array(
                 $idField => $blum->id(),
                 'name' => 'Blum',
-                'magic' => (object) array(
-                    'name' => 'Charm'
+                'magics' => array(
+                    (object) array (
+                        'name' => 'Charm'
+                    )
                 )
             )
         ));

@@ -73,7 +73,7 @@ class NormalizerTest extends \PHPixieTests\AbstractORMTest
         $this->method($inCondition, 'items', $items, array(), 1);
         
         $inGroup = $this->getRelationshipGroup();
-        $this->method($this->conditions, 'relatedToGroup', $inGroup, array($modelName), 0);
+        $this->method($this->conditions, 'group', $inGroup, array(), 0);
         
         $this->prepareCopyLogicAndNegated($inCondition, $inGroup, 2);
         

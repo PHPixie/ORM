@@ -302,7 +302,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->assertEquals(null, $yellow);
     }
     
-    protected function prepareSQLDatabase($multipleConnections = false)
+    protected function prepareSqlDatabase($multipleConnections = false)
     {
         $connection = $this->database->get('default');
         $connection->execute('

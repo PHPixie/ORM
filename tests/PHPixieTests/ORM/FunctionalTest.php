@@ -4,6 +4,8 @@ namespace PHPixieTests\ORM;
 
 abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $testCases = array();
+    
     protected $databaseConfigData = array(
         'default' => array(
             'driver' => 'pdo',
@@ -27,6 +29,15 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
         $this->orm = $this->orm();
     }
     
+    protected function runTests($name)
+    {
+        $method = $name.'Test';
+        
+        foreach($this->testCases as $testCase) {
+            $runMethod = 'run'.ucfirst($testCase).'Test';
+            $this->$runMethod($method);
+        }
+    }
 
     protected function createEntity($name, $data)
     {
@@ -54,9 +65,6 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
                         ->find()
                         ->asArray();
         
-        foreach($entities as $entity) {
-            print_r($entity->data()->data());
-        }
         $this->assertEntities($data, $entities);
     }
     

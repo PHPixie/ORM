@@ -63,18 +63,16 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 
     protected function setItem($entity, $config, $offset, $item)
     {
-        $this->checkNode($entity, $config, $arrayNode);
-        $arrayNode = $this->getArrayNode($entity, $config->path);
-        $count = $arrayNode->count();
+        $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
+        $arrayNodeLoader = $property->value();
+        
+        $count = $arrayNodeLoader->count();
 
         if($offset === null) {
             $offset = $count;
         }elseif($offset > $count) {
             throw new \PHPixie\ORM\Exception\Relationship("There may be no gaps in items array. Key $offset is larger than item count $count");
         }
-
-        $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
-        $arrayNodeLoader = $property->value();
 
         if($offset < $count) {
             $this->unsetCachedItemOwner($arrayNodeLoader, $offset);
@@ -83,9 +81,13 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         $arrayNodeLoader->cacheEntity($offset, $item);
 
         $document  = $item->data()->document();
+        
+        $arrayNode = $arrayNodeLoader->arrayNode();
         $arrayNode->offsetSet($offset, $document);
-
+        
         $item->setOwnerRelationship($entity, $config->ownerItemsProperty);
+        $this->checkArrayNode($entity, $config, $arrayNodeLoader);
+        
     }
 
     protected function unsetItems($entity, $config, $offsets)
@@ -93,7 +95,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
         $arrayNodeLoader = $property->value();
         $cachedEntities = $arrayNodeLoader->getCachedEntities();
-        $arrayNode = $this->getArrayNode($entity, $config->path);
+        $arrayNode = $arrayNodeLoader->arrayNode();
 
         sort($offsets, SORT_NUMERIC);
 
@@ -106,7 +108,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
             $arrayNodeLoader->shiftCachedEntities($adjustedOffset);
         }
         
-        $this->checkNode($entity, $config, $arrayNode);
+        $this->checkArrayNode($entity, $config, $arrayNodeLoader);
     }
 
     public function removeAllItems($entity, $config) {
@@ -119,18 +121,16 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         }
 
         $arrayNodeLoader->clearCachedEntities();
-        $arrayNode = $this->getArrayNode($entity, $config->path);
+        $arrayNode = $arrayNodeLoader->arrayNode();
         $arrayNode->clear();
-        $this->checkNode($entity, $config, $arrayNode);
-        
+        $this->checkArrayNode($entity, $config, $arrayNodeLoader);
     }
 
     public function loadProperty($config, $entity)
     {
         $arrayNode = $this->getArrayNode($entity, $config->path);
-        $this->checkNode($entity, $config, $arrayNode);
         
-        $loader = $this->loaders->arrayNode(
+        $arrayNodeLoader = $this->loaders->arrayNode(
             $config->itemModel,
             $arrayNode,
             $entity,
@@ -138,7 +138,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         );
         
         $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
-        $property->setValue($loader);
+        $property->setValue($arrayNodeLoader);
+        $this->checkArrayNode($entity, $config, $arrayNodeLoader);
     }
     
     protected function unsetCachedItemOwner($arrayNodeLoader, $offset)
@@ -149,14 +150,15 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         }
     }
     
-    protected function checkNode($entity, $config, $arrayNode)
+    protected function checkArrayNode($entity, $config, $arrayNodeLoader)
     {
         list($parent, $key) = $this->getParentDocumentAndKey($entity, $config->path);
         
-        if($arrayNode->count() === 0) {
+        if($arrayNodeLoader->count() === 0) {
             $parent->remove($key);
+            
         }else{
-            $parent->set($key, $arrayNode);
+            $parent->$key = $arrayNodeLoader->arrayNode();
         }
     }
 }

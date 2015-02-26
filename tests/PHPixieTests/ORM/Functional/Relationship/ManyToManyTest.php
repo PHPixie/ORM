@@ -360,7 +360,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         }
     }
     
-    protected function prepareSQLDatabase($multipleConnections = false)
+    protected function prepareSqlDatabase($multipleConnections = false)
     {
         $connection = $this->database->get('default');
         $connection->execute('

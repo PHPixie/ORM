@@ -42,7 +42,6 @@ abstract class Result extends \PHPixie\ORM\Steps\Step\Query
         foreach($this as $item){
             $values = array();
             foreach($fields as $field) {
-                var_dump($item);
                 $values[$field] = $this->result()->getItemField($item, $field);
             }
             $data[]=$values;

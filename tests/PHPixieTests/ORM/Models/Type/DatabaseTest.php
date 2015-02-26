@@ -40,11 +40,12 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
      */
     public function testEntity()
     {
+        $this->prepareWrapper('repositories', array());
         $this->prepareWrapper('entities', array('pixie'));
         $driver = $this->prepareDriver('pdo');
         
         $this->entityTest($driver, 'fairy', false, false);
-        $this->entityTest($driver, 'pixie', true, true);
+        $this->entityTest($driver, 'pixie', true, false);
     }
     
     /**
@@ -74,12 +75,12 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
     
     protected function queryTest($driver, $modelName, $isWrapped, $wrapperAt = 0)
     {
-        $config = $this->config($modelName, 'pdo');
+        $config = $config = $this->prepareConfig($modelName);
         
         $query  = $this->getQuery();
         $this->method($driver, 'query', $query, array(
             $config
-        ), 0);
+        ), 1);
         
         if($isWrapped) {
             $wrapped  = $this->getQuery();
@@ -87,12 +88,12 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
             $query = $wrapped;
         }
         
-        $this->assertSame($query, $this->model->query($config));
+        $this->assertSame($query, $this->model->query($modelName));
     }
     
-    protected function entityTest($driver, $modelName, $isWrapped, $isNew, $wrapperAt = 0)
+    protected function entityTest($driver, $modelName, $isWrapped, $isNew, $driverAt = 2, $wrapperAt = 1)
     {
-        $repository = $this->getRepository();
+        $repository = $this->prepareRepository($driver, $modelName, false);
         $data = $this->getData();
         
         $config = $this->config($modelName, 'pdo');
@@ -100,25 +101,29 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
         
         $entity  = $this->getEntity();
         $this->method($driver, 'entity', $entity, array(
-            $config,
+            $repository,
             $data,
             $isNew
-        ), 0);
+        ), $driverAt);
         
         if($isWrapped) {
             $wrapped  = $this->getEntity();
-            $this->method($this->wrappers, 'databaseEntityWrapper', $wrapped, array($entity), $wrapperAt);
+            $this->method($this->wrappers, 'databaseEntityWrapper', $wrapped, array($entity));
             $entity = $wrapped;
         }
         
-        $this->assertSame($entity, $this->model->entity($repository, $data, $isNew));
+        $this->assertSame($entity, $this->model->entity($modelName, $data, $isNew));
     }
     
     protected function repositoryTest($driver, $modelName, $isWrapped, $wrapperAt = 0)
     {
+        $repository = $this->prepareRepository($driver, $modelName, $isWrapped);
+        $this->assertSame($repository, $this->model->repository($modelName));
+    }
+    
+    protected function prepareRepository($driver, $modelName, $isWrapped, $wrapperAt = 0)
+    {
         $config = $this->prepareConfig($modelName);
-        $config->driver = 'pdo';
-        
         $repository = $this->getRepository();
         
         $this->method($driver, 'repository', $repository, array(
@@ -131,7 +136,7 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
             $repository = $wrapped;
         }
         
-        $this->assertSame($repository, $this->model->repository($modelName));
+        return $repository;
     }
     
     protected function prepareBuildConfig($modelName, $slice)
@@ -141,7 +146,9 @@ class DatabaseTest extends \PHPixieTests\ORM\Models\ModelTest
         $this->method($this->database, 'connectionDriverName', 'pdo', array(), 0);
         
         $config = $this->getConfig();
-        $this->method($driver, 'config', $config, array($this->inflector, $modelName, $slice), 0);
+        $this->method($driver, 'config', $config, array($modelName, $slice), 0);
+        $config->driver = 'pdo';
+        
         return $config;
     }
     

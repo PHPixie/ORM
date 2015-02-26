@@ -80,7 +80,7 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
                     $shortMethod = '_'.$method;
                 }
                 
-                $this->method($this->builder, 'addCondition', null, array($logic, $negated, array('a', 1)), 0);
+                $this->method($this->builder, 'buildCondition', null, array($logic, $negated, array('a', 1)), 0);
                 $this->proxy->$shortMethod('a', 1);
                 
                 $method = 'start'.ucfirst($method).'Group';
@@ -89,7 +89,7 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
             }
         }
         
-        $this->method($this->builder, 'addCondition', null, array('and', true, array('a', 1)), 0);
+        $this->method($this->builder, 'buildCondition', null, array('and', true, array('a', 1)), 0);
         $this->proxy->_not('a', 1);
         
         foreach(array(true, false) as $negate) {
@@ -104,7 +104,6 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
             $this->proxy->$method();
         }
 
-        
     }
     
     /**
@@ -158,7 +157,7 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
                 if($negated)
                     $method.='Not';
                 
-                $this->method($this->builder, 'addCondition', null, array($logic, $negated, array('a', 1)), 0);
+                $this->method($this->builder, 'buildCondition', null, array($logic, $negated, array('a', 1)), 0);
                 $this->proxy->$method('a', 1);
                 
                 $method = 'start'.ucfirst($method).'Group';
@@ -172,7 +171,7 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
             if($negated)
                 $method.='Not';
             
-            $this->method($this->builder, 'addCondition', null, array('and', $negated, array('a', 1)), 0);
+            $this->method($this->builder, 'buildCondition', null, array('and', $negated, array('a', 1)), 0);
             $this->proxy->$method('a', 1);
             
             $this->method($this->builder, 'startWhereConditionGroup', null, array('and', $negated), 0);
@@ -298,11 +297,11 @@ class ProxyTest extends \PHPixieTests\AbstractORMTest
     public function testCall()
     {
         foreach(array('and', 'or', 'xor') as $logic) {
-            $this->method($this->builder, 'addCondition', null, array($logic, false, array('a', 1)), 0);
+            $this->method($this->builder, 'buildCondition', null, array($logic, false, array('a', 1)), 0);
             $this->proxy->$logic('a', 1);
         }
         
-        $this->method($this->builder, 'addCondition', null, array('and', true, array('a', 1)), 0);
+        $this->method($this->builder, 'buildCondition', null, array('and', true, array('a', 1)), 0);
         $this->proxy->not('a', 1);
         
         $this->setExpectedException('\PHPixie\ORM\Exception\Builder');

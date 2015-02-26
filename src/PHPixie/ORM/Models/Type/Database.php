@@ -55,7 +55,6 @@ class Database extends \PHPixie\ORM\Models\Model
     {
         $repository = $this->repository($modelName);
         $config = $repository->config();
-        
         $driver = $this->drivers->get($config->driver);
         
         $entity = $driver->entity(

@@ -29,7 +29,6 @@ abstract class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationshi
     public function testLoadProperty()
     {
         $property = $this->getProperty();
-        $this->preloader->loadProperty($property);
         
         foreach($this->preloaders as $relationship => $preloader) {
             $this->preloader->addPreloader($relationship, $preloader);

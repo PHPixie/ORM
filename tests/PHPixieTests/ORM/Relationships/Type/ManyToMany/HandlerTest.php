@@ -46,8 +46,12 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
         $this->prepareQuery($side, $query, $entity);
         $this->method($query, 'find', $loader, array(), 1);
         $this->method($this->loaders, 'editableProxy', $editable, array($loader), 0);
-
-        $this->assertEquals($editable, $this->handler->loadProperty($side, $entity));
+        
+        $property = $this->getProperty();
+        $this->method($entity, 'getRelationshipProperty', $property, array($this->configData['rightProperty']), 0, true);
+        $this->method($property, 'setValue', null, array($editable), 0);
+        
+        $this->handler->loadProperty($side, $entity);
     }
 
     protected function prepareQuery($side, $query, $related)
@@ -109,13 +113,15 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
             'fairy' => $m['leftRepo'],
             'flower' => $m['rightRepo'],
         ));
-
+        
+        $opposing = $side === 'left' ? 'right' :'left';
+        
         $items = $this->getDatabaseEntity();
         $data = $this->configData;
         $this->method($this->planners, 'pivot', $m['pivotPlanner'], array());
 
-        $this->method($m['pivotPlanner'], 'side', $m[$side.'Side'],
-                      array($items, $m[$side.'Repo'], $data[$side.'PivotKey']), 0);
+        $this->method($m['pivotPlanner'], 'side', $m[$opposing.'Side'],
+                      array($items, $m[$opposing.'Repo'], $data[$opposing.'PivotKey']), 0);
 
         $this->method($m['leftRepo'], 'connection', $m['connection'], array(), 0);
 
@@ -123,7 +129,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
                       array($m['connection'], $data['pivot']), 1);
 
         $this->method($m['pivotPlanner'], 'unlinkAll', array(),
-                      array($m['pivotPivot'], $m[$side.'Side'], $m['plan']), 2);
+                      array($m['pivotPivot'], $m[$opposing.'Side'], $m['plan']), 2);
 
         $side = $this->side($side, $this->configData);
         $this->assertSame($m['plan'], $this->handler->unlinkAllPlan($side, $items));
@@ -221,7 +227,6 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
         $sideQuery = $this->getDatabaseQuery();
         $this->method($m[$type.'Repo'], 'databaseSelectQuery', $sideQuery, array(), $sideOffset++);
         $this->method($m[$type.'Repo'], 'modelName', $this->configData[$type.'Model'], array(), $sideOffset++);
-        $this->method($sideQuery, 'fields', $sideQuery, array(array($type.'Id')), 0);
 
         $this->method($this->mapperMocks['conditions'], 'map', null, array(
             $sideQuery,
@@ -340,8 +345,15 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
             $plan
         ), 0);
 
+        $sideConfig = $this->prepareRepositoryConfig($m[$type.'Repo'], array(), $sideOffset++);
         $preloader = $this->getPreloader();
-        $this->method($this->relationship, 'preloader', $preloader, array($m['side'], $cachingProxy, $pivotResult), 0);
+        $this->method($this->relationship, 'preloader', $preloader, array(
+            $m['side'],
+            $sideConfig,
+            $preloadStep,
+            $cachingProxy,
+            $pivotResult
+        ), 0);
 
         $this->assertEquals($preloader, $this->handler->mapPreload($m['side'], $preloadProperty['property'], $result, $plan));
 
@@ -491,7 +503,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
         $loader = null;
 
         if($propertyExists) {
-            $property = $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Property\Entity');
+            $property = $this->getProperty();
             $this->method($property, 'isLoaded', $propertyLoaded, array());
 
             if($propertyLoaded){
@@ -564,8 +576,14 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
         return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Entity');
     }
 
-    protected function getPreloader(){
+    protected function getPreloader()
+    {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Preloader');
+    }
+    
+    protected function getProperty()
+    {
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\ManyToMany\Property\Entity');
     }
 
     protected function getConnection()

@@ -81,6 +81,8 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
         foreach($params as $key => $value) {
             $config->$key = $value;
         }
+        
+        return $config;
     }
 
     protected function getModelConfig()

@@ -18,11 +18,19 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     {
         $this->offsetSetTest(1);
         $this->offsetSetTest(1, 5, false, true);
-        $this->offsetSetTest(6, 5);
         $this->offsetSetTest(5, 5);
         $this->offsetSetTest(1, 5, true, false);
         $this->offsetSetTest(1, 5, true, true, 'one');
         $this->offsetSetTest(null);
+    }
+    
+    /**
+     * @covers ::offsetSet
+     * @covers ::<protected>
+     */
+    public function testWrongOffset()
+    {
+        $this->offsetSetTest(6, 5);
     }
 
     /**
@@ -42,7 +50,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
     public function testOffsetUnset() {
         $owner = $this->getOwner(true);
         $loaderOffset = 0;
-        $this->prepareUnsetItems($owner, array(1), $loaderOffset);
+        $this->prepareUnsetItems($owner, array(1), 1, $loaderOffset);
         $this->handler->offsetUnset($owner['entity'], $this->propertyConfig, 1);
     }
 
@@ -85,8 +93,8 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
             $this->method($item, 'unsetOwnerRelationship', null, array(), 0);
         }
         $this->method($owner['loader'], 'clearCachedEntities', null, array(), 1);
-        $arrayNode = $this->prepareGetArrayNode($owner['document'], $this->configData['path']);
-        $this->method($arrayNode, 'clear', null, array(), 0);
+        $this->method($owner['node'], 'clear', null, array(), 0);
+        $this->prepareCheckArrayNode($owner, 0, false, 1);
         $this->handler->removeAllItems($owner['entity'], $this->propertyConfig);
     }
 
@@ -96,17 +104,26 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
      */
     public function testLoadProperty()
     {
+        $this->loadPropertyTest(false);
+        $this->loadPropertyTest(true);
+    }
+    
+    protected function loadPropertyTest($isEmpty)
+    {
         $owner = $this->getOwner();
-
-        $arrayNode = $this->prepareGetArrayNode($owner['document'], $this->configData['path']);
-        $loader = $this->getArrayNodeLoader();
-        $this->method($this->loaders, 'arrayNode', $loader, array(
+        
+        $count = $isEmpty ? 0 : 5;
+        $arrayNode = $this->prepareCheckArrayNode($owner, $count, true);
+        
+        $this->method($this->loaders, 'arrayNode', $owner['loader'], array(
             $this->configData['itemModel'],
             $arrayNode,
             $owner['entity'],
             $this->configData['ownerItemsProperty'],
         ), 0);
-        $this->assertSame($loader, $this->handler->loadProperty($this->propertyConfig, $owner['entity']));
+        
+        $this->method($owner['property'], 'setValue', null, array($owner['loader']), 0);
+        $this->handler->loadProperty($this->propertyConfig, $owner['entity']);    
     }
 
     protected function prepareMapConditionBuilder($builder, $side, $collection, $plan)
@@ -148,8 +165,8 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $item = $this->getItem($oldOwner);
         $this->prepareRemoveItemFromOwner($item, $withOldOwnerType);
         
-        $owner = $this->getOwner();
-        $this->prepareSetItem($owner, $item, $key, $count);
+        $owner = $this->getOwner($withOldItem);
+        $this->prepareSetItem($owner, $item, $key, $count, $withOldItem);
         $this->handler->offsetSet($owner['entity'], $this->propertyConfig, $key, $item['entity']);
     }
 
@@ -158,20 +175,20 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         if($key === null) {
             $key = $count;
         }
-
-        $arrayNode = $this->prepareGetArrayNode($owner['document'], $this->configData['path']);
-        $this->method($arrayNode, 'count', $count, array(), 0);
+        
+        $loaderOffset = 0;
+        $this->method($owner['loader'], 'count', $count, array(), $loaderOffset++);
 
         if($key <= $count) {
-            $loaderOffset = 0;
             if($key < $count) {
                 $cachedEntity = $withOldItem ? $owner['cachedEntities'][$key] :null;
                 $this->method($owner['loader'], 'getCachedEntity', $cachedEntity, array($key), $loaderOffset++);
                 if($withOldItem)
-                    $this->method($owner['cachedEntities'][$offset], 'unsetOwnerRelationship', null, array(), 0);
+                    $this->method($owner['cachedEntities'][$key], 'unsetOwnerRelationship', null, array(), 0);
             }
             $this->method($owner['loader'], 'cacheEntity', null, array($key, $item['entity']), $loaderOffset);
-            $this->method($arrayNode, 'offsetSet', null, array($key, $item['document']), 1);
+            $this->method($owner['node'], 'offsetSet', null, array($key, $item['document']), 0);
+            $this->prepareCheckArrayNode($owner, $count, false, 1);
         }else{
             $this->setExpectedException('\PHPixie\ORM\Exception\Relationship');
         }
@@ -191,22 +208,22 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         }
 
         $loaderOffset = 1;
-        $this->prepareUnsetItems($owner, $keys, $loaderOffset, 1);
+        $this->prepareUnsetItems($owner, $keys, 1, $loaderOffset, 1);
         $this->handler->removeItems($owner['entity'], $this->propertyConfig, $remove);
     }
 
-    protected function prepareUnsetItems($owner, $offsets, &$loaderOffset, $entityOffset = 0)
+    protected function prepareUnsetItems($owner, $offsets, $countRemaining, &$loaderOffset, $entityOffset = 0)
     {
-
-        $arrayNode = $this->prepareGetArrayNode($owner['document'], $this->configData['path']);
-        $loaderOffset++;
+        $loaderOffset+=2;
 
         foreach($offsets as $key => $offset) {
             $this->method($owner['cachedEntities'][$offset], 'unsetOwnerRelationship', null, array(), $entityOffset);
             $adjustedOffset = $offset - $key;
-            $this->method($arrayNode, 'offsetUnset', null, array($adjustedOffset), $key);
+            $this->method($owner['node'], 'offsetUnset', null, array($adjustedOffset), $key);
             $this->method($owner['loader'], 'shiftCachedEntities', null, array($adjustedOffset), $loaderOffset++);
         }
+        
+        $this->prepareCheckArrayNode($owner, $countRemaining, false, $key+1);
     }
 
     protected function offsetCreateTest($key, $count = 5)
@@ -225,14 +242,44 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $this->prepareSetItem($owner, $item, $key, $count);
         $this->handler->offsetCreate($owner['entity'], $this->propertyConfig, $key, $data);
     }
-
+    
+    protected function prepareCheckArrayNode($owner, $count, $createNode = false, $nodeOffset = 0)
+    {
+        list($parent, $key) = $this->prepareGetParentDocumentAndKey($owner['document'], $this->configData['path']);
+        
+        if($createNode) {
+            $arrayNode = $this->prepareGetArrayNode($parent, $key);
+            $parentOffset = 2;
+        }else{
+            $arrayNode = $owner['node'];
+            $parentOffset = 0;
+        }
+        
+        $this->method($arrayNode, 'count', $count, array(), $nodeOffset);
+        
+        if($count === 0) {
+            $this->method($parent, 'remove', null, array($key), $parentOffset);
+            
+        }else{
+            $this->method($parent, 'set', null, array($key, $arrayNode), $parentOffset);
+        }
+        
+        return $arrayNode;
+    }
+    
     protected function getOwner($addCachedEntities = false)
     {
         $owner = $this->getRelationshipEntity('owner');
         $property = $this->getProperty();
+        
         $loader = $this->getArrayNodeLoader();
+        $arrayNode = $this->getArrayNode();
+        $this->method($loader, 'arrayNode', $arrayNode, array());
         $this->method($property, 'value', $loader, array());
+        
         $owner['loader'] = $loader;
+        $owner['node'] = $arrayNode;
+        
         if($addCachedEntities) {
             $cached = array();
             for($i=0; $i<5; $i++) {

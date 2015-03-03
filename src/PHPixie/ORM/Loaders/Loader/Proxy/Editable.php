@@ -44,7 +44,6 @@ class Editable extends \PHPixie\ORM\Loaders\Loader\Proxy
             $this->skipId($id);
             if(array_key_exists($id, $this->addedIdsOffsets)) {
                 $offset = $this->addedIdsOffsets[$id];
-                $this->loaderItemsCount--;
                 if($offset <= $this->maxAccessedOffset) {
                     $this->maxAccessedOffset--;
                 }

@@ -93,7 +93,7 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $step  = $this->prepareStep('count', array($databaseQuery));
         $plan  = $this->preparePlan('count', array($step));
         
-        $this->prepareMapConditons($query, $databaseQuery, $plan);
+        $this->prepareMapCommon($query, $databaseQuery, $plan);
         $this->assertSame($plan, $this->queryMapper->mapCount($query));
     }
     
@@ -110,7 +110,7 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $step  = $this->prepareStep('query', array($databaseQuery));
         $plan  = $this->preparePlan('query', array($step));
         
-        $this->prepareMapConditons($query, $databaseQuery, $plan);
+        $this->prepareMapCommon($query, $databaseQuery, $plan);
         $this->method($this->updateMapper, 'map', null, array($databaseQuery, $update), 0);
         
         $this->assertSame($plan, $this->queryMapper->mapUpdate($query, $update));
@@ -163,7 +163,7 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         
         $plan  = $this->preparePlan('loader', array($step, $cachingProxy));
         
-        $this->prepareMapConditons($query, $databaseQuery, $plan);
+        $this->prepareMapCommon($query, $databaseQuery, $plan);
         
         if($withPreload) {
             $preloadPlan = $this->getPlan('Steps');
@@ -186,18 +186,19 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         $this->method($this->cascadeDeleteMapper, 'isModelHandled', $cascade, array($this->modelName), 0);
         if($cascade) {
             $selectQuery = $this->prepareDatabaseQuery('select', $repository, 1);
+            $this->prepareMapCommon($query, $selectQuery, $plan);
             $requiredPlan = $this->getPlan('Steps');
             $this->method($plan, 'requiredPlan', $requiredPlan, array(), 1);
             $this->method($this->cascadeDeleteMapper, 'map', null, array($deleteQuery, $selectQuery, $this->modelName, $requiredPlan), 1);
         }else{
-            $this->prepareMapConditons($query, $deleteQuery, $plan);
+            $this->prepareMapCommon($query, $deleteQuery, $plan);
         }
         
         
         $this->assertSame($plan, $this->queryMapper->mapDelete($query));
     }
     
-    protected function prepareMapConditons($query, $databaseQuery, $plan)
+    protected function prepareMapCommon($query, $databaseQuery, $plan, $offset = null, $limit = null, $orderBySets = array())
     {
         $conditions = array('test');
         $this->method($query, 'getConditions', $conditions, array());
@@ -207,11 +208,32 @@ class QueryTest extends \PHPixieTests\AbstractORMTest
         
         $this->method($this->conditionsMapper, 'map', null, array(
             $databaseQuery,
-            $conditions,
             $this->modelName,
+            $conditions,
             $requiredPlan
         ), 0);
-
+        
+        $this->method($query, 'getOffset', $offset, array());
+        if($offset > 0) {
+            $this->method($databaseQuery, 'offset', null, array($offset), $databaseQueryAt++);
+        }
+        
+        $this->method($query, 'getLimit', $limit, array());
+        if($limit > 0) {
+            $this->method($databaseQuery, 'limit', null, array($limit), $databaseQueryAt++);
+        }
+        
+        $orderByValues = array();
+        foreach($orderBySets as $orderBySet) {
+            $orderBy = $this->quickMock('\PHPixie\ORM\Values\OrderBy');
+            $orderByValues[] = $orderBy;
+            
+            $this->method($orderBy, 'field', $orderBySet[0], array());
+            $this->method($orderBy, 'direction', $orderBySet[1], array());
+            
+            $this->method($databaseQuery, 'direction', $orderBySet[1], array(), $databaseQueryAt++);
+        }
+        $this->method($query, 'getOrderBy', $orderByValues, array());
     }
     
     protected function prepareDatabaseQuery($type, $repository = null, $at = 0)

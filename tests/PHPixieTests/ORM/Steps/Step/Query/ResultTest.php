@@ -20,7 +20,6 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
             $this->rows[]=$item;
         }
         $this->result = $this->abstractMock('\PHPixie\Database\Result');
-        $this->method($this->result, 'asArray', $this->rows, array());
         parent::setUp();
     }
     
@@ -52,7 +51,7 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
      */
     public function testExecute()
     {
-        $this->setStepResult();
+        $this->setStepResult(false);
         $this->assertEquals($this->result, $this->step->result());
     }
     
@@ -61,29 +60,54 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
      */
     public function testGetField()
     {
-        $this->setStepResult();
-        $this->method($this->result, 'getField', array(5), array('name', true), 0);
-        $this->assertEquals(array(5), $this->step->getField('name'));
+        $this->getFieldTest(false);
+        $this->getFieldTest(true);
+    }
+    
+    protected function getFieldTest($skipNulls)
+    {
+        $this->step = $this->getStep();
+        $values = array(1, null, 2);
+        $resultAt = $this->setStepResult();
+        
+        if($skipNulls) {
+            $expected = array($values[0], $values[2]);
+        }else{
+            $expected = $values;
+        }
+
+        foreach($this->rows as $key => $row) {
+            $this->method($this->result, 'getItemField', $values[$key], array($row, 'name'), $resultAt++);
+        }
+        $this->assertEquals($expected, $this->step->getField('name', $skipNulls));
     }
     
     /**
-     * @covers ::getFields
+     * @covers ::getField
      */
     public function testGetFields()
     {
-        $fields = array('pixie', 'trixie');
-        $this->setStepResult();
-        $this->method($this->result, 'getFields', array(5), array($fields), 0);
-        $this->assertEquals(array(5), $this->step->getFields($fields));
+        $values = array();
+        foreach($this->rows as $row) {
+            $values[] = (array) $row;
+        }
+        
+        $resultAt = $this->setStepResult();
+        
+        foreach($this->rows as $key => $row) {
+            foreach(array('name', 'magic') as $field) {
+                $this->method($this->result, 'getItemField', $values[$key][$field], array($row, $field), $resultAt++);
+            }
+        }
+        $this->assertEquals($values, $this->step->getFields(array('name', 'magic')));
     }
-    
+
     /**
      * @covers ::getIterator
      * @covers ::<protected>
      */
     public function testIterator()
     {
-        $this->prepareIterator();
         $this->setStepResult();
         $this->iteratorTest();
     }
@@ -107,36 +131,17 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
         $this->assertEquals($this->rows, $rows);
     }
     
-    protected function setStepResult()
+    protected function setStepResult($withData = true)
     {
         $this->method($this->query, 'execute', $this->result, array(), 0);
+        if($withData) {
+            $at = $this->prepareResult();
+        }else{
+            $at = 0;
+        }
         $this->step->execute();
+        return $at;
     }
     
-    protected function prepareIterator()
-    {
-        $rows = $this->rows;
-        $pos = 0;
-        $this->result
-            ->expects($this->any())
-            ->method('valid')
-            ->will($this->returnCallback(function() use(&$pos){
-                return $pos < 3;
-            }));
-        
-        $this->result
-            ->expects($this->any())
-            ->method('next')
-            ->will($this->returnCallback(function() use(&$pos){
-                $pos++;
-            }));
-        
-        $this->result
-            ->expects($this->any())
-            ->method('current')
-            ->will($this->returnCallback(function() use(&$pos, $rows){
-                return $rows[$pos];
-            }));
-    }
-    
+    abstract protected function prepareResult();
 }

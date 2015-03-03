@@ -181,7 +181,7 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         if($left->isNegated() !== $right->isNegated())
             return false;
         
-        if($right->logic() === 'xor')
+        if($right->logic() !== 'or')
             return false;
         
         return true;

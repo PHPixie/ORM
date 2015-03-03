@@ -5,8 +5,9 @@ namespace PHPixieTests\ORM\Steps\Step\Pivot;
 /**
  * @coversDefaultClass \PHPixie\ORM\Steps\Step\Pivot\Cartesian
  */
-class CartesianTest extends \PHPixieTests\ORM\Steps\StepTest
+class CartesianTest extends \PHPixieTests\ORM\Steps\Step\Query\Insert\Batch\DataTest
 {
+    protected $fields = array('a', 'b');
     protected $resultFilters;
     
     public function setUp()
@@ -17,13 +18,13 @@ class CartesianTest extends \PHPixieTests\ORM\Steps\StepTest
         );
         
         $this->method($this->resultFilters[0], 'getFilteredData', array(
-            (object) array('a' => 1, 'b' => 2),
-            (object) array('a' => 3, 'b' => 4)
+            array('a' => 1, 'b' => 2),
+            array('a' => 3, 'b' => 4)
         ));
         
         $this->method($this->resultFilters[1], 'getFilteredData', array(
-            (object) array('a' => 5, 'c' => 6),
-            (object) array('a' => 7, 'c' => 8)
+            array('a' => 5, 'c' => 6),
+            array('a' => 7, 'c' => 8)
         ));
         
         parent::setUp();
@@ -32,13 +33,13 @@ class CartesianTest extends \PHPixieTests\ORM\Steps\StepTest
     /**
      * @covers ::<protected>
      * @covers ::execute
-     * @covers ::product
+     * @covers ::data
      */
     public function testProduct()
     {
         $step = $this->step;
         $this->assertException(function() use($step){
-            $step->product();
+            $step->data();
         }, '\PHPixie\ORM\Exception\Plan');
         
         $step->execute();
@@ -47,11 +48,11 @@ class CartesianTest extends \PHPixieTests\ORM\Steps\StepTest
             array(1,2,7,8),
             array(3,4,5,6),
             array(3,4,7,8),
-        ), $step->product());
+        ), $step->data());
     }
     
     protected function getStep()
     {
-        return new \PHPixie\ORM\Steps\Step\Pivot\Cartesian($this->resultFilters);
+        return new \PHPixie\ORM\Steps\Step\Pivot\Cartesian($this->fields, $this->resultFilters);
     }
 }

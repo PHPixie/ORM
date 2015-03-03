@@ -26,8 +26,9 @@ abstract class Result extends \PHPixie\ORM\Steps\Step\Query
     public function getField($field, $skipNulls = true)
     {
         $values = array();
+        $result = $this->result();
         foreach($this as $item) {
-            $value = $this->result()->getItemField($item, $field);
+            $value = $result->getItemField($item, $field);
             if ($value !== null || !$skipNulls) {
                 $values[] = $value;
             }
@@ -39,10 +40,11 @@ abstract class Result extends \PHPixie\ORM\Steps\Step\Query
     public function getFields($fields)
     {
         $data = array();
+        $result = $this->result();
         foreach($this as $item){
             $values = array();
             foreach($fields as $field) {
-                $values[$field] = $this->result()->getItemField($item, $field);
+                $values[$field] = $result->getItemField($item, $field);
             }
             $data[]=$values;
         }

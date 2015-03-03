@@ -8,11 +8,6 @@ namespace PHPixieTests\ORM\Steps\Query\Result;
 class ReusableTest extends \PHPixieTests\ORM\Steps\Step\Query\ResultTest
 {
 
-    protected function getStep()
-    {
-        return new \PHPixie\ORM\Steps\Step\Query\Result\Reusable($this->query);
-    }
-
     /**
      * @covers ::getByOffset
      * @covers ::<protected>
@@ -55,12 +50,22 @@ class ReusableTest extends \PHPixieTests\ORM\Steps\Step\Query\ResultTest
     public function testReuse()
     {
         $this->setStepResult();
-        $this->prepareIterator();
         $iterator = $this->step->getIterator();
         $iterator->next();
         $nextIterator = $this->step->getIterator();
         $this->assertEquals(true, $iterator !== $nextIterator);
         $this->assertNotEquals($iterator->current(), $nextIterator->current());
+    }
+    
+    protected function prepareResult()
+    {
+        $this->method($this->result, 'asArray', $this->rows, array(), 0);
+        return 1;
+    }
+    
+    protected function getStep()
+    {
+        return new \PHPixie\ORM\Steps\Step\Query\Result\Reusable($this->query);
     }
     
 }

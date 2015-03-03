@@ -43,9 +43,12 @@ class Cartesian extends \PHPixie\ORM\Steps\Step\Query\Insert\Batch\Data
     protected function updateProduct($product, $rows)
     {
         $updatedProduct = array();
-        foreach($product as $productRow)
-            foreach($rows as $item)
+        foreach($product as $productRow) {
+            $productRow = $productRow;
+            foreach($rows as $item) {
                 $updatedProduct[] = array_merge($productRow, array_values($item));
+            }
+        }
         return $updatedProduct;
     }
 

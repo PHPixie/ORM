@@ -65,6 +65,7 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
      */
     public function testOptimize()
     {
+        /*
         $this->assertOptimize(array(
             array(
                 'and_a' => array (
@@ -159,12 +160,16 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                 $b->_and('f3', 1);
             })
         );
-        
+        */
         $this->assertOptimize(array(
             array(
                 '!and_a' => array (
                     'and.f1',
-                    'or.f2',
+                ),
+            ),
+            array(
+                '!and_a' => array (
+                    'and.f2',
                 ),
             ),
         ),$this->builder()
@@ -258,10 +263,18 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                     array (
                         'and_b' => array (
                             'and.f1',
-                            'or.f3',
                         ),
                     ),
                     'or.f2',
+                ),
+            ),
+            array (
+                '!and_a' => array (
+                    array (
+                        'and_b' => array (
+                            'and.f3',
+                        ),
+                    ),
                     'or.f4',
                 ),
             ),
@@ -281,6 +294,7 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                 $b->_or('f4', 1);
             })
         );
+        
         
     }
     

@@ -124,7 +124,7 @@ class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
                         ->and('name', 'Trixie')
                         ->or('name', 'Blum');
                 })
-                ->orNot($idField, '=', 3)
+                ->orNot($idField, '=', $fairies[2]->id())
                 ->find()->asArray()
         );
         

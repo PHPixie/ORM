@@ -13,7 +13,7 @@ class FilterTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->resultStep = $this->abstractMock('\PHPixie\Steps\Step\Result');
+        $this->resultStep = $this->abstractMock('\PHPixie\ORM\Steps\Result');
         $this->fields = array('a', 'b');
         $this->resultFilter = new \PHPixie\ORM\Steps\Result\Filter($this->resultStep, $this->fields);
     }

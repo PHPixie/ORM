@@ -25,6 +25,70 @@ class ConditionsTest extends \PHPixieTests\AbstractORMTest
         $this->method($this->maps, 'relationship', $this->relationshipMap, array());
     }
     
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+    
+    }
+    
+    /**
+     * @covers ::container
+     * @covers ::<protected>
+     */
+    public function testContainer()
+    {
+        $container = $this->conditions->container('pixie');
+        $this->assertContainer($container);
+        
+        $container = $this->conditions->container('pixie', '>');
+        $this->assertContainer($container, '>');
+    }
+    
+    /**
+     * @covers ::placeholder
+     * @covers ::<protected>
+     */
+    public function testPlaceholder()
+    {
+        $placeholder = $this->conditions->placeholder('pixie');
+        $this->assertInstance($placeholder, '\PHPixie\ORM\Conditions\Condition\Collection\Placeholder', array(
+            'allowEmpty' => true
+        ));
+        $this->assertContainer($placeholder->container());
+        
+        $placeholder = $this->conditions->placeholder('pixie', '>', false);
+        $this->assertInstance($placeholder, '\PHPixie\ORM\Conditions\Condition\Collection\Placeholder', array(
+            'allowEmpty' => false
+        ));
+        $this->assertContainer($placeholder->container(), '>');
+    }
+    
+    /**
+     * @covers ::operator
+     * @covers ::<protected>
+     */
+    public function testOperator()
+    {
+        $operator = $this->conditions->operator('id', '>', array(3));
+        $this->assertInstance($operator, '\PHPixie\ORM\Conditions\Condition\Field\Operator', array(
+            'field'    => 'id',
+            'operator' => '>',
+            'values'   => array(3),
+        ));
+    }
+    
+    /**
+     * @covers ::group
+     * @covers ::<protected>
+     */
+    public function testGroup()
+    {
+        $group = $this->conditions->group();
+        $this->assertInstance($group, '\PHPixie\ORM\Conditions\Condition\Collection\Group');
+    }
     
     /**
      * @covers ::relatedToGroup
@@ -33,7 +97,7 @@ class ConditionsTest extends \PHPixieTests\AbstractORMTest
     public function testRelatedToGroup()
     {
         $group = $this->conditions->relatedToGroup('pixie');
-        $this->assertInstance($group, '\PHPixie\ORM\Conditions\Condition\Collection\Group');
+        $this->assertInstance($group, '\PHPixie\ORM\Conditions\Condition\Collection\RelatedTo\Group');
         $this->assertSame('pixie', $group->relationship());
     }
     
@@ -51,6 +115,16 @@ class ConditionsTest extends \PHPixieTests\AbstractORMTest
         $this->assertInstance($in, '\PHPixie\ORM\Conditions\Condition\In');
         $this->assertSame($modelName, $in->modelName());
         $this->assertSame(array($item), $in->items());
+    }
+    
+    protected function assertContainer($container, $defaultOperator = '=')
+    {
+        $this->assertInstance($container, '\PHPixie\ORM\Conditions\Builder\Container', array(
+            'conditions'       => $this->conditions,
+            'relationshipMap'  => $this->relationshipMap,
+            'currentModelName' => 'pixie',
+            'defaultOperator'  => $defaultOperator,
+        ));
     }
     
     protected function conditions()

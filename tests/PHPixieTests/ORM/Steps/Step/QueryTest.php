@@ -58,8 +58,7 @@ class QueryTest extends \PHPixieTests\ORM\Steps\StepTest
     
     protected function query()
     {
-        return $this->abstractMock('\PHPixie\Database\Query', array('connection', 'execute'));
+        return $this->abstractMock('\PHPixie\Database\Query');
     }
-    
     
 }

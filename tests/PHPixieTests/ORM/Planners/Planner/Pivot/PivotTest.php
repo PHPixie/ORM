@@ -7,13 +7,19 @@ namespace PHPixieTests\ORM\Planners\Planner\Pivot;
  */
 class PivotTest extends \PHPixieTests\AbstractORMTest
 {
+    protected $queryPlanner;
     protected $connection;
     protected $pivot;
     
     public function setUp()
     {
+        $this->queryPlanner = $this->quickMock('\PHPixie\ORM\Planners\Planner\Query');
         $this->connection = $this->quickMock('\PHPixie\Database\Connection');
-        $this->pivot = new \PHPixie\ORM\Planners\Planner\Pivot\Pivot($this->connection, 'pixie');
+        $this->pivot = new \PHPixie\ORM\Planners\Planner\Pivot\Pivot(
+            $this->queryPlanner,
+            $this->connection,
+            'pixie'
+        );
     }
     
     /**

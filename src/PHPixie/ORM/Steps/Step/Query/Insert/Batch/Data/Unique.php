@@ -21,15 +21,15 @@ class Unique extends \PHPixie\ORM\Steps\Step\Query\Insert\Batch\Data
     public function execute()
     {
         $fields = $this->fields();
-        $product = $this->dataStep->data();
+        $data = $this->dataStep->data();
         $this->selectQuery->fields($fields);
         
         foreach($fields as $key => $field) {
             $values = array();
-            foreach($product as $productRow){
-                $values[]=$productRow[$key];
+            foreach($data as $dataRow){
+                $values[]=$dataRow[$key];
             }
-            $this->selectQuery->where($field, 'in', $values);
+            $this->selectQuery->addInOperatorCondition($field, $values);
         }
 
         $existingItems = $this->selectQuery->execute()->getFields($fields);
@@ -43,9 +43,11 @@ class Unique extends \PHPixie\ORM\Steps\Step\Query\Insert\Batch\Data
         }
         
         $filteredProduct = array();
-        foreach($product as $productRow)
-            if(!in_array($productRow, $existing))
-                $filteredProduct[] = $productRow;
+        foreach($data as $dataRow) {
+            if(!in_array($dataRow, $existing, true)) {
+                $filteredProduct[] = $dataRow;
+            }
+        }
         
         $this->data = $filteredProduct;
     }

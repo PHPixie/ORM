@@ -45,4 +45,9 @@ class CountTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
     {
         return new \PHPixie\ORM\Steps\Step\Query\Count($this->query);
     }
+    
+    protected function query()
+    {
+        return $this->abstractMock('\PHPixie\Database\Query\Type\Count');
+    }
 }

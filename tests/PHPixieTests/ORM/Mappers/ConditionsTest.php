@@ -90,7 +90,7 @@ class ConditionsTest extends \PHPixieTests\AbstractORMTest
         $this->method($builder, 'addOperatorCondition', null, $operatorParams, 0);
         
         $optimizedConditions[] = $this->conditionCollection('and', true, array($operator));
-        $this->method($builder, 'startGroup', null, array('and', true), 1);
+        $this->method($builder, 'startConditionGroup', null, array('and', true), 1);
         $this->method($builder, 'addOperatorCondition', null, $operatorParams, 2);
         $this->method($builder, 'endGroup', null, array(), 3);
         
@@ -121,7 +121,7 @@ class ConditionsTest extends \PHPixieTests\AbstractORMTest
             $optimizedConditions[] = $inCondition;
             
             $normalizedCondition = $this->conditionCollection('and', true, array($operator));
-            $this->method($builder, 'startGroup', null, array('and', true), 4);
+            $this->method($builder, 'startConditionGroup', null, array('and', true), 4);
             $this->method($builder, 'addOperatorCondition', null, $operatorParams, 5);
             $this->method($builder, 'endGroup', null, array(), 6);
             

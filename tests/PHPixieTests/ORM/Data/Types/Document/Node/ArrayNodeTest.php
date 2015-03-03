@@ -49,6 +49,12 @@ class ArrayNodeTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
         $this->node[]=array();
         $this->assertEquals($arrayNode, $this->node[5]);
         
+        $document = $this->document();
+        $this->method($this->documentBuilder, 'document', $document, array(array('t' => 1)), 0);
+        $this->node[]=array('t' => 1);
+        $this->assertEquals($document, $this->node[6]);
+        unset($this->node[6]);
+        
         unset($this->node[0]);
         $this->assertEquals($arrayNode, $this->node[4]);
         $this->assertEquals($this->items[1], $this->node[0]);

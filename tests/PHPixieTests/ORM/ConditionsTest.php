@@ -5,37 +5,24 @@ namespace PHPixieTests\ORM;
 /**
  * @coversDefaultClass \PHPixie\ORM\Conditions
  */
-class ConditionsTest extends \PHPixieTests\Database\ConditionsTest
+class ConditionsTest extends \PHPixieTests\AbstractORMTest
 {
-    protected $operatorClass    = '\PHPixie\ORM\Conditions\Condition\Field\Operator';
-    protected $groupClass       = '\PHPixie\ORM\Conditions\Condition\Collection\Group';
-    protected $placeholderClass = '\PHPixie\ORM\Conditions\Condition\Collection\Placeholder';
-    protected $containerClass   = '\PHPixie\ORM\Conditions\Builder\Container';
-    
-    protected $relatedToGroupClass = '\PHPixie\ORM\Conditions\Condition\Collection\RelatedTo\Group';
-    protected $inClass             = '\PHPixie\ORM\Conditions\Condition\In';
-    
     protected $ormBuilder;
+    
+    protected $conditions;
+    
     protected $maps;
     protected $relationshipMap;
     
     public function setUp()
     {
-        $this->ormBuilder = $this->getMock('\PHPixie\ORM\Builder', array(), array(), '', false);
-        $this->maps = $this->getMock('\PHPixie\ORM\Maps', array(), array(), '', false);
-        $this->relationshipMap = $this->getMock('\PHPixie\ORM\Maps\Map\Relationship', array(), array(), '', false);
-
-        $this->ormBuilder
-            ->expects($this->any())
-            ->method('maps')
-            ->will($this->returnValue($this->maps));
+        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder');
+        $this->conditions = new \PHPixie\ORM\Conditions($this->ormBuilder);
+        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
+        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
         
-        $this->maps
-            ->expects($this->any())
-            ->method('relationship')
-            ->will($this->returnValue($this->relationshipMap));
-        
-        parent::setUp();
+        $this->method($this->ormBuilder, 'maps', $this->maps, array());
+        $this->method($this->maps, 'relationship', $this->relationshipMap, array());
     }
     
     
@@ -46,7 +33,7 @@ class ConditionsTest extends \PHPixieTests\Database\ConditionsTest
     public function testRelatedToGroup()
     {
         $group = $this->conditions->relatedToGroup('pixie');
-        $this->assertInstanceOf($this->relatedToGroupClass, $group);
+        $this->assertInstance($group, '\PHPixie\ORM\Conditions\Condition\Collection\Group');
         $this->assertSame('pixie', $group->relationship());
     }
     
@@ -57,15 +44,11 @@ class ConditionsTest extends \PHPixieTests\Database\ConditionsTest
     public function testIn()
     {
         $modelName = 'pixie';
-        $item = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In\Item', array());
-        $item
-            ->expects($this->any())
-            ->method('modelName')
-            ->with()
-            ->will($this->returnValue($modelName));
+        $item = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In\Item');
+        $this->method($item, 'modelName', $modelName, array(), 0);
         
         $in = $this->conditions->in($modelName, $item);
-        $this->assertInstanceOf($this->inClass, $in);
+        $this->assertInstance($in, '\PHPixie\ORM\Conditions\Condition\In');
         $this->assertSame($modelName, $in->modelName());
         $this->assertSame(array($item), $in->items());
     }

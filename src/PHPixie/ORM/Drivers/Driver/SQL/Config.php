@@ -15,8 +15,8 @@ abstract class Config extends \PHPixie\ORM\Models\Type\Database\Config
         parent::processConfig($configSlice, $inflector);
     }
     
-    protected function defaultIdField()
+    protected function idField($configSlice)
     {
-        return 'id';
+        return $configSlice->get('id', 'id');
     }
 }

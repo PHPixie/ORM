@@ -18,7 +18,6 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Models\Model\ConfigTest
                 
             )),
             array(
-                'idField'    => $this->defaultIdField,
                 'connection' => 'default',
                 'driver'     => $this->driver
             )
@@ -26,11 +25,9 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Models\Model\ConfigTest
         
         $this->sets[] = array(
             $this->slice(array(
-                'id'         => 'fairy_id',
                 'connection' => 'test',
             )),
             array(
-                'idField'    => 'fairy_id',
                 'connection' => 'test',
                 'driver'     => $this->driver
             )

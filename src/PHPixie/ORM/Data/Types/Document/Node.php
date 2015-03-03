@@ -14,8 +14,9 @@ abstract class Node
     protected function convertValue($value)
     {
         $isArray = is_array($value);
+        $isAssociativeArray = $isArray && !empty($value) && !is_numeric(key($value));
         
-        if ($value instanceof \stdClass || ($isArray && !is_numeric(key($value)))) {
+        if ($value instanceof \stdClass || $isAssociativeArray) {
             $value = $this->documentBuilder->document($value);
         } elseif ($isArray) {
             $value = $this->documentBuilder->arrayNode($value);

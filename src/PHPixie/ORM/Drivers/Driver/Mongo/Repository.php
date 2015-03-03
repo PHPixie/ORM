@@ -31,13 +31,10 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
     {
         if($data !== null) {
             $data = (object) $data;
-            $id = '_id';
             
-            if(property_exists($data, $id) && $data->$id instanceof \MongoId) {
-                $data->$id = (string) $data->$id;
+            if(property_exists($data, '_id')) {
+                $data->_id = (string) $data->_id;
             }
-
-            $data = (array) $data;
         }
         
         return $this->dataBuilder->diffableDocumentFromData($data);
@@ -57,27 +54,4 @@ class Repository extends \PHPixie\ORM\Models\Type\Database\Implementation\Reposi
             ->data((array) $data)
             ->execute();
     }
-    
-    protected function getMongoIdParentAndKey($data, $createMissing = false) {
-        $idField = $this->config->idField();
-        $path = explode('.', $idField);
-        
-        $key = array_pop($path);
-        
-        foreach($path as $step) {
-            if(!property_exists($data, $step)) {
-                if(!$createMissing) {
-                    return array(null, $key);
-                }
-                
-                $data->$step = new \stdClass;
-            }
-            
-            $data = $data->$step;
-        }
-        
-        return array($data, $key);
-    }
-
-    
 }

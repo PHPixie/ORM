@@ -4,25 +4,22 @@ namespace PHPixie\ORM\Data\Types\Document\Node;
 
 class Document extends \PHPixie\ORM\Data\Types\Document\Node
 {
-
+    protected $properties = array();
+    
     public function __construct($documentBuilder, $data = null)
     {
         parent::__construct($documentBuilder);
-        if($data !== null)
+        if($data !== null) {
             foreach ($data as $key => $value) {
-                $this->$key = $this->convertValue($value);
+                $this->set($key, $value);
+            }
         }
     }
 
     public function data()
     {
-        $currentProperties = get_object_vars($this);
-        $classProperties = array_keys(get_class_vars(get_class($this)));
-        foreach($classProperties as $property)
-            unset($currentProperties[$property]);
-
         $current = new \stdClass;
-        foreach($currentProperties as $key => $value)
+        foreach($this->properties as $key => $value)
             $current->$key = $this->convertNode($value);
 
         return $current;
@@ -30,22 +27,21 @@ class Document extends \PHPixie\ORM\Data\Types\Document\Node
 
     public function set($key, $value = null)
     {
-        $this->$key = $value;
+        $this->properties[$key] = $this->convertValue($value);
         return $this;
     }
 
     public function remove($key)
     {
-        if(property_exists($this, $key))
-            unset($this->$key);
+        unset($this->properties[$key]);
         return $this;
     }
 
     public function get($key, $default = null)
     {
-        if(!property_exists($this, $key))
+        if(!array_key_exists($key, $this->properties))
             return $default;
-        return $this->$key;
+        return $this->properties[$key];
     }
 
     public function addArray($key, $data = array())
@@ -60,6 +56,22 @@ class Document extends \PHPixie\ORM\Data\Types\Document\Node
 
     public function __set($key, $value)
     {
-        $this->$key = $this->convertValue($value);
+        $this->set($key, $this->convertValue($value));
     }
+    
+    public function __get($key)
+    {
+        return $this->properties[$key];
+    }
+    
+    public function __isset($key)
+    {
+        return array_key_exists($key, $this->properties);
+    }
+    
+    public function __unset($key)
+    {
+        $this->remove($key);
+    }
+
 }

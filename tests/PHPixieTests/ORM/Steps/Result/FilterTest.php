@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPixieTests\ORM\Steps;
+namespace PHPixieTests\ORM\Steps\Result;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Steps\ResultFilter
+ * @coversDefaultClass \PHPixie\ORM\Steps\Result\Filter
  */
-class ResultFilterTest extends \PHPixieTests\AbstractORMTest
+class FilterTest extends \PHPixieTests\AbstractORMTest
 {
     protected $resultStep;
     protected $fields;
@@ -13,9 +13,9 @@ class ResultFilterTest extends \PHPixieTests\AbstractORMTest
     
     public function setUp()
     {
-        $this->resultStep = $this->quickMock('\PHPixie\Steps\Step\Query\Result', array('getField', 'getFields'));
+        $this->resultStep = $this->abstractMock('\PHPixie\Steps\Step\Result');
         $this->fields = array('a', 'b');
-        $this->resultFilter = new \PHPixie\ORM\Steps\ResultFilter($this->resultStep, $this->fields);
+        $this->resultFilter = new \PHPixie\ORM\Steps\Result\Filter($this->resultStep, $this->fields);
     }
 
     /**

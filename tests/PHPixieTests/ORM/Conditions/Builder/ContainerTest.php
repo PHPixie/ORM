@@ -8,6 +8,7 @@ namespace PHPixieTests\ORM\Conditions\Builder;
 class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerTest
 {
     protected $ormBuilder;
+    protected $conditions;
     protected $maps;
     protected $relationshipMap;
     protected $modelName = 'pixie';
@@ -15,6 +16,7 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
     public function setUp()
     {
         $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder', array(), array(), '', false);
+        $this->conditions = new \PHPixie\ORM\Conditions($this->ormBuilder);
         $this->maps = $this->getMock('\PHPixie\ORM\Maps', array(), array(), '', false);
         $this->relationshipMap = $this->getMock('\PHPixie\ORM\Maps\Map\Relationship', array(), array(), '', false);
 
@@ -345,11 +347,6 @@ class ContainerTest extends \PHPixieTests\Database\Conditions\Builder\ContainerT
         }else{
             parent::assertCondition($condition, $expected);
         }
-    }
-    
-    protected function conditions()
-    {
-        return new \PHPixie\ORM\Conditions($this->ormBuilder);
     }
     
     protected function getInItem($modelName)

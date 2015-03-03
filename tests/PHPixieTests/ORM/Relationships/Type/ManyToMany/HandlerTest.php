@@ -381,8 +381,8 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
         $owner = $this->getLinkModelMocks($type, true, true);
 
         $items = array(
-            $this->getLinkModelMocks($opposing, true, true),
-            $this->getLinkModelMocks($opposing),
+            $this->getLinkModelMocks($type, true, true),
+            $this->getLinkModelMocks($type),
         );
 
         $itemsModels = array();

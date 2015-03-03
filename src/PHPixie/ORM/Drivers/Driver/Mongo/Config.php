@@ -12,9 +12,6 @@ class Config extends \PHPixie\ORM\Models\Type\Database\Config
             $this->collection = $inflector->plural($this->model);
         }
         
-        if($configSlice->get('id', '_id') !== '_id') {
-            throw new \Exception();
-        }
         parent::processConfig($configSlice, $inflector);
     }
     
@@ -23,7 +20,7 @@ class Config extends \PHPixie\ORM\Models\Type\Database\Config
         return 'mongo';
     }
     
-    protected function defaultIdField()
+    protected function idField($configSlice)
     {
         return '_id';
     }

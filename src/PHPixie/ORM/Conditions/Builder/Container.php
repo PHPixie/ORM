@@ -5,14 +5,16 @@ namespace PHPixie\ORM\Conditions\Builder;
 class Container extends \PHPixie\Database\Conditions\Builder\Container
                 implements \PHPixie\ORM\Conditions\Builder
 {
+    protected $conditions;
     protected $relationshipMap;
     protected $modelNameStack = array();
     protected $currentModelName;
     
     public function __construct($conditions, $relationshipMap, $modelName, $defaultOperator = '=')
     {
+        $this->conditions = $conditions;
         $this->relationshipMap = $relationshipMap;
-        parent::__construct($conditions, $defaultOperator);
+        parent::__construct($defaultOperator);
         $this->pushModelNameToStack($modelName);
     }
 
@@ -25,7 +27,7 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
             $field = substr($field, $pos + 1);
         }
 
-        $condition = $this->conditions->operator($field, $operator, $values);
+        $condition = $this->buildOperatorCondition($field, $operator, $values);
         $this->addToRelationship($logic, $negate, $condition, $relationship);
         return $this;
     }
@@ -42,7 +44,7 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
             $side = $this->relationshipMap->get($modelName, $step);
             $modelName = $side->relatedModelName();
             
-            $group = $this->conditions->relatedToGroup($step);
+            $group = $this->buildRelatedToGroupCondition($step);
             
             if ($key == 0) {
                 $root = $group;
@@ -76,7 +78,7 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
 
     public function addInCondition($logic, $negate, $items)
     {
-        $condition = $this->conditions->in($this->currentModelName, $items);
+        $condition = $this->buildInCondition($items);
         return $this->addCondition($logic, $negate, $condition);
     }
 
@@ -109,17 +111,34 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
         return $this;
     }
     
-    public function addPlaceholder($logic = 'and', $negate = false, $allowEmpty = true)
+    
+    protected function buildGroupCondition()
     {
-        $placeholder = $this->conditions->placeholder(
+        return $this->conditions->group();
+    }
+    
+    protected function buildOperatorCondition($field, $operator, $values)
+    {
+        return $this->conditions->operator($field, $operator, $values);
+    }
+    
+    protected function buildPlaceholderCondition($allowEmpty)
+    {
+        return $this->conditions->placeholder(
             $this->currentModelName,
             $this->defaultOperator,
             $allowEmpty
         );
-        
-        $this->addCondition($logic, $negate, $placeholder);
-        
-        return $placeholder->container();
+    }
+    
+    protected function buildRelatedToGroupCondition($relationshipName)
+    {
+        return $this->conditions->relatedToGroup($relationshipName);
+    }
+    
+    protected function buildInCondition($items)
+    {
+        return $this->conditions->in($this->currentModelName, $items);
     }
     
     public function addWhereOperatorCondition($logic, $negate, $field, $operator, $values)

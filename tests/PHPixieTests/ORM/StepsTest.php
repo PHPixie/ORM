@@ -80,19 +80,34 @@ class StepsTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::resultFilter
+     */
+    public function testResultFilter()
+    {
+        $result = $this->abstractMock('\PHPixie\ORM\Steps\Result');
+        $fields = array('fairy', 'trixie');
+        
+        $filter = $this->steps->resultFilter($result, $fields);
+        $this->assertInstance($filter, '\PHPixie\ORM\Steps\Result\Filter', array(
+            'result' => $result,
+            'fields' => $fields
+        ));
+    }
+    
+    /**
      * @covers ::in
      */
     public function testIn()
     {
-        $placeholder = $this->quickMock('\PHPixie\Database\Conditions\Condition\Collection\Placeholder');
+        $container = $this->quickMock('\PHPixie\ORM\Builder\Container');
         $resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result');
-        $step = $this->steps->in($placeholder, 'fairy', $resultStep, 'pixie');
+        $step = $this->steps->in($container, 'fairy', $resultStep, 'pixie');
         
         $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\In', array(
-            'placeholder'      => $placeholder,
-            'placeholderField' => 'fairy',
-            'resultStep'       => $resultStep,
-            'resultField'      => 'pixie',
+            'placeholderContainer' => $container,
+            'placeholderField'     => 'fairy',
+            'resultStep'           => $resultStep,
+            'resultField'          => 'pixie',
         ));
     }
     
@@ -101,34 +116,49 @@ class StepsTest extends \PHPixieTests\AbstractORMTest
      */
     public function testPivotCartesian()
     {
+        $fields = array('fairy', 'trixie');
         $reusltFilters = array(
             $this->quickMock('\PHPixie\ORM\Steps\ResultFilter')
         );
         
-        $step = $this->steps->pivotCartesian($reusltFilters);
+        $step = $this->steps->pivotCartesian($fields, $reusltFilters);
         $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Pivot\Cartesian', array(
+            'fields'        => $fields,
             'resultFilters' => $reusltFilters
         ));
     }
     
     /**
-     * @covers ::pivotInsert
+     * @covers ::batchInsert
      */
-    public function testPivotInsert()
+    public function testBatchInsert()
     {
         $query = $this->getDatabaseQuery();
-        $cartesianStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Pivot\Cartesian');
-        $fields = array('fairy', 'trixie');
+        $dataStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Insert\Data');
             
         $queryPlanner = $this->quickMock('\PHPixie\Database\Planners\Planner\Query');
         $this->method($this->planners, 'query', $queryPlanner, array(), 0);
         
-        $step = $this->steps->pivotInsert($query, $fields, $cartesianStep);
-        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Pivot\Insert', array(
-            'queryPlanner'  => $queryPlanner,
-            'insertQuery'   => $query,
-            'fields'        => $fields,
-            'cartesianStep' => $cartesianStep,
+        $step = $this->steps->batchInsert($query, $dataStep);
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Query\Insert\Batch', array(
+            'queryPlanner' => $queryPlanner,
+            'query'        => $query,
+            'dataStep'     => $dataStep,
+        ));
+    }
+    
+    /**
+     * @covers ::uniqueDataInsert
+     */
+    public function testUniqueDataInsert()
+    {
+        $dataStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Insert\Data');
+        $query = $this->getDatabaseQuery();
+            
+        $step = $this->steps->uniqueDataInsert($dataStep, $query);
+        $this->assertInstance($step, '\PHPixie\ORM\Steps\Step\Query\Insert\Batch\Data\Unique', array(
+            'dataStep'     => $dataStep,
+            'selectQuery'  => $query,
         ));
     }
     

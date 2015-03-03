@@ -50,6 +50,7 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
     /**
      * @covers ::set
      * @covers ::__set
+     * @covers ::__get
      * @covers ::<protected>
      */
     public function testSet()
@@ -68,6 +69,12 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
         $this->method($this->documentBuilder, 'arrayNode', $flowersArray, array($flowers), 0);
         $this->node->flowers = $flowers;
         $this->assertEquals($flowersArray, $this->node->flowers);
+        
+        $flowers = array('t' => 1);
+        $flowersDocument = $this->document();
+        $this->method($this->documentBuilder, 'document', $flowersDocument, array($flowers), 0);
+        $this->node->flowers = $flowers;
+        $this->assertEquals($flowersDocument, $this->node->flowers);
     }
     
     /**
@@ -79,7 +86,21 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
         $this->node->remove('test');
         $this->assertEquals('Trixie', $this->node->name);
         $this->node->remove('name');
-        $this->assertEquals(false, property_exists($this->node, 'name'));
+        $this->assertEquals(false, isset($this->node->name));
+    }
+    
+    
+    /**
+     * @covers ::__isset
+     * @covers ::__unset
+     * @covers ::<protected>
+     */
+    public function testIssetUnset()
+    {
+        unset($this->node->test);
+        $this->assertEquals(true, isset($this->node->name));
+        unset($this->node->name);
+        $this->assertEquals(false, isset($this->node->name));
     }
     
     /**
@@ -147,6 +168,7 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
      * @covers ::data
      * @covers ::get
      * @covers ::__set
+     * @covers ::__get
      */
     public function testOriginalNull()
     {

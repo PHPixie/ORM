@@ -33,7 +33,7 @@ class Steps
     
     public function resultFilter($result, $fields)
     {
-        return new Steps\ResultFilter($result, $fields);
+        return new Steps\Result\Filter($result, $fields);
     }
 
     public function in($placeholder, $placeholderField, $resultStep, $resultField)

@@ -33,6 +33,7 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
         $entity7 = $this->entity(7);
         $entity7->setIsDeleted(true);
         $this->loader->add(array($entity7));
+        $this->loader->add(array($entity7));
         $this->assertItems(array(0, 2, 3, 4, 5));
         
         
@@ -68,7 +69,7 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
      * @covers ::offsetExists
      * @covers ::getByOffset
      */
-    public function testRemovedAndAdd()
+    public function testRemoveAndAdd()
     {
         $this->prepareSubloader();
         $this->assertItems(array(0, 2, 3, 4));
@@ -82,6 +83,8 @@ class EditableTest extends \PHPixieTests\ORM\Loaders\Loader\ProxyTest
         $this->assertItems(array(0, 2, 4, 3));
         
         $entity5 = $this->entity(5);
+        $this->loader->add(array($entity5));
+        $this->loader->remove(array($entity5));
         $this->loader->add(array($entity5));
         $this->assertItems(array(0, 2, 4, 3, 5));
         

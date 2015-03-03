@@ -12,8 +12,8 @@ class CartesianTest extends \PHPixieTests\ORM\Steps\StepTest
     public function setUp()
     {
         $this->resultFilters = array(
-            $this->quickMock('\PHPixie\ORM\Steps\ResultFilter', array('getFilteredData')),
-            $this->quickMock('\PHPixie\ORM\Steps\ResultFilter', array('getFilteredData'))
+            $this->quickMock('\PHPixie\ORM\Steps\Result\Filter', array('getFilteredData')),
+            $this->quickMock('\PHPixie\ORM\Steps\Result\Filter', array('getFilteredData'))
         );
         
         $this->method($this->resultFilters[0], 'getFilteredData', array(

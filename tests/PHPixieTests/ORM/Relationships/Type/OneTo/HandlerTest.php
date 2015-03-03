@@ -199,16 +199,42 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $data = $this->configData;
         $config = $this->config($data);
 
-        $plan = $this->getPlan();
-        $this->method($this->plans, 'steps', $plan, array(), $plansOffset);
-
         $ownerQuery = $this->getDatabaseQuery();
         $this->method($ownerRepository, 'databaseSelectQuery', $ownerQuery, array(), $ownerRepoOffset++);
-        $this->preparePlanItemsSubquery($ownerQuery, 'owner', $owner, $plan, null, 'and', $inPlannerOffset, $ownerRepoOffset);
 
         $updateQuery = $this->getDatabaseQuery('update');
         $this->method($itemRepository, 'databaseUpdateQuery', $updateQuery, array(), $itemRepoOffset++);
-        $this->preparePlanItemsSubquery($updateQuery, 'item', $items, $plan, null, 'and', $inPlannerOffset + 1, $itemRepoOffset++);
+        
+        $queryStep = $this->getQueryStep();
+        $this->method($this->steps, 'query', $queryStep, array($updateQuery), 0);
+        
+        $plan = $this->getQueryPlan();
+        $this->method($this->plans, 'query', $plan, array($queryStep), $plansOffset);
+        
+        $requiredPlan = $this->getPlan();
+        $this->method($plan, 'requiredPlan', $requiredPlan, array(), 0);
+
+        $this->preparePlanItemsSubquery(
+            $ownerQuery,
+            'owner',
+            $owner,
+            $requiredPlan,
+            null,
+            'and',
+            $inPlannerOffset,
+            $ownerRepoOffset
+        );
+        
+        $this->preparePlanItemsSubquery(
+            $updateQuery,
+            'item',
+            $items,
+            $requiredPlan,
+            null,
+            'and',
+            $inPlannerOffset + 1,
+            $itemRepoOffset++
+        );
 
         $this->prepareRepositoryConfig($ownerRepository, array('idField' =>'id'), $ownerRepoOffset + 2);
 
@@ -218,7 +244,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
                                                                     $data['ownerKey'] => 'id'
                                                                 ),
                                                                 $ownerQuery,
-                                                                $plan
+                                                                $requiredPlan
                                                             ), 0);
         return $plan;
     }
@@ -246,25 +272,50 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     protected function prepareUnlinkTest($constrainOwners, $owners, $constrainItems, $items, $logic = 'and')
     {
         $this->prepareRepositories();
+        
         $itemRepository = $this->modelMocks['database']->repository($this->configData['itemModel']);
-        $plan = $this->getPlan();
-        $this->method($this->plans, 'steps', $plan, array(), 0);
+        $updateQuery = $this->getDatabaseQuery('update');
+        $this->method($itemRepository, 'databaseUpdateQuery', $updateQuery, array(), 0);
+        
+        $queryStep = $this->getQueryStep();
+        $this->method($this->steps, 'query', $queryStep, array($updateQuery), 0);
+        
+        $plan = $this->getQueryPlan();
+        $this->method($this->plans, 'query', $plan, array($queryStep), 0);
+        
+        $requiredPlan = $this->getPlan();
+        $this->method($plan, 'requiredPlan', $requiredPlan, array(), 0);
 
         $ownerKey = $this->configData['ownerKey'];
-        $updateQuery = $this->getDatabaseQuery('update');
-
-        $this->method($itemRepository, 'databaseUpdateQuery', $updateQuery, array(), 0);
-
+        
         $this->method($updateQuery, 'set', null, array($ownerKey, null), 0);
 
         $inPlannerOffset = 0;
 
         if ($constrainItems) {
-            $this->preparePlanItemsSubquery($updateQuery, 'item', $items, $plan, null, 'and', $inPlannerOffset++, 1);
+            $this->preparePlanItemsSubquery(
+                $updateQuery,
+                'item',
+                $items,
+                $requiredPlan,
+                null,
+                'and',
+                $inPlannerOffset++,
+                1
+            );
         }
 
         if ($constrainOwners) {
-            $this->preparePlanItemsSubquery($updateQuery, 'owner', $owners, $plan, $ownerKey, $logic, $inPlannerOffset++, 0);
+            $this->preparePlanItemsSubquery(
+                $updateQuery,
+                'owner',
+                $owners,
+                $requiredPlan,
+                $ownerKey,
+                $logic,
+                $inPlannerOffset++,
+                0
+            );
         }
 
         return $plan;
@@ -381,6 +432,16 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     {
         $opposing = $type == 'owner' ? $this->itemSide : 'owner';
         return $this->sidePropertyName($opposing);
+    }
+
+    protected function getQueryStep()
+    {
+        return $this->quickMock('\PHPixie\ORM\Steps\Step\Query');
+    }
+    
+    protected function getQueryPlan()
+    {
+        return $this->quickMock('\PHPixie\ORM\Plans\Plan\Query');
     }
     
     protected function getDatabaseEntity()

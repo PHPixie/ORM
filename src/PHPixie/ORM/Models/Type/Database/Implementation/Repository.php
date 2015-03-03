@@ -30,17 +30,17 @@ abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repositor
         return $this->databaseModel->query($this->modelName());
     }
     
-    public function create()
+    public function create($data = null)
     {
-        return $this->entity();
+        return $this->entity($data);
     }
     
     public function load($data)
     {
-        return $this->entity(false, $data);
+        return $this->entity($data, false);
     }
     
-    protected function entity($isNew = true, $data = null)
+    protected function entity($data = null, $isNew = true)
     {
         $modelName = $this->modelName();
         $data = $this->buildData($data);

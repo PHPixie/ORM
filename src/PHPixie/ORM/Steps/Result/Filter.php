@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Steps;
+namespace PHPixie\ORM\Steps\Result;
 
-class ResultFilter
+class Filter
 {
     protected $result;
     protected $fields;

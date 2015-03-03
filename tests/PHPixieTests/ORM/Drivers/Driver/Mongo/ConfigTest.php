@@ -20,6 +20,7 @@ class ConfigTest extends \PHPixieTests\ORM\Models\Type\Database\ConfigTest
                 
             )),
             array(
+                'idField'    => '_id',
                 'collection' => 'fairies',
             )
         );

@@ -76,8 +76,21 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
      */
     public function testLoad()
     {
-        $entity = $this->prepareEntity(false, $this->loadData);
+        $entity = $this->prepareEntity($this->loadData, false);
         $this->assertSame($entity, $this->repository->load($this->loadData));
+    }
+    
+    /**
+     * @covers ::create
+     * @covers ::<protected>
+     */
+    public function testCreate()
+    {
+        $entity = $this->prepareEntity(null, true);
+        $this->assertSame($entity, $this->repository->create());
+        
+        $entity = $this->prepareEntity($this->loadData, true);
+        $this->assertSame($entity, $this->repository->create($this->loadData));
     }
     
     /**
@@ -151,11 +164,11 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
         return $query;
     }
     
-    protected function prepareEntity($isNew = true, $data = null, $modelsOffset = 0)
+    protected function prepareEntity($data = null, $isNew = true, $modelsOffset = 0)
     {
         $entity = $this->getEntity();
         $data = $this->prepareBuildData($data);
-        $this->method($this->databaseModel, 'entity', $entity, array($this->configData['model'], $isNew, $data), $modelsOffset);
+        $this->method($this->databaseModel, 'entity', $entity, array($this->configData['model'], $data, $isNew), $modelsOffset);
         return $entity;
     }
     

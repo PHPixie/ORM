@@ -2,6 +2,21 @@
 
 namespace PHPixieTests\ORM\Drivers\Driver\Mongo;
 
+class Id
+{
+    protected $id;
+    
+    public function __construct($id)
+    {
+        $this->id = $id;
+    }
+    
+    public function __toString()
+    {
+        return $this->id;
+    }
+}
+
 /**
  * @coversDefaultClass \PHPixie\ORM\Drivers\Driver\Mongo\Repository
  */
@@ -25,6 +40,21 @@ class RepositoryTest extends \PHPixieTests\ORM\Models\Type\Database\Implementati
     public function testConstruct()
     {
     
+    }
+    
+    /**
+     * @covers ::load
+     * @covers ::<protected>
+     */
+    public function testLoadMongoId()
+    {
+        $loadData = clone $this->loadData;
+        
+        $this->loadData->_id = 'test';
+        $loadData->_id = new Id('test');
+        
+        $entity = $this->prepareEntity($this->loadData, false);
+        $this->assertSame($entity, $this->repository->load($this->loadData));
     }
     
     protected function prepareUpdateEntityData($connection, $id, $data, &$dataOffset = 0, &$connectionOffset = 0)

@@ -22,9 +22,9 @@ abstract class Config extends \PHPixie\ORM\Models\Model\Config
     protected function processConfig($configSlice, $inflector)
     {
         $this->connection = $configSlice->get('connection', 'default');
-        $this->idField = $configSlice->get('id', $this->defaultIdField());
+        $this->idField = $this->idField($configSlice);
     }
     
-    abstract protected function defaultIdField();
+    abstract protected function idField($configSlice);
     abstract protected function driver();
 }

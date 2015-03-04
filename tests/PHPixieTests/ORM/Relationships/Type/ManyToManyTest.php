@@ -44,15 +44,20 @@ class ManyToManyTest extends \PHPixieTests\ORM\Relationships\Relationship\Implem
         $configSlice = $this->configSlice();
         $sides = $this->relationship->getSides($configSlice);
         $side = $sides[0];
+
+        $modelConfig = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
+        $result = $this->abstractMock('\PHPixie\ORM\Steps\Result');
         
         $loader = $this->getLoader();
         $pivotResult = $this->getReusableResult();
         
-        $preloader = $this->relationship->preloader($side, $loader, $pivotResult);
+        $preloader = $this->relationship->preloader($side, $modelConfig, $result, $loader, $pivotResult);
         $this->assertInstanceOf('\PHPixie\ORM\Relationships\Type\ManyToMany\Preloader', $preloader);
         
         $this->assertProperties($preloader, array(
             'loaders'     => $this->loaders,
+            'modelConfig' => $modelConfig,
+            'result'      => $result,
             'side'        => $side,
             'loader'      => $loader,
             'pivotResult' => $pivotResult

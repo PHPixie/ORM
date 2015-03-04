@@ -53,8 +53,8 @@ abstract class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Imp
     public function testPropertyName()
     {
         $this->assertSidesMethod('propertyName', array(
-            'owner'  => $this->ownerProperty,
-            $this->itemSideName => 'pixie'
+            'owner'  => 'pixie',
+            $this->itemSideName => $this->ownerProperty
         ));
     }
 

@@ -95,11 +95,12 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\Property\Ent
     {
         $item = $this->getEntity();
 
-        $this->method($this->handler, 'offsetCreate', $item, array($this->entity, $this->config, null), 0);
+        $this->method($this->handler, 'offsetCreate', $item, array($this->entity, $this->config, null, null), 0);
         $this->assertSame($item, $this->property->create());
 
-        $this->method($this->handler, 'offsetCreate', $item, array($this->entity, $this->config, 3), 0);
-        $this->assertSame($item, $this->property->create(3));
+        $data = array('t' => 1);
+        $this->method($this->handler, 'offsetCreate', $item, array($this->entity, $this->config, 3, $data), 0);
+        $this->assertSame($item, $this->property->create($data, 3));
     }
 
     /**

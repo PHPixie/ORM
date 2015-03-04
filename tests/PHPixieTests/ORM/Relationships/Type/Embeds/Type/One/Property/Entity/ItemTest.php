@@ -22,8 +22,12 @@ class ItemTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\Property\Enti
     public function testCreate()
     {
         $item = $this->getValue();
-
-        $this->method($this->handler, 'createItem', $item, array($this->entity, $this->config), 0);
+        $property = $this->property;
+        
+        $this->method($this->handler, 'createItem', function() use($property, $item){
+            $property->setValue($item);
+        }, array($this->entity, $this->config), 0);
+        
         $this->assertSame($item, $this->property->create());
     }
 

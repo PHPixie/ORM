@@ -11,6 +11,8 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     {
         $this->sets[] = array(
             $this->slice(array(
+                
+            ),array(
                 'owner'                => 'fairy',
                  $this->itemOptionName => 'flower'
             )),
@@ -27,11 +29,11 @@ abstract class ConfigTest extends \PHPixieTests\ORM\Relationships\Relationship\I
 
         $this->sets[] = array(
             $this->slice(array(
-                'owner'               => 'fairy',
-                $this->itemOptionName => 'flower',
-
                 $itemOptionsPrefix.'.path' => 'favourite',
                 'ownerOptions.'.$this->itemOptionName.'Property' => 'plants'
+            ), array(
+                'owner'               => 'fairy',
+                $this->itemOptionName => 'flower',            
             )),
             array(
                 'ownerModel'       => 'fairy',

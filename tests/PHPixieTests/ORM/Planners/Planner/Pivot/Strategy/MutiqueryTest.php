@@ -10,34 +10,56 @@ class MultiqueryTest extends \PHPixieTests\ORM\Planners\Planner\Pivot\StrategyTe
 
     protected function prepareLinkTest($pivot, $firstSide, $secondSide, $plan)
     {
-        $resultSteps = array();
+        $resultFilters = array();
+        
+        $planAt = 0;
+        $stepsAt = 0;
         
         foreach(array($firstSide, $secondSide) as $key => $side) {
-            $idQuery = $this->prepareIdQuery($side, $plan, $key*2);
+            $idQuery = $this->prepareIdQuery($side, $plan, $planAt++);
             
-            $resultStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Iterator');
-            $resultSteps[]=$resultStep;
+            $resultStep = $this->abstractMock('\PHPixie\ORM\Steps\Step\Query\Result');
+            $this->method($this->steps, 'iteratorResult', $resultStep, array($idQuery), $stepsAt++);
             
-            $this->method($this->steps, 'iteratorResult', $resultStep, array($idQuery), $key);
-            $this->method($plan, 'add', null, array($resultStep), $key*2+1);
+            $resultFilter = $this->abstractMock('\PHPixie\ORM\Steps\Result\Filter');
+            $id = 'id'.$key;
+            $this->prepareModelConfig($side['repository'], array('idField' => $id), 2);
+            $this->method($this->steps, 'resultFilter', $resultFilter, array($resultStep, array($id)), $stepsAt++);
+            
+            $resultFilters[]=$resultFilter;
+            
+            $this->method($plan, 'add', null, array($resultStep), $planAt++);
         }
         
         $cartesianStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Pivot\Cartesian');
-        $this->method($this->steps, 'pivotCartesian', $cartesianStep, array($resultSteps), 2);
-        $this->method($plan, 'add', null, array($cartesianStep), 4);
-        
-        $insertStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Pivot\Insert');
-        $this->method($this->steps, 'pivotInsert', $insertStep, array(
-            $pivot['connection'],
-            $pivot['source'],
+        $this->method($this->steps, 'pivotCartesian', $cartesianStep, array(
             array(
                 $firstSide['pivotKey'],
                 $secondSide['pivotKey']
             ),
-            $cartesianStep
-        ), 3);
+            $resultFilters
+        ), $stepsAt++);
+        $this->method($plan, 'add', null, array($cartesianStep), $planAt++);
         
-        $this->method($plan, 'add', null, array($insertStep), 5);
+        $selectQuery = $this->abstractMock('\PHPixie\Database\Query\Type\Select');
+        $this->method($pivot['pivot'], 'databaseSelectQuery', $selectQuery, array(), 0);
+        
+        $uniqueDataStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Insert\Batch\Data\Unique');
+        $this->method($this->steps, 'uniqueDataInsert', $uniqueDataStep, array(
+            $cartesianStep,
+            $selectQuery
+        ), $stepsAt++);
+        $this->method($plan, 'add', null, array($uniqueDataStep), $planAt++);
+        
+        $insertQuery = $this->abstractMock('\PHPixie\Database\Query\Type\Insert');
+        $this->method($pivot['pivot'], 'databaseInsertQuery', $insertQuery, array(), 1);
+        
+        $insertStep = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Insert\Batch');
+        $this->method($this->steps, 'batchInsert', $insertStep, array(
+            $insertQuery,
+            $uniqueDataStep
+        ), $stepsAt++);
+        $this->method($plan, 'add', null, array($insertStep), $planAt++);
     }
     
     protected function getConnection()

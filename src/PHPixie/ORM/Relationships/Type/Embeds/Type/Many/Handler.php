@@ -86,7 +86,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         $arrayNode->offsetSet($offset, $document);
         
         $item->setOwnerRelationship($entity, $config->ownerItemsProperty);
-        $this->checkArrayNode($entity, $config, $arrayNodeLoader);
+        $this->checkArrayNode($entity, $config, $arrayNode);
         
     }
 
@@ -108,7 +108,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
             $arrayNodeLoader->shiftCachedEntities($adjustedOffset);
         }
         
-        $this->checkArrayNode($entity, $config, $arrayNodeLoader);
+        $this->checkArrayNode($entity, $config, $arrayNode);
     }
 
     public function removeAllItems($entity, $config) {
@@ -123,12 +123,12 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         $arrayNodeLoader->clearCachedEntities();
         $arrayNode = $arrayNodeLoader->arrayNode();
         $arrayNode->clear();
-        $this->checkArrayNode($entity, $config, $arrayNodeLoader);
+        $this->checkArrayNode($entity, $config, $arrayNode);
     }
 
     public function loadProperty($config, $entity)
     {
-        $arrayNode = $this->getArrayNode($entity, $config->path);
+        $arrayNode = $this->checkArrayNode($entity, $config);
         
         $arrayNodeLoader = $this->loaders->arrayNode(
             $config->itemModel,
@@ -139,7 +139,6 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         
         $property = $entity->getRelationshipProperty($config->ownerItemsProperty);
         $property->setValue($arrayNodeLoader);
-        $this->checkArrayNode($entity, $config, $arrayNodeLoader);
     }
     
     protected function unsetCachedItemOwner($arrayNodeLoader, $offset)
@@ -150,15 +149,22 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         }
     }
     
-    protected function checkArrayNode($entity, $config, $arrayNodeLoader)
+    protected function checkArrayNode($entity, $config, $arrayNode = null)
     {
-        list($parent, $key) = $this->getParentDocumentAndKey($entity, $config->path);
+        $document = $entity->data()->document();
+        list($parent, $key) = $this->getParentDocumentAndKey($document, $config->path);
         
-        if($arrayNodeLoader->count() === 0) {
+        if($arrayNode === null) {
+            $arrayNode = $this->getArrayNode($parent, $key);
+        }
+        
+        if($arrayNode->count() === 0) {
             $parent->remove($key);
             
         }else{
-            $parent->$key = $arrayNodeLoader->arrayNode();
+            $parent->set($key, $arrayNode);
         }
+        
+        return $arrayNode;
     }
 }

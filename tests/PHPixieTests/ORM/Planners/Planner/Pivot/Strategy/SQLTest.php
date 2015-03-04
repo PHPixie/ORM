@@ -29,12 +29,13 @@ class SQLTest extends \PHPixieTests\ORM\Planners\Planner\Pivot\StrategyTest
             $this->method($side['repository'], 'config', $config, array(), 0);
             
             $sideData[] = array(
-                'query' => $this->prepareIdQuery($side, $plan, $key, 1),
-                'queryAlias' => $alias,
+                'query'          => $this->prepareIdQuery($side, $plan, $key, 1),
+                'queryAlias'     => $alias,
                 'productIdField' => $alias.'.'.$config->idField,
-                'productAlias' => $name,
-                'productKey' => $this->productAlias.'.'.$name,
-                'pivotKey' => $pivot['source'].'.'.$side['pivotKey'],
+                'productAlias'   => $name,
+                'productKey'     => $this->productAlias.'.'.$name,
+                'pivotKey'       => $side['pivotKey'],
+                'fullPivotKey'   => $pivot['source'].'.'.$side['pivotKey'],
             );
             
             $key++;
@@ -80,14 +81,14 @@ class SQLTest extends \PHPixieTests\ORM\Planners\Planner\Pivot\StrategyTest
             )),
             array('on', array(
                 $sideData[0]['productKey'],
-                $sideData[0]['pivotKey']
+                $sideData[0]['fullPivotKey']
             )),
             array('on', array(
                 $sideData[1]['productKey'],
-                $sideData[1]['pivotKey']
+                $sideData[1]['fullPivotKey']
             )),
             array('where', array(
-                $sideData[0]['pivotKey'],
+                $sideData[0]['fullPivotKey'],
                 null
             )),
         ));

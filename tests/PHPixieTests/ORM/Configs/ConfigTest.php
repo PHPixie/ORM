@@ -64,9 +64,9 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
         $this->assertEquals($value, $this->config->get($key));
     }
 
-    protected function slice($data)
+    protected function slice($data, $requiredData = array())
     {
-        $slice = $this->abstractMock('\PHPixie\Config\Slice', array('get'));
+        $slice = $this->abstractMock('\PHPixie\Config\Slice', array('get', 'getRequired'));
         $slice
             ->expects($this->any())
             ->method('get')
@@ -78,6 +78,17 @@ abstract class ConfigTest extends \PHPixieTests\AbstractORMTest
                 $args = func_get_args();
                 if(count($args) == 2)
                     return $args[1];
+
+                throw new \Exception("Key $key is not set.");
+            }));
+        
+        $slice
+            ->expects($this->any())
+            ->method('getRequired')
+            ->will($this->returnCallback(function($key) use($requiredData){
+
+                if(array_key_exists($key, $requiredData))
+                    return $requiredData[$key];
 
                 throw new \Exception("Key $key is not set.");
             }));

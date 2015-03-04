@@ -10,7 +10,8 @@ class Multiquery extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
         foreach (array($firstSide, $secondSide) as $side) {
             $idQuery = $this->idQuery($side, $plan);
             $resultStep = $this->steps->iteratorResult($idQuery);
-            $resultFilter = $this->steps->resultFilter($resultStep, array($side->repository()->config()->idField));
+            $idField = $side->repository()->config()->idField;
+            $resultFilter = $this->steps->resultFilter($resultStep, array($idField));
             $plan->add($resultStep);
             $resultFilters[] = $resultFilter;
         }
@@ -25,14 +26,12 @@ class Multiquery extends \PHPixie\ORM\Planners\Planner\Pivot\Strategy
         
         $plan->add($cartesianStep);
         
-        $selectQuery = $pivot->dataBaseSelectQuery();
+        $selectQuery = $pivot->databaseSelectQuery();
         $uniqueDataStep  = $this->steps->uniqueDataInsert($cartesianStep, $selectQuery);
-        
         $plan->add($uniqueDataStep);
         
         $insertQuery = $pivot->databaseInsertQuery();
         $insertStep = $this->steps->batchInsert($insertQuery, $uniqueDataStep);
-        
         $plan->add($insertStep);
     }
 }

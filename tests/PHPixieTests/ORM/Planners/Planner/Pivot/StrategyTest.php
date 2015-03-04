@@ -49,11 +49,8 @@ abstract class StrategyTest extends \PHPixieTests\AbstractORMTest
     {
         $query = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');
         
-        $config = $this->getConfig();
-        $config->idField = 'id';
-        
         $this->method($side['repository'], 'query', $query, array(), $repositoryAt++);
-        $this->method($side['repository'], 'config', $config, array(), $repositoryAt++);
+        $this->prepareModelConfig($side['repository'], array('idField' => 'id'), $repositoryAt++);
         
         $this->method($query, 'in', $query, array($side['items']), 0);
         
@@ -110,6 +107,16 @@ abstract class StrategyTest extends \PHPixieTests\AbstractORMTest
         $methods['side'] = $side;
         
         return $methods;
+    }
+    
+    protected function prepareModelConfig($repository, $properties, $repositoryAt = 0)
+    {
+        $config = $this->getConfig();
+        foreach($properties as $key => $value) {
+            $config->$key = $value;
+        }
+        
+        $this->method($repository, 'config', $config, array(), $repositoryAt);
     }
     
     protected function getPlan()

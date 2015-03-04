@@ -26,8 +26,8 @@ class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementati
     public function testModelName()
     {
         $this->assertSidesMethod('modelName', array(
-            'left'  => 'fairy',
-            'right' => 'flower'
+            'left'  => 'flower',
+            'right' => 'fairy'
         ));
     }
     
@@ -38,8 +38,8 @@ class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementati
     public function testRelatedModelName()
     {
         $this->assertSidesMethod('relatedModelName', array(
-            'left'  => 'flower',
-            'right' => 'fairy'
+            'left'  => 'fairy',
+            'right' => 'flower'
         ));
     }
 
@@ -50,8 +50,8 @@ class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementati
     public function testPropertyName()
     {
         $this->assertSidesMethod('propertyName', array(
-            'left'  => 'flowers',
-            'right' => 'fairies'
+            'left'  => 'fairies',
+            'right' => 'flowers'
         ));
     }
 

@@ -25,7 +25,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
 
     public function loadProperty($config, $owner)
     {
-        $item = $this->getDocument($owner, $config->path, false);
+        $document = $this->getEntityDocument($owner);
+        $item = $this->getDocument($document, $config->path, false);
         if($item !== null) {
             $item = $this->models->embedded()->loadEntity($config->itemModel, $item);
             $item->setOwnerRelationship($owner, $config->ownerItemProperty);
@@ -34,36 +35,38 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         $property->setValue($item);
     }
 
-    public function setItem($model, $config, $item)
+    public function setItem($entity, $config, $item)
     {
         $this->assertModelName($item, $config->itemModel);
         $this->removeItemFromOwner($item);
-        $this->setItemModel($model, $config, $item);
+        $this->setItemModel($entity, $config, $item);
     }
 
-    public function removeItem($model, $config)
+    public function removeItem($entity, $config)
     {
-        $property = $model->getRelationshipProperty($config->ownerItemProperty);
+        $property = $entity->getRelationshipProperty($config->ownerItemProperty);
         $this->unsetCurrentItemOwner($property);
-        list($document, $key) = $this->getParentDocumentAndKey($model, $config->path);
+        $document = $this->getEntityDocument($entity);
+        list($document, $key) = $this->getParentDocumentAndKey($document, $config->path);
         $document->remove($key);
         $property->setValue(null);
     }
 
-    public function createItem($model, $config, $data)
+    public function createItem($entity, $config, $data)
     {
         $item = $this->models->embedded()->loadEntityFromData($config->itemModel, $data);
-        $this->setItemModel($model, $config, $item);
+        $this->setItemModel($entity, $config, $item);
     }
 
-    protected function setItemModel($model, $config, $item)
+    protected function setItemModel($entity, $config, $item)
     {
-        $property = $model->getRelationshipProperty($config->ownerItemProperty);
+        $property = $entity->getRelationshipProperty($config->ownerItemProperty);
         $this->unsetCurrentItemOwner($property);
-
-        list($document, $key) = $this->getParentDocumentAndKey($model, $config->path);
+        
+        $document = $this->getEntityDocument($entity);
+        list($document, $key) = $this->getParentDocumentAndKey($document, $config->path);
         $document->set($key, $item->data()->document());
-        $item->setOwnerRelationship($model, $config->ownerItemProperty);
+        $item->setOwnerRelationship($entity, $config->ownerItemProperty);
         $property->setValue($item);
     }
 
@@ -76,6 +79,11 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         if($oldItem !== null) {
             $oldItem->unsetOwnerRelationship();
         }
+    }
+    
+    protected function getEntityDocument($entity)
+    {
+        return $entity->data()->document();
     }
 
 }

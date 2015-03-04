@@ -9,38 +9,37 @@ abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Implemen
         return explode('.', $path);
     }
     
-    protected function getDocument($entity, $path, $createMissing = true)
+    protected function getDocument($document, $path, $createMissing = true)
     {
         $explodedPath = $this->explodePath($path);
-        return $this->getDocumentByExplodedPath($entity, $explodedPath, $createMissing);
+        return $this->getDocumentByExplodedPath($document, $explodedPath, $createMissing);
     }
     
-    protected function getArrayNode($entity, $path, $createMissing = true)
+    protected function getArrayNode($document, $path, $createMissing = true)
     {
-        list($document, $key) = $this->getParentDocumentAndKey($entity, $path);
+        list($parent, $key) = $this->getParentDocumentAndKey($document, $path);
         if($document === null)
             return null;
-        $property = $document->get($key);
+        $property = $parent->get($key);
         if($property !== null) {
             if(!($property instanceof \PHPixie\ORM\Data\Types\Document\Node\ArrayNode))
                 throw new \PHPixie\ORM\Exception\Relationship("$path is not an array node");
         }elseif($createMissing) {
-            $document->addArray($key);
+            $parent->addArray($key);
         }else{
             return null;
         }
-        return $document->get($key);
+        return $parent->get($key);
     }
-    protected function getParentDocumentAndKey($entity, $path, $createMissing = true)
+    protected function getParentDocumentAndKey($document, $path, $createMissing = true)
     {
         $explodedPath = $this->explodePath($path);
         $key = array_pop($explodedPath);
-        $document = $this->getDocumentByExplodedPath($entity, $explodedPath, $createMissing);
-        return array($document, $key);
+        $parent = $this->getDocumentByExplodedPath($document, $explodedPath, $createMissing);
+        return array($parent, $key);
     }
-    protected function getDocumentByExplodedPath($entity, $explodedPath, $createMissing = true)
+    protected function getDocumentByExplodedPath($document, $explodedPath, $createMissing = true)
     {
-        $document = $entity->data()->document();
         $last = count($explodedPath) - 1;
         foreach($explodedPath as $i => $key) {
             $property = $document->get($key);

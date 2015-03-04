@@ -16,10 +16,12 @@ abstract class OneToTest extends \PHPixieTests\ORM\Relationships\Relationship\Im
         $configSlice = $this->configSlice();
         $sides = $this->relationship->getSides($configSlice);
         
+        $modelConfig = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
+        $result = $this->abstractMock('\PHPixie\ORM\Steps\Result');
         $loader = $this->getLoader();
         
-        $this->preloaderTest($sides, $loader);
+        $this->preloaderTest($sides, $modelConfig, $result, $loader);
     }
     
-    abstract protected function preloaderTest($sides, $loader);
+    abstract protected function preloaderTest($sides, $modelConfig, $result, $loader);
 }

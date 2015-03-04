@@ -104,15 +104,15 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         $conditions = $collectionCondition->conditions();
         $hasConditions = !empty($conditions);
         
-        $skipNulls = $side->type() !== 'owner';
+        $isOwner = $side->type() === 'owner';
         
-        if($skipNulls) {
+        if(!$isOwner) {
             $subquery->whereNot($config->ownerKey, null);
         }
         
         if($hasConditions) {
             
-            if($skipNulls) {
+            if(!$isOwner) {
                 $subquery->startGroup();
             }   
 
@@ -123,30 +123,38 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
                 $plan
             );
             
-            if($skipNulls) {
+            if(!$isOwner) {
                 $subquery->endGroup();
             }   
         }
-
-        $query->startConditionGroup(
-            $collectionCondition->logic(),
-            $collectionCondition->isNegated()
-        );
         
-        if($side->type() === 'owner') {
+        if($isOwner) {
+            $query->startConditionGroup(
+                $collectionCondition->logic(),
+                $collectionCondition->isNegated()
+            );
+            
             $query->whereNot($config->ownerKey, null);
+            $subqueryLogic  = 'and';
+            $negateSubquery = false;
+        }else{
+            $subqueryLogic  = $collectionCondition->logic();
+            $negateSubquery = $collectionCondition->isNegated();
         }
-        
+
         $this->planners->in()->subquery(
             $query,
             $queryField,
             $subquery,
             $subqueryField,
-            $plan
+            $plan,
+            $subqueryLogic,
+            $negateSubquery
         );
         
-        $query->endGroup();
-        
+        if($isOwner) {
+            $query->endGroup();
+        }
     }
 
     public function handleDelete($side, $reusableResult, $plan, $sidePath)
@@ -232,7 +240,12 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
             $plan
         );
         
-        return $this->relationship->preloader($side, $preloadRepository->config(), $preloadStep, $cachingProxy);
+        return $this->relationship->preloader(
+            $side,
+            $preloadRepository->config(),
+            $preloadStep,
+            $cachingProxy
+        );
     }
     
     protected function getRepository($modelName)

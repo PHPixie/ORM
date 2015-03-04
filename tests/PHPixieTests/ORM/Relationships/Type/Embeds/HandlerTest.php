@@ -9,7 +9,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
 {
     protected $ownerPropertyName;
     protected $propertyConfig;
-    protected $configOnwerProperty;
+    protected $configOwnerProperty;
     protected $oldOwnerProperty = 'plants';
     protected $itemSideName;
 

@@ -12,7 +12,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     protected $itemSide;
     protected $ownerPropertyName;
     protected $propertyConfig;
-    protected $configOnwerProperty;
+    protected $configOwnerProperty;
     public function setUp()
     {
         $this->configData = array(
@@ -20,7 +20,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             'itemModel'         => 'flower',
             'ownerKey'          => 'fairy_id',
             'itemOwnerProperty' => 'fairy',
-            $this->ownerPropertyName => $this->configOnwerProperty,
+            $this->ownerPropertyName => $this->configOwnerProperty,
         );
         
         $this->plannerMocks['in'] = $this->getPlanner('in');
@@ -70,51 +70,95 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     public function testMapDatabaseQuery()
     {
         $repositories = $this->prepareRepositories();
-
-        foreach(array('owner', 'item') as $type) {
-            $side = $this->side($type, $this->configData);
-            $query = $this->getDatabaseQuery();
-            $plan = $this->getPlan();
-
-            $subqueryRepository = $repositories[$type == 'owner' ? 'owner' : 'item'];
-            $this->prepareRepositoryConfig($repositories['owner'], array('idField' =>'id'));
-
-            if ($type === 'owner') {
-                $queryField = $this->configData['ownerKey'];
-                $subqueryField = 'id';
-            } else {
-                $queryField = 'id';
-                $subqueryField = $this->configData['ownerKey'];
-            }
-
-            $subquery = $this->getDatabaseQuery();
-            $collectionCondition = $this->getCollectionCondition('and', true, array(5));
-
-            $subqueryRepoOffset = $type == 'owner' ? 1 : 0;
-            $this->method($subqueryRepository, 'databaseSelectQuery', $subquery, array(), $subqueryRepoOffset++);
-
+        
+        $this->mapDatabaseQueryTest($repositories, 'owner', true);
+        $this->mapDatabaseQueryTest($repositories, 'owner', false);
+        
+        $this->mapDatabaseQueryTest($repositories, $this->itemSide, false);
+        $this->mapDatabaseQueryTest($repositories, $this->itemSide, false);
+    }
+    
+    protected function mapDatabaseQueryTest($repositories, $type, $hasConditions)
+    {
+        $side = $this->side($type, $this->configData);
+        $query = $this->getDatabaseQuery();
+        $plan = $this->getPlan();
+        
+        $subqueryRepository = $repositories[$type == 'owner' ? 'owner' : 'item'];
+        $this->prepareRepositoryConfig($repositories['owner'], array('idField' =>'id'));
+        
+        if ($type === 'owner') {
+            $queryField = $this->configData['ownerKey'];
+            $subqueryField = 'id';
+        } else {
+            $queryField = 'id';
+            $subqueryField = $this->configData['ownerKey'];
+        }
+        
+        $isOwner = $type === 'owner';
+        
+        $subquery = $this->getDatabaseQuery();
+        $subqueryRepoOffset = $isOwner ? 1 : 0;
+        $this->method($subqueryRepository, 'databaseSelectQuery', $subquery, array(), $subqueryRepoOffset++);
+        
+        $subQueryAt = 0;
+        $queryAt = 0;
+        
+        $conditions = $hasConditions ? array(5) : array();
+        $collectionCondition = $this->getCollectionCondition('or', true, $conditions);
+        
+        
+        
+        if(!$isOwner) {
+            $this->method($subquery, 'whereNot', null, array($this->configData['ownerKey'], null), $subQueryAt++);
+        }
+        
+        if($hasConditions) {
+            
+            if(!$isOwner) {
+                $this->method($subquery, 'starGroup', null, array(), $subQueryAt++);
+            }   
+            
             $modelName = $this->configData[$type.'Model'];
             $this->method($subqueryRepository, 'modelName', $modelName, array(), $subqueryRepoOffset++);
-
             $this->method($this->mapperMocks['conditions'], 'map', null, array(
                 $subquery,
                 $modelName,
                 array(5),
                 $plan
             ), 0);
-
-            $this->method($this->plannerMocks['in'], 'subquery', null, array(
-                $query,
-                $queryField,
-                $subquery,
-                $subqueryField,
-                $plan,
-                'and',
-                true
-            ), 0);
-
-            $this->handler->mapDatabaseQuery($query, $side, $collectionCondition, $plan);
+            
+            if(!$isOwner) {
+                $this->method($subquery, 'endGroup', null, array(), $subQueryAt++);
+            }   
         }
+        
+        if($isOwner) {
+            $this->method($query, 'startConditionGroup', null, array('or', true), $queryAt++);
+            $this->method($query, 'whereNot', null, array($this->configData['ownerKey'], null), $queryAt++);
+            
+            $subqueryLogic  = 'and';
+            $negatesubQuery = false;
+        }else{
+            $subqueryLogic  = 'or';
+            $negatesubQuery = true;
+        }
+        
+        $this->method($this->plannerMocks['in'], 'subquery', null, array(
+            $query,
+            $queryField,
+            $subquery,
+            $subqueryField,
+            $plan,
+            $subqueryLogic,
+            $negatesubQuery
+        ), 0);
+        
+        if($isOwner) {
+            $this->method($query, 'endGroup', null, array(), $queryAt++);
+        }
+        
+        $this->handler->mapDatabaseQuery($query, $side, $collectionCondition, $plan);
     }
     
     /**
@@ -170,7 +214,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
             $cachingProxy = $this->getLoaderProxy('caching');
             $this->method($this->loaders, 'cachingProxy', $cachingProxy, array($preloadingProxy), 2);
             
-            $this->method($preloadRepository, 'modelName', $this->configData[$normalizedType.'Model'], array(), $preloadRepoOffset);
+            $this->method($preloadRepository, 'modelName', $this->configData[$normalizedType.'Model'], array(), $preloadRepoOffset++);
                         
             $this->method($this->mapperMocks['preload'], 'map', null, array(
                 $preloadingProxy,
@@ -180,8 +224,14 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
                 $plan
             ), 0);
             
+            $config = $this->prepareRepositoryConfig($preloadRepository, array(), $preloadRepoOffset);
             $preloader = $this->getPreloader($type);
-            $this->method($this->relationship, 'preloader', $preloader, array($side, $cachingProxy), 0);
+            $this->method($this->relationship, 'preloader', $preloader, array(
+                $side,
+                $config,
+                $preloadStep,
+                $cachingProxy
+            ), 0);
             
             $this->assertSame($preloader, $this->handler->mapPreload(
                 $side,
@@ -192,7 +242,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         }
     }
 
-    protected function prepareLinkPlan($owner, $items, $plansOffset = 0, $inPlannerOffset = 0, $ownerRepoOffset = 0, $itemRepoOffset= 0)
+    protected function prepareLinkPlan($owner, $items, $plansOffset = 0, $stepsOffset = 0, $inPlannerOffset = 0, $ownerRepoOffset = 0, $itemRepoOffset= 0)
     {
         $ownerRepository = $this->modelMocks['database']->repository($this->configData['ownerModel']);
         $itemRepository = $this->modelMocks['database']->repository($this->configData['itemModel']);
@@ -206,7 +256,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $this->method($itemRepository, 'databaseUpdateQuery', $updateQuery, array(), $itemRepoOffset++);
         
         $queryStep = $this->getQueryStep();
-        $this->method($this->steps, 'query', $queryStep, array($updateQuery), 0);
+        $this->method($this->steps, 'query', $queryStep, array($updateQuery), $stepsOffset);
         
         $plan = $this->getQueryPlan();
         $this->method($this->plans, 'query', $plan, array($queryStep), $plansOffset);

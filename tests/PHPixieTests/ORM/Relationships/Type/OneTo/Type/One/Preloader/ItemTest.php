@@ -19,17 +19,6 @@ class ItemTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementati
             $this->method($entity, 'id', $id, array());
         }
         
-        $repository = $this->getDatabaseRepository();
-        $this->method($this->loader, 'repository', $repository, array(), 0);
-        
-        $loaderResult = $this->getReusableResult();
-        $this->method($this->loader, 'reusableResult', $loaderResult, array(), 1);
-        
-        $config = $this->getDatabaseConfig();
-        $config->idField = 'id';
-        
-        $this->method($repository, 'config', $config, array(), 0);
-        
         $fields = array();
         foreach($this->map as $id => $preloadId) {
             $fields[] = array(
@@ -37,7 +26,7 @@ class ItemTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementati
                 $this->configData['ownerKey'] => $id
             );
         }
-        $this->method($loaderResult, 'getFields', $fields, array(array('id', $this->configData['ownerKey'])), 0);
+        $this->method($this->result, 'getFields', $fields, array(array('id', $this->configData['ownerKey'])), 0);
     }
     
     protected function getModel()
@@ -74,6 +63,8 @@ class ItemTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementati
     {
         return new \PHPixie\ORM\Relationships\Type\OneTo\Type\One\Preloader\Item(
             $this->side,
+            $this->modelConfig,
+            $this->result,
             $this->loader
         );
     }

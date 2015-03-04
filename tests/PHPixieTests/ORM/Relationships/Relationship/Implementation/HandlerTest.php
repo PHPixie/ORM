@@ -73,7 +73,7 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
                     }));
     }
 
-    protected function prepareRepositoryConfig($repository, $params, $at = 0)
+    protected function prepareRepositoryConfig($repository, $params = array(), $at = 0)
     {
         $config = $this->getModelConfig();
         $this->method($repository, 'config', $config, array(), $at);

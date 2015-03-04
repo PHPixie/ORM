@@ -11,12 +11,16 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     protected $preloadedEntities = array();
     protected $loaders;
     protected $side;
+    protected $modelConfig;
+    protected $result;
     protected $loader;
     
     public function setUp()
     {
         $this->side = $this->side();
-        $this->loader    = $this->loader();
+        $this->modelConfig = $this->modelConfig();
+        $this->result = $this->result();
+        $this->loader = $this->loader();
         parent::setUp();
     }
     
@@ -50,17 +54,9 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\I
         }
     }
     
-    protected function prepareMapIdOffsets($idField = 'id')
+    protected function prepareMapIdOffsets($at = 0, $idField = 'id')
     {
-        $repository = $this->repository(array('idField' => $idField));
-        $this->method($this->loader, 'repository', $repository, array(), 0);
-        
-        $loaderResult = $this->getReusableResult();
-        $this->method($this->loader, 'reusableResult', $loaderResult, array(), 1);
-        
-        $this->method($loaderResult, 'getField', array_keys($this->preloadedEntities), array('id'), 0);
-
-        
+        $this->method($this->result, 'getField', array_keys($this->preloadedEntities), array($idField), $at);
     }
     
     protected function prepareLoader()
@@ -108,6 +104,23 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\I
         return $repository;
     }
     
+    protected function result()
+    {
+        return $this->getReusableResult();
+    }
+    
+    protected function modelConfig()
+    {
+        $config = $this->getDatabaseModelConfig();
+        $this->mapConfig($config, array('idField' => 'id'));
+        return $config;
+    }
+
+    protected function getDatabaseModelConfig()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Config');
+    }
+    
     protected function getReusableResult()
     {
         return $this->quickMock('\PHPixie\ORM\Steps\Result\Reusable');
@@ -129,6 +142,7 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     }    
     
     abstract protected function loader();
+    
     abstract protected function getSide();
     abstract protected function getConfig();
     abstract protected function prepareMap();

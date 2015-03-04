@@ -49,14 +49,7 @@ class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Impleme
         }
         
         $this->method($this->pivotResult, 'getFields', $fields, array(array($ownerKey, $itemKey)), 0);
-        
-        $repository = $this->repository(array('idField' => 'id'));
-        $this->method($this->loader, 'repository', $repository, array(), 0);
-        
-        $loaderResult = $this->quickMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
-        $this->method($this->loader, 'reusableResult', $loaderResult, array(), 1);
-        
-        $this->method($loaderResult, 'getField', array_keys($this->preloadedEntities), array('id'), 0);
+        $this->prepareMapIdOffsets();
         
     }
 
@@ -90,6 +83,8 @@ class PreloaderTest extends \PHPixieTests\ORM\Relationships\Relationship\Impleme
         return new \PHPixie\ORM\Relationships\Type\ManyToMany\Preloader(
             $this->loaders,
             $this->side,
+            $this->modelConfig,
+            $this->result,
             $this->loader,
             $this->pivotResult
         );

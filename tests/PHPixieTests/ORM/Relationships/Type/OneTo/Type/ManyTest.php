@@ -65,7 +65,7 @@ class ManyTest extends \PHPixieTests\ORM\Relationships\Type\OneToTest
         ));
     }
     
-    protected function preloaderTest($sides, $loader)
+    protected function preloaderTest($sides, $modelConfig, $result, $loader)
     {
         $classMap = array(
             'owner' => '\PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\Owner',
@@ -74,12 +74,14 @@ class ManyTest extends \PHPixieTests\ORM\Relationships\Type\OneToTest
         
         foreach($sides as $side) {
             $class = $classMap[$side->type()];
-            $preloader = $this->relationship->preloader($side, $loader);
+            $preloader = $this->relationship->preloader($side, $modelConfig, $result, $loader);
             $this->assertInstanceOf($class, $preloader);
             
             $properties = array(
-                'side'   => $side,
-                'loader' => $loader,
+                'side'        => $side,
+                'modelConfig' => $modelConfig,
+                'result'      => $result,
+                'loader'      => $loader,
             );
             
             if($side->type() === 'items') {

@@ -35,12 +35,7 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementat
             }
         }
     
-        $repository = $this->repository(array('idField' => 'id'));
-        $this->method($this->loader, 'repository', $repository, array(), 0);
-        
-        $result = $this->getReusableResult();
-        $this->method($this->loader, 'reusableResult', $result, array(), 1);
-        $this->method($result, 'getFields', $fields, array(array('id', $ownerKey)), 0);
+        $this->method($this->result, 'getFields', $fields, array(array('id', $ownerKey)), 0);
     }
     
     
@@ -74,6 +69,8 @@ class ItemsTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementat
         return new \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\Items(
             $this->loaders,
             $this->side,
+            $this->modelConfig,
+            $this->result,
             $this->loader
         );
     }

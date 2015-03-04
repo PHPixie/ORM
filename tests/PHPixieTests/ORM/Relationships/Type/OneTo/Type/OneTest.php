@@ -33,7 +33,7 @@ class OneTest extends \PHPixieTests\ORM\Relationships\Type\OneToTest
         ));
     }
     
-    protected function preloaderTest($sides, $loader)
+    protected function preloaderTest($sides, $modelConfig, $result, $loader)
     {
         $classMap = array(
             'owner' => '\PHPixie\ORM\Relationships\Type\OneTo\Type\One\Preloader\Owner',
@@ -42,11 +42,13 @@ class OneTest extends \PHPixieTests\ORM\Relationships\Type\OneToTest
         
         foreach($sides as $side) {
             $class = $classMap[$side->type()];
-            $preloader = $this->relationship->preloader($side, $loader);
+            $preloader = $this->relationship->preloader($side, $modelConfig, $result, $loader);
             $this->assertInstanceOf($class, $preloader);
             
             $this->assertProperties($preloader, array(
                 'side'        => $side,
+                'modelConfig' => $modelConfig,
+                'result'      => $result,
                 'loader'      => $loader,
             ));
         }

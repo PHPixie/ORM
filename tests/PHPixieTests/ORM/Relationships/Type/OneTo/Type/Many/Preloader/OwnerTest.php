@@ -26,6 +26,8 @@ class OwnerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Preloader\Own
     {
         return new \PHPixie\ORM\Relationships\Type\OneTo\Type\Many\Preloader\Owner(
             $this->side,
+            $this->modelConfig,
+            $this->result,
             $this->loader
         );
     }

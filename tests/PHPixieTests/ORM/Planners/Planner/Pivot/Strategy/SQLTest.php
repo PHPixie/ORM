@@ -129,7 +129,7 @@ class SQLTest extends \PHPixieTests\ORM\Planners\Planner\Pivot\StrategyTest
     
     protected function getSQLQuery($type)
     {
-        return $this->quickMock('\PHPixie\Database\Type\SQL\Query\Type\\'.ucfirst($type));
+        return $this->abstractMock('\PHPixie\Database\Type\SQL\Query\Type\\'.ucfirst($type));
     }
     
     protected function strategy()

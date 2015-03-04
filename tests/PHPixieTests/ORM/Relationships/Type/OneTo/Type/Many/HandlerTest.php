@@ -9,7 +9,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
 {
     protected $itemSide = 'items';
     protected $ownerPropertyName = 'ownerItemsProperty';
-    protected $configOnwerProperty = 'flowers';
+    protected $configOwnerProperty = 'flowers';
 
     
     /**

@@ -9,7 +9,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
 {
     protected $itemSide = 'item';
     protected $ownerPropertyName = 'ownerItemProperty';
-    protected $configOnwerProperty = 'flower';
+    protected $configOwnerProperty = 'flower';
     
    /**
      * @covers ::loadProperty
@@ -32,9 +32,23 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
         $items = $this->getDatabaseEntity();
         $this->prepareRepositories();
         
-        $plan = $this->prepareUnlinkTest(true, $owner, true, $items, 'or');
-        $linkPlan = $this->prepareLinkPlan($owner, $items, $plansOffset = 1, $inPlannerOffset = 2, $ownerRepoOffset = 2, $itemRepoOffset= 3);
-        $this->method($plan, 'appendPlan', null, array($linkPlan), 0);
+        $unlinkPlan = $this->prepareUnlinkTest(true, $owner, true, $items, 'or');
+        $linkPlan = $this->prepareLinkPlan(
+            $owner,
+            $items,
+            $plansOffset = 1,
+            $stepsOffset = 1,
+            $inPlannerOffset = 2,
+            $ownerRepoOffset = 2,
+            $itemRepoOffset= 3
+        );
+        
+        $plan = $this->getPlan();
+        $this->method($this->plans, 'steps', $plan, array(), 2);
+        
+        $this->method($plan, 'appendPlan', null, array($unlinkPlan), 0);
+        $this->method($plan, 'appendPlan', null, array($linkPlan), 1);
+        
         $this->assertSame($plan, $this->handler->linkPlan($this->propertyConfig, $owner, $items));
     }
     

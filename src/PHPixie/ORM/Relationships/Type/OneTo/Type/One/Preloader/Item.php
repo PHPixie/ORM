@@ -10,6 +10,7 @@ class Item extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloa
     {
         $ownerKey = $this->side->config()->ownerKey;
         $idField = $this->modelConfig->idField;
+        
         $fields = $this->result->getFields(array($idField, $ownerKey));
         foreach($fields as $offset => $row) {
             $id = $row[$idField];

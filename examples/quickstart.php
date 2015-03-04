@@ -4,14 +4,14 @@ require_once('vendor/autoload.php');
 
 
 $config = new \PHPixie\Config();
-$database = new PHPixie\Database($config->dataStorage(array(
+$database = new \PHPixie\Database($config->dataStorage(array(
     'default' => array(
         'driver' => 'pdo',
         'connection' => 'sqlite::memory:'
     )
 )));
 
-$orm = new PHPixie\ORM($database, $config->dataStorage(array(
+$orm = new \PHPixie\ORM($database, $config->dataStorage(array(
     'relationships' => array(
         array(
             'type'  => 'oneToMany',

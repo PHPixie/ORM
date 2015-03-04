@@ -17,7 +17,7 @@
         "phpixie/config": "3.*@dev"
     },
     "autoload": {
-        "psr-0": {"PHPixie": "classes/"}
+        "psr-0": {"PHPixie": "src/"}
     },
     "extra": {
         "branch-alias": {

@@ -72,6 +72,15 @@ class ArrayNodeTest extends \PHPixieTests\ORM\Loaders\Loader\EmbeddedTest
             $this->assertSame($entity, $this->loader->getByOffset($key));
         }
     }
+
+    /**
+     * @covers ::arrayNode
+     * @covers ::<protected>
+     */
+    public function testArrayNode()
+    {
+        $this->assertSame($this->arrayNode, $this->loader->arrayNode());
+    }
     
     /**
      * @covers ::getByOffset

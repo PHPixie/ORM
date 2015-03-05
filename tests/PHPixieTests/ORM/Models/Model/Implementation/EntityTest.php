@@ -141,6 +141,19 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::__call
+     * @covers ::<protected>
+     */
+    public function testCall()
+    {
+        $this->prepareRequirePropertyNames();
+        
+        $property = $this->prepareProperty('test1', 1);
+        $this->method($property, '__invoke', 'test', array(), 0);
+        $this->assertEquals('test', $this->entity->test1());
+    }
+    
+    /**
      * @covers ::__set
      * @covers ::<protected>
      */

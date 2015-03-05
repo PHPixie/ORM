@@ -57,6 +57,7 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
     
     /**
      * @covers ::getField
+     * @covers ::<protected>
      */
     public function testGetField()
     {
@@ -83,7 +84,8 @@ abstract class ResultTest extends \PHPixieTests\ORM\Steps\Step\QueryTest
     }
     
     /**
-     * @covers ::getField
+     * @covers ::getFields
+     * @covers ::<protected>
      */
     public function testGetFields()
     {

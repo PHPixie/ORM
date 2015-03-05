@@ -139,6 +139,16 @@ abstract class RepositoryTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::query
+     * @covers ::<protected>
+     */
+    public function testQuery()
+    {
+        $query = $this->prepareQuery();
+        $this->assertSame($query, $this->repository->query());
+    }
+    
+    /**
      * @covers ::databaseSelectQuery
      * @covers ::databaseUpdateQuery
      * @covers ::databaseDeleteQuery

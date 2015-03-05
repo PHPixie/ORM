@@ -178,13 +178,16 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         if ($left->relationship() !== $right->relationship())
             return false;
         
-        if($left->isNegated() !== $right->isNegated())
+        if($left->isNegated() xor $right->isNegated())
             return false;
         
-        if($right->logic() !== 'or')
-            return false;
+        if($right->logic() === 'or' && !$left->isNegated())
+            return true;
         
-        return true;
+        if($right->logic() === 'and' && $left->isNegated())
+            return true;
+        
+        return false;
     }
 
     protected function mergeRelatedToCollections($left, $right)
@@ -197,11 +200,7 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
         
         $newRight->setLogic($right->logic());
         if($left->isNegated()) {
-            if($right->logic() === 'and') {
-                $newRight->setLogic('or');
-            }else{
-                $newRight->setLogic('and');
-            }
+            $newRight->setLogic('or');
         }
         
         $conditions = $this->extractCollections(array($newLeft, $newRight));

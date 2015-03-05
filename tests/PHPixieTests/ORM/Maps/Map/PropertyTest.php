@@ -24,6 +24,26 @@ abstract class PropertyTest extends \PHPixieTests\ORM\Maps\MapTest
         
     }
     
+    /**
+     * @covers ::getPropertyNames
+     * @covers ::<protected>
+     */
+    public function testGetPropertyNames()
+    {
+        $sides = array(
+            $this->side('fairy', 'flowers'),
+            $this->side('fairy', 'trees'),
+            $this->side('pixie', 'trees')
+        );
+        
+        foreach($sides as $side) {
+            $this->map->add($side);
+        }
+        
+        $this->assertSame(array('flowers', 'trees'), $this->map->getPropertyNames('fairy'));
+        $this->assertSame(array('trees'), $this->map->getPropertyNames('pixie'));
+    }
+    
     protected function prepareRelationship($type, $relationshipsAt = 0)
     {
         $relationship = $this->getRelationship();

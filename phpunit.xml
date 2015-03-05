@@ -1,7 +1,9 @@
 <phpunit bootstrap="./tests/phpunit.php">
     <testsuites>
-        <testsuite>
+        <testsuite name="unit">
             <directory>./tests</directory>
+            <exclude>./tests/PHPixieTests/ORM/Functional</exclude>
+            <exclude>./tests/PHPixieTests/ORM/Functional.php</exclude>
         </testsuite>
         <testsuite name="functional">
             <directory>./tests/PHPixieTests/ORM/Functional</directory>

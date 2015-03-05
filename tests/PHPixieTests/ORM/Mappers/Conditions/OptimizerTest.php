@@ -65,7 +65,6 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
      */
     public function testOptimize()
     {
-        /*
         $this->assertOptimize(array(
             array(
                 'and_a' => array (
@@ -102,6 +101,33 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
             })
         );
         
+        
+        $this->assertOptimize(array(
+            'and.f1',
+            array(
+                'and' => array(
+                    'and.f2',
+                    'or.f3',
+                )
+            )
+        ),$this->builder()
+            ->_and('f1', 1)
+            ->_and(function($b) {
+                $b
+                    ->_and('f2', 1)
+                    ->_or('f3', 1);
+            })
+        );
+        
+        $this->assertOptimize(array(
+            'and.f1',
+        ),$this->builder()
+            ->_and('f1', 1)
+            ->_and(function($b) {
+
+            })
+        );
+        
         $this->assertOptimize(array(
             array (
                 'and_a' => array (
@@ -125,8 +151,11 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
         $this->assertOptimize(array(
             array(
                 '!and_a' => array (
-                    'and.f1',
-                    'and.f2',
+                    'and.f1'
+                ),
+            ), array(
+                '!or_a' => array (
+                    'and.f2'
                 ),
             ),
         ),$this->builder()
@@ -142,15 +171,15 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
         $this->assertOptimize(array(
             array (
                 '!and_a' => array (
-                    array (
-                        'and' => array (
-                            'and.f1',
-                            'xor.f2',
-                        ),
-                    ),
-                    'and.f3',
+                    'and.f1',
+                    'xor.f2',
                 ),
             ),
+            array (
+                '!or_a' => array (
+                    'and.f3',
+                ),
+            )
         ),$this->builder()
             ->notRelatedTo('a', function($b) {
                 $b->_and('f1', 1);
@@ -160,18 +189,14 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                 $b->_and('f3', 1);
             })
         );
-        */
+        
         $this->assertOptimize(array(
             array(
                 '!and_a' => array (
                     'and.f1',
+                    'or.f2'
                 ),
-            ),
-            array(
-                '!and_a' => array (
-                    'and.f2',
-                ),
-            ),
+            )
         ),$this->builder()
             ->notRelatedTo('a', function($b) {
                 $b->_and('f1', 1);
@@ -263,21 +288,13 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
                     array (
                         'and_b' => array (
                             'and.f1',
+                            'or.f3'
                         ),
                     ),
                     'or.f2',
-                ),
-            ),
-            array (
-                '!and_a' => array (
-                    array (
-                        'and_b' => array (
-                            'and.f3',
-                        ),
-                    ),
                     'or.f4',
                 ),
-            ),
+            )
         ), $this->builder()
             ->notRelatedTo('a', function($b) {
                 $b->relatedTo('b', function($b) {
@@ -371,6 +388,7 @@ class OptimizerTest extends \PHPixieTests\AbstractORMTest
             $res = $this->extractConditions($optimized);
             $this->assertEquals($expected, $res);
         }
+        
     }
 
     protected function builder()

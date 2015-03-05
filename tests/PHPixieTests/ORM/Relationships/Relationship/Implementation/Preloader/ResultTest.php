@@ -3,7 +3,7 @@
 namespace PHPixieTests\ORM\Relationships\Relationship\Implementation\Preloader;
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Preloader\Result
+ * @coversDefaultClass \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result
  */
 abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\PreloaderTest
 {
@@ -22,6 +22,16 @@ abstract class ResultTest extends \PHPixieTests\ORM\Relationships\Relationship\I
         $this->result = $this->result();
         $this->loader = $this->loader();
         parent::setUp();
+    }
+    
+    /**
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result::__construct
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+        
     }
     
     /**

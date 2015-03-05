@@ -13,4 +13,15 @@ abstract class MultipleTest extends \PHPixieTests\ORM\Relationships\Relationship
         $this->method($this->loaders, 'multiplePreloader', $loader, array($this->preloader, $ids), 0);
         return $loader;
     }
+    
+    /**
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result::__construct
+     * @covers \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple::__construct
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+        
+    }
 }

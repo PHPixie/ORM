@@ -73,6 +73,16 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::getRequiredField
+     * @covers ::<protected>
+     */
+    public function testGetRequiredField()
+    {
+        $this->prepareGetRequiredDataField('name', 'Blum');
+        $this->assertEquals('Blum', $this->entity->getRequiredField('name'));
+    }
+    
+    /**
      * @covers ::setField
      * @covers ::<protected>
      */
@@ -136,7 +146,7 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
         $this->assertSame($property, $this->entity->test1);
         $this->assertSame($property, $this->entity->test1);
         
-        $this->prepareGetDataField('name', null, 'Blum');
+        $this->prepareGetRequiredDataField('name', 'Blum');
         $this->assertSame('Blum', $this->entity->name);
     }
     
@@ -206,6 +216,11 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
     protected function prepareGetDataField($name, $default, $return)
     {
         $this->method($this->data, 'get', $return, array($name, $default), 0);
+    }
+    
+    protected function prepareGetRequiredDataField($name, $return)
+    {
+        $this->method($this->data, 'getRequired', $return, array($name), 0);
     }
     
     protected function prepareSetDataField($name, $value, $at = 0)

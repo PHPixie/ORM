@@ -31,6 +31,11 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
         return $this->data->get($name, $default);
     }
     
+    public function getRequiredField($name)
+    {
+        return $this->data->getRequired($name);
+    }
+    
     public function setField($name, $value)
     {
         $this->data->set($name, $value);
@@ -84,7 +89,7 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
         if (array_key_exists($name, $this->relationshipProperties)) {
             return $this->relationshipProperty($name);
         }
-        return $this->getField($name);
+        return $this->getRequiredField($name);
     }
     
     public function __call($name, $params)

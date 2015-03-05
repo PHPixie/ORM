@@ -33,9 +33,24 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
      */
     public function testSetGet()
     {
-        $this->method($this->document, 'get', 5, array('flowers'), 0);
+        $this->method($this->document, 'get', 5, array('flowers', null), 0);
         $this->assertEquals(5, $this->type->get('flowers'));
+        
+        $this->method($this->document, 'get', 5, array('flowers', 7), 0);
+        $this->assertEquals(5, $this->type->get('flowers', 7));
+        
+        $this->method($this->document, 'set', null, array('flowers', 5), 0);
         $this->type->set('flowers', 5);
+    }
+    
+    /**
+     * @covers ::getRequired
+     * @covers ::<protected>
+     */
+    public function testGetRequired()
+    {
+        $this->method($this->document, 'getRequired', 5, array('flowers'), 0);
+        $this->assertEquals(5, $this->type->getRequired('flowers'));
     }
     
     /**

@@ -48,6 +48,17 @@ class DocumentTest extends \PHPixieTests\ORM\Data\Types\Document\NodeTest
     }
     
     /**
+     * @covers ::getRequired
+     * @covers ::<protected>
+     */
+    public function testGetRequired()
+    {
+        $this->assertEquals('Trixie', $this->node->getRequired('name'));
+        $this->setExpectedException('\PHPixie\ORM\Exception\Data');
+        $this->node->getRequired('tree');
+    }
+    
+    /**
      * @covers ::set
      * @covers ::__set
      * @covers ::__get

@@ -18,6 +18,8 @@ abstract class EntityTest extends \PHPixieTests\AbstractORMTest
         array('getRelationshipProperty', true, array('a'), array('a', true)),
         array('getRelationshipProperty', true, array('a', false), array('a', false)),
         array('getField', true, array('a')),
+        array('getField', true, array('a', 5)),
+        array('getRequiredField', true, array('a')),
         array('setField', false, array('a', 5)),
     );
     public function setUp()

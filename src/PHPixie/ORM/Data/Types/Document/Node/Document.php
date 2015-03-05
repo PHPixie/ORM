@@ -39,9 +39,18 @@ class Document extends \PHPixie\ORM\Data\Types\Document\Node
 
     public function get($key, $default = null)
     {
-        if(!array_key_exists($key, $this->properties))
-            return $default;
-        return $this->properties[$key];
+        if(array_key_exists($key, $this->properties))
+            return $this->properties[$key];
+        
+        return $default;
+    }
+    
+    public function getRequired($key)
+    {
+        if(array_key_exists($key, $this->properties))
+            return $this->properties[$key];
+        
+        throw new \PHPixie\ORM\Exception\Data("Field '$key' is not set");
     }
 
     public function addArray($key, $data = array())

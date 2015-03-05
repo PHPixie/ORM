@@ -55,4 +55,14 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
         $this->method($this->connection, 'selectQuery', $query, array(), 0);
         $this->assertSame($query, $this->pivot->databaseSelectQuery());
     }
+    
+    /**
+     * @covers ::databaseInsertQuery
+     */
+    public function testDatabaseInsertQuery()
+    {
+        $query = $this->abstractMock('\PHPixie\Database\Query\Type\Insert');
+        $this->method($this->connection, 'insertQuery', $query, array(), 0);
+        $this->assertSame($query, $this->pivot->databaseInsertQuery());
+    }
 }

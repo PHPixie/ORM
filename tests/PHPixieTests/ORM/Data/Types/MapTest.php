@@ -24,17 +24,30 @@ class MapTest extends \PHPixieTests\ORM\Data\Type\ImplementationTest
     
     /**
      * @covers ::get
+     * @covers ::getRequired
      * @covers ::set
      * @covers ::<protected>
      */
     public function testSetGet()
     {
         $this->assertEquals('Trixie', $this->type->get('name'));
+        $this->assertEquals('Trixie', $this->type->getRequired('name'));
         $this->type->set('test', 5);
         $this->assertEquals(5, $this->type->get('test'));
         $this->assertEquals(null, $this->type->get('test2'));
         $this->assertEquals(5, $this->type->get('test2', 5));
     }
+    
+    /**
+     * @covers ::getRequired
+     * @covers ::<protected>
+     */
+    public function testGetRequiredException()
+    {
+        $this->setExpectedException('\PHPixie\ORM\Exception\Data');
+        $this->type->getRequired('tree');
+    }
+    
     
     /**
      * @covers ::data

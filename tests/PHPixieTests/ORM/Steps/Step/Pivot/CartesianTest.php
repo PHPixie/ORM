@@ -30,10 +30,20 @@ class CartesianTest extends \PHPixieTests\ORM\Steps\Step\Query\Insert\Batch\Data
         parent::setUp();
     }
     
+
     /**
+     * @covers ::fields
      * @covers ::<protected>
+     */
+    public function testFields()
+    {
+        $this->assertSame($this->fields, $this->step->fields());
+    }
+    
+    /**
      * @covers ::execute
      * @covers ::data
+     * @covers ::<protected>
      */
     public function testProduct()
     {

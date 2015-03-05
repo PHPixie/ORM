@@ -15,6 +15,11 @@ class Document extends \PHPixie\ORM\Data\Type\Implementation
     {
         return $this->document->get($key, $default);
     }
+    
+    public function getRequired($key)
+    {
+        return $this->document->getRequired($key);
+    }
 
     protected function setValue($key, $value)
     {

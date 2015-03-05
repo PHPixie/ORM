@@ -25,6 +25,14 @@ class Map extends \PHPixie\ORM\Data\Type\Implementation
         return $default;
     }
     
+    public function getRequired($key)
+    {
+        if(array_key_exists($key, $this->data))
+            return $this->data[$key];
+        
+        throw new \PHPixie\ORM\Exception\Data("Field '$key' is not set");
+    }
+    
     protected function setValue($key, $value)
     {
         $this->data[$key] = $value;

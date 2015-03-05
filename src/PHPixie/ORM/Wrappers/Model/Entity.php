@@ -31,9 +31,14 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
         return $this->entity->data();
     }
     
-    public function getField($name)
+    public function getField($name, $default = null)
     {
-        return $this->entity->getField($name);
+        return $this->entity->getField($name, $default);
+    }
+    
+    public function getRequiredField($name)
+    {
+        return $this->entity->getRequiredField($name);
     }
     
     public function setField($key, $value)

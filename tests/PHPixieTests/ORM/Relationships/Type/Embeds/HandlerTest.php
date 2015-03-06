@@ -5,13 +5,16 @@ namespace PHPixieTests\ORM\Relationships\Type\Embeds;
 /**
  * @coversDefaultClass \PHPixie\ORM\Relationships\Type\Embeds\Handler
  */
-abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\Handler\EmbeddedTest
+abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementation\HandlerTest
 {
+    protected $planners;
     protected $ownerPropertyName;
     protected $propertyConfig;
     protected $configOwnerProperty;
     protected $oldOwnerProperty = 'plants';
     protected $itemSideName;
+    
+    protected $documentPlanner;
 
     public function setUp()
     {
@@ -24,6 +27,9 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
 
         $this->propertyConfig = $this->config($this->configData);
         parent::setUp();
+        
+        $this->documentPlanner = $this->getPlanner('document');
+        $this->method($this->planners, 'document', $this->documentPlanner, array());
     }
     
     /**
@@ -84,6 +90,45 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $this->assertSame($preloader, $this->handler->mapPreload($side, $preloadProperty['property'], $result, $plan));
     }
     
+    protected function prepareGetDocument($document, $path, $createMissing = false, $at = 0)
+    {
+        $subdocument = $this->getDocument();
+        $this->method(
+            $this->documentPlanner,
+            'getDocument',
+            $subdocument,
+            array($document, $path, $createMissing),
+            $at
+        );
+        return $subdocument;
+    }
+    
+    protected function prepareGetArrayNode($document, $path, $createMissing = false, $at = 0)
+    {
+        $arrayNode = $this->getArrayNode();
+        $this->method(
+            $this->documentPlanner,
+            'getArrayNode',
+            $arrayNode,
+            array($document, $path, $createMissing),
+            $at
+        );
+        return $arrayNode;
+    }
+    
+    protected function prepareGetParentDocumentAndKey($document, $path, $createMissing = false, $parentKey = 'parentKey', $at = 0)
+    {
+        $parent = $this->getDocument();
+        $this->method(
+            $this->documentPlanner,
+            'getParentDocumentAndKey',
+            array($parent, $parentKey),
+            array($document, $path, $createMissing),
+            $at
+        );
+        return array($parent, $parentKey);
+    }
+    
     protected function prepareRemoveItemFromOwner($item, $ownerRelationshipType = 'one')
     {
         if($item['owner'] === null)
@@ -128,7 +173,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     {
         $entity = $this->getEmbeddedEntity();
         $this->method($entity, 'modelName', $this->configData[$type.'Model'], array());
-        $data = $this->getData();
+        $data = $this->getDocumentData();
         $document = $this->getDocument();
 
         $this->method($entity, 'data', $data, array());
@@ -148,6 +193,26 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         return $entity;
     }
 
+    protected function getEmbeddedEntity()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Models\Type\Embedded\Entity');
+    }
+    
+    protected function getDocumentData()
+    {
+        return $this->quickMock('\PHPixie\ORM\Data\Types\Document');
+    }
+    
+    protected function getDocument()
+    {
+        return $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\Document');
+    }
+    
+    protected function getArrayNode()
+    {
+        return $this->quickMock('\PHPixie\ORM\Data\Types\Document\Node\ArrayNode');
+    }
+    
     protected function getArrayNodeLoader()
     {
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Embedded\ArrayNode');
@@ -161,6 +226,16 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
     protected function getEmbedsOneProperty()
     {
         return $this->quickMock('\PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Entity\Item');
+    }
+    
+    protected function getDatabaseDocumentQuery()
+    {
+        return $this->abstractMock('\PHPixie\Database\Type\Document\Query\Items');
+    }
+    
+    protected function getDocumentConditionContainer()
+    {
+        return $this->quickMock('\PHPixie\Database\Type\Document\Conditions\Builder\Container');
     }
     
     abstract protected function prepareMapConditionBuilder($builder, $side, $collection, $plan);

@@ -21,7 +21,7 @@ class Item extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloa
         }
     }
 
-    public function getMappedIdFor($entity)
+    protected function getMappedIdFor($entity)
     {
         $id = $entity->id();
         

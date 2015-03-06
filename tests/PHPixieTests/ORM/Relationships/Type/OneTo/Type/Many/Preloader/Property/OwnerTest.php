@@ -14,6 +14,15 @@ class OwnerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementat
         $this->owner = $this->getEntity();
         parent::setUp();
     }
+
+    /**
+     * @covers ::__construct
+     * @covers ::<protected>
+     */
+    public function testConstruct()
+    {
+        
+    }
     
     /**
      * @covers ::loadProperty

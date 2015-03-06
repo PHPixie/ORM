@@ -39,8 +39,7 @@ class Pivot extends \PHPixie\ORM\Planners\Planner
             $sides[]= $secondSide;
         }
         
-        $deleteQuery = $pivot->connection()->deleteQuery();
-        $this->planners->query()->setSource($deleteQuery, $pivot->source());
+        $deleteQuery = $pivot->databaseDeleteQuery();
 
         foreach ($sides as $side) {
             $this->planners->in()->itemIds(

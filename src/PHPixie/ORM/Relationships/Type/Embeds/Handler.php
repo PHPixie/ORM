@@ -41,7 +41,7 @@ abstract class Handler extends    \PHPixie\ORM\Relationships\Relationship\Implem
         if ($owner !== null) {
             $propertyName = $item->ownerPropertyName();
             $property = $owner->getRelationshipProperty($propertyName);
-            if ($property instanceof \PHPixie\ORM\Relationships\Type\Embeds\Type\One\Property\Item) {
+            if ($property instanceof Type\One\Property\Entity\Item) {
                 $property->remove();
             } else {
                 $property->remove($item);

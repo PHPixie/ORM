@@ -9,21 +9,22 @@ class Document extends \PHPixie\ORM\Planners\Planner
         return explode('.', $path);
     }
     
-    protected function getDocument($document, $path, $createMissing = true)
+    public function getDocument($document, $path, $createMissing = false)
     {
         $explodedPath = $this->explodePath($path);
         return $this->getDocumentByExplodedPath($document, $explodedPath, $createMissing);
     }
     
-    protected function getArrayNode($document, $path, $createMissing = true)
+    public function getArrayNode($document, $path, $createMissing = false)
     {
         list($parent, $key) = $this->getParentDocumentAndKey($document, $path);
         if($document === null)
             return null;
+        
         $property = $parent->get($key);
         if($property !== null) {
             if(!($property instanceof \PHPixie\ORM\Data\Types\Document\Node\ArrayNode))
-                throw new \PHPixie\ORM\Exception\Relationship("$path is not an array node");
+                throw new \PHPixie\ORM\Exception\Data("$path is not an array node");
         }elseif($createMissing) {
             $parent->addArray($key);
         }else{
@@ -32,7 +33,7 @@ class Document extends \PHPixie\ORM\Planners\Planner
         return $parent->get($key);
     }
     
-    protected function getParentDocumentAndKey($document, $path, $createMissing = true)
+    public function getParentDocumentAndKey($document, $path, $createMissing = false)
     {
         $explodedPath = $this->explodePath($path);
         $key = array_pop($explodedPath);
@@ -40,7 +41,7 @@ class Document extends \PHPixie\ORM\Planners\Planner
         return array($parent, $key);
     }
     
-    protected function getDocumentByExplodedPath($document, $explodedPath, $createMissing = true)
+    protected function getDocumentByExplodedPath($document, $explodedPath, $createMissing)
     {
         $last = count($explodedPath) - 1;
         foreach($explodedPath as $i => $key) {
@@ -48,7 +49,7 @@ class Document extends \PHPixie\ORM\Planners\Planner
             if($property !== null) {
                 if($i === $last && !($property instanceof \PHPixie\ORM\Data\Types\Document\Node\Document)) {
                     $path = implode('.', array_slice($explodedPath, 0, $i+1));
-                    throw new \PHPixie\ORM\Exception\Relationship("$path is not a document node.");
+                    throw new \PHPixie\ORM\Exception\Data("$path is not a document node.");
                 }
             }elseif($createMissing) {
                 $document->addDocument($key);

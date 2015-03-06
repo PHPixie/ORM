@@ -49,6 +49,11 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->runTests('removeItems');
     }
     
+    public function testCascadeDelete()
+    {
+        $this->runTests('cascadeDelete');
+    }
+    
     protected function itemsConditionsTest()
     {
         $this->prepareEntities();
@@ -149,7 +154,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     
     protected function loadItemsTest()
     {
-        list($map, $flowerMap) = $this->prepareEntities();
+        list($map, $flowerMap, $instances) = $this->prepareEntities();
         
         $fairies = $this->orm->get('fairy')->query()
             ->find()->asArray();
@@ -161,7 +166,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     
     protected function preloadItemsTest()
     {
-        list($map, $flowerMap) = $this->prepareEntities();
+        list($map, $flowerMap, $instances) = $this->prepareEntities();
         
         $fairies = $this->orm->get('fairy')->query()
             ->find(array('flowers'))->asArray();
@@ -256,6 +261,26 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
     }
     
+    protected function cascadeDeleteTest()
+    {
+        list($map, $flowerMap, $instances) = $this->prepareEntities();
+        unset($flowerMap['Trixie']);
+        
+        $pivot = array();
+        foreach($flowerMap as $fairyName => $flowers) {
+            foreach($flowers as $flowerName) {
+                $pivot[] = array($instances[$fairyName]->id(), $instances[$flowerName]->id());
+            }
+        }
+        
+        $this->orm->get('fairy')->query()
+            ->where('name', 'Trixie')
+            ->delete();
+        
+        $this->assertPivot($pivot);
+        
+    }
+    
     protected function getEntities()
     {
         $entities = array();
@@ -337,7 +362,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
             }
         }
         
-        return array($map, $flowerMap);
+        return array($map, $flowerMap, $instances);
 
     }
     

@@ -63,7 +63,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
         $owner = $this->getOwner();
         $item = $this->getItem();
 
-        $document = $this->prepareGetDocument($owner['document'], $this->configData['path']);
+        $document = $this->prepareGetDocument($owner['document'], $this->configData['path'], false);
         $this->method($this->modelMocks['embedded'], 'loadEntity', $item['entity'], array($this->configData['itemModel'], $document), 0);
         $this->method($item['entity'], 'setOwnerRelationship',null , array($owner['entity'], $this->configData['ownerItemProperty']), 0);
         $this->handler->loadProperty($this->propertyConfig, $owner['entity']);
@@ -112,7 +112,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
 
     protected function prepareSetItemModel($owner, $item, $itemOffset = 2)
     {
-        list($document, $key) = $this->prepareGetParentDocumentAndKey($owner['document'], $this->configData['path']);
+        list($document, $key) = $this->prepareGetParentDocumentAndKey($owner['document'], $this->configData['path'], true);
         $this->method($document, 'set', null, array($key, $item['document']), 0);
         $this->method($item['entity'], 'setOwnerRelationship', null, array($owner['entity'], $this->configData['ownerItemProperty']), $itemOffset);
         $this->preparePopertySetValue($owner['property'], $item['entity']);
@@ -120,7 +120,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\Embeds\HandlerTes
 
     protected function prepareRemoveItem($owner)
     {
-        list($document, $key) = $this->prepareGetParentDocumentAndKey($owner['document'], $this->configData['path']);
+        list($document, $key) = $this->prepareGetParentDocumentAndKey($owner['document'], $this->configData['path'], true);
         $this->method($document, 'remove', null, array($key), 0);
         $this->preparePopertySetValue($owner['property'], null);
     }

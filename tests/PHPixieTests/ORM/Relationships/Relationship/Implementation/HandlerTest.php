@@ -155,6 +155,11 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
     {
         return $this->quickMock('\PHPixie\ORM\Values\Preload');
     }
+    
+    protected function getCascadePath()
+    {
+        return $this->quickMock('\PHPixie\ORM\Mappers\Cascade\Path');
+    }
 
     protected function getReusableResult()
     {
@@ -164,6 +169,11 @@ abstract class HandlerTest extends \PHPixieTests\AbstractORMTest
     protected function getReusableResultStep()
     {
         return $this->abstractMock('\PHPixie\ORM\Steps\Step\Query\Result\Reusable');
+    }
+    
+    protected function getQueryStep()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Steps\Step\Query');
     }
 
     protected function getReusableResultLoader()

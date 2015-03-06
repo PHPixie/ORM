@@ -12,6 +12,11 @@ class Planners
         $this->ormBuilder = $ormBuilder;
     }
 
+    public function document()
+    {
+        return $this->plannerInstance('document');
+    }
+    
     public function in()
     {
         return $this->plannerInstance('in');
@@ -40,6 +45,11 @@ class Planners
         }
 
         return $this->planners[$name];
+    }
+    
+    protected function buildDocumentPlanner()
+    {
+        return new Planners\Planner\Document();
     }
     
     protected function buildInPlanner()

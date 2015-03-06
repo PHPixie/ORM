@@ -153,10 +153,10 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     {
         $document = $entity->data()->document();
         $documentPlanner = $this->planners->document();
-        list($parent, $key) = $documentPlanner->getParentAndKey($document, $config->path);
+        list($parent, $key) = $documentPlanner->getParentDocumentAndKey($document, $config->path, true);
         
         if($arrayNode === null) {
-            $arrayNode = $this->getArrayNode($parent, $key);
+            $arrayNode = $documentPlanner->getArrayNode($parent, $key, true);
         }
         
         if($arrayNode->count() === 0) {

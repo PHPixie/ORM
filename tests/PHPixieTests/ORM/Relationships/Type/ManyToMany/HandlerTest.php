@@ -440,6 +440,56 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
                                     $item['entity']
                                 );
     }
+    
+    /**
+     * @covers ::handleDelete
+     * @covers ::<protected>
+     */
+    public function testHandleDeleteLeft()
+    {
+        $this->handleDeleteTest('left');
+    }
+    
+    /**
+     * @covers ::handleDelete
+     * @covers ::<protected>
+     */
+    public function testHandleDeleteRight()
+    {
+        $this->handleDeleteTest('right');
+    }
+
+    
+    protected function handleDeleteTest($type)
+    {
+        $opposing = $type == 'left' ? 'right' : 'left';
+        
+        $side = $this->side($type, $this->configData, array(
+            'modelName' => $this->configData[$opposing.'Model']
+        ));
+        
+        $result = $this->getReusableResult();
+        $plan = $this->getPlan();
+        $sidePath = $this->getCascadePath();
+        
+        $m = $this->getRelationshipMocks($type, $this->configData);
+        $this->method($this->planners, 'pivot', $m['pivotPlanner'], array());
+        
+        $opposingAt = $m[$opposing.'Offset'];
+        
+        $query = $this->getDatabaseQuery('delete');
+        $this->method($m['pivotPivot'], 'databaseDeleteQuery', $query, array(), 0);
+        
+        $this->prepareRepositoryConfig($m[$opposing.'Repo'], array('idField' => $opposing.'Id'), $opposingAt++);
+        $this->method($m['inPlanner'], 'result', array(),
+                      array($query, $this->configData[$opposing.'PivotKey'], $result, $opposing.'Id', $plan), 0);
+        
+        $step = $this->getQueryStep();
+        $this->method($this->steps, 'query', $step, array($query), 0);
+        $this->method($plan, 'add', null, array($step), 0);
+        
+        $this->handler->handleDelete($side, $result, $plan, $sidePath);
+    }
 
     protected function modifyPropertyLinkTest($method)
     {

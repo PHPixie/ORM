@@ -65,4 +65,14 @@ class PivotTest extends \PHPixieTests\AbstractORMTest
         $this->method($this->connection, 'insertQuery', $query, array(), 0);
         $this->assertSame($query, $this->pivot->databaseInsertQuery());
     }
+    
+    /**
+     * @covers ::databaseDeleteQuery
+     */
+    public function testDatabaseDeleteQuery()
+    {
+        $query = $this->abstractMock('\PHPixie\Database\Query\Type\Delete');
+        $this->method($this->connection, 'deleteQuery', $query, array(), 0);
+        $this->assertSame($query, $this->pivot->databaseDeleteQuery());
+    }
 }

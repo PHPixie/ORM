@@ -190,14 +190,8 @@ class PivotTest extends \PHPixieTests\ORM\Planners\PlannerTest
             $sides[]= $secondSide;
         }
         
-        $connection  = $this->getConnection();
         $deleteQuery = $this->getDatabaseQuery('delete');
-        
-        $this->method($pivot, 'connection', $connection, array(), 0);
-        $this->method($connection, 'deleteQuery', $deleteQuery, array(), 0);
-        
-        $this->method($pivot, 'source', 'pixie', array(), 1);
-        $this->method($this->plannerMocks['query'], 'setSource', null, array($deleteQuery, 'pixie'), 0);
+        $this->method($pivot, 'databaseDeleteQuery', $deleteQuery, array(), 0);
         
         foreach($sides as $key => $side) {
             $repository = $this->getRepository();

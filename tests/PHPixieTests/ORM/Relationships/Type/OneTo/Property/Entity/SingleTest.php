@@ -35,6 +35,18 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\Pro
     }
 
     /**
+     * @covers ::value
+     * @covers ::<protected>
+     */
+    public function testDeletedValue()
+    {
+        $entity = $this->getEntity();
+        $this->method($entity, 'isDeleted', true, array(), 0);
+        $this->prepareLoad($entity);
+        $this->assertSame(null, $this->property->value());
+    }
+    
+    /**
      * @covers ::remove
      * @covers ::<protected>
      */

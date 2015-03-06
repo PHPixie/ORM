@@ -38,4 +38,11 @@ class Pivot
         $this->queryPlanner->setSource($query, $this->source);
         return $query;
     }
+    
+    public function databaseDeleteQuery()
+    {
+        $query = $this->connection->deleteQuery();
+        $this->queryPlanner->setSource($query, $this->source);
+        return $query;
+    }
 }

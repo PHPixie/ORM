@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Planners\Planner;
 
-class Update
+class Update extends \PHPixie\ORM\Planners\Planner
 {
     protected $steps;
     

@@ -90,7 +90,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     {
         $document = $this->getEntityDocument($entity);
         $documentPlanner = $this->planners->document();
-        return $documentPlanner->getParentAndKey($document, $config->path);
+        return $documentPlanner->getParentDocumentAndKey($document, $config->path, true);
     }
 
 }

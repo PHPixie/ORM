@@ -36,6 +36,20 @@ class PlannersTest extends \PHPixieTests\AbstractORMTest
     }
     
     /**
+     * @covers ::document
+     * @covers ::<protected>
+     */
+    public function testDocument()
+    {
+        $planner = $this->planners->document();
+        $this->assertSame($planner, $this->planners->document());
+        
+        $this->assertInstance($planner, '\PHPixie\ORM\Planners\Planner\Document', array(
+            
+        ));
+    }
+    
+    /**
      * @covers ::in
      * @covers ::<protected>
      */

@@ -57,6 +57,18 @@ abstract class SideTest extends \PHPixieTests\ORM\Relationships\Relationship\Imp
             $this->itemSideName => $this->ownerProperty
         ));
     }
+    
+    /**
+     * @covers ::isDeleteHandled
+     * @covers ::<protected>
+     */
+    public function testIsDeleteHandled()
+    {
+        $this->assertSidesMethod('isDeleteHandled', array(
+            'owner'  => false,
+            $this->itemSideName => true
+        ));
+    }
 
     protected function config()
     {

@@ -2,7 +2,7 @@
 
 namespace PHPixie\ORM\Relationships\Type\Embeds;
 
-abstract class Handler extends    \PHPixie\ORM\Relationships\Relationship\Implementation\Handler\Embedded
+abstract class Handler extends    \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
                        implements \PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Database,
                                   \PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Embedded,
                                   \PHPixie\ORM\Relationships\Relationship\Handler\Preloading

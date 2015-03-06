@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Relationship\Implementation\Handler;
+namespace PHPixie\ORM\Planners\Planner;
 
-abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
+class Document extends \PHPixie\ORM\Planners\Planner
 {
     protected function explodePath($path)
     {
@@ -31,6 +31,7 @@ abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Implemen
         }
         return $parent->get($key);
     }
+    
     protected function getParentDocumentAndKey($document, $path, $createMissing = true)
     {
         $explodedPath = $this->explodePath($path);
@@ -38,6 +39,7 @@ abstract class Embedded extends \PHPixie\ORM\Relationships\Relationship\Implemen
         $parent = $this->getDocumentByExplodedPath($document, $explodedPath, $createMissing);
         return array($parent, $key);
     }
+    
     protected function getDocumentByExplodedPath($document, $explodedPath, $createMissing = true)
     {
         $last = count($explodedPath) - 1;

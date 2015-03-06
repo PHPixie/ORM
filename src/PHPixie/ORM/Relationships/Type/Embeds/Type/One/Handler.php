@@ -26,7 +26,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     public function loadProperty($config, $owner)
     {
         $document = $this->getEntityDocument($owner);
-        $item = $this->getDocument($document, $config->path, false);
+        $item = $this->planners->document()->getDocument($document, $config->path, false);
+        
         if($item !== null) {
             $item = $this->models->embedded()->loadEntity($config->itemModel, $item);
             $item->setOwnerRelationship($owner, $config->ownerItemProperty);
@@ -46,8 +47,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     {
         $property = $entity->getRelationshipProperty($config->ownerItemProperty);
         $this->unsetCurrentItemOwner($property);
-        $document = $this->getEntityDocument($entity);
-        list($document, $key) = $this->getParentDocumentAndKey($document, $config->path);
+        
+        list($document, $key) = $this->getParentDocumentAndKey($entity, $config);
         $document->remove($key);
         $property->setValue(null);
     }
@@ -63,8 +64,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
         $property = $entity->getRelationshipProperty($config->ownerItemProperty);
         $this->unsetCurrentItemOwner($property);
         
-        $document = $this->getEntityDocument($entity);
-        list($document, $key) = $this->getParentDocumentAndKey($document, $config->path);
+        list($document, $key) = $this->getParentDocumentAndKey($entity, $config);
         $document->set($key, $item->data()->document());
         $item->setOwnerRelationship($entity, $config->ownerItemProperty);
         $property->setValue($item);
@@ -84,6 +84,13 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     protected function getEntityDocument($entity)
     {
         return $entity->data()->document();
+    }
+    
+    protected function getParentDocumentAndKey($entity, $config)
+    {
+        $document = $this->getEntityDocument($entity);
+        $documentPlanner = $this->planners->document();
+        return $documentPlanner->getParentAndKey($document, $config->path);
     }
 
 }

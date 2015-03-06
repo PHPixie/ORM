@@ -152,7 +152,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\Embeds\Handler
     protected function checkArrayNode($entity, $config, $arrayNode = null)
     {
         $document = $entity->data()->document();
-        list($parent, $key) = $this->getParentDocumentAndKey($document, $config->path);
+        $documentPlanner = $this->planners->document();
+        list($parent, $key) = $documentPlanner->getParentAndKey($document, $config->path);
         
         if($arrayNode === null) {
             $arrayNode = $this->getArrayNode($parent, $key);

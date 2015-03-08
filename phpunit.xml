@@ -5,10 +5,12 @@
             <exclude>./tests/PHPixieTests/ORM/Functional</exclude>
             <exclude>./tests/PHPixieTests/ORM/Functional.php</exclude>
         </testsuite>
-        <testsuite name="functional">
-            <directory>./tests/PHPixieTests/ORM/Functional</directory>
-            <file>./tests/PHPixieTests/ORM/FunctionalTest.php</file>
-        </testsuite>
+        <!--
+            <testsuite name="functional">
+                <directory>./tests/PHPixieTests/ORM/Functional</directory>
+                <file>./tests/PHPixieTests/ORM/FunctionalTest.php</file>
+            </testsuite>
+        -->
     </testsuites>
     <filter>
         <whitelist>

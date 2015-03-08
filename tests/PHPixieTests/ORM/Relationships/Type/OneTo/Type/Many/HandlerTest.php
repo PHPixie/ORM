@@ -164,23 +164,22 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Type\OneTo\HandlerTest
      * @covers ::mapPreload
      * @covers ::<protected>
      */
-    public function mapPreloadOwner()
+    public function testMapPreloadOwner()
     {
-        $side = $this->side($type, $this->configData);
-        $query = $this->getDatabaseQuery();
+        $side = $this->side('owner', $this->configData);
         $result = $this->getReusableResult();
         $plan = $this->getPlan();
         $preloadProperty = $this->getOwnerPreloadValue();
         
         $owner = $this->getDatabaseEntity();
-        $this->method($preloadValue, 'owner', $owner, array(), 0);
+        $this->method($preloadProperty, 'owner', $owner, array(), 0);
         
-        $preloader = $his->getOwnerPropertyPreloader();
+        $preloader = $this->getOwnerPropertyPreloader();
         $this->method($this->relationship, 'ownerPropertyPreloader', $preloader, array($owner), 0);
         
         $this->assertEquals($preloader, $this->handler->mapPreload(
             $side,
-            $preloadProperty['property'],
+            $preloadProperty,
             $result,
             $plan
         ));

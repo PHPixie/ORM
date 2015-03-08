@@ -28,12 +28,7 @@ class ItemTest extends \PHPixieTests\ORM\Relationships\Relationship\Implementati
         }
         $this->method($this->result, 'getFields', $fields, array(array('id', $this->configData['ownerKey'])), 0);
     }
-    
-    protected function getModel()
-    {
-        return $this->abstractMock('\PHPixie\ORM\Repositories\Type\Database\Model');
-    }
-    
+
     protected function loader()
     {
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\ReusableResult');

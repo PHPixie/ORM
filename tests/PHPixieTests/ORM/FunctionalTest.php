@@ -41,7 +41,7 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
 
     protected function createEntity($name, $data)
     {
-        $entity = $this->orm->get($name)->create();
+        $entity = $this->orm->repository($name)->create();
         foreach($data as $field => $value) {
             $entity->$field = $value;
         }
@@ -61,7 +61,7 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
     
     protected function assertData($modelName, $data, $idField = null)
     {
-        $entities = $this->orm->get($modelName)->query()
+        $entities = $this->orm->repository($modelName)->query()
                         ->find()
                         ->asArray();
         
@@ -70,7 +70,7 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
     
     protected function assertDataAsObject($modelName, $data)
     {
-        $entityData = $this->orm->get($modelName)->query()
+        $entityData = $this->orm->repository($modelName)->query()
                         ->find()
                         ->asArray(true);
         
@@ -101,7 +101,7 @@ abstract class FunctionalTest extends \PHPixieTests\AbstractORMTest
     
     protected function idField($modelName)
     {
-        return $this->orm->get($modelName)->config()->idField;
+        return $this->orm->repository($modelName)->config()->idField;
     }
     
     protected function database()

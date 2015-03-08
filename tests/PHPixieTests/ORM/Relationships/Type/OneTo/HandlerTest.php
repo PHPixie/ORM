@@ -74,7 +74,7 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         $this->mapDatabaseQueryTest($repositories, 'owner', true);
         $this->mapDatabaseQueryTest($repositories, 'owner', false);
         
-        $this->mapDatabaseQueryTest($repositories, $this->itemSide, false);
+        $this->mapDatabaseQueryTest($repositories, $this->itemSide, true);
         $this->mapDatabaseQueryTest($repositories, $this->itemSide, false);
     }
     
@@ -116,10 +116,10 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         if($hasConditions) {
             
             if(!$isOwner) {
-                $this->method($subquery, 'starGroup', null, array(), $subQueryAt++);
+                $this->method($subquery, 'startGroup', null, array(), $subQueryAt++);
             }   
             
-            $modelName = $this->configData[$type.'Model'];
+            $modelName = $type === 'owner' ? $this->configData['ownerModel'] : $this->configData['itemModel'];
             $this->method($subqueryRepository, 'modelName', $modelName, array(), $subqueryRepoOffset++);
             $this->method($this->mapperMocks['conditions'], 'map', null, array(
                 $subquery,
@@ -242,6 +242,84 @@ abstract class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\
         }
     }
 
+    /**
+     * @covers ::handleDelete
+     * @covers ::<protected>
+     */
+    public function testHandleDelete()
+    {
+        $this->handleDeleteTest('update');
+        $this->handleDeleteTest('delete');
+        $this->handleDeleteTest('delete', true);
+    }
+    
+    protected function handleDeleteTest($onDelete = 'update', $isItemModelHandled = false)
+    {
+        $data = $this->configData;
+        $data['onDelete'] = $onDelete;
+        $side = $this->side($this->ownerPropertyName, $data);
+        
+        $result = $this->getReusableResult();
+        $plan = $this->getPlan();
+        $sidePath = $this->getCascadePath();
+           
+        $repositories = $this->prepareRepositories();
+        
+        $ownerRepository = $this->modelMocks['database']->repository($data['ownerModel']);
+        $itemRepository = $this->modelMocks['database']->repository($data['itemModel']);
+        $itemRepositoryAt = 0;
+        
+        $hasHandledSides = false;
+        
+        if($onDelete === 'update') {
+            $query = $this->getDatabaseQuery('update');
+            $this->method($itemRepository, 'databaseUpdateQuery', $query, array(), $itemRepositoryAt++);
+        }else{
+            $this->method(
+                $this->mapperMocks['cascadeDelete'],
+                'isModelHandled',
+                $isItemModelHandled,
+                array($data['itemModel']),
+                0
+            );
+            $hasHandledSides = $isItemModelHandled;
+            
+            if($hasHandledSides) {
+                $query = $this->getDatabaseQuery('select');
+                $this->method($itemRepository, 'databaseSelectQuery', $query, array(), $itemRepositoryAt++);
+                
+            }else{
+                $query = $this->getDatabaseQuery('delete');
+                $this->method($itemRepository, 'databaseDeleteQuery', $query, array(), $itemRepositoryAt++);
+            }
+        }
+        $this->prepareRepositoryConfig($ownerRepository, array('idField' =>'owner_id'), 0);
+        
+        $this->method($this->plannerMocks['in'], 'result', null, array(
+            $query,
+            $data['ownerKey'],
+            $result,
+            'owner_id',
+            $plan
+        ), 0);
+        
+        if($hasHandledSides) {
+            $this->method($this->mapperMocks['cascadeDelete'], 'handleQuery', null, array(
+                $query,
+                $data['itemModel'],
+                $plan,
+                $sidePath
+            ), 1);
+        }else{
+            $step = $this->getQueryStep();
+            $this->method($this->steps, 'query', $step, array($query), 0);
+            $this->method($plan, 'add', null, array($step), 0);
+        }
+        
+        $this->handler->handleDelete($side, $result, $plan, $sidePath);
+        
+    }
+        
     protected function prepareLinkPlan($owner, $items, $plansOffset = 0, $stepsOffset = 0, $inPlannerOffset = 0, $ownerRepoOffset = 0, $itemRepoOffset= 0)
     {
         $ownerRepository = $this->modelMocks['database']->repository($this->configData['ownerModel']);

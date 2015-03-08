@@ -85,13 +85,13 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
     {
         $this->prepareEntities();
         
-        $trixie = $this->orm->get('fairy')->query()
+        $trixie = $this->orm->repository('fairy')->query()
                     ->where('name', 'Trixie')
                     ->findOne();
         
         $this->assertEquals('Red', $trixie->flower()->name);
         
-        $pixie = $this->orm->get('fairy')->query()
+        $pixie = $this->orm->repository('fairy')->query()
                     ->where('name', 'Pixie')
                     ->findOne();
         
@@ -102,7 +102,7 @@ class OneTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
     {
         $map = $this->prepareEntities();
         
-        $fairies = $this->orm->get('fairy')->query()
+        $fairies = $this->orm->repository('fairy')->query()
                         ->find(array('flower'))
                         ->asArray();
         

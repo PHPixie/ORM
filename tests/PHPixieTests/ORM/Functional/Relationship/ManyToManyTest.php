@@ -60,7 +60,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Trixie', 'Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo('flowers', function($b) {
                     $b->and('name', 'Red');
                 })
@@ -70,7 +70,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Pixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->notRelatedTo('flowers', function($b) {
                     $b->and('name', 'Red');
                 })
@@ -79,29 +79,29 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->where('flowers'.'.name', 'Yellow')
                 ->find()->asArray()
         );
         
         $this->assertNames(
             array('Trixie', 'Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo('flowers')
                 ->find()->asArray()
         );
                 
         $this->assertNames(
             array('Pixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->notRelatedTo('flowers')
                 ->find()->asArray()
         );
         
-        $red = $this->orm->get('flower')->query()->findOne();
+        $red = $this->orm->repository('flower')->query()->findOne();
         $this->assertNames(
             array('Trixie', 'Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo('flowers', $red)
                 ->find()->asArray()
         );
@@ -112,21 +112,21 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     {
         $this->prepareEntities();
         
-        $red = $this->orm->get('flower')->query()
+        $red = $this->orm->repository('flower')->query()
             ->where('name', 'Red')
             ->findOne();
         
-        $green = $this->orm->get('flower')->query()
+        $green = $this->orm->repository('flower')->query()
             ->where('name', 'Green')
             ->findOne();
         
-        $yellow = $this->orm->get('flower')->query()
+        $yellow = $this->orm->repository('flower')->query()
             ->where('name', 'Yellow')
             ->findOne();
 
         $this->assertNames(
             array('Trixie', 'Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo('flowers', $red)
                 ->relatedTo('flowers', $green)
                 ->find()->asArray()
@@ -134,7 +134,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo('flowers', $red)
                 ->relatedTo('flowers', $green)
                 ->relatedTo('flowers', $yellow)
@@ -143,7 +143,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Blum', 'Pixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo('flowers', $yellow)
                 ->orNotRelatedTo('flowers')
                 ->find()->asArray()
@@ -156,7 +156,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     {
         list($map, $flowerMap, $instances) = $this->prepareEntities();
         
-        $fairies = $this->orm->get('fairy')->query()
+        $fairies = $this->orm->repository('fairy')->query()
             ->find()->asArray();
         
         foreach($fairies as $fairy) {
@@ -168,7 +168,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     {
         list($map, $flowerMap, $instances) = $this->prepareEntities();
         
-        $fairies = $this->orm->get('fairy')->query()
+        $fairies = $this->orm->repository('fairy')->query()
             ->find(array('flowers'))->asArray();
         
         foreach($fairies as $fairy) {
@@ -273,7 +273,7 @@ class ManyToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
             }
         }
         
-        $this->orm->get('fairy')->query()
+        $this->orm->repository('fairy')->query()
             ->where('name', 'Trixie')
             ->delete();
         

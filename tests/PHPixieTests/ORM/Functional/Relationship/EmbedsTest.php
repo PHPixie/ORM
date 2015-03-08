@@ -53,7 +53,7 @@ abstract class EmbedsTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Trixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo($this->itemProperty, function($b) {
                     $b->and('name', 'Nature');
                 })
@@ -62,7 +62,7 @@ abstract class EmbedsTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Blum', 'Pixie', 'Stella'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->notRelatedTo($subProperty, function($b) {
                     $b->and('name', 'Rain');
                 })
@@ -71,35 +71,35 @@ abstract class EmbedsTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->where($this->itemProperty.'.name', 'Charm')
                 ->find()->asArray()
         );
         
         $this->assertNames(
             array('Trixie', 'Blum', 'Pixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo($this->itemProperty)
                 ->find()->asArray()
         );
         
         $this->assertNames(
             array('Trixie', 'Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo($subProperty)
                 ->find()->asArray()
         );
                 
         $this->assertNames(
             array('Stella'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->notRelatedTo($this->itemProperty)
                 ->find()->asArray()
         );
         
         $this->assertNames(
             array('Pixie', 'Stella'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->notRelatedTo($subProperty)
                 ->find()->asArray()
         );

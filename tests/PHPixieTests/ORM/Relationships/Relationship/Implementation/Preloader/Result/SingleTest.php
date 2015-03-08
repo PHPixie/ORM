@@ -12,11 +12,12 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Relationship\I
         2 => 6,
         3 => 7,
         4 => 8,
+        5 => null
     );
     
     public function setUp()
     {
-        for($i=1; $i<5; $i++)
+        for($i=1; $i<7;$i++)
             $this->entities[$i] = $this->getEntity();
         
         for($i=5; $i<9; $i++)
@@ -27,6 +28,10 @@ abstract class SingleTest extends \PHPixieTests\ORM\Relationships\Relationship\I
     
     protected function getExpectedValue($id)
     {
+        if(!array_key_exists($id, $this->map) || $this->map[$id] == null) {
+            return null;
+        }
+        
         $id = $this->map[$id];
         return $this->preloadedEntities[$id];
     }

@@ -191,7 +191,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         );
         
         if($hasHandledSides) {
-            $this->cascadeMapper->handleQuery($query, $itemModel, $plan, $sidePath);
+            $this->mappers->cascadeDelete()->handleQuery($query, $itemModel, $plan, $sidePath);
             
         }else{
             $step = $this->steps->query($query);

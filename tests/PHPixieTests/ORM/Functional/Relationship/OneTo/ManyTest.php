@@ -133,17 +133,17 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
     {
         $this->prepareEntities();
         
-        $red = $this->orm->get('flower')->query()
+        $red = $this->orm->repository('flower')->query()
             ->where('name', 'Red')
             ->findOne();
         
-        $green = $this->orm->get('flower')->query()
+        $green = $this->orm->repository('flower')->query()
             ->where('name', 'Green')
             ->findOne();
 
         $this->assertNames(
             array('Trixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo('flowers', $red)
                 ->relatedTo('flowers', $green)
                 ->find()->asArray()
@@ -155,7 +155,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
     {
         $this->prepareEntities();
         
-        $trixie = $this->orm->get('fairy')->query()
+        $trixie = $this->orm->repository('fairy')->query()
                     ->where('name', 'Trixie')
                     ->findOne();
         
@@ -167,7 +167,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
             $trixie->flowers()->asArray()
         );
         
-        $pixie = $this->orm->get('fairy')->query()
+        $pixie = $this->orm->repository('fairy')->query()
                     ->where('name', 'Pixie')
                     ->findOne();
         $this->assertEntities(
@@ -180,7 +180,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\OneToTest
     {
         $map = $this->prepareEntities();
         
-        $fairies = $this->orm->get('fairy')->query()
+        $fairies = $this->orm->repository('fairy')->query()
                         ->find(array('flowers'))
                         ->asArray();
         

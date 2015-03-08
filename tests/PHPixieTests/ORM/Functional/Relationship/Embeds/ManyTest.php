@@ -96,7 +96,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
     {
         $this->prepareEntities();
         
-        $trixie = $this->orm->get('fairy')->query()
+        $trixie = $this->orm->repository('fairy')->query()
                     ->where('name', 'Trixie')
                     ->findOne();
         
@@ -117,7 +117,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
         $this->assertSame(true, $magics[0]->spells->isLoaded());
         
         
-        $pixie = $this->orm->get('fairy')->query()
+        $pixie = $this->orm->repository('fairy')->query()
                     ->where('name', 'Pixie')
                     ->findOne();
         
@@ -128,7 +128,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
         
         $this->assertEquals(0, $magics[0]->spells->count());
         
-        $stella = $this->orm->get('fairy')->query()
+        $stella = $this->orm->repository('fairy')->query()
                     ->where('name', 'Stella')
                     ->findOne();
         
@@ -139,7 +139,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
     {
         $map = $this->prepareEntities();
         
-        $fairies = $this->orm->get('fairy')->query()
+        $fairies = $this->orm->repository('fairy')->query()
                         ->find(array('magics.spells'))
                         ->asArray();
         
@@ -261,7 +261,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
         
         $trixie->save();
         
-        $trixie = $this->orm->get('fairy')->query()
+        $trixie = $this->orm->repository('fairy')->query()
             ->where('name', 'Trixie')
             ->findOne();
         
@@ -271,14 +271,14 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
             'name' => 'Blum'
         ));
         
-        $blum = $this->orm->get('fairy')->query()
+        $blum = $this->orm->repository('fairy')->query()
             ->where('name', 'Blum')
             ->findOne();
         
         $blum->magics();
         $blum->save();
         
-        $blum = $this->orm->get('fairy')->query()
+        $blum = $this->orm->repository('fairy')->query()
             ->where('name', 'Blum')
             ->findOne();
         
@@ -303,11 +303,11 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
         $trixie->save();
         $blum->save();
         
-        $trixie = $this->orm->get('fairy')->query()
+        $trixie = $this->orm->repository('fairy')->query()
             ->where('name', 'Trixie')
             ->findOne();
         
-        $blum = $this->orm->get('fairy')->query()
+        $blum = $this->orm->repository('fairy')->query()
                     ->where('name', 'Blum')
                     ->findOne();
         
@@ -355,7 +355,7 @@ class ManyTest extends \PHPixieTests\ORM\Functional\Relationship\EmbedsTest
         
         foreach($map as $fairyName => $magicMap) {
             
-            $fairy = $this->orm->get('fairy')->create();
+            $fairy = $this->orm->repository('fairy')->create();
             $fairy->name = $fairyName;
             
             foreach($magicMap as $magicName => $spells) {

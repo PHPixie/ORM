@@ -17,8 +17,10 @@ abstract class OwnerTest extends \PHPixieTests\ORM\Relationships\Relationship\Im
     
     protected function prepareMap()
     {
-        foreach($this->entities as $id => $model) {
-            $this->method($model, 'getField', $this->map[$id], array('fairy_id'));
+        foreach($this->entities as $id => $entity) {
+            if(array_key_exists($id, $this->map)) {
+                $this->method($entity, 'getField', $this->map[$id], array('fairy_id'));
+            }
         }
         
         $this->prepareMapIdOffsets();

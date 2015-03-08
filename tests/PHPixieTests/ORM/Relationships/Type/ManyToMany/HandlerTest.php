@@ -210,13 +210,13 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
      */
     public function testMapRightDatabaseQuery()
     {
-        $this->mapDatabaseQueryTest('right');
+        $this->mapDatabaseQueryTest('right', true);
     }
 
-    protected function mapDatabaseQueryTest($type)
+    protected function mapDatabaseQueryTest($type, $withPivotConnection = false)
     {
         $opposing = $type === 'left' ? 'right' :'left';
-        $m = $this->getRelationshipMocks($type, $this->configData);
+        $m = $this->getRelationshipMocks($type, $this->configData, $withPivotConnection);
         $plan = $this->getPlan();
 
         $sideOffset = $m[$type.'Offset'];
@@ -279,15 +279,15 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
      */
     public function testMapPreloadRight()
     {
-        $this->mapPreloadTest('right');
+        $this->mapPreloadTest('right', true);
     }
 
-    protected function mapPreloadTest($type)
+    protected function mapPreloadTest($type, $withPivotConnection = false)
     {
         $preloadProperty = $this->preloadPropertyValue();
 
         $opposing = $type === 'left' ? 'right' :'left';
-        $m = $this->getRelationshipMocks($type, $this->configData);
+        $m = $this->getRelationshipMocks($type, $this->configData, $withPivotConnection);
         $sideOffset = $m[$type.'Offset'];
         $opposingOffset = $m[$opposing.'Offset'];
 
@@ -580,8 +580,12 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
             $this->method($owner['loader'], $method, null, array($itemsModels), 0);
     }
 
-    protected function getRelationshipMocks($type, $data)
+    protected function getRelationshipMocks($type, $data, $withPivotConnection = false)
     {
+        if($withPivotConnection) {
+            $data['pivotConnection'] = 'second';
+        }
+        
         $m = array(
             'side'  => $this->side($type, $data),
             'leftRepo'  => $this->getRepository(),
@@ -595,7 +599,7 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
 
             'connection' => $this->getConnection(),
 
-            'leftOffset' => 1,
+            'leftOffset' => $withPivotConnection ? 0 : 1,
             'rightOffset' => 0
         );
 
@@ -607,9 +611,23 @@ class HandlerTest extends \PHPixieTests\ORM\Relationships\Relationship\Implement
 
         $this->method($this->planners, 'in', $m['inPlanner'], array());
         $this->method($this->planners, 'pivot', $m['pivotPlanner'], array());
-
-        $this->method($m['leftRepo'], 'connection', $m['connection'], array(), 0);
-        $this->method($m['pivotPlanner'], 'pivot', $m['pivotPivot'], array($m['connection'], $data['pivot']));
+        
+        if($withPivotConnection) {
+            $this->method(
+                $m['pivotPlanner'],
+                'pivotByConnectionName',
+                $m['pivotPivot'],
+                array('second', $data['pivot'])
+            );
+        }else{
+            $this->method($m['leftRepo'], 'connection', $m['connection'], array(), 0);
+            $this->method(
+                $m['pivotPlanner'],
+                'pivot',
+                $m['pivotPivot'],
+                array($m['connection'], $data['pivot'])
+            );
+        }
 
         return $m;
     }

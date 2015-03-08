@@ -67,7 +67,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     {
         $map = $this->prepareEntities();
         
-        $flowers = $this->orm->get('flower')->query()
+        $flowers = $this->orm->repository('flower')->query()
                         ->find(array('fairy'))
                         ->asArray();
         
@@ -94,12 +94,12 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     {
         $this->prepareEntities();
         
-        $red = $this->orm->get('flower')->query()
+        $red = $this->orm->repository('flower')->query()
                     ->where('name', 'Red')
                     ->findOne();
         $this->assertEquals('Trixie', $red->fairy()->name);
         
-        $purple = $this->orm->get('flower')->query()
+        $purple = $this->orm->repository('flower')->query()
                     ->where('name', 'Purple')
                     ->findOne();
         $this->assertEquals(null, $purple->fairy());
@@ -159,7 +159,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Trixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo($this->itemProperty, function($b) {
                     $b->and('name', 'Red');
                 })
@@ -169,7 +169,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Blum', 'Pixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->notRelatedTo($this->itemProperty, function($b) {
                     $b->and('name', 'Red');
                 })
@@ -178,29 +178,29 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             array('Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->where($this->itemProperty.'.name', 'Yellow')
                 ->find()->asArray()
         );
         
         $this->assertNames(
             array('Trixie', 'Blum'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo($this->itemProperty)
                 ->find()->asArray()
         );
                 
         $this->assertNames(
             array('Pixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->notRelatedTo($this->itemProperty)
                 ->find()->asArray()
         );
         
-        $red = $this->orm->get('flower')->query()->findOne();
+        $red = $this->orm->repository('flower')->query()->findOne();
         $this->assertNames(
             array('Trixie'),
-            $this->orm->get('fairy')->query()
+            $this->orm->repository('fairy')->query()
                 ->relatedTo($this->itemProperty, $red)
                 ->find()->asArray()
         );
@@ -213,7 +213,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             $map['Trixie'],
-            $this->orm->get('flower')->query()
+            $this->orm->repository('flower')->query()
                 ->relatedTo('fairy', function($b) {
                     $b->and('name', 'Trixie');
                 })
@@ -226,7 +226,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
                 $map['Pixie'],
                 $map['']
             ),
-            $this->orm->get('flower')->query()
+            $this->orm->repository('flower')->query()
                 ->notRelatedTo('fairy', function($b) {
                     $b->and('name', 'Trixie');
                 })
@@ -235,7 +235,7 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         
         $this->assertNames(
             $map['Trixie'],
-            $this->orm->get('flower')->query()
+            $this->orm->repository('flower')->query()
                 ->where('fairy.name', 'Trixie')
                 ->find()->asArray()
         );
@@ -246,22 +246,22 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
                 $map['Blum'],
                 $map['Pixie']
             ),
-            $this->orm->get('flower')->query()
+            $this->orm->repository('flower')->query()
                 ->relatedTo('fairy')
                 ->find()->asArray()
         );
         
         $this->assertNames(
             $map[''],
-            $this->orm->get('flower')->query()
+            $this->orm->repository('flower')->query()
                 ->notRelatedTo('fairy')
                 ->find()->asArray()
         );
         
-        $trixie = $this->orm->get('fairy')->query()->findOne();
+        $trixie = $this->orm->repository('fairy')->query()->findOne();
         $this->assertNames(
             $map['Trixie'],
-            $this->orm->get('flower')->query()
+            $this->orm->repository('flower')->query()
                 ->relatedTo('fairy', $trixie)
                 ->find()->asArray()
         );
@@ -271,11 +271,11 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
     protected function cascadeDeleteUpdateTest()
     {
         $this->prepareEntities(false);
-        $this->orm->get('fairy')->query()
+        $this->orm->repository('fairy')->query()
             ->where('name', 'Blum')
             ->delete();
         
-        $yellow = $this->orm->get('flower')->query()
+        $yellow = $this->orm->repository('flower')->query()
                     ->where('name', 'Yellow')
                     ->findOne();
         
@@ -291,11 +291,11 @@ abstract class OneToTest extends \PHPixieTests\ORM\Functional\RelationshipTest
         $this->orm = $this->orm();
         
         $this->prepareEntities(false);
-        $this->orm->get('fairy')->query()
+        $this->orm->repository('fairy')->query()
             ->where('name', 'Blum')
             ->delete();
         
-        $yellow = $this->orm->get('flower')->query()
+        $yellow = $this->orm->repository('flower')->query()
                     ->where('name', 'Yellow')
                     ->findOne();
         

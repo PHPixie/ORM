@@ -10,7 +10,7 @@ abstract class ModelTest extends \PHPixieTests\ORM\FunctionalTest
     public function setUp()
     {
         parent::setUp();
-        $this->repository = $this->orm->get('fairy');
+        $this->repository = $this->orm->repository('fairy');
     }
     
     protected function createFairies($names)

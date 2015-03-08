@@ -51,8 +51,8 @@ $fairy->save();
 $fairy->where('name', 'Stella')->find();
 */
 
-$fairyRepository = $orm->get('fairy');
-$flowerRepository = $orm->get('flower');
+$fairyRepository = $orm->repository('fairy');
+$flowerRepository = $orm->repository('flower');
 
 //Here goes
 

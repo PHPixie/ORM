@@ -253,7 +253,7 @@ class QueryTest extends \PHPixieTests\ORM\Functional\ModelTest
     
     protected function query()
     {
-        return $this->orm->get('fairy')->query();
+        return $this->orm->repository('fairy')->query();
     }
 
 }

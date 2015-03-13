@@ -2,15 +2,11 @@
     <testsuites>
         <testsuite name="unit">
             <directory>./tests</directory>
-            <exclude>./tests/PHPixieTests/ORM/Functional</exclude>
-            <exclude>./tests/PHPixieTests/ORM/Functional.php</exclude>
+            <exclude>./tests/PHPixie/Tests/ORM/Functional</exclude>
         </testsuite>
-        <!--
-            <testsuite name="functional">
-                <directory>./tests/PHPixieTests/ORM/Functional</directory>
-                <file>./tests/PHPixieTests/ORM/FunctionalTest.php</file>
-            </testsuite>
-        -->
+    <testsuite name="functional">
+        <directory>./tests/PHPixie/Tests/ORM/Functional</directory>
+    </testsuite>
     </testsuites>
     <filter>
         <whitelist>

@@ -13,11 +13,17 @@
         }
     ],
     "require": {
-        "phpixie/database": "3.*@dev",
-        "phpixie/config": "3.*@dev"
+        "phpixie/slice": "3.*@dev",
+        "phpixie/database": "3.*@dev"
+    },
+    "require-dev": {
+        "phpixie/test": "3.*@dev"
     },
     "autoload": {
-        "psr-0": {"PHPixie": "src/"}
+        "psr-4": {
+            "PHPixie\\": "src/PHPixie",
+            "PHPixie\\Tests\\": "tests/PHPixie/Tests"
+        }
     },
     "extra": {
         "branch-alias": {

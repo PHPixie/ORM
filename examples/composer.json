@@ -2,6 +2,6 @@
     "require": {
         "phpixie/orm": "3.*@dev",
         "phpixie/database": "3.*@dev",
-        "phpixie/config": "3.*@dev"
+        "phpixie/slice": "3.*@dev"
     }
 }

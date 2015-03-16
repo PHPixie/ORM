@@ -2,8 +2,13 @@
 
 namespace PHPixie\ORM;
 
-abstract class Wrappers
+class Wrappers
 {
+    protected $databaseRepositories = array();
+    protected $databaseQueries      = array();
+    protected $databaseEntities     = array();
+    protected $embeddedEntities     = array();
+    
     public function databaseRepositoryWrapper($repository)
     {
         $method = $repository->modelName().'Repository';
@@ -32,8 +37,23 @@ abstract class Wrappers
         return $this->$method($entity);
     }
     
-    abstract public function databaseRepositories();
-    abstract public function databaseQueries();
-    abstract public function databaseEntities();
-    abstract public function embeddedEntities();
+    public function databaseRepositories()
+    {
+        return $this->databaseRepositories;
+    }
+    
+    public function databaseQueries()
+    {
+        return $this->databaseQueries;
+    }
+    
+    public function databaseEntities()
+    {
+        return $this->databaseEntities;
+    }
+    
+    public function embeddedEntities()
+    {
+        return $this->embeddedEntities;
+    }
 }

@@ -3,15 +3,15 @@
 require_once('vendor/autoload.php');
 
 
-$config = new \PHPixie\Config();
-$database = new \PHPixie\Database($config->dataStorage(array(
+$slice = new \PHPixie\Slice();
+$database = new \PHPixie\Database($slice->arrayData(array(
     'default' => array(
         'driver' => 'pdo',
         'connection' => 'sqlite::memory:'
     )
 )));
 
-$orm = new \PHPixie\ORM($database, $config->dataStorage(array(
+$orm = new \PHPixie\ORM($database, $slice->arrayData(array(
     'relationships' => array(
         array(
             'type'  => 'oneToMany',

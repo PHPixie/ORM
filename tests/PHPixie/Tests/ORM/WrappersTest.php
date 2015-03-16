@@ -4,25 +4,10 @@ namespace PHPixie\Tests\ORM;
 
 class WrappersStub extends \PHPixie\ORM\Wrappers
 {
-    public function databaseRepositories()
-    {
-        return array('pixie');
-    }
-    
-    public function databaseQueries()
-    {
-        return array('fairy');
-    }
-    
-    public function databaseEntities()
-    {
-        return array('trixie');
-    }
-    
-    public function embeddedEntities()
-    {
-        return array('blum');
-    }
+    protected $databaseRepositories = array('pixie');
+    protected $databaseQueries      = array('fairy');
+    protected $databaseEntities     = array('trixie');
+    protected $embeddedEntities     = array('blum');
     
     public function pixieRepository($repository)
     {
@@ -63,6 +48,29 @@ class WrappersTest extends \PHPixie\Test\Testcase
     public function setUp()
     {
         $this->wrappers = new WrappersStub();
+    }
+
+    /**
+     * @covers ::databaseRepositories
+     * @covers ::databaseQueries
+     * @covers ::databaseEntities
+     * @covers ::embeddedEntities
+     * @covers ::<protected>
+     */
+    public function testDefaultWrappers()
+    {
+        $methods = array(
+            'databaseRepositories',
+            'databaseQueries',
+            'databaseEntities',
+            'embeddedEntities'
+        );
+        
+        $wrappers = new \PHPixie\ORM\Wrappers();
+        
+        foreach($methods as $method) {
+            $this->assertSame(array(), $wrappers->$method());
+        }
     }
     
     /**

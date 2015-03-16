@@ -39,8 +39,8 @@ class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Type\OneTo\HandlerTes
             $plansOffset = 1,
             $stepsOffset = 1,
             $inPlannerOffset = 2,
-            $ownerRepoOffset = 2,
-            $itemRepoOffset= 3
+            $ownerRepoOffset = 0,
+            $itemRepoOffset = 1
         );
         
         $plan = $this->getPlan();

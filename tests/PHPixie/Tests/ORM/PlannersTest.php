@@ -10,8 +10,7 @@ class PlannersTest extends \PHPixie\Test\Testcase
     protected $ormBuilder;
     protected $planners;
     
-    protected $steps;
-    protected $database;
+    protected $dependencies = array();
     
     public function setUp()
     {
@@ -19,11 +18,11 @@ class PlannersTest extends \PHPixie\Test\Testcase
         
         $this->planners = new \PHPixie\ORM\Planners($this->ormBuilder);
         
-        $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
-        $this->method($this->ormBuilder, 'steps', $this->steps, array());
-        
-        $this->database = $this->quickMock('\PHPixie\ORM\Database');
-        $this->method($this->ormBuilder, 'database', $this->database, array());
+        foreach(array('conditions', 'database', 'mappers', 'steps') as $name) {
+            $instance = $this->quickMock('\PHPixie\ORM\\'.ucfirst($name));
+            $this->method($this->ormBuilder, $name, $instance, array());
+            $this->dependencies[$name] = $instance;
+        }
     }
 
     /**
@@ -59,7 +58,9 @@ class PlannersTest extends \PHPixie\Test\Testcase
         $this->assertSame($planner, $this->planners->in());
         
         $this->assertInstance($planner, '\PHPixie\ORM\Planners\Planner\In', array(
-            'steps' => $this->steps
+            'conditions' => $this->dependencies['conditions'],
+            'mappers'    => $this->dependencies['mappers'],
+            'steps'      => $this->dependencies['steps'],
         ));
     }
     
@@ -74,8 +75,8 @@ class PlannersTest extends \PHPixie\Test\Testcase
         
         $this->assertInstance($planner, '\PHPixie\ORM\Planners\Planner\Pivot', array(
             'planners' => $this->planners,
-            'steps'    => $this->steps,
-            'database' => $this->database,
+            'steps'    => $this->dependencies['steps'],
+            'database' => $this->dependencies['database'],
         ));
     }
     
@@ -101,7 +102,7 @@ class PlannersTest extends \PHPixie\Test\Testcase
         $this->assertSame($planner, $this->planners->update());
         
         $this->assertInstance($planner, '\PHPixie\ORM\Planners\Planner\Update', array(
-            'steps'    => $this->steps
+            'steps'    => $this->dependencies['steps']
         ));
     }
 }

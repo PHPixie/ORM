@@ -7,17 +7,26 @@ namespace PHPixie\Tests\ORM\Planners\Planner;
  */
 class InTest extends \PHPixie\Tests\ORM\Planners\PlannerTest
 {
+    protected $conditions;
+    protected $mappers;
     protected $steps;
     
     protected $subqueryStrategy;
     protected $multiqueryStrategy;
+    
+    protected $conditionsMapper;
     
     protected $queryField = 'id';
     protected $subqueryField = 'fairy_id';
     
     public function setUp()
     {
-        $this->steps = $this->quickMock('\PHPixie\ORM\Steps');
+        $this->conditions = $this->quickMock('\PHPixie\ORM\Conditions');
+        $this->mappers    = $this->quickMock('\PHPixie\ORM\Mappers');
+        $this->steps      = $this->quickMock('\PHPixie\ORM\Steps');
+        
+        $this->conditionsMapper = $this->quickMock('\PHPixie\ORM\Mappers\Conditions');
+        $this->method($this->mappers, 'conditions', $this->conditionsMapper, array());
         
         $this->subqueryStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\In\Strategy\Subquery');
         $this->multiqueryStrategy = $this->quickMock('\PHPixie\ORM\Planners\Planner\In\Strategy\Multiquery');
@@ -31,6 +40,34 @@ class InTest extends \PHPixie\Tests\ORM\Planners\PlannerTest
      */
     public function testConstruct()
     {
+        
+    }
+    
+    /**
+     * @covers ::items
+     * @covers ::<protected>
+     */
+    public function testItems()
+    {
+        $query = $this->getItemsQuery();
+        $modelName = 'pixie';
+        $items = array($this->getDatabaseModelQuery());
+        $plan = $this->getStepsPlan();
+        
+        $callback = array($this->plannerMock(), 'items');
+        $params = array(
+            $query,
+            $modelName,
+            $items,
+            $plan
+        );
+        
+        $this->prepareItemsTest($query, $modelName, $items, $plan, 'and', false);
+        call_user_func_array($callback, $params);
+        
+        $this->prepareItemsTest($query, $modelName, $items, $plan, 'or', true);
+        $params = array_merge($params, array('or', true));
+        call_user_func_array($callback, $params);
         
     }
     
@@ -66,7 +103,7 @@ class InTest extends \PHPixie\Tests\ORM\Planners\PlannerTest
      * @covers ::itemIds
      * @covers ::<protected>
      */
-    public function testIemsIds()
+    public function testItemsIds()
     {
         $query = $this->getItemsQuery();
         $repository = $this->getRepository();
@@ -183,6 +220,26 @@ class InTest extends \PHPixie\Tests\ORM\Planners\PlannerTest
         $this->prepareConnections($query, $subquery, true, true, 0);
         $this->prepareSubquery('subquery', $query, $subquery, $plan, $logic, $negate);
     }
+
+    protected function prepareItemsTest($query, $modelName, $items, $plan, $logic, $negate)
+    {
+        $inCondition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
+        $this->method($this->conditions, 'in', $inCondition, array(
+            $modelName,
+            $items
+        ), 0);
+        
+        $this->method($inCondition, 'setLogic', null, array($logic), 0);
+        $this->method($inCondition, 'setIsNegated', null, array($negate), 1);
+        
+        $this->method($this->conditionsMapper, 'map', null, array(
+            $query,
+            $modelName,
+            array($inCondition),
+            $plan
+        ), 0);
+        
+    }
     
     protected function prepareItemIdsTest($query, $repository, $items, $plan, $logic, $negate)
     {
@@ -269,15 +326,21 @@ class InTest extends \PHPixie\Tests\ORM\Planners\PlannerTest
     
     protected function planner()
     {
-        return new \PHPixie\ORM\Planners\Planner\In($this->steps);
+        return new \PHPixie\ORM\Planners\Planner\In(
+            $this->conditions,
+            $this->mappers,
+            $this->steps
+        );
     }
     
     protected function plannerMock()
     {
-        $mock = $this->quickMock('\PHPixie\ORM\Planners\Planner\In', array(
+        $mock = $this->getMock('\PHPixie\ORM\Planners\Planner\In', array(
             'buildSubqueryStrategy',
             'buildMultiqueryStrategy'
         ), array(
+            $this->conditions,
+            $this->mappers,
             $this->steps
         ));
         

@@ -4,13 +4,29 @@ namespace PHPixie\ORM\Planners\Planner;
 
 class In extends \PHPixie\ORM\Planners\Planner
 {
-    protected $steps;
+    protected $conditions;
     protected $mappers;
+    protected $steps;
     
-    public function __construct($steps, $mappers)
+    public function __construct($conditions, $mappers, $steps)
     {
-        $this->steps   = $steps;
+        $this->conditions = $conditions;
         $this->mappers = $mappers;
+        $this->steps   = $steps;
+    }
+
+    public function items($query, $modelName, $items, $plan, $logic = 'and', $negate = false)
+    {
+        $condition = $this->conditions->in($modelName, $items);
+        $condition->setLogic($logic);
+        $condition->setIsNegated($negate);
+        
+        $this->mappers->conditions()->map(
+            $query,
+            $modelName,
+            array($condition),
+            $plan
+        );
     }
     
     public function itemIds($query, $queryField, $repository, $items, $plan, $logic = 'and', $negate = false)

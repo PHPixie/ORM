@@ -19,7 +19,7 @@ class SubqueryTest extends \PHPixie\Tests\Database\Conditions\Condition\Field\Im
     /**
      * @covers ::subquery
      * @covers ::setSubquery
-     * @covers ::subqueryFiled
+     * @covers ::subqueryField
      * @covers ::setSubqueryField
      */
     public function testProperties()
@@ -28,7 +28,7 @@ class SubqueryTest extends \PHPixie\Tests\Database\Conditions\Condition\Field\Im
         $this->assertEquals($this->subqueryField, $this->condition->subqueryField());
         
         $subquery = $this->getDatabaseQuery();
-        $this->assertSame($this->condition, $this->condition->setSubqueryField($subquery));
+        $this->assertSame($this->condition, $this->condition->setSubquery($subquery));
         $this->assertSame($this->condition, $this->condition->setSubqueryField('b'));
         
         $this->assertEquals($subquery, $this->condition->subquery());

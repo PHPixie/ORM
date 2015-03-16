@@ -341,30 +341,22 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
         
         $requiredPlan = $this->getPlan();
         $this->method($plan, 'requiredPlan', $requiredPlan, array(), 0);
-
-        $this->preparePlanItemsSubquery(
-            $ownerQuery,
-            'owner',
-            $owner,
-            $requiredPlan,
-            null,
-            'and',
-            $inPlannerOffset,
-            $ownerRepoOffset
-        );
         
-        $this->preparePlanItemsSubquery(
+        $this->method($this->plannerMocks['in'], 'items', null, array(
+            $ownerQuery,
+            $this->configData['ownerModel'],
+            $owner,
+            $requiredPlan
+        ), $inPlannerOffset++);
+        
+        $this->method($this->plannerMocks['in'], 'items', null, array(
             $updateQuery,
-            'item',
+            $this->configData['itemModel'],
             $items,
-            $requiredPlan,
-            null,
-            'and',
-            $inPlannerOffset + 1,
-            $itemRepoOffset++
-        );
+            $requiredPlan
+        ), $inPlannerOffset++);
 
-        $this->prepareRepositoryConfig($ownerRepository, array('idField' =>'id'), $ownerRepoOffset + 2);
+        $this->prepareRepositoryConfig($ownerRepository, array('idField' =>'id'), $ownerRepoOffset++);
 
         $this->method($this->plannerMocks['update'], 'subquery', null, array(
                                                                 $updateQuery,
@@ -375,26 +367,6 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
                                                                 $requiredPlan
                                                             ), 0);
         return $plan;
-    }
-    
-    protected function preparePlanItemsSubquery($query, $type, $items, $plan, $queryField = null, $logic = 'and', $inPlannerOffset = 0, $repositoryOffset = 1)
-    {
-        if($queryField === null)
-            $queryField = 'id';
-
-        $modelName = $this->configData[$type.'Model'];
-        $repository = $this->modelMocks['database']->repository($modelName);
-
-        $collection = $this->quickMock('\PHPixie\ORM\Planners\Collection');
-        
-        $this->prepareRepositoryConfig($repository, array('idField' =>'id'), $repositoryOffset++);
-        
-        $itemsQuery = $this->getQuery();
-        $this->method($repository, 'query', $itemsQuery, array(), $repositoryOffset++);
-        
-        $this->method($itemsQuery, 'in', $itemsQuery, array($items), 0);
-        
-        $this->method($this->plannerMocks['in'], 'databaseModelQuery', null, array($query, $queryField, $itemsQuery, 'id', $plan, $logic), $inPlannerOffset);
     }
 
     protected function prepareUnlinkTest($constrainOwners, $owners, $constrainItems, $items, $logic = 'and')
@@ -417,33 +389,27 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
         $ownerKey = $this->configData['ownerKey'];
         
         $this->method($updateQuery, 'set', null, array($ownerKey, null), 0);
-
-        $inPlannerOffset = 0;
-
+        
+        $inPlannerAt = 0;
+        
         if ($constrainItems) {
-            $this->preparePlanItemsSubquery(
+            $this->method($this->plannerMocks['in'], 'items', null, array(
                 $updateQuery,
-                'item',
+                $this->configData['itemModel'],
                 $items,
-                $requiredPlan,
-                null,
-                'and',
-                $inPlannerOffset++,
-                1
-            );
+                $requiredPlan
+            ), $inPlannerAt++);
         }
 
         if ($constrainOwners) {
-            $this->preparePlanItemsSubquery(
+            $this->method($this->plannerMocks['in'], 'itemIds', null, array(
                 $updateQuery,
-                'owner',
+                $this->configData['ownerKey'],
+                $this->modelMocks['database']->repository($this->configData['ownerModel']),
                 $owners,
                 $requiredPlan,
-                $ownerKey,
-                $logic,
-                $inPlannerOffset++,
-                0
-            );
+                $logic
+            ), $inPlannerAt++);
         }
 
         return $plan;

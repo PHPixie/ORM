@@ -5,12 +5,14 @@ namespace PHPixie\ORM\Mappers;
 class Conditions
 {
     protected $mappers;
+    protected $planners;
     protected $relationships;
     protected $relationshipMap;
     
-    public function __construct($mappers, $relationships, $relationshipMap)
+    public function __construct($mappers, $planners, $relationships, $relationshipMap)
     {
         $this->mappers         = $mappers;
+        $this->planners        = $planners;
         $this->relationships   = $relationships;
         $this->relationshipMap = $relationshipMap;
     }
@@ -52,6 +54,19 @@ class Conditions
         $this->mapConditionCollection($builder, $modelName, $collectionCondition, $plan);
     }
     
+    protected function mapSubqueryCondition($builder, $modelName, $condition, $plan)
+    {
+        $this->planners->in()->databaseModelQuery(
+            $builder,
+            $condition->field(),
+            $condition->subquery(),
+            $condition->subqueryField(),
+            $plan,
+            $condition->logic(),
+            $condition->isNegated()
+        );
+    }
+    
     protected function mapConditions($builder, $modelName, $conditions, $plan)
     {
         foreach ($conditions as $condition) {
@@ -67,6 +82,9 @@ class Conditions
 
             }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\Collection) {
                 $this->mapConditionCollection($builder, $modelName, $condition, $plan);
+
+            }elseif ($condition instanceof \PHPixie\ORM\Conditions\Condition\Field\Subquery) {
+                $this->mapSubqueryCondition($builder, $modelName, $condition, $plan);
 
             }else {
                 throw new \PHPixie\ORM\Exception\Mapper("Unexpected condition encountered");

@@ -37,6 +37,11 @@ class Conditions
         return new \PHPixie\ORM\Conditions\Condition\In($modelName, $items);
     }
     
+    public function subquery($field, $subquery, $subqueryField)
+    {
+        return new \PHPixie\ORM\Conditions\Condition\Field\Subquery($field, $subquery, $subqueryField);
+    }
+    
     public function container($modelName, $defaultOperator = '=')
     {
         return new \PHPixie\ORM\Conditions\Builder\Container(

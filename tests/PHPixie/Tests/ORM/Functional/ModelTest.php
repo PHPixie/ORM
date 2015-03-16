@@ -30,9 +30,9 @@ abstract class ModelTest extends \PHPixie\Tests\ORM\Functional\Testcase
     protected function runTests($name)
     {
         $this->runTestCases($name, array(
-            //'sqlite',
+            'sqlite',
             'mysql',
-            //'mongo'
+            'mongo'
         ));
     }
     

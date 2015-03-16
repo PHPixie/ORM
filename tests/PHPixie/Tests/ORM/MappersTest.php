@@ -82,6 +82,7 @@ class MappersTest extends \PHPixie\Test\Testcase
     {
         $this->assertMapper('conditions', 'Conditions', array(
             'mappers',
+            'planners',
             'relationshipMap'
         ));
     }

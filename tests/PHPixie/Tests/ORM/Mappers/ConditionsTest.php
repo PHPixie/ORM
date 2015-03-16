@@ -8,26 +8,32 @@ namespace PHPixie\Tests\ORM\Mappers;
 class ConditionsTest extends \PHPixie\Test\Testcase
 {
     protected $mappers;
-    protected $models;
+    protected $planners;
     protected $relationships;
     protected $relationshipMap;
     
     protected $conditionsMapper;
     
+    protected $inPlanner;
     protected $mapperMocks = array();
     protected $modelName = 'fairy';
     
     public function setUp()
     {
         $this->mappers = $this->quickMock('\PHPixie\ORM\Mappers');
+        $this->planners = $this->quickMock('\PHPixie\ORM\Planners');
         $this->relationships = $this->quickMock('\PHPixie\ORM\Relationships');
         $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship');
         
         $this->conditionsMapper = new \PHPixie\ORM\Mappers\Conditions(
             $this->mappers,
+            $this->planners,
             $this->relationships,
             $this->relationshipMap
         );
+        
+        $this->inPlanner = $this->quickMock('\PHPixie\ORM\Planners\Planner\In');
+        $this->method($this->planners, 'in', $this->inPlanner, array());
         
         foreach(array('optimizer', 'normalizer') as $type) {
             $method = 'conditions'.ucfirst($type);
@@ -94,6 +100,20 @@ class ConditionsTest extends \PHPixie\Test\Testcase
         $this->method($builder, 'addOperatorCondition', null, $operatorParams, 2);
         $this->method($builder, 'endGroup', null, array(), 3);
         
+        $subquery = $this->getDatabaseQuery();
+        $subqueryCondition = $this->subqueryCondition('or', true, 'id', $subquery, 'pixie_id');
+        $optimizedConditions[] = $subqueryCondition;
+        
+        $this->method($this->inPlanner, 'databaseModelQuery', null, array(
+            $builder,
+            'id',
+            $subquery,
+            'pixie_id',
+            $plan,
+            'or',
+            true
+        ), 0);
+        
         $relatedToCondition = $this->relatedToCollection('and', true, 'pixie', array($operator));
         
         $optimizedConditions[] = $relatedToCondition;
@@ -106,6 +126,7 @@ class ConditionsTest extends \PHPixie\Test\Testcase
         
         $handler = $this->getHandler(!$isQuery);
         $this->method($relationship, 'handler', $handler, array(), 0);
+        
         
         if($isQuery) {
             $this->method($handler, 'mapDatabaseQuery', null, array($builder, $side, $relatedToCondition, $plan), 0);
@@ -172,6 +193,15 @@ class ConditionsTest extends \PHPixie\Test\Testcase
         $inCondition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
         $this->method($inCondition, 'items', $items);
         return $this->prepareCondition($inCondition, $logic, $negated);
+    }
+    
+    protected function subqueryCondition($logic, $negated, $field, $subquery, $subqueryField)
+    {
+        $condition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\Field\Subquery');
+        $this->method($condition, 'field', $field);
+        $this->method($condition, 'subquery', $subquery);
+        $this->method($condition, 'subqueryField', $subqueryField);
+        return $this->prepareCondition($condition, $logic, $negated);
     }
     
     protected function conditionCollection($logic, $negated, $conditions)

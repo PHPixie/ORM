@@ -34,6 +34,11 @@ class QueryTest extends \PHPixie\Tests\ORM\Functional\ModelTest
         $this->runTests('update');
     }
     
+    public function testSubquery()
+    {
+        $this->runTests('subquery');
+    }
+    
     protected function findTest()
     {
         $this->createFairies(array('Trixie', 'Blum', 'Pixie'));
@@ -249,6 +254,40 @@ class QueryTest extends \PHPixie\Tests\ORM\Functional\ModelTest
             array('name' => 'Trixie'),
             array('name' => 'Pixie')
         ));
+    }
+    
+    protected function subqueryTest()
+    {
+        $this->createFairies(array('Trixie', 'Blum', 'Pixie', 'Stella'));
+        
+        $this->assertFairyNames(
+            array('Trixie', 'Blum'),
+            $this->query()
+                ->in($this->query()
+                        ->limit(2)
+                    )
+                ->find()->asArray()
+        );
+        
+        $this->assertFairyNames(
+            array('Blum', 'Pixie', 'Stella'),
+            $this->query()
+                ->in($this->query()
+                        ->offset(1)
+                    )
+                ->find()->asArray()
+        );
+        
+        $this->assertFairyNames(
+            array('Stella'),
+            $this->query()
+                ->in($this->query()
+                        ->orderDescendingBy('name')
+                        ->offset(1)
+                        ->limit(1)
+                    )
+                ->find()->asArray()
+        );
     }
     
     protected function query()

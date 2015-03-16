@@ -5,10 +5,12 @@ namespace PHPixie\ORM\Planners\Planner;
 class In extends \PHPixie\ORM\Planners\Planner
 {
     protected $steps;
+    protected $mappers;
     
-    public function __construct($steps)
+    public function __construct($steps, $mappers)
     {
-        $this->steps = $steps;
+        $this->steps   = $steps;
+        $this->mappers = $mappers;
     }
     
     public function itemIds($query, $queryField, $repository, $items, $plan, $logic = 'and', $negate = false)

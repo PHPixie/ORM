@@ -56,8 +56,14 @@ class NormalizerTest extends \PHPixie\Test\Testcase
         $inCondition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
         $this->method($inCondition, 'modelName', $modelName, array(), 0);
         
+        $idField = 'pixie_id';
+        $config = $this->getDatabaseConfig();
+        $this->method($this->databaseModel, 'config', $config, array($modelName), 0);
+        $config->idField = $idField;
+        
         $queries = array();
         if($withQueries) {
+            $queries[]= $this->getDatabaseQuery();
             $queries[]= $this->getDatabaseQuery();
             $queries[]= $this->getDatabaseQuery();
         }
@@ -72,42 +78,69 @@ class NormalizerTest extends \PHPixie\Test\Testcase
         $items = array_merge($queries, $entities);
         $this->method($inCondition, 'items', $items, array(), 1);
         
+        $conditionsAt = 0;
+        
         $inGroup = $this->getRelationshipGroup();
-        $this->method($this->conditions, 'group', $inGroup, array(), 0);
+        $this->method($this->conditions, 'group', $inGroup, array(), $conditionsAt++);
         
         $this->prepareCopyLogicAndNegated($inCondition, $inGroup, 2);
+        $inGroupAt = 2;
         
         foreach($queries as $key => $query) {
-            $queryGroup = $this->getGroup();
-            $this->method($this->conditions, 'group', $queryGroup, array(), 1+$key);
             
-            $this->prepareSetLogicAndNegated($queryGroup, 'or', false);
+            $limit = $key === 0 ? 5 : null;
+            $offset = $key === 1 ? 5 : null;
             
-            $conditions = array($this->getGroup());
-            $this->method($query, 'getConditions', $conditions, array(), 0);
-            $this->method($queryGroup, 'setConditions', null, array($conditions), 2);
+            $this->method($query, 'getLimit', $limit, array());
+            $this->method($query, 'getOffset', $offset, array());
             
-            $this->method($inGroup, 'add', null, array($queryGroup), 2+$key);
+            if($key !== 2) {
+                $condition = $this->getSubqueryCondition();
+                $this->method($this->conditions, 'subquery', $condition, array(
+                    $idField,
+                    $query,
+                    $idField
+                ), $conditionsAt++);
+                $this->prepareSetLogicAndNegated($condition, 'or', false);
+                
+            }else{
+                $condition = $this->getGroup();
+                $this->method($this->conditions, 'group', $condition, array(), $conditionsAt++);
+                
+                $conditions = array($this->getGroup());
+                $this->method($query, 'getConditions', $conditions, array());
+                $this->method($condition, 'setConditions', null, array($conditions));
+                $this->prepareSetLogicAndNegated($condition, 'or', false, 1);    
+            }
+                        
+            $this->method($inGroup, 'add', null, array($condition), $inGroupAt++);
         }
         
         foreach($entities as $key => $entity) {
             $this->method($entity, 'id', $key, array(), 0);
         }
         
-        if(!empty($entities) || empty($items)) {
-            $config = $this->getDatabaseConfig();
-            $this->method($this->databaseModel, 'config', $config, array($modelName), 0);
-            $config->idField = 'id';
-            
+        if(!empty($entities)) {
             $operatorCondition = $this->getOperatorCondition();
             $this->method($this->conditions, 'operator', $operatorCondition, array(
-                'id',
+                $idField,
                 'in',
                 array(array_keys($entities))
-            ), count($queries)+1);
+            ), $conditionsAt++);
             
             $this->prepareSetLogicAndNegated($operatorCondition, 'or', false);
-            $this->method($inGroup, 'add', null, array($operatorCondition), count($queries)+2);
+            $this->method($inGroup, 'add', null, array($operatorCondition), $inGroupAt++);
+        }
+        
+        if(empty($items)) {
+            $operatorCondition = $this->getOperatorCondition();
+            $this->method($this->conditions, 'operator', $operatorCondition, array(
+                $idField,
+                '=',
+                array(null)
+            ), $conditionsAt++);
+            
+            $this->method($inGroup, 'add', null, array($operatorCondition), $inGroupAt++);
         }
         
         $this->assertSame($inGroup, $this->normalizer->normalizeIn($inCondition));
@@ -135,6 +168,11 @@ class NormalizerTest extends \PHPixie\Test\Testcase
     protected function getOperatorCondition()
     {
         return $this->quickMock('\PHPixie\ORM\Conditions\Condition\Field\Operator');
+    }
+    
+    protected function getSubqueryCondition()
+    {
+        return $this->quickMock('\PHPixie\ORM\Conditions\Condition\Field\Subquery');
     }
     
     protected function getRelationshipGroup()

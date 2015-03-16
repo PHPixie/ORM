@@ -129,8 +129,4 @@ abstract class EmbedsTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->prepareORM();
     }
     
-    protected function prepareSqlDatabase($multipleConnections = false)
-    {
-        
-    }
 }

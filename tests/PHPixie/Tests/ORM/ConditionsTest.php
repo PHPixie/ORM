@@ -117,6 +117,23 @@ class ConditionsTest extends \PHPixie\Test\Testcase
         $this->assertSame(array($item), $in->items());
     }
     
+    /**
+     * @covers ::subquery
+     * @covers ::<protected>
+     */
+    public function testSubquery()
+    {
+        $field = 'id';
+        $subquery = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');
+        $subqueryField = 'pixie_id';
+        
+        $condition = $this->conditions->subquery($field, $subquery, $subqueryField);
+        $this->assertInstance($condition, '\PHPixie\ORM\Conditions\Condition\Field\Subquery');
+        $this->assertSame($field, $condition->field());
+        $this->assertSame($subquery, $condition->subquery());
+        $this->assertSame($subqueryField, $condition->subqueryField());
+    }
+    
     protected function assertContainer($container, $defaultOperator = '=')
     {
         $this->assertInstance($container, '\PHPixie\ORM\Conditions\Builder\Container', array(

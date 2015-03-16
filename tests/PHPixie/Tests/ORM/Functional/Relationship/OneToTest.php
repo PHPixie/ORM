@@ -307,6 +307,7 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->runTestCases($name, array(
             'sqlite',
             'multiSql',
+            'mysql',
             'mongo',
         ));
     }
@@ -330,6 +331,38 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
                 )
             )
         ));
+    }
+    
+    protected function prepareMysql()
+    {
+        $this->prepareMysqlDatabase();
+        
+        $connection = $this->database->get('default');
+        
+        $connection->execute('
+            DROP TABLE IF EXISTS fairies
+        ');
+        
+        $connection->execute('
+            CREATE TABLE fairies (
+              id INTEGER PRIMARY KEY AUTO_INCREMENT,
+              name VARCHAR(255)
+            )
+        ');
+        
+        $connection->execute('
+            DROP TABLE IF EXISTS flowers
+        ');
+        
+        $connection->execute('
+            CREATE TABLE flowers (
+              id INTEGER PRIMARY KEY AUTO_INCREMENT,
+              name VARCHAR(255),
+              fairy_id INTEGER
+            )
+        ');
+        
+        $this->prepareOrm();
     }
 
     protected function prepareMongo()

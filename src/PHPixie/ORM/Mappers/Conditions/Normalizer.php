@@ -17,6 +17,7 @@ class Normalizer
     {
         $modelName = $inCondition->modelName();
         $items  = $inCondition->items();
+        $idField = $this->models->database()->config($modelName)->idField;
         
         $inGroup = $this->conditions->group();
         $this->copyLogicAndNegated($inCondition, $inGroup);
@@ -25,23 +26,39 @@ class Normalizer
         foreach($items as $item) {
             
             if($item instanceof \PHPixie\ORM\Models\Type\Database\Query) {
-                $queryGroup = $this->conditions->group();
-                $this->setLogicAndNegated($queryGroup, 'or', false);
-                $queryGroup->setConditions($item->getConditions());
-                $inGroup->add($queryGroup);            
+                $condition = $this->getSubqueryCondition($item, $idField);
+                $inGroup->add($condition);
             }else{
                 $ids[]=$item->id();
             }
         }
         
-        if(!empty($ids) || empty($items)) {
-            $idField = $this->models->database()->config($modelName)->idField;
+        if(!empty($ids)) {
             $operatorCondition = $this->conditions->operator($idField, 'in', array($ids));
             $this->setLogicAndNegated($operatorCondition, 'or', false);
-            $inGroup->add($operatorCondition);    
+            $inGroup->add($operatorCondition); 
+        }
+        
+        if(empty($items)) {
+            $operatorCondition = $this->conditions->operator($idField, '=', array(null));
+            $inGroup->add($operatorCondition);
         }
         
         return $inGroup;
+    }
+    
+    protected function getSubqueryCondition($query, $idField)
+    {
+        if($query->getLimit() !== null || $query->getOffset() !== null) {
+            $condition = $this->conditions->subquery($idField, $query, $idField);
+
+        }else{
+            $condition = $this->conditions->group();
+            $condition->setConditions($query->getConditions());
+        }
+
+        $this->setLogicAndNegated($condition, 'or', false);
+        return $condition;
     }
 
     protected function copyLogicAndNegated($source, $target)

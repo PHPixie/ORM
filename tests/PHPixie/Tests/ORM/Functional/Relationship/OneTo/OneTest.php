@@ -57,6 +57,24 @@ class OneTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
             array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
             array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
         ));
+        
+        $trixie->flower->set($red);
+        $trixie->flower->set($this->query('flower')->in($green));
+        
+        $this->assertSame(false,  $trixie->flower->isLoaded());
+        $this->assertData('flower', array(
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
+        ));
+        
+        $trixie->flower->set($red);
+        $trixie->flower->set($green->id());
+        
+        $this->assertSame(false, $trixie->flower->isLoaded());
+        $this->assertData('flower', array(
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
+        ));
     }
     
     protected function removeItemTest()

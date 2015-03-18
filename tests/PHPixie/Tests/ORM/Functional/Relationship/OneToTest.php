@@ -130,12 +130,31 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->assertData('flower', array(
             array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $blum->id()),
         ));
+        
+        $red->fairy->set($this->query('fairy')->in($trixie));
+        
+        $this->assertSame(false, $red->fairy->isLoaded());
+        $this->assertData('flower', array(
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
+        ));
+        
+        $red->fairy->set($blum);
+        $red->fairy->set($trixie->id());
+        
+        $this->assertSame(false, $red->fairy->isLoaded());
+        $this->assertData('flower', array(
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
+        ));
     }
     
     protected function removeOwnerTest()
     {
         $trixie = $this->createEntity('fairy', array(
             'name' => 'Trixie'
+        ));
+        
+        $blum = $this->createEntity('fairy', array(
+            'name' => 'Blum'
         ));
         
         $red = $this->createEntity('flower', array(
@@ -198,13 +217,20 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         );
         
         $red = $this->orm->repository('flower')->query()->findOne();
-        $this->assertNames(
-            array('Trixie'),
-            $this->orm->repository('fairy')->query()
-                ->relatedTo($this->itemProperty, $red)
-                ->find()->asArray()
+        $relatedToSets = array(
+            $red,
+            $red->id(),
+            $this->query('flower')->in($red)
         );
-
+        
+        foreach($relatedToSets as $relatedTo) {
+            $this->assertNames(
+                array('Trixie'),
+                $this->orm->repository('fairy')->query()
+                    ->relatedTo($this->itemProperty, $relatedTo)
+                    ->find()->asArray()
+            );
+        }
     }
     
     protected function ownerCondtionsTest()
@@ -259,13 +285,21 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         );
         
         $trixie = $this->orm->repository('fairy')->query()->findOne();
-        $this->assertNames(
-            $map['Trixie'],
-            $this->orm->repository('flower')->query()
-                ->relatedTo('fairy', $trixie)
-                ->find()->asArray()
+        
+        $relatedToSets = array(
+            $trixie,
+            $trixie->id(),
+            $this->query('fairy')->in($trixie)
         );
         
+        foreach($relatedToSets as $relatedTo) {
+            $this->assertNames(
+                $map['Trixie'],
+                $this->orm->repository('flower')->query()
+                    ->relatedTo('fairy', $relatedTo)
+                    ->find()->asArray()
+            );
+        }
     }
     
     protected function cascadeDeleteUpdateTest()
@@ -384,7 +418,11 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
     protected function prepareSqliteTables($multipleConnections = false)
     {
         $connection = $this->database->get('default');
-
+        
+        $connection->execute('
+            DROP TABLE IF EXISTS fairies
+        ');
+        
         $connection->execute('
             CREATE TABLE fairies (
               id INTEGER PRIMARY KEY,
@@ -395,6 +433,10 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         if($multipleConnections) {
             $connection = $this->database->get('second');
         }
+        
+        $connection->execute('
+            DROP TABLE IF EXISTS flowers
+        ');
         
         $connection->execute('
             CREATE TABLE flowers (

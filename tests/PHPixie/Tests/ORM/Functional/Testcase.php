@@ -30,15 +30,23 @@ abstract class Testcase extends \PHPixie\Test\Testcase
         }
     }
 
-    protected function createEntity($name, $data)
+    protected function createEntity($name, $data = array(), $save = true)
     {
         $entity = $this->orm->repository($name)->create();
         foreach($data as $field => $value) {
             $entity->$field = $value;
         }
-        $entity->save();
+        
+        if($save) {
+            $entity->save();
+        }
         
         return $entity;
+    }
+    
+    protected function query($name)
+    {
+       return $this->orm->query($name); 
     }
     
     protected function assertEntities($data, $entities, $idField = null)

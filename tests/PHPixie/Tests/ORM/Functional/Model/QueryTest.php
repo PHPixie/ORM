@@ -181,6 +181,28 @@ class QueryTest extends \PHPixie\Tests\ORM\Functional\ModelTest
                 ->notIn(array())
                 ->find()->asArray()
         );
+
+        $this->assertFairyNames(
+            array('Blum'),
+            $this->query()
+                ->in($fairies[1]->id())
+                ->find()->asArray()
+        );
+        
+        $this->assertFairyNames(
+            array('Blum', 'Pixie'),
+            $this->query()
+                ->in(array($fairies[1]->id(), $fairies[2]->id()))
+                ->find()->asArray()
+        );
+        
+        $stella = $this->createEntity('fairy', array(), false);
+        
+        $query = $this->query();
+        $this->assertException(function() use($query, $stella){
+            $query->in($stella)->find();
+        }, '\PHPixie\ORM\Exception\Builder');
+        
     }
         
     protected function countTest()
@@ -290,9 +312,9 @@ class QueryTest extends \PHPixie\Tests\ORM\Functional\ModelTest
         );
     }
     
-    protected function query()
+    protected function query($name = 'fairy')
     {
-        return $this->orm->repository('fairy')->query();
+        return parent::query($name);
     }
 
 }

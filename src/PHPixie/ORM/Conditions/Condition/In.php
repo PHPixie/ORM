@@ -20,9 +20,18 @@ class In extends \PHPixie\ORM\Conditions\Condition\Implementation
         }
         
         foreach($items as $item) {
+            if(is_scalar($item)) {
+                continue;
+            }
+            
             if($item->modelName() !== $this->modelName) {
                 throw new \PHPixie\ORM\Exception\Builder("Model {$item->modelName()} does not match {$this->modelName}");
             }
+            
+            if($item instanceof \PHPixie\ORM\Models\Type\Database\Entity && $item->isNew()) {
+                throw new \PHPixie\ORM\Exception\Builder("Only saved entities can be used");
+            }
+
         }
         
         foreach($items as $item) {

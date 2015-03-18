@@ -97,11 +97,11 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
         if(!is_array($items))
             $items = array($items);
 
-        if($action == 'set' && $owner instanceof \PHPixie\ORM\Models\Type\Database\Query)
+        if($action == 'set' && !$this->isEntityValue($owner))
             $action = 'reset';
             
         foreach($items as $item) {
-            if($item instanceof \PHPixie\ORM\Models\Type\Database\Query)
+            if(!$this->isEntityValue($item))
                 continue;
             
             $property = $item->getRelationshipProperty($config->itemOwnerProperty, $action !== 'reset');
@@ -137,7 +137,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
             $items = array($items);
         
         
-        if($owner instanceof \PHPixie\ORM\Models\Type\Database\Query)
+        if(!($owner instanceof \PHPixie\ORM\Models\Type\Database\Entity))
             return;
         
         
@@ -147,7 +147,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
             return;
 
         foreach($items as $item) {
-            if($item instanceof \PHPixie\ORM\Models\Type\Database\Query) {
+            if(!($item instanceof \PHPixie\ORM\Models\Type\Database\Entity)) {
                 $action = 'reset';
                 break;
             }

@@ -52,7 +52,7 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
     
     protected function processProperty($type, $config, $entity, $action, $value = null, $unsetRelated = true)
     {
-        if($entity instanceof \PHPixie\ORM\Models\Type\Database\Query)
+        if(!$this->isEntityValue($entity))
             return;
         
         if($type === 'owner') {
@@ -70,7 +70,8 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
                 $this->processProperty($opposing, $config, $property->value(), 'set', null, false);
             }
         }
-        if($action === 'set' && $value instanceof \PHPixie\ORM\Models\Type\Database\Query)
+        
+        if($action === 'set' && !$this->isEntityValue($value))
             $action = 'reset';
         
         if($action === 'reset') {

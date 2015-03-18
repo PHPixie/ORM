@@ -241,7 +241,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             $items = array($items);
 
         foreach($items as $item) {
-            if($item instanceof \PHPixie\ORM\Models\Type\Database\Query)
+            if(!$this->isEntityValue($item))
                 continue;
             $property = $this->getPropertyIfLoaded($item, $itemsProperty);
             if($property !== null)
@@ -259,14 +259,14 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
 
         $resetOwners = false;
         foreach ($items as $item) {
-            if (!($item instanceof \PHPixie\ORM\Models\Type\Database\Entity)) {
+            if (!$this->isEntityValue($item)) {
                 $resetOwners = true;
                 break;
             }
         }
 
         foreach ($owners as $owner) {
-            if (!($owner instanceof \PHPixie\ORM\Models\Type\Database\Entity))
+            if (!$this->isEntityValue($owner))
                 continue;
 
             $property = $this->getPropertyIfLoaded($owner, $ownerProperty);

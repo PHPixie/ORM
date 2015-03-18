@@ -83,6 +83,24 @@ class ManyTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
                 array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $blum->id()),
             ));
         }
+        
+        $trixie->flowers->add(
+            $this->query('flower')->in($green)
+        );
+        
+        $this->assertSame(false, $trixie->flowers->isLoaded());
+        
+        $blum->flowers->add($green);
+        $trixie->flowers->add(
+            $green->id()
+        );
+        
+        $this->assertSame(false, $trixie->flowers->isLoaded());
+        
+        $this->assertData('flower', array(
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
+        ));
     }
 
     protected function removeItemsTest()
@@ -122,6 +140,25 @@ class ManyTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         
         $this->assertSame(null, $red->fairy());
 
+        $this->assertData('flower', array(
+            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => null),
+        ));
+        
+        $trixie->flowers->add($green);
+        $trixie->flowers->remove(
+            $this->query('flower')->in($green)
+        );
+        
+        $this->assertSame(false, $trixie->flowers->isLoaded());
+        
+        $trixie->flowers->add($green);
+        $trixie->flowers->remove(
+            $green->id()
+        );
+        
+        $this->assertSame(false, $trixie->flowers->isLoaded());
+        
         $this->assertData('flower', array(
             array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
             array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => null),

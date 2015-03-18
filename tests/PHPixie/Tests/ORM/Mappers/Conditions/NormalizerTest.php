@@ -43,13 +43,14 @@ class NormalizerTest extends \PHPixie\Test\Testcase
      */
     public function testNormalizeIn()
     {
-        $this->normalizeInTest(false, false);
-        $this->normalizeInTest(false, true);
-        $this->normalizeInTest(true, false);
-        $this->normalizeInTest(true, true);
+        $this->normalizeInTest(false, false, false);
+        $this->normalizeInTest(false, false, true);
+        $this->normalizeInTest(true, true, false);
+        $this->normalizeInTest(true, true, true);
+        $this->normalizeInTest(true, false, false, true);
     }
     
-    protected function normalizeInTest($withQueries, $withEntities)
+    protected function normalizeInTest($withIds, $withQueries, $withEntities, $singleId = false)
     {
         $modelName = 'pixie';
         
@@ -60,6 +61,14 @@ class NormalizerTest extends \PHPixie\Test\Testcase
         $config = $this->getDatabaseConfig();
         $this->method($this->databaseModel, 'config', $config, array($modelName), 0);
         $config->idField = $idField;
+        
+        $ids = array();
+        if($withIds) {
+            $ids[]=5;
+            if(!$singleId) {
+                $ids[]=6;
+            }
+        }
         
         $queries = array();
         if($withQueries) {
@@ -72,10 +81,9 @@ class NormalizerTest extends \PHPixie\Test\Testcase
         if($withEntities) {
             $entities[5]= $this->getDatabaseEntity();
             $entities[6]= $this->getDatabaseEntity();
-            $ids = array(5, 6);
         }
         
-        $items = array_merge($queries, $entities);
+        $items = array_merge($ids, $queries, array_values($entities));
         $this->method($inCondition, 'items', $items, array(), 1);
         
         $conditionsAt = 0;
@@ -120,12 +128,20 @@ class NormalizerTest extends \PHPixie\Test\Testcase
             $this->method($entity, 'id', $key, array(), 0);
         }
         
-        if(!empty($entities)) {
+        $allIds = array_merge($ids, array_keys($entities));
+        if(!empty($allIds)) {
+            if(count($allIds) === 1) {
+                $operator = '=';
+                $values   = $allIds;
+            }else{
+                $operator = 'in';
+                $values   = array($allIds);   
+            }
             $operatorCondition = $this->getOperatorCondition();
             $this->method($this->conditions, 'operator', $operatorCondition, array(
                 $idField,
-                'in',
-                array(array_keys($entities))
+                $operator,
+                $values
             ), $conditionsAt++);
             
             $this->prepareSetLogicAndNegated($operatorCondition, 'or', false);

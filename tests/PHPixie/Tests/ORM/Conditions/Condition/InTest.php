@@ -41,17 +41,26 @@ class InTest extends \PHPixie\Tests\ORM\Conditions\Condition\ImplementationTest
         $this->assertSame($item, end($addedItems));
         
         $items = array(
+            5,
             $this->item(),
             $this->item()
         );
         $this->condition->add($items);
         
         $addedItems = $this->condition->items();
-        $this->assertSame($items, array_slice($addedItems, -2));
+        $this->assertSame($items, array_slice($addedItems, -3));
         
-        $invalidItem = $this->item(false);
-        $this->setExpectedException('\PHPixie\ORM\Exception\Builder');
-        $this->condition->add($invalidItem);
+        $condition = $this->condition;
+        $invalidItems = array(
+            $this->item(false),
+            $this->getEntity(true)
+        );
+        
+        foreach($invalidItems as $invalidItem) {
+            $this->assertException(function() use($condition, $invalidItem){
+                $condition->add($invalidItem);
+            }, '\PHPixie\ORM\Exception\Builder');
+        }
     }
     
     /**
@@ -72,18 +81,22 @@ class InTest extends \PHPixie\Tests\ORM\Conditions\Condition\ImplementationTest
         $this->assertSame($this->modelName, $this->condition->modelName());
     }
     
-    protected function item($valid = true)
+    protected function item($validModelName = true)
     {
         $item = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In', array());
         
-        $modelName = $valid ? $this->modelName : 'fairy';
-        $item
-            ->expects($this->any())
-            ->method('modelName')
-            ->with()
-            ->will($this->returnValue($modelName));
+        $modelName = $validModelName ? $this->modelName : 'fairy';
+        $this->method($item, 'modelName', $modelName, array());
         
         return $item;
+    }
+    
+    protected function getEntity($isNew = false)
+    {
+        $entity = $this->quickMock('\PHPixie\ORM\Models\Type\Database\Entity', array());
+        $this->method($entity, 'modelName', $this->modelName, array());
+        $this->method($entity, 'isNew', $isNew, array());
+        return $entity;
     }
     
     protected function condition()

@@ -11,4 +11,5 @@ abstract class RelationshipTest extends \PHPixie\Tests\ORM\Functional\Testcase
         $this->ormConfigData = array_merge($this->defaultORMConfig, $config);
         $this->orm = $this->orm();
     }
+    
 }

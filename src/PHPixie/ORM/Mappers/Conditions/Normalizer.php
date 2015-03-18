@@ -25,16 +25,31 @@ class Normalizer
         $ids = array();
         foreach($items as $item) {
             
+            if(is_scalar($item)) {
+                $ids[] = $item;
+                continue;
+            }
+            
             if($item instanceof \PHPixie\ORM\Models\Type\Database\Query) {
                 $condition = $this->getSubqueryCondition($item, $idField);
                 $inGroup->add($condition);
-            }else{
-                $ids[]=$item->id();
+                continue;
             }
+            
+            $ids[]=$item->id();
         }
         
         if(!empty($ids)) {
-            $operatorCondition = $this->conditions->operator($idField, 'in', array($ids));
+            
+            if(count($ids) === 1) {
+                $operator = '=';
+                $values   = array(current($ids));
+            }else{
+                $operator = 'in';
+                $values   = array($ids);                
+            }
+            
+            $operatorCondition = $this->conditions->operator($idField, $operator, $values);
             $this->setLogicAndNegated($operatorCondition, 'or', false);
             $inGroup->add($operatorCondition); 
         }
@@ -60,7 +75,7 @@ class Normalizer
         $this->setLogicAndNegated($condition, 'or', false);
         return $condition;
     }
-
+    
     protected function copyLogicAndNegated($source, $target)
     {
         $this->setLogicAndNegated(

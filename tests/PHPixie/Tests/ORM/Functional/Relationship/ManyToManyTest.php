@@ -100,6 +100,13 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
                 ->relatedTo('flowers', $red)
                 ->find()->asArray()
         );
+        
+        $this->assertNames(
+            array('Trixie', 'Blum'),
+            $this->orm->repository('fairy')->query()
+                ->relatedTo('flowers', $red->id())
+                ->find()->asArray()
+        );
 
     }
 
@@ -131,7 +138,7 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             array('Blum'),
             $this->orm->repository('fairy')->query()
                 ->relatedTo('flowers', $red)
-                ->relatedTo('flowers', $green)
+                ->relatedTo('flowers', $green->id())
                 ->relatedTo('flowers', $yellow)
                 ->find()->asArray()
         );
@@ -192,7 +199,14 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             array($trixie->id(), $red->id()),
             array($blum->id(), $red->id())
         ));
-            
+        
+        $pivot = array(
+            array($trixie->id(), $red->id()),
+            array($blum->id(), $red->id()),
+            array($trixie->id(), $green->id()),
+            array($blum->id(), $green->id())
+        );
+        
         for($i=0;$i<2;$i++) {
             $green->fairies->add($trixie);
             $green->fairies->add($blum);
@@ -202,13 +216,23 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             $this->assertSame(array($trixie, $blum), $green->fairies()->asArray());
             $this->assertSame(array($trixie, $blum), $red->fairies()->asArray());
 
-            $this->assertPivot(array(
-                array($trixie->id(), $red->id()),
-                array($blum->id(), $red->id()),
-                array($trixie->id(), $green->id()),
-                array($blum->id(), $green->id())
-            ));
+            $this->assertPivot($pivot);
         }
+        
+        $green->fairies->add(
+            $this->query('fairy')->in($trixie)
+        );
+        
+        $this->assertSame(false, $green->fairies->isLoaded());
+        $this->assertSame(true, $blum->flowers->isLoaded());
+        
+        $blum->flowers->add(
+            $green->id()
+        );
+        
+        $this->assertSame(false, $blum->flowers->isLoaded());
+        
+        $this->assertPivot($pivot);
     }
     
     protected function removeItemsTest()
@@ -253,6 +277,21 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->assertPivot(array(
             
         ));
+        
+        $trixie->flowers->add($red);
+        $blum->flowers->add($green);
+        
+        $trixie->flowers->remove(
+            $this->query('flower')->in($green->id())
+        );
+        
+        $this->assertSame(false, $trixie->flowers->isLoaded());
+        
+        $blum->flowers->remove(
+            $green->id()
+        );
+        
+        $this->assertSame(false, $blum->flowers->isLoaded());
         
     }
     

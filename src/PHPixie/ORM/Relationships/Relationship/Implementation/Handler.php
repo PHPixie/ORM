@@ -49,4 +49,12 @@ abstract class Handler
         return $property;
     }
     
+    protected function isEntityValue($item)
+    {
+        if($item === null) {
+            return true;
+        }
+        
+        return $item instanceof \PHPixie\ORM\Models\Model\Entity;
+    }
 }

@@ -24,15 +24,12 @@ class Repository implements \PHPixie\ORM\Models\Type\Database\Repository
     public function save($entity)
     {
         $this->repository->save($entity);
-        return $this;
     }
     
     public function delete($entity)
     {
         $this->repository->delete($entity);
-        return $this;
     }
-    
     
     public function load($data)
     {

@@ -25,8 +25,8 @@ class RepositoryTest extends \PHPixie\Test\Testcase
         $methods = array(
             array('config', true, array()),
             array('modelName', true, array()),
-            array('save', false, array('a')),
-            array('delete', false, array('a')),
+            array('save', null, array('a')),
+            array('delete', null, array('a')),
             array('load', true, array('a')),
             array('create', true, array()),
             array('query', true, array()),
@@ -41,12 +41,15 @@ class RepositoryTest extends \PHPixie\Test\Testcase
         foreach($methods as $set) {
             $method = $set[0];
             
-            if($set[1]) {
+            if($set[1] === true) {
                 $return = 'test';
                 $expect = 'test';
-            }else{
+            }elseif($set === false){
                 $return = null;
                 $expect = $this->wrapper;
+            }else{
+                $return = $set[1];
+                $expect = $set[1];
             }
             
             $params = isset($set[3]) ? $set[3] : $set[2];

@@ -70,7 +70,7 @@ abstract class EntityTest extends \PHPixie\Tests\ORM\Models\Model\Implementation
     public function testSetId()
     {
         $this->prepareSetDataField('id', 1);
-        $this->entity->setId(1);
+        $this->assertSame($this->entity, $this->entity->setId(1));
     }
     
     /**
@@ -80,7 +80,7 @@ abstract class EntityTest extends \PHPixie\Tests\ORM\Models\Model\Implementation
     public function testSave()
     {
         $this->method($this->repository, 'save', null, array($this->entity), 0);
-        $this->entity->save();
+        $this->assertSame($this->entity, $this->entity->save());
     }
     
     /**
@@ -90,7 +90,7 @@ abstract class EntityTest extends \PHPixie\Tests\ORM\Models\Model\Implementation
     public function testDelete()
     {
         $this->method($this->repository, 'delete', null, array($this->entity), 0);
-        $this->entity->delete();
+        $this->assertSame($this->entity, $this->entity->delete());
     }
     
     /**

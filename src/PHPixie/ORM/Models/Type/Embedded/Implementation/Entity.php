@@ -18,6 +18,7 @@ class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
     {
         $this->owner = null;
         $this->ownerPropertyName = null;
+        return $this;
     }
 
     public function owner()

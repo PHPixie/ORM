@@ -32,7 +32,7 @@ class EntityTest extends \PHPixie\Tests\ORM\Models\Model\Implementation\EntityTe
         $this->entity->setOwnerRelationship($owner, 'pixie');
         $this->assertOwnerRelationship($owner, 'pixie');
         
-        $this->entity->unsetOwnerRelationship();
+        $this->assertSame($this->entity, $this->entity->unsetOwnerRelationship());
         $this->assertOwnerRelationship(null, null);
     }
     

@@ -25,6 +25,7 @@ abstract class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
     public function setIsNew($isNew)
     {
         $this->isNew = $isNew;
+        return $this;
     }
     
     public function isDeleted()
@@ -35,6 +36,7 @@ abstract class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
     public function setIsDeleted($isDeleted)
     {
         $this->isDeleted = $isDeleted;
+        return $this;
     }
     
     public function id()
@@ -45,17 +47,20 @@ abstract class Entity extends \PHPixie\ORM\Models\Model\Implementation\Entity
     
     public function setId($id) {
         $this->assertNotDeleted();
-        return $this->setField($this->config->idField, $id);
+        $this->setField($this->config->idField, $id);
+        return $this;
     }
     
     public function save()
     {
         $this->repository->save($this);
+        return $this;
     }
     
     public function delete()
     {
         $this->repository->delete($this);
+        return $this;
     }
     
     public function getRelationshipProperty($name, $createMissing = true)

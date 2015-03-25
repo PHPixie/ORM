@@ -1,6 +1,6 @@
 # ORM
 PHPixie ORM library
-Supports Mongo ,MySQL, PostgreSQL and SQLite database and One-To-One, One-To-Many, Many-To-Many, Embeds-One and Embeds-Many relationships.
+Supports Mongo ,MySQL, PostgreSQL and SQLite databases and One-To-One, One-To-Many, Many-To-Many, Embeds-One and Embeds-Many relationships.
 
 [![Build Status](https://travis-ci.org/PHPixie/ORM.svg?branch=master)](https://travis-ci.org/PHPixie/ORM)
 [![Test Coverage](https://codeclimate.com/github/PHPixie/ORM/badges/coverage.svg)](https://codeclimate.com/github/PHPixie/ORM)

@@ -33,7 +33,7 @@ class FairyEntity extends \PHPixie\ORM\Wrappers\Type\Database\Entity
 
 
 //Create wrapper builder
-class Wrappers extends \PHPixie\ORM\Wrappers
+class Wrappers extends \PHPixie\ORM\Wrappers\Implementation
 {
     //Tell which models have wrapped entities
     public function databaseEntities()

@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPixie\Tests\ORM;
+namespace PHPixie\Tests\ORM\Wrappers;
 
-class WrappersStub extends \PHPixie\ORM\Wrappers
+class ImplementationStub extends \PHPixie\ORM\Wrappers\Implementation
 {
     protected $databaseRepositories = array('pixie');
     protected $databaseQueries      = array('fairy');
@@ -39,15 +39,15 @@ class WrappersStub extends \PHPixie\ORM\Wrappers
 }
 
 /**
- * @coversDefaultClass \PHPixie\ORM\Wrappers
+ * @coversDefaultClass \PHPixie\ORM\Wrappers\Implementation
  */
-class WrappersTest extends \PHPixie\Test\Testcase
+class ImplementationTest extends \PHPixie\Test\Testcase
 {
     protected $wrappers;
     
     public function setUp()
     {
-        $this->wrappers = new WrappersStub();
+        $this->wrappers = new ImplementationStub();
     }
 
     /**
@@ -66,7 +66,7 @@ class WrappersTest extends \PHPixie\Test\Testcase
             'embeddedEntities'
         );
         
-        $wrappers = new \PHPixie\ORM\Wrappers();
+        $wrappers = new \PHPixie\ORM\Wrappers\Implementation();
         
         foreach($methods as $method) {
             $this->assertSame(array(), $wrappers->$method());
@@ -113,26 +113,3 @@ class WrappersTest extends \PHPixie\Test\Testcase
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

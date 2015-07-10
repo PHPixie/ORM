@@ -18,7 +18,7 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
         $this->configData = array(
             'ownerModel'        => 'fairy',
             'itemModel'         => 'flower',
-            'ownerKey'          => 'fairy_id',
+            'ownerKey'          => 'fairyId',
             'itemOwnerProperty' => 'fairy',
             $this->ownerPropertyName => $this->configOwnerProperty,
         );
@@ -293,13 +293,13 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
                 $this->method($itemRepository, 'databaseDeleteQuery', $query, array(), $itemRepositoryAt++);
             }
         }
-        $this->prepareRepositoryConfig($ownerRepository, array('idField' =>'owner_id'), 0);
+        $this->prepareRepositoryConfig($ownerRepository, array('idField' =>'ownerId'), 0);
         
         $this->method($this->plannerMocks['in'], 'result', null, array(
             $query,
             $data['ownerKey'],
             $result,
-            'owner_id',
+            'ownerId',
             $plan
         ), 0);
         

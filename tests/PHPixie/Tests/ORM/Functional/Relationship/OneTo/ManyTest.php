@@ -59,8 +59,8 @@ class ManyTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         
         $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
-            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => $trixie->id()),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairyId' => $trixie->id()),
         ));
 
         
@@ -79,8 +79,8 @@ class ManyTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
             
             $idField = $this->idField('flower');
             $this->assertData('flower', array(
-                array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
-                array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $blum->id()),
+                array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => $trixie->id()),
+                array( $idField => $green->id(), 'name' => 'Green', 'fairyId' => $blum->id()),
             ));
         }
         
@@ -98,8 +98,8 @@ class ManyTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         $this->assertSame(false, $trixie->flowers->isLoaded());
         
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
-            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => $trixie->id()),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairyId' => $trixie->id()),
         ));
     }
 
@@ -131,8 +131,8 @@ class ManyTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         $idField = $this->idField('flower');
         
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
-            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => null),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => $trixie->id()),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairyId' => null),
         ));
         
         $trixie->flowers->removeAll();
@@ -141,8 +141,8 @@ class ManyTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         $this->assertSame(null, $red->fairy());
 
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
-            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => null),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairyId' => null),
         ));
         
         $trixie->flowers->add($green);
@@ -160,8 +160,8 @@ class ManyTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         $this->assertSame(false, $trixie->flowers->isLoaded());
         
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
-            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => null),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairyId' => null),
         ));
     }
     

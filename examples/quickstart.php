@@ -36,7 +36,7 @@ $connection->execute('
     CREATE TABLE flowers (
       id INTEGER PRIMARY KEY,
       name VARCHAR(255),
-      fairy_id INTEGER
+      fairyId INTEGER
     )
 ');
 

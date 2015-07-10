@@ -20,7 +20,7 @@ abstract class Config extends \PHPixie\ORM\Relationships\Relationship\Implementa
 
         $itemOptionsPrefix = $itemOptionName.'Options';
         $this->itemOwnerProperty = $configSlice->get($itemOptionsPrefix.'.ownerProperty', $this->ownerModel);
-        $this->ownerKey = $configSlice->get($itemOptionsPrefix.'.ownerKey', $this->itemOwnerProperty.'_id');
+        $this->ownerKey = $configSlice->get($itemOptionsPrefix.'.ownerKey', $this->itemOwnerProperty.'Id');
         $this->onDelete = $configSlice->get($itemOptionsPrefix.'.onOwnerDelete', 'update');
 
         $itemProperty = $configSlice->get('ownerOptions.'.$itemOptionName.'Property', null);

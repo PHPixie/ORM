@@ -28,7 +28,7 @@ class BatchTest extends \PHPixie\Tests\ORM\Steps\Step\Query\InsertTest
             array(1, 2),
             array(3, 4),
         );
-        $fields = array('fairy_id', 'flower_id');
+        $fields = array('fairyId', 'flowerId');
         
         $this->method($this->dataStep, 'data', $data, array(), 0);
         $this->method($this->dataStep, 'fields', $fields, array(), 1);

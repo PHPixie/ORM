@@ -24,13 +24,13 @@ class ConfigTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implement
             array(
                 'leftModel'       => 'fairy',
                 'leftProperty'    => 'flowers',
-                'leftPivotKey'    => 'fairy_id',
+                'leftPivotKey'    => 'fairyId',
 
                 'rightModel'      => 'flower',
                 'rightProperty'   => 'fairies',
-                'rightPivotKey'   => 'flower_id',
+                'rightPivotKey'   => 'flowerId',
 
-                'pivot'           => 'fairies_flowers',
+                'pivot'           => 'fairiesFlowers',
                 'pivotConnection' => null
             )
         );

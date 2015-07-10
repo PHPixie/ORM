@@ -414,8 +414,8 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->assertEquals(count($data), count($pivotData));
         
         foreach($pivotData as $key => $row) {
-            $this->assertEquals($data[$key][0], $row->fairy_id);
-            $this->assertEquals($data[$key][1], $row->flower_id);
+            $this->assertEquals($data[$key][0], $row->fairyId);
+            $this->assertEquals($data[$key][1], $row->flowerId);
         }
     }
     
@@ -473,8 +473,8 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         
         $connection->execute('
             CREATE TABLE fairies_flowers (
-              fairy_id INTEGER,
-              flower_id INTEGER
+              fairyId INTEGER,
+              flowerId INTEGER
             )
         ');
         
@@ -520,8 +520,8 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         
         $connection->execute('
             CREATE TABLE fairies_flowers (
-              fairy_id INTEGER,
-              flower_id INTEGER
+              fairyId INTEGER,
+              flowerId INTEGER
             )
         ');
         

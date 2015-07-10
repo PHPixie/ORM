@@ -12,7 +12,7 @@ class ItemsTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implementa
         'ownerProperty'  => 'flowers',
         'itemModel'      => 'flower',
         'itemProperty'   => 'fairies',
-        'ownerKey'       => 'fairy_id',
+        'ownerKey'       => 'fairyId',
     );
     
     protected function prepareMap()

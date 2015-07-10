@@ -17,7 +17,7 @@ class InTest extends \PHPixie\Tests\ORM\Planners\PlannerTest
     protected $conditionsMapper;
     
     protected $queryField = 'id';
-    protected $subqueryField = 'fairy_id';
+    protected $subqueryField = 'fairyId';
     
     public function setUp()
     {

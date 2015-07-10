@@ -382,9 +382,16 @@ abstract class QueryTest extends \PHPixie\Tests\ORM\Conditions\Builder\ProxyTest
      */
     public function testGetRelationshipProperty()
     {
-        $this->prepareProperty('test');
-        $property = $this->query->getRelationshipProperty('test');
-        $this->assertSame($property, $this->query->getRelationshipProperty('test'));
+        $this->prepareRequirePropertyNames(array('test'));
+        $property = $this->prepareProperty('test', 1);
+        for($i=0; $i<2; $i++) {
+            $this->assertSame($property, $this->query->getRelationshipProperty('test'));
+        }
+        
+        $query = $this->query();
+        $this->assertException(function() use($query) {
+            $this->query->getRelationshipProperty('trixie');
+        }, '\PHPixie\ORM\Exception\Relationship');
     }
     
     /**
@@ -393,9 +400,40 @@ abstract class QueryTest extends \PHPixie\Tests\ORM\Conditions\Builder\ProxyTest
      */
     public function testGet()
     {
-        $this->prepareProperty('test');
-        $property = $this->query->test;
-        $this->assertSame($property, $this->query->test);
+        $this->prepareRequirePropertyNames(array('test'));
+        $property = $this->prepareProperty('test', 1);
+        for($i=0; $i<2; $i++) {
+            $this->assertSame($property, $this->query->test);
+        }
+    }
+    
+    /**
+     * @covers ::__call
+     * @covers ::<protected>
+     */
+    public function testCall()
+    {
+        $this->prepareRequirePropertyNames(array());
+        $this->callTest();
+    }
+    
+    /**
+     * @covers ::__call
+     * @covers ::<protected>
+     */
+    public function testInvokePropert()
+    {
+        $this->prepareRequirePropertyNames(array('test'));
+        $property = $this->prepareProperty('test', 1);
+        for($i=0; $i<2; $i++) {
+            $this->method($property, '__invoke', 'trixie', array(), 0);
+            $this->assertSame('trixie', $this->query->test());
+        }
+    }
+    
+    protected function prepareRequirePropertyNames($names, $at = 0)
+    {
+        $this->method($this->queryPropertyMap, 'getPropertyNames', $names, array($this->configData['model']), $at);
     }
     
     protected function prepareProperty($name, $at = 0)

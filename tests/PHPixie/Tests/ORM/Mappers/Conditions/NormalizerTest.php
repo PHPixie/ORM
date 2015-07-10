@@ -57,7 +57,7 @@ class NormalizerTest extends \PHPixie\Test\Testcase
         $inCondition = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In');
         $this->method($inCondition, 'modelName', $modelName, array(), 0);
         
-        $idField = 'pixie_id';
+        $idField = 'pixieId';
         $config = $this->getDatabaseConfig();
         $this->method($this->databaseModel, 'config', $config, array($modelName), 0);
         $config->idField = $idField;

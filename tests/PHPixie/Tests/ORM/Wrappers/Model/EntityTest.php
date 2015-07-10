@@ -72,6 +72,16 @@ abstract class EntityTest extends \PHPixie\Test\Testcase
         $this->wrapper->test = 5;
     }
     
+    /**
+     * @covers ::__call
+     * @covers ::<protected>
+     */
+    public function testCall()
+    {
+        $this->method($this->entity, '__call', 5, array('test', array(4)), 0);
+        $this->assertSame(5, $this->wrapper->test(4));
+    }
+    
     abstract protected function entity();
     abstract protected function wrapper();
     

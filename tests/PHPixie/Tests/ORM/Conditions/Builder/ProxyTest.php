@@ -296,6 +296,11 @@ class ProxyTest extends \PHPixie\Test\Testcase
      */
     public function testCall()
     {
+        $this->callTest();
+    }
+    
+    protected function callTest()
+    {
         foreach(array('and', 'or', 'xor') as $logic) {
             $this->method($this->builder, 'buildCondition', null, array($logic, false, array('a', 1)), 0);
             $this->proxy->$logic('a', 1);
@@ -307,7 +312,6 @@ class ProxyTest extends \PHPixie\Test\Testcase
         $this->setExpectedException('\PHPixie\ORM\Exception\Builder');
         $this->proxy->maybe('a', 1);
     }
-    
     
     protected function getBuilder()
     {

@@ -93,6 +93,16 @@ class QueryTest extends \PHPixie\Tests\ORM\Conditions\Builder\ProxyTest
         $this->assertSame(5, $this->wrapper->test);
     }
     
+    /**
+     * @covers ::__call
+     * @covers ::<protected>
+     */
+    public function testCall()
+    {
+        $this->method($this->query, '__call', 5, array('test', array(4)), 0);
+        $this->assertSame(5, $this->wrapper->test(4));
+    }
+    
     protected function getBuilder()
     {
         return $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');

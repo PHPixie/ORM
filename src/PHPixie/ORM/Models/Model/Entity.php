@@ -13,4 +13,5 @@ interface Entity extends \PHPixie\ORM\Conditions\Condition\In\Item
     public function setField($key, $value);
     public function __get($name);
     public function __set($name, $value);
+    public function __call($method, $params);
 }

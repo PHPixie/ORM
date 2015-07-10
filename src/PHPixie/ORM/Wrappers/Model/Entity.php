@@ -55,6 +55,10 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
     public function __set($name, $value)
     {
         $this->entity->__set($name, $value);
-    }    
+    }
     
+    public function __call($method, $params)
+    {
+        return $this->entity->__call($method, $params);
+    }
 }

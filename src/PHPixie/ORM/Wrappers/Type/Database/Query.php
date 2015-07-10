@@ -144,10 +144,13 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
         return $this->query->getRelationshipProperty($name);
     }
     
-    
     public function __get($name)
     {
         return $this->query->__get($name);
     }
     
+    public function __call($method, $params)
+    {
+        return $this->query->__call($method, $params);
+    }
 }

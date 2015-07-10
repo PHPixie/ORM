@@ -26,11 +26,11 @@ abstract class ConfigTest extends \PHPixie\Tests\ORM\Models\Type\Database\Config
         
         $this->sets[] = array(
             $this->slice(array(
-                'id'    => 'pixie_id',
+                'id'    => 'pixieId',
                 'table' => 'pixies',
             )),
             array(
-                'idField' => 'pixie_id',
+                'idField' => 'pixieId',
                 'table'   => 'pixies',
             )
         );

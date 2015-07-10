@@ -11,7 +11,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     protected $container;
     protected $config;
     
-    protected $relationshipProperties = array();
+    protected $relationshipProperties;
 
     protected $limit;
     protected $offset;
@@ -189,7 +189,20 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
 
     public function getRelationshipProperty($name)
     {
-        if(!array_key_exists($name, $this->relationshipProperties)) {
+        $this->requirePropertyNames();
+        
+        if (!array_key_exists($name, $this->relationshipProperties)) {
+            throw new \PHPixie\ORM\Exception\Relationship("Relationship property '$name' is not defined for '{$this->modelName()}'");
+        }
+        
+        return $this->relationshipProperty($name);
+    }
+    
+    protected function relationshipProperty($name)
+    {
+        $property = $this->relationshipProperties[$name];
+        
+        if($property === null) {
             $property = $this->queryPropertyMap->property($this, $name);
             $this->relationshipProperties[$name] = $property;
         }
@@ -202,4 +215,23 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
         return $this->getRelationshipProperty($name);
     }
     
+    public function __call($name, $params)
+    {
+        $this->requirePropertyNames();
+        
+        if (array_key_exists($name, $this->relationshipProperties)) {
+            $property = $this->relationshipProperty($name);
+            return call_user_func_array($property, $params);
+        }
+        
+        return parent::__call($name, $params);
+    }
+    
+    protected function requirePropertyNames()
+    {
+        if ($this->relationshipProperties === null) {
+            $propertyNames = $this->queryPropertyMap->getPropertyNames($this->modelName());
+            $this->relationshipProperties = array_fill_keys($propertyNames, null);
+        }
+    }
 }

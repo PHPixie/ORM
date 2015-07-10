@@ -8,7 +8,7 @@ namespace PHPixie\Tests\ORM\Conditions\Condition\Field;
 class SubqueryTest extends \PHPixie\Tests\Database\Conditions\Condition\Field\ImplementationTest
 {
     protected $subquery;
-    protected $subqueryField = 'pixie_id';
+    protected $subqueryField = 'pixieId';
     
     public function setUp()
     {

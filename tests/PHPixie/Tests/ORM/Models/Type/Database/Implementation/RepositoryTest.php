@@ -14,7 +14,7 @@ abstract class RepositoryTest extends \PHPixie\Test\Testcase
     protected $repository;
     
     protected $configData = array(
-        'idField' => 'fairy_id',
+        'idField' => 'fairyId',
         'connection' => 'test',
         'model'  => 'fairy'
     );

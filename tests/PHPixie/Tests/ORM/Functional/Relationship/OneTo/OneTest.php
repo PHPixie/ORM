@@ -54,8 +54,8 @@ class OneTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         
         $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
-            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairyId' => $trixie->id()),
         ));
         
         $trixie->flower->set($red);
@@ -63,8 +63,8 @@ class OneTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         
         $this->assertSame(false,  $trixie->flower->isLoaded());
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
-            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairyId' => $trixie->id()),
         ));
         
         $trixie->flower->set($red);
@@ -72,8 +72,8 @@ class OneTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         
         $this->assertSame(false, $trixie->flower->isLoaded());
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
-            array( $idField => $green->id(), 'name' => 'Green', 'fairy_id' => $trixie->id()),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => null),
+            array( $idField => $green->id(), 'name' => 'Green', 'fairyId' => $trixie->id()),
         ));
     }
     
@@ -95,7 +95,7 @@ class OneTest extends \PHPixie\Tests\ORM\Functional\Relationship\OneToTest
         
         $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => null),
         ));
     }
     

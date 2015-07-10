@@ -10,7 +10,7 @@ class ItemTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implementat
     protected $configData = array(
         'ownerModel'       => 'fairy',
         'itemModel'        => 'flower',
-        'ownerKey'         => 'fairy_id',
+        'ownerKey'         => 'fairyId',
     );
     
     protected function prepareMap()

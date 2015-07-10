@@ -41,5 +41,5 @@ interface Query extends \PHPixie\ORM\Conditions\Condition\In\Item,
     public function getConditions();
 
     public function __get($name);
-
+    public function __call($method, $params);
 }

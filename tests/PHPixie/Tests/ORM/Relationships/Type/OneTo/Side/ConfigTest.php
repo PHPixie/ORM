@@ -24,7 +24,7 @@ abstract class ConfigTest extends \PHPixie\Tests\ORM\Relationships\Relationship\
                 'ownerModel'       => 'fairy',
                 'itemModel'        => 'flower',
                 
-                'ownerKey'         => 'fairy_id',
+                'ownerKey'         => 'fairyId',
                 'onDelete'         => 'update',
                 
                 $this->ownerProperty    => $this->defaultOwnerProperty,
@@ -37,7 +37,7 @@ abstract class ConfigTest extends \PHPixie\Tests\ORM\Relationships\Relationship\
         $this->sets[] = array(
             $this->slice(array(
                 $itemOptionsPrefix.'.ownerProperty' => 'pixie',
-                $itemOptionsPrefix.'.ownerKey'      => 'owner_id',
+                $itemOptionsPrefix.'.ownerKey'      => 'ownerId',
                 $itemOptionsPrefix.'.onOwnerDelete' => 'delete',
 
                 'ownerOptions.'.$this->itemOptionName.'Property' => 'plants'
@@ -49,7 +49,7 @@ abstract class ConfigTest extends \PHPixie\Tests\ORM\Relationships\Relationship\
                 'ownerModel'       => 'fairy',
                 'itemModel'        => 'flower',
                 
-                'ownerKey'          => 'owner_id',
+                'ownerKey'          => 'ownerId',
                 'onDelete'         => 'delete',
                 
                 $this->ownerProperty    => 'plants',

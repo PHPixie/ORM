@@ -12,10 +12,10 @@ class PreloaderTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implem
     protected $configData = array(
         'leftModel'     => 'fairy',
         'leftProperty'  => 'flowers',
-        'leftPivotKey'  => 'fairy_id',
+        'leftPivotKey'  => 'fairyId',
         'rightModel'    => 'flower',
         'rightProperty' => 'fairies',
-        'rightPivotKey' => 'flower_id',
+        'rightPivotKey' => 'flowerId',
         'pivot'         => 'fairies_flowers'
     );
     

@@ -101,14 +101,14 @@ class ConditionsTest extends \PHPixie\Test\Testcase
         $this->method($builder, 'endGroup', null, array(), 3);
         
         $subquery = $this->getDatabaseQuery();
-        $subqueryCondition = $this->subqueryCondition('or', true, 'id', $subquery, 'pixie_id');
+        $subqueryCondition = $this->subqueryCondition('or', true, 'id', $subquery, 'pixieId');
         $optimizedConditions[] = $subqueryCondition;
         
         $this->method($this->inPlanner, 'databaseModelQuery', null, array(
             $builder,
             'id',
             $subquery,
-            'pixie_id',
+            'pixieId',
             $plan,
             'or',
             true

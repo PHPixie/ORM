@@ -97,7 +97,7 @@ abstract class StrategyTest extends \PHPixie\Test\Testcase
         $methods = array(
             'items' => array($this->quickMock('\PHPixie\ORM\Models\Type\Database\Query')),
             'repository' => $this->quickMock('\PHPixie\ORM\Models\Type\Database\Repository'),
-            'pivotKey' => $source.'_id',
+            'pivotKey' => $source.'Id',
         );
         
         foreach($methods as $method => $value) {

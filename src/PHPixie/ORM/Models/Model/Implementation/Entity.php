@@ -89,6 +89,7 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
         if (array_key_exists($name, $this->relationshipProperties)) {
             return $this->relationshipProperty($name);
         }
+        
         return $this->getRequiredField($name);
     }
     

@@ -33,7 +33,7 @@ class Config extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side
         $this->pivot = $configSlice->get('pivot', null);
 
         if($this->pivot === null) {
-            $this->pivot = $this->rightProperty.'_'.$this->leftProperty;
+            $this->pivot = $this->rightProperty.ucfirst($this->leftProperty);
         }
 
         $this->pivotConnection = $configSlice->get('pivotOptions.connection', null);
@@ -41,7 +41,7 @@ class Config extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side
         foreach ($sides as $side => $opposing) {
             $property = $side.'PivotKey';
             if(($this->$property = $configSlice->get('pivotOptions.'.$side.'Key', null)) === null)
-                $this->$property = $inflector->singular($this->get($opposing.'Property')).'_id';
+                $this->$property = $inflector->singular($this->get($opposing.'Property')).'Id';
         }
     }
 }

@@ -128,14 +128,14 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         
         $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $blum->id()),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => $blum->id()),
         ));
         
         $red->fairy->set($this->query('fairy')->in($trixie));
         
         $this->assertSame(false, $red->fairy->isLoaded());
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => $trixie->id()),
         ));
         
         $red->fairy->set($blum);
@@ -143,7 +143,7 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         
         $this->assertSame(false, $red->fairy->isLoaded());
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => $trixie->id()),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => $trixie->id()),
         ));
     }
     
@@ -168,7 +168,7 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         
         $idField = $this->idField('flower');
         $this->assertData('flower', array(
-            array( $idField => $red->id(), 'name' => 'Red', 'fairy_id' => null),
+            array( $idField => $red->id(), 'name' => 'Red', 'fairyId' => null),
         ));
     }
     
@@ -313,7 +313,7 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
                     ->where('name', 'Yellow')
                     ->findOne();
         
-        $this->assertEquals(null, $yellow->fairy_id);
+        $this->assertEquals(null, $yellow->fairyId);
     }
     
     protected function cascadeDeleteTest()
@@ -392,7 +392,7 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             CREATE TABLE flowers (
               id INTEGER PRIMARY KEY AUTO_INCREMENT,
               name VARCHAR(255),
-              fairy_id INTEGER
+              fairyId INTEGER
             )
         ');
         
@@ -442,7 +442,7 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             CREATE TABLE flowers (
               id INTEGER PRIMARY KEY,
               name VARCHAR(255),
-              fairy_id INTEGER
+              fairyId INTEGER
             )
         ');
     }

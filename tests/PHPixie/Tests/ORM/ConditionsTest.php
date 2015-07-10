@@ -125,7 +125,7 @@ class ConditionsTest extends \PHPixie\Test\Testcase
     {
         $field = 'id';
         $subquery = $this->abstractMock('\PHPixie\ORM\Models\Type\Database\Query');
-        $subqueryField = 'pixie_id';
+        $subqueryField = 'pixieId';
         
         $condition = $this->conditions->subquery($field, $subquery, $subqueryField);
         $this->assertInstance($condition, '\PHPixie\ORM\Conditions\Condition\Field\Subquery');

@@ -10,7 +10,7 @@ abstract class OwnerTest extends \PHPixie\Tests\ORM\Relationships\Relationship\I
     protected $configData = array(
         'ownerModel'       => 'fairy',
         'itemModel'        => 'flower',
-        'ownerKey'         => 'fairy_id',
+        'ownerKey'         => 'fairyId',
         'ownerProperty'    => 'items',
         'itemProperty'     => 'fairy',
     );
@@ -19,7 +19,7 @@ abstract class OwnerTest extends \PHPixie\Tests\ORM\Relationships\Relationship\I
     {
         foreach($this->entities as $id => $entity) {
             if(array_key_exists($id, $this->map)) {
-                $this->method($entity, 'getField', $this->map[$id], array('fairy_id'));
+                $this->method($entity, 'getField', $this->map[$id], array('fairyId'));
             }
         }
         

@@ -25,7 +25,7 @@ class UniqueTest extends \PHPixie\Tests\ORM\Steps\Step\Query\Insert\Batch\DataTe
      */
     public function testExecute()
     {
-        $fields = array('fairy_id', 'flower_id');
+        $fields = array('fairyId', 'flowerId');
         $data = array(
             array(1, 2),
             array(1, 3),
@@ -52,9 +52,9 @@ class UniqueTest extends \PHPixie\Tests\ORM\Steps\Step\Query\Insert\Batch\DataTe
         $this->method($this->selectQuery, 'execute', $result, array(), $key+2);
         
         $existing = array(
-            array('fairy_id' => 1, 'flower_id' => 3),
-            array('fairy_id' => 3, 'flower_id' => 5),
-            array('fairy_id' => 5, 'flower_id' => 6),
+            array('fairyId' => 1, 'flowerId' => 3),
+            array('fairyId' => 3, 'flowerId' => 5),
+            array('fairyId' => 5, 'flowerId' => 6),
         );
         
         $this->method($result, 'getFields', $existing, array($fields), 0);
@@ -70,7 +70,7 @@ class UniqueTest extends \PHPixie\Tests\ORM\Steps\Step\Query\Insert\Batch\DataTe
      */
     public function testFields()
     {
-        $fields = array('fairy_id', 'flower_id');
+        $fields = array('fairyId', 'flowerId');
         $this->method($this->dataStep, 'fields', $fields, array(), 0);
         
         $this->assertSame($fields, $this->step->fields());

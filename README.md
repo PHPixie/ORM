@@ -136,6 +136,11 @@ $articles = $orm->query('article')
     ->or('viewsDone', '<', 5)
     ->find();
 
+// Limit and offset
+$articles
+    ->limit(1)
+    ->offset(2);
+
 // It continues in the same way
 // as in the Database component
 
@@ -201,6 +206,79 @@ return array(
 );
 ```
 
+> It is possible to define relationships between tables in same database, different databases
+> or even between relational databases and MongoDB
+
+### Querying relationships
+
+Before looking at actual relationship types, let's see how can you define conditions on a relationship:
+
+```php
+// Lets say we have a one to many relationship
+// between categories and articles
+
+// Finding all categories with
+// at lest one article
+// 
+// Note that you use the property name,
+// and not the model name here.
+// You can modify property names
+// in your config file, more on them later
+$categoryQuery->relatedTo('articles');
+
+// or all artciles with a category
+$articleQuery->relatedTo('category');
+
+// Use logic operators
+// like with where()
+$articleQuery->orNotRelatedTo('category');
+
+// Find categories related to
+// particular articles
+$categoryQuery->relatedTo('articles', $articles);
+
+// $articles can be an id of an article,
+// an article entity or an article query,
+// or an array of them, e.g.
+$categoryQuery->relatedTo('articles', $articleQuery);
+$categoryQuery->relatedTo('articles', $someArticle);
+$categoryQuery->relatedTo('articles', 4); //id
+
+// Will find all categories related
+// to any of the defined articles
+$categoryQuery->relatedTo('articles', array(
+    4, 3, $articleQuery, $articleEntity
+));
+
+
+// Relationship conditions
+
+// Find categories related to articles
+// that have a title 'Welcome'
+$categoryQuery->relatedTo('articles', function($query) {
+    $query
+        ->where('title', 'Welcome');
+});
+
+// Or a shorthand
+// Yo'll be using this a lot
+$categoryQuery->where('articles.title', 'Welcome');
+
+// You can use the '.'
+// to go deeper in the relationships
+
+// Find categories that have at least one article
+// written by the author 'Dracony'
+$categoryQuery->where('articles.author.name', 'Dracony');
+
+// Or combine the verbose approach
+// with the shorthand one
+$categoryQuery->relatedTo('articles.author', function($query) {
+    $query
+        ->where('name', 'Dracony');
+});
+```
+
 ### One To Many
 
 This is the most common relationship. A category can own many articles, a topic has manty replies, etc.
@@ -224,27 +302,303 @@ return array(
             // and will fallback to the defaults
             // based on model names
             
-            // the field that is used to link items
-            'ownerKey' => 'categoryId',
+            'ownerOptions' => array(
+                // the name of the property added to the owner
+                // e.g. $category->articles();
+                //
+                // defaults to the plural of the item model
+                'property' => 'articles'
+            ),
             
-            // The default behavior is to set
-            // the field defined in ownerKey to null
-            // when the owner gets deleted
-            //
-            // changed it to 'delete' to remove
-            // all category articles when a category
-            // is removed
-            'onDelete' => 'update'
+            'itemOptions' => array(
             
-            // the name of the property added to the owner
-            // e.g. $category->articles();
-            'ownerItemsProperty' => 'articles',
-            
-            // the name of the property added to items1
-            // e.g. $article->category()
-            'itemOwnerProperty' => 'category'
+                // the name of the property added to items
+                // e.g. $article->category()
+                //
+                // defaults to the owner model
+                'property' => 'category',
+                
+                // the field that is used to link items
+                // defaults to '<property>Id'
+                'ownerKey' => 'categoryId',
+                
+                // The default behavior is to set
+                // the field defined in ownerKey to null
+                // when the owner gets deleted
+                //
+                // changed it to 'delete' to delete
+                // the articles when their category is deleted
+                'onOwnerDelete' => 'update'
+            )
         )
     )
 );
 ```
+
+Now that we ave relationship properties defined we may start using them:
+
+```php
+// Using with entities
+
+// Getting articles category
+// The property names used are
+// the ones defined in the config
+$category = $article->category();
+
+// Get category articles
+$articles = $category->articles();
+
+// Add artcle to category
+$category->articles->add($article);
+
+// Remove article from category
+$category->articles->remove($article);
+
+// Remove categories from all articles
+$category->articles->removeAll();
+
+// Or you can do the same
+// from the article side
+$article->category->set($category);
+$article->category->remove();
+```
+
+> Note how using properties instead of conventional methods like `addArticle`, `removeAllArticles` tidies up
+> your entities, and doesn't result in a heap of methods added to single class when there are multiple relationships defined
+
+```php
+// You can use queries, ids and arrays
+// anywhere you can use an entity.
+// This allows performing bulk operations faster
+
+// Assign first 5 articles
+// to a category
+$articleQuery
+    ->limit(5)
+    ->offset(0);
+$category->articles->add($articleQuery);
+```
+
+Queries also have properties, just like Entities do. This allows yout to perform more operations with
+less calls tot he database.
+
+```php
+// Assign articles to a category
+$articlesQuery->category->set($category);
+
+// Assign articles to a category with a single
+// database call, without the need to select
+// rows from database
+$categoryQuery->where('title', 'PHP');
+$articlesQuery->category->set($category);
+
+// Unset categories for all articles
+$orm->query('aricle')
+    ->category->remove();
+    
+// Unset only some ctaegories
+$categoryQuery->where('title', 'PHP');
+$orm->query('aricle')
+    ->category->remove($category);
+```
+
+> Using queries instead of iterating over entities provides a huge boost to your performance
+
+```php
+// You can also use query properties
+// for query building
+$categoryQuery = $articleQuery
+    ->where('title', 'Welcome')
+    ->categories();
+
+// is the same as
+$categoryQuery = $orm->query('category')
+    ->relatedTo('articles.title', 'Welcome');
+
+// or
+$articleQuery->where('title', 'Welcome');
+$categoryQuery = $orm->query('category')
+    ->relatedTo('articles', $articleQuery);
+```
+
+> It may seem like too many options at this point, but you can just stick to whichever syntax you prefer best.
+> The generated queries stay exactly the same.
+
+### One to One
+
+One to One relationships are very similar to One To Many. The main difference isthat as soon as you attach
+a new item to an owner, the previous item gets detached. A good example of this would be a relationship between
+an auction lot and the highest bidder. As soon as we set a new person as the highest bidder the old one is unset.
+Another example wold be tasks and workers. Where each task can be performed by a single worker.
+
+```php
+// Configuration 
+return array(
+    'models' => array(
+        // ...
+    ),
+    'relationships' => array(
+        //...
+        
+        array(
+            // mandatory options
+            'type'  => 'oneToOne',
+            'owner' => 'worker',
+            'items' => 'task',
+            
+            // The following keys are optional
+            // and will fallback to the defaults
+            // based on model names
+            
+            'ownerOptions' => array(
+                // the name of the property added to the owner
+                // e.g. $worker->task();
+                //
+                // Unlike manyToMany this uses
+                // a singular case by default
+                'property' => 'task'
+            ),
+            
+            'itemOptions' => array(
+            
+                // the name of the property added to items
+                // e.g. $task->worker()
+                'property' => 'worker',
+                
+                // the field that is used to link items
+                // defaults to '<property>Id'
+                'ownerKey' => 'workerId',
+                
+                // The default behavior is to set
+                // the field defined in ownerKey to null
+                // when the owner gets deleted
+                //
+                // changed it to 'delete' to delete
+                // the task when its worker is deleted
+                'onOwnerDelete' => 'update'
+            )
+        )
+    )
+);
+```
+
+```php
+// Using with entities
+
+// Getting task worker
+$worker = $task->worker();
+
+// Getting worker tasks
+$worker = $task->worker();
+
+// assign worker to a task
+$task->worker->set($worker);
+$worker->task->set($task);
+
+// Unset task
+$task->worker->remove();
+$work->task->remove();
+```
+
+> The interface in oneToOne relationships is the same on both sides and is identical to
+> the owner property in oneToMany relationships
+
+### Many To Many
+
+The most common many-to-many relationship is between articles and tags. These relationships require a special pivot
+table (or a MongoDB collection) to store the links between items.
+
+```php
+// Configuration 
+return array(
+    'models' => array(
+        // ...
+    ),
+    'relationships' => array(
+        //...
+        
+        array(
+            // mandatory options
+            'type'  => 'manyToMany',
+            'left'  => 'article',
+            'right' => 'tag',
+            
+            // The following keys are optional
+            // and will fallback to the defaults
+            // based on model names
+            
+            'leftOptions' => array(
+                'property' => 'tags'
+            ),
+            
+            'rightOptions' => array(
+                'property' => 'articles'
+            ),
+            
+            // depends on property names
+            // defaults to <rightProperty><leftProperty>
+            'pivot' => 'articlesTags',
+
+            
+            'pivotOptions' => array(
+            
+                // defaults to the connection
+                // of the left model
+                'connection' => 'default',
+                
+                // columns in pivot table
+                // default to '<property>Id'
+                'leftKey'  => 'articleId',
+                'rightKey' => 'tagId',
+            )
+        )
+    )
+);
+```
+
+Using a many-to-many relationship is simiar to using the owner side of a one-to-many one. 
+
+```php
+// Add
+$article->tags->add($tag);
+
+// Remove a particular tag
+$article->tags->remove($tag);
+
+// Remove all tags from article
+$article->tags->removeAll();
+
+// Remove all tags from multiple articles
+$orm->query('article')
+    ->where('status', 'published')
+    ->tags->removeAll();
+    
+// Construct a tag query from article query
+$tagQuery = $orm->query('article')
+    ->where('status', 'published')
+    ->tags();
+    
+// Everything else can be used 
+// in the same way as categories
+// in the one-to-many examples
+```
+
+Using queries for bulk operations here makes it possible to assign and remove relationships
+with a single database call
+
+```php
+// Link multiple articles
+// to multiple tags in one go
+$articleQuery->tags->add($tagQuery);
+```
+
+> A lot of work went into optimizing these query operations, and at the moment no other PHP ORM
+> supports editing relationships between queries. Instread of requiring m*n queries to edit
+> many-to-many relationships, the query approach can achieve it in one go.
+
+
+
+
+
+
 

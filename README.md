@@ -12,8 +12,24 @@ PHPixie ORM library
 [![Software License](https://img.shields.io/badge/license-BSD-brightgreen.svg?style=flat-square)](https://github.com/phpixie/orm/blob/master/LICENSE)
 [![Total Downloads](https://img.shields.io/packagist/dt/phpixie/orm.svg?style=flat-square)](https://packagist.org/packages/phpixie/orm)
 
+- [ORM](#orm)
+    - [Initializing](#initializing)
+    - [Models](#models)
+        - [Configuration](#configuration)
+        - [Entities](#entities)
+        - [Queries](#queries)
+        - [Extending Models](#extending-models)
+    - [Relationships](#relationships)
+        - [Querying relationships](#querying-relationships)
+        - [One To Many](#one-to-many)
+        - [One to One](#one-to-one)
+        - [Many To Many](#many-to-many)
+    - [Embedded Models in MongoDB](#embedded-models-in-mongodb)
+        - [Embeds One](#embeds-one)
+        - [Embeds Many](#embeds-many)
 
-# Initializing
+
+## Initializing
 
 ```php
 
@@ -33,7 +49,7 @@ $orm = new \PHPixie\ORM($database, $slice->arrayData(array(
 > It is accessable via `$frameworkBuilder->components()->orm()` and can be confgigured
 > in the `config/orm.php` file of your bundle.
 
-# Models
+## Models
 
 A Model consists of a Repository, Queries and Entities and will usuaully map to a table in a relational database
 or a document collection in MongoDB.
@@ -55,7 +71,7 @@ $newArtcile   = $orm->createEntity('article');
 $articleQuery = $orm->query('article');
 ```
 
-## Configuration 
+### Configuration 
 
 By default ORM assumes that thte table name is the plural of the name of the model, and that the name of the primary key is 'id'.
 For MongoDB database the default id field '_id' is assumed. You can ovveride these settings for a particular model in your
@@ -77,7 +93,7 @@ return array(
 );
 ```
 
-## Entities
+### Entities
 
 ```php
 // Saving an entity
@@ -99,7 +115,7 @@ $object = $article->asObject();
 $article->delete();
 ```
 
-## Queries
+### Queries
 
 ORM queries share a lot of syntax with the Database queries, here are a few query examples:
 
@@ -182,6 +198,116 @@ $articles = $articles->asArray();
 // useful for serializing
 $data = $articles->asArray(true);
 ```
+
+### Extending Models
+
+Extending ORM Models usually forces the developer into coupling business logic to the database,
+which makes them hard to test and and debug. In these cases performing any kind of testing requires
+inserting some dummy test data into the database. PHPixie ORM solves this problem by allowing Decorator-like
+behavior with Wrappers. Instead of extending a class you provide wrappers that might be used to wrap ORM
+Entities, Queries and Repositories and add functionality to them.
+
+```php
+class UserEntity extends \PHPixie\ORM\Wrappers\Type\Database\Entity
+{
+    // Get users full name
+    public function fullName()
+    {
+        // You can access the actual entity
+        // Using $this->entity;
+        return $this->entity->firstName.' '.$this->entity->lastName;
+    }
+}
+
+class UserQuery extends \PHPixie\ORM\Wrappers\Type\Database\Query
+{
+    // Extending queries is useful
+    // For adding bulk conditions
+    public function popular()
+    {
+        // Access query with $this->query
+        $this->query
+            ->where('viewsPerDay', '>', 5000)
+            ->orWhere('friendCount' '>=', 100);
+    }
+}
+
+// You will rarely need to extend repositories
+class UserRepository extends \PHPixie\ORM\Wrappers\Type\Database\Repository
+{
+    // Overriding a save method
+    // can be used for validation
+    public function save($entity)
+    {
+        if($entity->getField('name') === null) {
+            throw new \Exception("You must provide a user name");
+        }
+        
+        $this->repository->save($entity);
+    }
+}
+```
+
+Now we have to register these classes with the ORM.
+
+```php
+class ORMWrappers extends \PHPixie\ORM\Wrappers\Implementation
+{
+    // Model names of database entities to wrap
+    protected $databaseEntities = array(
+        'user'
+    );
+    
+    // Model names of queries to wrap
+    protected $databaseQueries = array(
+        'user'
+    );
+    
+    // Model names of repositories to wrap
+    protected $databaseQueries = array(
+        'user'
+    );
+    
+    // Model names of embedded entities to wrap
+    // We cover them later in this manual
+    protected $embeddedEntities = array(
+        'post'
+    );
+    
+    // Provide methods to build the wrappers
+    
+    public function userEntity($entity)
+    {
+        return new UserEntity($entity);
+    }
+    
+    public function userQuery($query)
+    {
+        return new UserQuery($query);
+    }
+    
+    public function userRepository($repository)
+    {
+        return new UserRepository($repository);
+    }
+    
+    public function postEntity($entity)
+        return new PostEntity($entity);
+    }
+}
+```
+
+Pass an instance of this class when creating the ORM instance:
+
+```php
+$wrappers = new ORMWrappers();
+$orm = new \PHPixie\ORM($database, $slice->arrayData(array(
+    // Configuration options
+)), $wrappers);
+```
+
+> When using the PHPixie Framework, you already have the `ORMWrappers`
+> class already registered and present in your bundle.
 
 ## Relationships
 
@@ -596,9 +722,259 @@ $articleQuery->tags->add($tagQuery);
 > supports editing relationships between queries. Instread of requiring m*n queries to edit
 > many-to-many relationships, the query approach can achieve it in one go.
 
+## Embedded Models in MongoDB
 
+MongoDB supports nested documents, which allows using embedded models. E.g. the author of an article:
 
+```js
+{
+    "title" : "Welcome",
+    //...
+    
+    "author" : {
+        "name" : "Dracony,
+        //...
+    }
+}
+```
 
+Embedded models consis only of Entities and have neither Repositories nor Queries.
+Subdocuments and subarrays are not automatically registered as embedded relationships,
+you have to do it inside your configuration:
 
+```php
+return array(
+    'models' => array(
+        
+        // Some database models
+        'article' => array(),
+        'topic'   => array(),
 
+        // Configuring an embedded model
+        'author' => array(
+            'type' => 'embedded'
+        ),
+    ),
+    
+    'relationships' => array(
+        array(
+            'type'  => 'embedsOne',
+            'owner' => 'article',
+            'item'  => 'author'
+        ),
+        
+        array(
+            'type'  => 'embedsOne',
+            'owner' => 'topic',
+            'item'  => 'author'
+        ),
+    )
+);
+```
 
+There are also some usage differences between embedded and database models:
+
+```php
+// Embedded entities cannot be saved on their own.
+// Instead you just save the database entity
+$article->author()->name = 'Dracony';
+$article->save();
+
+// Getting the parent model
+// Conditions are specified as usual
+$articleQuery
+    ->where('author.name', 'Dracony');
+    
+// To specify a subdocument condition
+// use a '>' separator.
+//
+// This will require the article author
+// to have a stats.totalPost field 'Dracony'
+$articleQuery
+    ->where('author>stats.totalPost', 'Dracony');
+```
+
+### Embeds One
+
+This is a relationship with a subdocument like the above article author example.
+
+```php
+// Configuration 
+return array(
+    'models' => array(
+        // ...
+    ),
+    'relationships' => array(
+        //...
+        
+        array(
+            // mandatory options
+            'type'  => 'embedsOne',
+            'owner' => 'article',
+            'item'  => 'author',
+            
+            // The following keys are optional
+            // and will fallback to the defaults
+            // based on model names
+            
+            'ownerOptions' => array(
+                // the name of the property added to the owner
+                // e.g. $article->author();
+                //
+                // Defaults to item model name
+                'property' => 'task',
+            ),
+            
+            'itemOptions' => array(
+                
+                // Dot separated path
+                // to the document within owner
+                //
+                // Defaults to owner property name
+                'path' => 'author'
+                
+                // You can use nested paths
+                // e.g. 'authors.editor'
+            )
+        )
+    )
+);
+```
+
+> Note how we don't define the property for accessing the article from the author. This is because
+> accessing the owner is always done using `$entity->owner()` for embedded entities.
+
+```php
+// get author from article
+$author = $article->author();
+
+// get author owner
+$article = $author->owner();
+
+// remove author
+$article->author->remove();
+
+// Set an author
+$article->author->set($author);
+
+// Check if an author is set
+$article->author->exists();
+
+// Create and set new author
+$author = $article->author->create();
+
+// Create with data
+$author = $article->author->create($data);
+```
+
+### Embeds Many
+
+Defines a relationship with an embedded array of subdocuments. E.g. forum topic replies:
+
+```js
+{
+    "title"   : "Welcome",
+    "replies" : [
+        {
+            "message" : "Hello",
+            "author"  : "Dracony"
+        },
+        {
+            "message" : "World",
+            "author"  : "Dracony"
+        }
+    ]
+}
+```
+
+```php
+// Configuration 
+return array(
+    'models' => array(
+        // ...
+    ),
+    'relationships' => array(
+        //...
+        
+        array(
+            // mandatory options
+            'type'   => 'embedsMany',
+            'owner'  => 'topic',
+            'items'  => 'reply',
+            
+            // The following keys are optional
+            // and will fallback to the defaults
+            // based on model names
+            
+            'ownerOptions' => array(
+                // the name of the property added to the owner
+                // e.g. $topic->replies();
+                //
+                // Defaults to the plural 
+                // of the item model name
+                'property' => 'replies',
+            ),
+            
+            'itemOptions' => array(
+                
+                // Dot separated path
+                // to the document within owner
+                //
+                // Defaults to owner property name
+                'path' => 'replies'
+                
+                // You can use nested paths
+                // e.g. 'content.replies'
+            )
+        )
+    )
+);
+```
+
+```php
+// Get replies iterator
+$replies = $topic->replies();
+
+// Get reply count
+$topic->replies->count();
+
+// Get reply by offset
+$reply = $topic->replies->get(2);
+
+// Create and add a reply
+$reply = $topic->replies->create();
+
+// Create reply from data
+$reply = $topic->replies->create($data);
+
+//Create reply at offset
+$reply = $topic->replies->create($data, 2);
+
+// Add reply
+$topic->replies->add($reply);
+
+// Add reply by offset
+$topic->replies->add($reply, 2);
+
+// Remove reply
+$topic->replies->remove($reply);
+
+// Remove multiple replies
+$topic->replies->remove($replies);
+
+// Remove reply by offset
+$topic->replies->offsetUnset(2);
+
+// Remove all replies
+$topic->replies->removeAll();
+
+// Check if a reply exists
+$exists = $topic->replies->offsetExists(2);
+
+// array access
+$reply = $topic->replies[1];
+$topic->replies[2] = $reply;
+
+$exists = isset($topic->replies[2]);
+unset($topic->replies[2]);
+```

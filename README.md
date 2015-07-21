@@ -152,6 +152,12 @@ $articles = $orm->query('article')
     ->or('viewsDone', '<', 5)
     ->find();
 
+// Ordering
+// Supports multiple fields
+$articles
+    ->orderAscendingBy('name')
+    ->orderDescendingBy('id');
+
 // Limit and offset
 $articles
     ->limit(1)
@@ -197,6 +203,49 @@ $articles = $articles->asArray();
 // Convert it into plain objects,
 // useful for serializing
 $data = $articles->asArray(true);
+```
+
+If you are going to access a particular relationship for multiple items that you are selecting
+you should preload their relationships to avoid multiple datbase queries. This is called *eager loading*.
+
+```php
+// To load relationships eagerly
+// just pass their names to find() or findOne()
+$articles = $query->find(array(
+    'author',
+    'tags'
+));
+
+// You can also preload nested relationships
+// using the dot notation
+$articles = $query->find(array(
+    'author.friends',
+));
+```
+
+Queries can also be used for updating and deleting items:
+
+```php
+// Count matched items
+$count = $articleQuery->count();
+
+// Delete matched items
+$articleQuery->delete();
+
+// Update a field in all matched items
+$articleQuery
+    ->update(array(
+        'status' => 'published'
+    ));
+
+// Some more advanced updating
+$articleQuery
+    ->getUpdateBuilder()
+        ->increment('views', 1)
+        ->set('status', 'published')
+        // Removing a field in MongoDB
+        ->remove('isDraft')
+        ->execute();
 ```
 
 ### Extending Models

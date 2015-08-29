@@ -22,6 +22,6 @@ class Config extends \PHPixie\ORM\Models\Type\Database\Config
     
     protected function idField($configSlice)
     {
-        return '_id';
+        return $configSlice->get('id', '_id');
     }
 }

@@ -135,8 +135,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     
     public function count()
     {
-        $this->query->count();
-        return $this;
+        return $this->query->count();
     }
     
     public function getRelationshipProperty($name)

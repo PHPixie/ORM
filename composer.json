@@ -13,11 +13,11 @@
         }
     ],
     "require": {
-        "phpixie/slice": "3.*@dev",
-        "phpixie/database": "3.*@dev"
+        "phpixie/slice": "~3.0",
+        "phpixie/database": "~3.0"
     },
     "require-dev": {
-        "phpixie/test": "3.*@dev"
+        "phpixie/test": "~3.0"
     },
     "autoload": {
         "psr-4": {

@@ -485,7 +485,7 @@ return array(
                 'property' => 'articles'
             ),
             
-            'itemOptions' => array(
+            'itemsOptions' => array(
             
                 // the name of the property added to items
                 // e.g. $article->category()
@@ -634,6 +634,8 @@ return array(
                 'property' => 'task'
             ),
             
+            // note it's 'itemOptions' here
+            // but 'itemsOptions' for One To Many
             'itemOptions' => array(
             
                 // the name of the property added to items

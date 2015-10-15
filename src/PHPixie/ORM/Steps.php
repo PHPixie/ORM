@@ -4,6 +4,9 @@ namespace PHPixie\ORM;
 
 class Steps
 {
+    /**
+     * @type \PHPixie\ORM\Builder
+     */
     protected $ormBuilder;
 
     public function __construct($ormBuilder)

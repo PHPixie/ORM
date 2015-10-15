@@ -5,9 +5,21 @@ namespace PHPixie\ORM\Models\Type\Database\Implementation;
 class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
             implements \PHPixie\ORM\Models\Type\Database\Query
 {
+    /**
+     * @type \PHPixie\ORM\Values
+     */
     protected $values;
+    /**
+     * @type \PHPixie\ORM\Mappers\Query
+     */
     protected $queryMapper;
+    /**
+     * @type \PHPixie\ORM\Maps\Map\Property\Query
+     */
     protected $queryPropertyMap;
+    /**
+     * @type \PHPixie\ORM\Conditions\Builder\Container
+     */
     protected $container;
     protected $config;
     
@@ -106,7 +118,12 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     {
         return $this->planFind($preload)->execute();
     }
-    
+
+    /**
+     * @param array $preload
+     * @return null|Entity
+     * @throws \PHPixie\ORM\Exception\Query
+     */
     public function findOne($preload = array())
     {
         $oldLimit = $this->getLimit();

@@ -4,6 +4,9 @@ namespace PHPixie\ORM;
 
 class Maps
 {
+    /**
+     * @type \PHPixie\ORM\Builder
+     */
     protected $ormBuilder;
     protected $configSlice;
     
@@ -27,27 +30,42 @@ class Maps
         $this->ormBuilder  = $ormBuilder;
         $this->configSlice = $configSlice;
     }
-    
+
+    /**
+     * @return Maps\Map\Relationship
+     */
     public function relationship()
     {
         return $this->getMap('relationship');
     }
-    
+
+    /**
+     * @return Maps\Map\Property\Entity
+     */
     public function entityProperty()
     {
         return $this->getMap('entityProperty');
     }
-    
+
+    /**
+     * @return Maps\Map\Property\Query
+     */
     public function queryProperty()
     {
         return $this->getMap('queryProperty');
     }
-    
+
+    /**
+     * @return Maps\Map\Preload
+     */
     public function preload()
     {
         return $this->getMap('preload');
     }
-    
+
+    /**
+     * @return Maps\Map\Cascade\Delete
+     */
     public function cascadeDelete()
     {
         return $this->getMap('cascadeDelete');

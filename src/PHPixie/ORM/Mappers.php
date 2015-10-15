@@ -4,6 +4,9 @@ namespace PHPixie\ORM;
 
 class Mappers
 {
+    /**
+     * @type \PHPixie\ORM\Builder
+     */
     protected $ormBuilder;
     protected $instances = array();
     
@@ -11,42 +14,66 @@ class Mappers
     {
         $this->ormBuilder = $ormBuilder;
     }
-    
+
+    /**
+     * @return \PHPixie\ORM\Mappers\Query
+     */
     public function query()
     {
         return $this->instance('query');
     }
-    
+
+    /**
+     * @return \PHPixie\ORM\Mappers\Conditions
+     */
     public function conditions()
     {
         return $this->instance('conditions');
     }
-    
+
+    /**
+     * @return \PHPixie\ORM\Mappers\Conditions\Normalizer
+     */
     public function conditionsNormalizer()
     {
         return $this->instance('conditionsNormalizer');
     }
-    
+
+    /**
+     * @return \PHPixie\ORM\Mappers\Conditions\Optimizer
+     */
     public function conditionsOptimizer()
     {
         return $this->instance('conditionsOptimizer');
     }
-    
+
+    /**
+     * @return \PHPixie\ORM\Mappers\Preload
+     */
     public function preload()
     {
         return $this->instance('preload');
     }
-    
+
+    /**
+     * @return \PHPixie\ORM\Mappers\Update
+     */
     public function update()
     {
         return $this->instance('update');
     }
-    
+
+    /**
+     * @return \PHPixie\ORM\Mappers\Cascade\Mapper\Delete
+     */
     public function cascadeDelete()
     {
         return $this->instance('cascadeDelete');
     }
-    
+
+    /**
+     * @return Mappers\Cascade\Path
+     */
     public function cascadePath()
     {
         return new \PHPixie\ORM\Mappers\Cascade\Path($this);

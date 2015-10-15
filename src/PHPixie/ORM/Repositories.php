@@ -4,8 +4,11 @@ namespace PHPixie\ORM;
 
 class Repositories
 {
+    /**
+     * @type Models
+     */
     protected $models;
-    
+
     public function __construct($models)
     {
         $this->models = $models;

@@ -4,7 +4,14 @@ namespace PHPixie\ORM\Models\Type\Database\Implementation;
 
 abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repository
 {
+    /**
+     * @type \PHPixie\ORM\Models\Type\Database
+     */
     protected $databaseModel;
+
+    /**
+     * @type \PHPixie\ORM\Database
+     */
     protected $database;
     protected $config;
     

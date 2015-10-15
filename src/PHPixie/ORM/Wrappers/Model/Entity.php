@@ -4,6 +4,9 @@ namespace PHPixie\ORM\Wrappers\Model;
 
 abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
 {
+    /**
+     * @type \PHPixie\ORM\Drivers\Driver\PDO\Entity|\PHPixie\ORM\Drivers\Driver\Mongo\Entity
+     */
     protected $entity;
     
     public function __construct($entity)

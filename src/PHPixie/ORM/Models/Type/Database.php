@@ -4,10 +4,29 @@ namespace PHPixie\ORM\Models\Type;
 
 class Database extends \PHPixie\ORM\Models\Model
 {
+    /**
+     * @type \PHPixie\ORM\Database
+     */
     protected $database;
+
+    /**
+     * @type \PHPixie\ORM\Drivers
+     */
     protected $drivers;
+
+    /**
+     * @type \PHPixie\ORM\Conditions
+     */
     protected $conditions;
+
+    /**
+     * @type \PHPixie\ORM\Mappers
+     */
     protected $mappers;
+
+    /**
+     * @type \PHPixie\ORM\Values
+     */
     protected $values;
     
     protected $repositories = array();
@@ -41,7 +60,11 @@ class Database extends \PHPixie\ORM\Models\Model
         
         return $repository;
     }
-    
+
+    /**
+     * @param $modelName
+     * @return Database\Repository
+     */
     public function repository($modelName)
     {
         if(!array_key_exists($modelName, $this->repositories)) {
@@ -50,7 +73,13 @@ class Database extends \PHPixie\ORM\Models\Model
         
         return $this->repositories[$modelName];
     }
-    
+
+    /**
+     * @param $modelName
+     * @param $data
+     * @param $isNew
+     * @return Database\Entity
+     */
     public function entity($modelName, $data, $isNew)
     {
         $repository = $this->repository($modelName);
@@ -69,7 +98,12 @@ class Database extends \PHPixie\ORM\Models\Model
         
         return $entity;
     }
-    
+
+    /**
+     * @param $modelName
+     * @return Database\Query
+     * @throws \PHPixie\ORM\Exception\Model
+     */
     public function query($modelName)
     {
         $config = $this->config($modelName);

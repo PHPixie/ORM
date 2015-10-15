@@ -3,7 +3,9 @@
 namespace PHPixie\ORM;
 
 class Data {
-    
+    /**
+     * @type \PHPixie\ORM\Data\Types\Document\Builder
+     */
     protected $documentBuilder;
     
     public function diff($set)

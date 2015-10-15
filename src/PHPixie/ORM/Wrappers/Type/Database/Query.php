@@ -5,6 +5,9 @@ namespace PHPixie\ORM\Wrappers\Type\Database;
 class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
             implements \PHPixie\ORM\Models\Type\Database\Query
 {
+    /**
+     * @type \PHPixie\ORM\Drivers\Driver\PDO\Query|\PHPixie\ORM\Drivers\Driver\Mongo\Query
+     */
     protected $query;
     
     public function __construct($query)

@@ -4,11 +4,21 @@ namespace PHPixie\ORM;
 
 class Models
 {
+    /**
+     * @type \PHPixie\ORM\Builder
+     */
     protected $ormBuilder;
     protected $configSlice;
     protected $wrappers;
-    
+
+    /**
+     * @type \PHPixie\ORM\Models\Type\Database
+     */
     protected $databaseModel;
+
+    /**
+     * @type \PHPixie\ORM\Models\Type\Embedded
+     */
     protected $embeddedModel;
     
     public function __construct($ormBuilder, $configSlice, $wrappers = null)
@@ -27,7 +37,10 @@ class Models
     {
         return $this->wrappers;
     }
-    
+
+    /**
+     * @return Models\Type\Database
+     */
     public function database()
     {
         if($this->databaseModel === null)
@@ -37,7 +50,10 @@ class Models
         
         return $this->databaseModel;
     }
-    
+
+    /**
+     * @return Models\Type\Embedded
+     */
     public function embedded()
     {
         if($this->embeddedModel === null)

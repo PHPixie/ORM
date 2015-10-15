@@ -4,6 +4,9 @@ namespace PHPixie\ORM\Wrappers\Type\Database;
 
 class Repository implements \PHPixie\ORM\Models\Type\Database\Repository
 {
+    /**
+     * @type \PHPixie\ORM\Drivers\Driver\PDO\Repository|\PHPixie\ORM\Drivers\Driver\Mongo\Repository
+     */
     protected $repository;
     
     public function __construct($repository)

@@ -4,6 +4,9 @@ namespace PHPixie\ORM;
 
 class Drivers
 {
+    /**
+     * @type \PHPixie\ORM\Builder
+     */
     protected $ormBuilder;
     protected $drivers = array();
     
@@ -16,7 +19,12 @@ class Drivers
     {
         $this->ormBuilder = $ormBuilder;
     }
-    
+
+    /**
+     * @param $name
+     * @return \PHPixie\ORM\Drivers\Driver\PDO|\PHPixie\ORM\Drivers\Driver\Mongo
+     *
+     */
     public function get($name)
     {
         if (!array_key_exists($name, $this->drivers))

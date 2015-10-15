@@ -12,26 +12,41 @@ class Planners
         $this->ormBuilder = $ormBuilder;
     }
 
+    /**
+     * @return Planners\Planner\Document
+     */
     public function document()
     {
         return $this->plannerInstance('document');
     }
-    
+
+    /**
+     * @return Planners\Planner\In
+     */
     public function in()
     {
         return $this->plannerInstance('in');
     }
 
+    /**
+     * @return Planners\Planner\Pivot
+     */
     public function pivot()
     {
         return $this->plannerInstance('pivot');
     }
 
+    /**
+     * @return Planners\Planner\Query
+     */
     public function query()
     {
         return $this->plannerInstance('query');
     }
-    
+
+    /**
+     * @return Planners\Planner\Update
+     */
     public function update()
     {
         return $this->plannerInstance('update');

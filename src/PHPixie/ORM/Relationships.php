@@ -29,6 +29,11 @@ class Relationships
         return $this->relationships[$name];
     }
 
+    /**
+     * @param $name
+     * @return Relationships\Type\OneTo\Type\One|Relationships\Type\OneTo\Type\Many|Relationships\Type\ManyToMany|Relationships\Type\Embeds\Type\One|Relationships\Type\Embeds\Type\Many
+     * @throws Exception\Relationship
+     */
     protected function buildRelationship($name) {
         if(!array_key_exists($name, $this->classMap)) {
             throw new \PHPixie\ORM\Exception\Relationship("Relationship type '$name' does not exist");

@@ -4,6 +4,9 @@ namespace PHPixie;
 
 class ORM
 {
+    /**
+     * @type ORM\Builder
+     */
     protected $builder;
     
     public function __construct($database, $configSlice, $wrappers = null)

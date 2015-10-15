@@ -4,6 +4,9 @@ namespace PHPixie\ORM;
 
 class Builder
 {
+    /**
+     * @type \PHPixie\Database
+     */
     protected $database;
     protected $configSlice;
     protected $wrappers;
@@ -16,76 +19,121 @@ class Builder
         $this->configSlice = $configSlice;
         $this->wrappers    = $wrappers;
     }
-    
+
+    /**
+     * @return Conditions
+     */
     public function conditions()
     {
         return $this->instance('conditions');
     }
-    
+
+    /**
+     * @return Configs
+     */
     public function configs()
     {
         return $this->instance('configs');
     }
-    
+
+    /**
+     * @return Data
+     */
     public function data()
     {
         return $this->instance('data');
     }
-    
+
+    /**
+     * @return Database
+     */
     public function database()
     {
         return $this->instance('database');
     }
-    
+
+    /**
+     * @return Drivers
+     */
     public function drivers()
     {
         return $this->instance('drivers');
     }
-    
+
+    /**
+     * @return Loaders
+     */
     public function loaders()
     {
         return $this->instance('loaders');
     }
-    
+
+    /**
+     * @return Mappers
+     */
     public function mappers()
     {
         return $this->instance('mappers');
     }
-    
+
+    /**
+     * @return Maps
+     */
     public function maps() {
         return $this->instance('maps');
     }
-    
+
+    /**
+     * @return Models
+     */
     public function models()
     {
         return $this->instance('models');
     }
-    
+
+    /**
+     * @return Planners
+     */
     public function planners()
     {
         return $this->instance('planners');
     }
-    
+
+    /**
+     * @return Plans
+     */
     public function plans()
     {
         return $this->instance('plans');
     }
-    
+
+    /**
+     * @return Relationships
+     */
     public function relationships()
     {
         return $this->instance('relationships');
     }
-    
+
+    /**
+     * @return Repositories
+     */
     public function repositories()
     {
         return $this->instance('repositories');
     }
-        
+
+    /**
+     * @return Steps
+     */
     public function steps()
     {
         return $this->instance('steps');
     }
-    
+
+    /**
+     * @return Values
+     */
     public function values()
     {
         return $this->instance('values');

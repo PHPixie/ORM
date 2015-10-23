@@ -15,17 +15,19 @@ abstract class Repository extends \PHPixie\ORM\Models\Type\Database\Implementati
     protected function updateEntityData($id, $data)
     {
         $set = (array) $data->diff()->set();
-        $this->databaseUpdateQuery()
-            ->set($set)
-            ->where($this->config->idField, $id)
-            ->execute();
+        if(!empty($set)) {
+            $this->databaseUpdateQuery()
+                ->set($set)
+                ->where($this->config->idField, $id)
+                ->execute();
+        }
     }
-    
+
     protected function buildData($data = null)
     {
         return $this->dataBuilder->map($data);
     }
-    
+
     protected function setQuerySource($query)
     {
         $query->table($this->config->table);

@@ -82,10 +82,11 @@ abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repositor
         if($entity->isNew()){
             
             $this->insertEntityData($data);
+            if($entity->id() === null) {
+                $id = $this->connection()->insertId();
+                $entity->setId($id);
+            }
             
-            $id = $this->connection()->insertId();
-            $entity->setField($idField, $id);
-            $entity->setId($id);
             $entity->setIsNew(false);
         } else {
             $this->updateEntityData($entity->id(), $data);

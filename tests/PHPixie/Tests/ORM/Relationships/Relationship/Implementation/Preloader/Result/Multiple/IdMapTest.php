@@ -10,10 +10,12 @@ abstract class IdMapTest extends \PHPixie\Tests\ORM\Relationships\Relationship\I
     protected $loaders;
         
     protected $map = array(
-        '1' => array(3, 4, 5),
-        '2' => array(6, 7),
+        '1' => array(4, 5, 6),
+        '2' => array(7, 8),
         '3' => array()
     );
+    
+    protected $preloadEntitiesCount = 5;
     
     public function setUp()
     {
@@ -21,7 +23,7 @@ abstract class IdMapTest extends \PHPixie\Tests\ORM\Relationships\Relationship\I
         for($i=1; $i<4; $i++)
             $this->entities[$i] = $this->getEntity();
         
-        for($i=3; $i<8; $i++)
+        for($i=4; $i<4+$this->preloadEntitiesCount; $i++)
             $this->preloadedEntities[$i] = $this->getEntity();
         
         parent::setUp();

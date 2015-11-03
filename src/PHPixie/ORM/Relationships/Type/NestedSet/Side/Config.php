@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\ManyToMany\Side;
+namespace PHPixie\ORM\Relationships\Type\NestedSet\Side;
 
 class Config extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side\Config
 {

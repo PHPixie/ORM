@@ -13,27 +13,39 @@ class ChildrenTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Impleme
         'rightKey' => 'right'
     );
     
+    protected $rows = array(
+        array(1, 1, 11),
+        array(4, 2, 3),
+        array(5, 4, 9),
+        array(9, 5, 6),
+        array(10, 7, 8),
+        array(6, 9, 10),
+        
+        array(2, 12, 17),
+        array(7, 13, 14),
+        array(8, 15, 16),
+        
+        array(3, 18, 19),
+    );
+    
+    protected $preloadEntitiesCount = 7;
+    
     protected function prepareMap()
     {
         foreach($this->entities as $id => $model) {
             $this->method($model, 'id', $id, array());
         }
         
-        $ownerKey = $this->configData['ownerKey'];
+        $leftKey  = $this->configData['leftKey'];
+        $rightKey = $this->configData['rightKey'];
         
         $fields = array();
-        foreach(array_keys($this->preloadedEntities) as $id) {
-            foreach($this->map as $ownerId => $ids) {
-                if(in_array($id, $ids)) {
-                    $fields[]=array(
-                            'id'      => $id,
-                            $ownerKey => $ownerId
-                    );
-                }
-            }
+        foreach($this->rows as $row) {
+            if($)
+            $fields[]= array_combine(array('id', $leftKey, $rightKey), $row);
         }
     
-        $this->method($this->result, 'getFields', $fields, array(array('id', $ownerKey)), 0);
+        $this->method($this->result, 'getFields', $fields, array(array('id', $leftKey, $rightKey)), 0);
     }
     
     

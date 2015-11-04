@@ -7,6 +7,8 @@ namespace PHPixie\Tests\ORM\Relationships\Type\NestedSet\Preloader;
  */
 class ChildrenTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple\IdMapTest
 {
+    protected $parentResult;
+    
     protected $configData = array(
         'model'    => 'fairy',
         'leftKey'  => 'left',
@@ -30,28 +32,42 @@ class ChildrenTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Impleme
     
     protected $preloadEntitiesCount = 7;
     
+    public function setUp()
+    {
+        $this->parentResult = $this->result();
+        parent::setUp();
+    }
+    
     protected function prepareMap()
     {
         foreach($this->entities as $id => $model) {
             $this->method($model, 'id', $id, array());
         }
         
-        $leftKey  = $this->configData['leftKey'];
-        $rightKey = $this->configData['rightKey'];
+        $fields   = array('id', 'left', 'right');
         
-        $fields = array();
+        $childData  = array();
+        $parentData = array();
         foreach($this->rows as $row) {
-            if($)
-            $fields[]= array_combine(array('id', $leftKey, $rightKey), $row);
+            $row = array_combine($fields, $row);
+            if($row['id'] > 3) {
+                $childData[]= $row;
+            }
+            
+            if($row['id'] < 5) {
+                $parentData[]= $row;
+            }
         }
-    
-        $this->method($this->result, 'getFields', $fields, array(array('id', $leftKey, $rightKey)), 0);
+        
+        
+        $this->method($this->result, 'getFields', $childData, array($fields), 0);
+        $this->method($this->parentResult, 'getFields', $parentData, array($fields), 0);
     }
     
     
     protected function getProperty()
     {
-        return $this->quickMock('\PHPixie\ORM\Relationships\Type\NestedSet\Property\Entity\Children');
+        return $this->quickMock('\PHPixie\ORM\Relationships\Type\NestedSet\Property\Parent\Entity');
     }
     
     protected function relationship()
@@ -81,7 +97,8 @@ class ChildrenTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Impleme
             $this->side,
             $this->modelConfig,
             $this->result,
-            $this->loader
+            $this->loader,
+            $this->parentResult
         );
     }
 }

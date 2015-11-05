@@ -8,6 +8,28 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
 {
     public function linkPlan($config, $parent, $child)
     {
+        $plan = $this->plans->steps();
+        $repository = $this->repository($config);
+        
+        $ids = array();
+        foreach($nodes as $node) {
+            $ids[]= $node->id();
+        }
+        
+        $query = $repository->databaseSelectQuery();
+        $query->addInOperatorCondition(
+            $repository->config()->idField,
+            $ids
+        );
+
+        $resultStep = $this->nestedSetSteps->iteratorResult($query);
+        $plan->addStep($resultStep);
+        
+        $moveStep = $this->planner->moveNode($config, $result, $parent->id());
+        $plan->addStep($moveStep);
+        
+        
+        
         $parentIsNew = $parent['rootId'] === null
         if($parentIsNew) {
             $this->prepareNode($parent['id'], 1, $parent['id'], $width);
@@ -49,7 +71,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
                 ->increment($property, $offset)
                 ->where($property, '>=', $right)
                 ->where('rootId', $rootId);
-        }        
+        }
     }
                                    
     public function prepareRoot($id, $left, $rootId, $innerWidth)
@@ -59,5 +81,10 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             ->set('right', $left+$innerWidth+1)
             ->set('rootId', $rootId)
             ->where('id', $id);
+    }
+    
+    protected function repository($config)
+    {
+        return $this->models->database()->repository($config->model);
     }
 }

@@ -13,12 +13,20 @@ class ORM
     {
         $this->builder = $this->buildBuilder($database, $configSlice, $wrappers);
     }
-    
+
+    /**
+     * @param string $modelName
+     * @return ORM\Models\Type\Database\Repository
+     */
     public function repository($modelName)
     {
         return $this->databaseModel()->repository($modelName);
     }
-    
+
+    /**
+     * @param $modelName
+     * @return ORM\Models\Type\Database\Implementation\Query
+     */
     public function query($modelName)
     {
         return $this->databaseModel()->query($modelName);

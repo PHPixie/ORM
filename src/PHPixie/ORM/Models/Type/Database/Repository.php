@@ -2,8 +2,6 @@
 
 namespace PHPixie\ORM\Models\Type\Database;
 
-use PHPixie\ORM\Models\Type\Database\Implementation\Query;
-
 interface Repository
 {
     public function config();

@@ -3,7 +3,6 @@
 namespace PHPixie\ORM\Models\Type\Database;
 
 use PHPixie\ORM\Loaders\Loader;
-use PHPixie\ORM\Models\Type\Database\Implementation\Entity;
 use PHPixie\ORM\Plans\Plan;
 use PHPixie\ORM\Relationships\Relationship\Property;
 use PHPixie\ORM\Values\Update\Builder as UpdateBuilder;
@@ -75,7 +74,7 @@ interface Query extends \PHPixie\ORM\Conditions\Condition\In\Item,
 
     /**
      * @param array $preload
-     * @return Entity
+     * @return \PHPixie\ORM\Models\Type\Database\Implementation\Entity
      */
     public function findOne($preload = array());
 

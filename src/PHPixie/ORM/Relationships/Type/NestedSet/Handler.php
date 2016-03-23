@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPixie\ORM\Relationships\Type\ManyToMany;
+namespace PHPixie\ORM\Relationships\Type\NestedSet;
 
 class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Handler
                     implements \PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Database,
@@ -11,76 +11,53 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $plan = $this->plans->steps();
         $repository = $this->repository($config);
         
-        $ids = array();
-        foreach($nodes as $node) {
-            $ids[]= $node->id();
-        }
-        
-        $query = $repository->databaseSelectQuery();
-        $query->addInOperatorCondition(
-            $repository->config()->idField,
-            $ids
+        $childQuery = $repository->databaseSelectQuery();
+        $this->planners->in()->items(
+            $childQuery,
+            $config->model,
+            [$parent, $child],
+            $plan
         );
+        
+        $childStep = $this->steps->iteratorResult($childQuery);
+        $plan->add($childStep);
 
-        $resultStep = $this->nestedSetSteps->iteratorResult($query);
-        $plan->addStep($resultStep);
-        
-        $moveStep = $this->planner->moveNode($config, $result, $parent->id());
-        $plan->addStep($moveStep);
-        
-        
-        
-        $parentIsNew = $parent['rootId'] === null
-        if($parentIsNew) {
-            $this->prepareNode($parent['id'], 1, $parent['id'], $width);
-            $rootId = $parent['id'];
-        }else{
-            $rootId = $parent['rootId'];
-            $this->move($width, $parent['right'], $parent['rootId']);
-        }
-        
-        if($child['rootId'] === null) {
-            $this->prepareNode($child['id'], $parent['left'], $parent['rootId'], 0);
-        }else{
-            if($child['left'] > $parent['right']) {
-                $childOffset = $width;
-            }else{
-                $childOffset = 0;
-            }
-
-            $distance = $parent['right'] - $child['left'] - $childOffset;
-
-            $this->updateQuery()
-                ->increment('left', $distance)
-                ->increment('right', $distance)
-                ->set('rootId', $parent['rootId'])
-                ->where('left', '>=', $child['left'] + $childOffset)
-                ->where('right', '<=', $child['right'] + $childOffset)
-                ->where('rootId', $child['rootId']);
-        }
-        
-        if(!$parentIsNew) {
-            $this->move(-$width, $child['right'], $child['rootId']);
-        }
-    }
-    
-    public function move($offset, $right, $rootId)
-    {
-        foreach(array('left', 'right') as $property) {
-            $this->updateQuery()
-                ->increment($property, $offset)
-                ->where($property, '>=', $right)
-                ->where('rootId', $rootId);
-        }
+        $moveStep = new Steps\MoveChild($repository, $config, $childStep, $parent->id());
+        $plan->add($moveStep);
+        return $plan;
     }
                                    
-    public function prepareRoot($id, $left, $rootId, $innerWidth)
+    public function mapDatabaseQuery($builder, $side, $group, $plan ){}
+    public function mapPreload($side, $property, $result, $plan)
     {
-        $this->updateQuery()
-            ->set('left', $left)
-            ->set('right', $left+$innerWidth+1)
-            ->set('rootId', $rootId)
-            ->where('id', $id);
+        $config = $side->config();
+        $repository = $this->repository($config);
+
+        $query = $repository->databaseSelectQuery();
+        
+        $mapStep = new Steps\Map\Children($config, $query, $result);
+        
+        $preloadStep = $this->steps->reusableResult($query);
+        $plan->add($preloadStep);
+        
+        $loader = $this->loaders->reusableResult($repository, $preloadStep);
+        $preloadingProxy = $this->loaders->preloadingProxy($loader);
+        $cachingProxy = $this->loaders->cachingProxy($preloadingProxy);
+        
+        $this->mappers->preload()->map(
+            $preloadingProxy,
+            $repository->modelName(),
+            $property->preload(),
+            $preloadStep,
+            $plan
+        );
+        
+        return $this->relationship->preloader(
+            $side,
+            $repository->config(),
+            $preloadStep,
+            $cachingProxy
+        );
     }
     
     protected function repository($config)

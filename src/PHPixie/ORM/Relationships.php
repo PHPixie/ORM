@@ -12,6 +12,7 @@ class Relationships
         'manyToMany' => '\PHPixie\ORM\Relationships\Type\ManyToMany',
         'embedsOne'  => '\PHPixie\ORM\Relationships\Type\Embeds\Type\One',
         'embedsMany' => '\PHPixie\ORM\Relationships\Type\Embeds\Type\Many',
+        'nestedSet' => '\PHPixie\ORM\Relationships\Type\NestedSet'
     );
 
     public function __construct($ormBuilder)
@@ -31,7 +32,6 @@ class Relationships
 
     /**
      * @param $name
-     * @return Relationships\Type\OneTo\Type\One|Relationships\Type\OneTo\Type\Many|Relationships\Type\ManyToMany|Relationships\Type\Embeds\Type\One|Relationships\Type\Embeds\Type\Many
      * @throws Exception\Relationship
      */
     protected function buildRelationship($name) {

@@ -28,6 +28,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
     }
                                    
     public function mapDatabaseQuery($builder, $side, $group, $plan ){}
+
     public function mapPreload($side, $property, $result, $plan)
     {
         $config = $side->config();
@@ -52,12 +53,17 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             $plan
         );
         
-        return $this->relationship->preloader(
+        $preloader = $this->relationship->preloader(
             $side,
             $repository->config(),
             $preloadStep,
-            $cachingProxy
+            $cachingProxy,
+            $result
         );
+
+        $preloadingProxy->addPreloader('children', $preloader);
+
+        return $preloader;
     }
     
     protected function repository($config)

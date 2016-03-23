@@ -24,9 +24,9 @@ class NestedSet extends \PHPixie\ORM\Relationships\Relationship\Implementation
         return new ManyToMany\Property\Query($this->handler(), $side, $query);
     }
     
-    public function preloader($side, $modelConfig, $result, $loader)
+    public function preloader($side, $modelConfig, $result, $loader, $parentResult)
     {
-        return new NestedSet\Preloader\Children($this->loaders, $side, $modelConfig, $result, $loader);
+        return new NestedSet\Preloader\Children($this->loaders, $side, $modelConfig, $result, $loader, $parentResult);
     }
     
     protected function config($configSlice)

@@ -6,12 +6,12 @@ abstract class IdMap extends \PHPixie\ORM\Relationships\Relationship\Implementat
 {
     protected $idMap = array();
     
-    protected function getMappedFor($model)
+    protected function getMappedFor($entity)
     {
-        $modelId = $model->id();
-        
-        if(array_key_exists($modelId, $this->idMap)) {
-            $ids = $this->idMap[$model->id()];
+
+        $entityId = $entity->id();
+        if(array_key_exists($entityId, $this->idMap)) {
+            $ids = $this->idMap[$entityId];
         }else{
             $ids = array();
         }

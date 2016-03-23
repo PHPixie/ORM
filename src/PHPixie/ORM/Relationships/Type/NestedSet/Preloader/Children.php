@@ -63,5 +63,7 @@ class Children extends \PHPixie\ORM\Relationships\Relationship\Implementation\Pr
                 $stack[$lastId] = $currentRight;
             }
         }
+
+        $this->mapIdOffsets();
     }
 }

@@ -33,6 +33,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $map = $this->prepareEntities();
         
         $fairies = $this->orm->repository('fairy')->query()
+                        ->where('depth', 0)
                         ->find(array('children'))
                         ->asArray(true);
         print_r($fairies);

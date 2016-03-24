@@ -22,7 +22,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         parent::setUp();
     }
     
-    public function testPreloadChilder()
+    public function testPreloadChildren()
     {
         $this->runTests('preloadChildren');
     }
@@ -33,11 +33,47 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $map = $this->prepareEntities();
         
         $fairies = $this->orm->repository('fairy')->query()
-                        ->where('depth', 0)
-                        ->find(array('children'))
-                        ->asArray(true);
-        print_r($fairies);
-        
+            ->find(array('children'))
+            ->asArray();
+
+        $this->checkChildren($fairies, $map, null, true);
+    }
+
+    public function testLoadChildren()
+    {
+        $this->runTests('loadChildren');
+    }
+
+    protected function loadChildrenTest()
+    {
+        $map = $this->prepareEntities();
+
+        $fairies = $this->orm->repository('fairy')->query()
+            ->find()
+            ->asArray();
+
+        $this->checkChildren($fairies, $map, null);
+    }
+
+    protected function checkChildren($fairies, $map, $expected, $assertLoaded = false)
+    {
+        $names = array();
+
+        foreach($fairies as $fairy) {
+            $names[]= $fairy->name;
+        }
+
+        if($expected !== null) {
+            $this->assertSame($expected, $names);
+        }
+
+        foreach($fairies as $fairy) {
+            $expect = isset($map[$fairy->name]) ? $map[$fairy->name] : array();
+            if($assertLoaded) {
+                $this->assertTrue($fairy->children->isLoaded());
+            }
+            $this->checkChildren($fairy->children(), $map, $expect, $assertLoaded);
+        }
     }
         
     protected function runTests($name)
@@ -70,10 +106,10 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
                     $entities[$name] = $this->createEntity('fairy', array('name' => $name));
                 }
                 $parent->children->add($entities[$name]);
-                //print_r($this->orm->query('fairy')->find()->asArray(true));
-                //die;
             }
         }
+
+        return $map;
     }
     
     protected function prepareSqlite()

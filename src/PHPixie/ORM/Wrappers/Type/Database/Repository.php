@@ -5,7 +5,7 @@ namespace PHPixie\ORM\Wrappers\Type\Database;
 class Repository implements \PHPixie\ORM\Models\Type\Database\Repository
 {
     /**
-     * @type \PHPixie\ORM\Drivers\Driver\PDO\Repository|\PHPixie\ORM\Drivers\Driver\Mongo\Repository
+     * @var \PHPixie\ORM\Drivers\Driver\PDO\Repository
      */
     protected $repository;
     
@@ -39,9 +39,9 @@ class Repository implements \PHPixie\ORM\Models\Type\Database\Repository
         return $this->repository->load($data);
     }
     
-    public function create()
+    public function create($data = null)
     {
-        return $this->repository->create();
+        return $this->repository->create($data);
     }
     
     public function query()

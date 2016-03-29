@@ -33,6 +33,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $map = $this->prepareEntities();
         
         $fairies = $this->orm->repository('fairy')->query()
+            ->where('depth', 0)
             ->find(array('children'))
             ->asArray();
 
@@ -49,10 +50,45 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $map = $this->prepareEntities();
 
         $fairies = $this->orm->repository('fairy')->query()
+            ->where('depth', 0)
             ->find()
             ->asArray();
 
         $this->checkChildren($fairies, $map, null);
+    }
+
+    public function testLoadParents()
+    {
+        $this->runTests('loadParents');
+    }
+
+    protected function loadParentsTest()
+    {
+        $map = $this->prepareEntities();
+
+        $fairies = $this->orm->repository('fairy')->query()
+            ->where('depth', 2)
+            ->find()
+            ->asArray();
+
+        $this->checkParents($fairies, $map);
+    }
+
+    public function testPreloadParents()
+    {
+        $this->runTests('preloadParents');
+    }
+
+    protected function preloadParentsTest()
+    {
+        $map = $this->prepareEntities();
+
+        $fairies = $this->orm->repository('fairy')->query()
+            ->where('depth', 2)
+            ->find(array('parent'))
+            ->asArray();
+
+        $this->checkParents($fairies, $map, true);
     }
 
     protected function checkChildren($fairies, $map, $expected, $assertLoaded = false)
@@ -75,7 +111,34 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             $this->checkChildren($fairy->children(), $map, $expect, $assertLoaded);
         }
     }
-        
+
+    protected function checkParents($fairies, $map, $assertLoaded = false)
+    {
+        $parentMap = array();
+        foreach($map as $key => $children) {
+            foreach($children as $child) {
+                $parentMap[$child] = $key;
+            }
+        }
+
+        foreach($fairies as $fairy) {
+            do {
+                $expect = isset($parentMap[$fairy->name]) ? $parentMap[$fairy->name] : null;
+                if($assertLoaded) {
+                    //$this->assertTrue($fairy->parent->isLoaded());
+                }
+                $parent = $fairy->parent();
+                if($expect === null) {
+                    $this->assertSame(null, $parent);
+                } else {
+                    $this->assertSame($expect, $parent->name);
+                }
+
+                $fairy = $parent;
+            } while($fairy !== null);
+        }
+    }
+
     protected function runTests($name)
     {
         $this->runTestCases($name, array(
@@ -91,11 +154,16 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $map = array(
             'Pixie' => array('Trixie', 'Fairy'),
             'Trixie' => array('Blum', 'Stella'),
-            'Fairy' => array('Sprite', 'Mermaid')
+            'Fairy' => array('Sprite', 'Mermaid'),
+
+            'Pinkie' => array('Rarity', 'Apple'),
+            'Rarity' => array('Rainbow', 'Dash'),
+            'Apple' => array('Jack', 'Twilight')
         );
         
         $entities = array(
-            'Pixie' => $this->createEntity('fairy', array('name' => 'Pixie'))
+            'Pixie' => $this->createEntity('fairy', array('name' => 'Pixie')),
+            'Pinkie' => $this->createEntity('fairy', array('name' => 'Pinkie'))
         );
         
         foreach($map as $parent => $children) {

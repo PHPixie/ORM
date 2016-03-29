@@ -16,10 +16,11 @@ class Side extends    \PHPixie\ORM\Relationships\Relationship\Implementation\Sid
 
     public function propertyName()
     {
-        if ($this->type === 'parent')
-            return $this->config->childrenProperty;
+        if ($this->type === 'parent') {
+            return $this->config->parentProperty;
+        }
 
-        return $this->config->parentsProperty;
+        return $this->config->childrenProperty;
     }
 
     public function relationshipType()

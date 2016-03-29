@@ -2,68 +2,33 @@
 
 namespace PHPixie\ORM\Relationships\Type\NestedSet\Preloader;
 
-class Children extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result\Multiple\IdMap
+class Children extends \PHPixie\ORM\Relationships\Type\NestedSet\Preloader
 {
-    protected $parentResult;
-    protected $rootIds = array();
-    
-    public function __construct($loaders, $side, $modelConfig, $result, $loader, $parentResult)
+    protected $map = array();
+
+    protected function getMappedFor($entity)
     {
-        $this->parentResult = $parentResult;
-        parent::__construct($loaders, $side, $modelConfig, $result, $loader);
-    }
-    
-    protected function mapItems()
-    {
-        $sideConfig = $this->side->config();
-        
-        $idField  = $this->modelConfig->idField;
-        $leftKey  = $sideConfig->leftKey;
-        $rightKey = $sideConfig->rightKey;
-        
-        $fields = array($idField, $leftKey, $rightKey);
-        
-        $childData = $this->result->getFields($fields);
-        
-        $data = array_merge(
-            $this->parentResult->getFields($fields),
-            $childData
-        );
-        
-        usort($data, function($a, $b) use($leftKey) {
-            return $a[$leftKey] > $b[$leftKey];
-        });
-        
-        $stack = array();
-        $currentRight = false;
-        $lastId = null;
-        
-        foreach ($data as $offset => $itemData) {
-            if($offset > 0 && $itemData['id'] === $lastId) {
-                continue;
-            }
-            
-            while($currentRight !== false && $itemData[$leftKey] > $currentRight) {
-                array_pop($stack);
-                $currentRight = end($stack);
-            }
-            
-            end($stack);
-            $lastId = $itemData[$idField];
-            $parentId = key($stack);
-            
-            if($parentId) {
-                $this->pushToMap($parentId, $lastId);
-            }else{
-                $this->rootIds[]= $lastId;
-            }
-            
-            if($itemData[$rightKey] - $itemData[$leftKey] > 1) {
-                $currentRight = $itemData[$rightKey];
-                $stack[$lastId] = $currentRight;
-            }
+        $entityId = $entity->id();
+        if(array_key_exists($entityId, $this->map)) {
+            $ids = $this->map[$entityId];
+        }else{
+            $ids = array();
         }
 
-        $this->mapIdOffsets();
+        $loader = $this->buildLoader($ids);
+        return $this->loaders->editableProxy($loader);
+    }
+
+    protected function pushToMap($parentId, $childId)
+    {
+        if(!array_key_exists($parentId, $this->map)) {
+            $this->map[$parentId] = array();
+        }
+        $this->map[$parentId][] = $childId;
+    }
+
+    protected function buildLoader($ids)
+    {
+        return $this->loaders->multiplePreloader($this, $ids);
     }
 }

@@ -30,7 +30,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
     public function query($side, $related)
     {
         $config = $side->config();
-        if ($side->type() !== 'parent') {
+        if ($side->type() === 'parent') {
             $property = $config->parentProperty;
         } else {
             $property = $config->childrenProperty;
@@ -47,17 +47,50 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
 
     public function loadProperty($side, $entity)
     {
-        $config = $side->config();
-        $loader = $this->query($side, $entity)->find();
+        $query = $this->query($side, $entity);
+
+        $property = $entity->getRelationshipProperty($side->propertyName());
+
+        if($side->type() === 'parent') {
+            $property->setValue($query->findOne());
+            return;
+        }
+
+        $loader = $query->find();
         $editable = $this->loaders->editableProxy($loader);
-
-        $opposing = $this->getOpposing($side->type());
-
-        $property = $entity->getRelationshipProperty($config->{$opposing.'Property'});
         $property->setValue($editable);
     }
 
-    public function mapDatabaseQuery($builder, $side, $group, $plan ){}
+    public function mapDatabaseQuery($builder, $side, $group, $plan)
+    {
+        $config = $side->config();
+        $repository = $this->repository($config);
+
+        $subquery = $repository->databaseSelectQuery();
+        $this->mappers->conditions()->map(
+            $subquery,
+            $config->model,
+            $group->conditions(),
+            $plan
+        );
+
+        $resultStep = $this->steps->iteratorResult($subquery);
+        $plan->add($resultStep);
+
+        $placeholder = $builder->addPlaceholder(
+            $group->logic(),
+            $group->isNegated()
+        );
+
+        $mapStep = $this->relationship->steps()->mapQuery(
+            $side,
+            $placeholder,
+            $resultStep,
+            true
+        );
+
+        $plan->add($mapStep);
+    }
 
     public function mapPreload($side, $property, $result, $plan)
     {
@@ -65,8 +98,15 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $repository = $this->repository($config);
 
         $query = $repository->databaseSelectQuery();
-        
-        $mapStep = new Steps\Map\Children($config, $query, $result);
+
+        $mapStep = $this->relationship->steps()->mapQuery(
+            $side,
+            $query,
+            $result,
+            false
+        );
+
+        $plan->add($mapStep);
 
         $preloadStep = $this->steps->reusableResult($query);
         $plan->add($preloadStep);

@@ -36,9 +36,9 @@ class MoveChild
         
         $childIsNew = $child['rootId'] === null;
         $parentIsNew = $parent['rootId'] === null;
-        
+
         $width = $childIsNew ? 2 : $child['right'] - $child['left'] + 1;
-        
+
         if($parentIsNew) {
             $this->prepareNode($parent['id'], 1, $parent['id'], $width, 0);
             $rootId = $parent['id'];

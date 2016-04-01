@@ -56,5 +56,10 @@ abstract class Entity extends \PHPixie\ORM\Relationships\Relationship\Implementa
         return $this->isLoaded;
     }
 
+    public function side()
+    {
+        return $this->side;
+    }
+
     abstract protected function load();
 }

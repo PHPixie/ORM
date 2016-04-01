@@ -29,14 +29,14 @@ class Handler extends \PHPixie\ORM\Relationships\Type\OneTo\Handler
         $property->setValue($loader);
     }
     
-    public function mapPreload($side, $preloadProperty, $reusableResult, $plan)
+    public function mapPreload($side, $preloadProperty, $reusableResult, $plan, $relatedLoader)
     {
         if($preloadProperty instanceof Value\Preload\Owner) {
             $owner = $preloadProperty->owner();
             return $this->relationship->ownerPropertyPreloader($owner);
         }
         
-        return parent::mapPreload($side, $preloadProperty, $reusableResult, $plan);
+        return parent::mapPreload($side, $preloadProperty, $reusableResult, $plan, $relatedLoader);
     }
 
     public function addOwnerItems($config, $owner, $items)

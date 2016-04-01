@@ -13,7 +13,7 @@ class Preload
         $this->preloadMap = $preloadMap;
     }
     
-    public function map($preloadable, $modelName, $preload, $result, $plan)
+    public function map($preloadable, $modelName, $preload, $result, $plan, $loader)
     {
         foreach($preload->properties() as $property) {
             
@@ -23,7 +23,7 @@ class Preload
             $relationship = $this->relationships->get($side->relationshipType());
             $handler = $relationship->handler();
             
-            $preloader = $handler->mapPreload($side, $property, $result, $plan);
+            $preloader = $handler->mapPreload($side, $property, $result, $plan, $loader);
             
             $preloadable->addPreloader($propertyName, $preloader);
         }

@@ -4,14 +4,17 @@ namespace PHPixie\ORM\Relationships\Type\NestedSet\Steps;
 
 class MapQuery
 {
-    protected $side;
+    protected $config;
+    protected $type;
     protected $builder;
     protected $resultStep;
     protected $immediateOnly;
 
-    public function __construct($side, $builder, $resultStep, $immediateOnly = false)
+    public function __construct($config, $type, $builder, $resultStep, $immediateOnly = false)
     {
-        $this->side = $side;
+        var_dump($immediateOnly);
+        $this->config = $config;
+        $this->type = $type;
         $this->builder = $builder;
         $this->resultStep = $resultStep;
         $this->immediateOnly = $immediateOnly;
@@ -19,8 +22,6 @@ class MapQuery
 
     public function execute()
     {
-        $type = $this->side->type();
-
         $fields = ['rootId', 'left', 'right'];
         if($this->immediateOnly) {
             $fields[]= 'depth';
@@ -31,13 +32,13 @@ class MapQuery
             $this->builder->startOrGroup();
             $this->builder->_and('rootId', $row['rootId']);
 
-            if ($type == 'parent') {
-                $depthModifier = -1;
+            if ($this->type == 'parent') {
+                $depthModifier = 1;
                 $this->builder
                     ->_and('left', '<', $row['left'])
                     ->_and('right', '>', $row['right']);
             } else {
-                $depthModifier = 1;
+                $depthModifier = -1;
                 $this->builder
                     ->_and('left', '>', $row['left'])
                     ->_and('right', '<', $row['right']);

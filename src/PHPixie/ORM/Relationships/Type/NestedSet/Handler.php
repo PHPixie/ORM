@@ -15,7 +15,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $this->planners->in()->items(
             $childQuery,
             $config->model,
-            [$parent, $child],
+            array($parent, $child),
             $plan
         );
         
@@ -27,22 +27,38 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         return $plan;
     }
 
+    public function unlinkPlan($config, $entity)
+    {
+        $plan = $this->plans->steps();
+        $repository = $this->repository($config);
+
+        $nodeQuery = $repository->databaseSelectQuery();
+        $this->planners->in()->items(
+            $nodeQuery,
+            $config->model,
+            array($entity),
+            $plan
+        );
+
+        $nodeStep = $this->steps->iteratorResult($nodeQuery);
+        $plan->add($nodeStep);
+
+        $removeStep = new Steps\RemoveChild($repository, $config, $nodeStep);
+        $plan->add($removeStep);
+        return $plan;
+    }
+
     public function query($side, $related)
     {
         $config = $side->config();
         if ($side->type() === 'parent') {
-            $property = $config->parentProperty;
-        } else {
             $property = $config->childrenProperty;
+        } else {
+            $property = $config->parentProperty;
         }
 
         $repository = $this->repository($config);
         return $repository->query()->relatedTo($property, $related);
-    }
-
-    protected function getOpposing($type)
-    {
-        return $type == 'parent' ? 'children' : 'parent';
     }
 
     public function loadProperty($side, $entity)
@@ -66,9 +82,28 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $config = $side->config();
         $repository = $this->repository($config);
 
+        $conditions = $group->conditions();
+        if(empty($conditions)) {
+            if ($side->type() == 'parent') {
+                $builder
+                    ->startConditionGroup($group->logic(), !$group->isNegated())
+                        ->where($config->depthKey, null)
+                        ->orWhere($config->depthKey, 0)
+                    ->endGroup();
+            } else {
+                $builder
+                    ->startConditionGroup($group->logic(), !$group->isNegated())
+                        ->where($config->leftKey, null)
+                        ->orWhere($config->leftKey, '=*', $config->rightKey)
+                    ->endGroup();
+            }
+            return;
+        }
+
         $subquery = $repository->databaseSelectQuery();
         $this->mappers->conditions()->map(
             $subquery,
+            $side->type(),
             $config->model,
             $group->conditions(),
             $plan
@@ -77,13 +112,18 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $resultStep = $this->steps->iteratorResult($subquery);
         $plan->add($resultStep);
 
-        $placeholder = $builder->addPlaceholder(
-            $group->logic(),
-            $group->isNegated()
-        );
+        if(!$group->isNegated()) {
+            $placeholder = $builder->addPlaceholder($group->logic());
+        }else{
+            $builder->startConditionGroup($group->logic());
+            $builder->where('rootId', null);
+            $placeholder = $builder->addPlaceholder('or', true);
+            $builder->endGroup();
+        }
+
 
         $mapStep = $this->relationship->steps()->mapQuery(
-            $side,
+            $config,
             $placeholder,
             $resultStep,
             true
@@ -92,7 +132,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $plan->add($mapStep);
     }
 
-    public function mapPreload($side, $property, $result, $plan)
+    public function mapPreload($side, $property, $result, $plan, $relatedLoader)
     {
         $config = $side->config();
         $repository = $this->repository($config);
@@ -100,7 +140,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $query = $repository->databaseSelectQuery();
 
         $mapStep = $this->relationship->steps()->mapQuery(
-            $side,
+            $config,
+            $side->type(),
             $query,
             $result,
             false
@@ -120,7 +161,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             $repository->modelName(),
             $property->preload(),
             $preloadStep,
-            $plan
+            $plan,
+            $cachingProxy
         );
         
         $preloader = $this->relationship->preloader(
@@ -128,10 +170,12 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             $repository->config(),
             $preloadStep,
             $cachingProxy,
-            $result
+            $result,
+            $relatedLoader
         );
 
         $preloadingProxy->addPreloader('children', $preloader);
+        $preloadingProxy->addPreloader('parent', $preloader);
 
         return $preloader;
     }

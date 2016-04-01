@@ -212,7 +212,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         }
     }
 
-    public function mapPreload($side, $preloadProperty, $reusableResult, $plan)
+    public function mapPreload($side, $preloadProperty, $reusableResult, $plan, $relatedLoader)
     {
         $config = $side->config();
 
@@ -250,7 +250,8 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
             $preloadRepository->modelName(),
             $preloadProperty->preload(),
             $preloadStep,
-            $plan
+            $plan,
+            $cachingProxy
         );
         
         return $this->relationship->preloader(

@@ -131,7 +131,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         );
     }
 
-    public function mapPreload($side, $preloadProperty, $result, $plan)
+    public function mapPreload($side, $preloadProperty, $result, $plan, $relatedLoader)
     {
 
         $dependencies   = $this->getMappingDependencies($side);
@@ -174,7 +174,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             $sideRepository->modelName(),
             $preloadProperty->preload(),
             $preloadStep,
-            $plan
+            $plan,
+            $cachingProxy
         );
 
         return $this->relationship->preloader($side, $sideRepository->config(), $preloadStep, 

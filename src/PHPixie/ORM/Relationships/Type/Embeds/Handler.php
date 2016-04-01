@@ -7,7 +7,7 @@ abstract class Handler extends    \PHPixie\ORM\Relationships\Relationship\Implem
                                   \PHPixie\ORM\Relationships\Relationship\Handler\Mapping\Embedded,
                                   \PHPixie\ORM\Relationships\Relationship\Handler\Preloading
 {
-    public function mapPreload($side, $property, $result, $plan)
+    public function mapPreload($side, $property, $result, $plan, $loader)
     {
         $config = $side->config();
         $preloadResult = $this->relationship->preloadResult($result, $config->path);
@@ -19,7 +19,8 @@ abstract class Handler extends    \PHPixie\ORM\Relationships\Relationship\Implem
             $config->itemModel,
             $property->preload(),
             $preloadResult,
-            $plan
+            $plan,
+            $loader
         );
         
         return $preloader;

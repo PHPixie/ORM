@@ -58,13 +58,24 @@ abstract class Testcase extends \PHPixie\Test\Testcase
         }
     }
     
-    protected function assertData($modelName, $data, $idField = null)
+    protected function assertData($modelName, $expect)
     {
         $entities = $this->orm->repository($modelName)->query()
-                        ->find()
-                        ->asArray();
+            ->find()
+            ->asArray(true);
         
-        $this->assertEntities($data, $entities);
+        $data = array();
+
+        foreach($entities as $key => $entity) {
+            $row = array();
+            foreach(array_keys($expect[$key]) as $field) {
+                $row[$field] = $entity->$field;
+            }
+
+            $data[]= $row;
+        }
+
+        $this->assertEquals($expect, $data);
     }
     
     protected function assertDataAsObject($modelName, $data)
@@ -90,12 +101,15 @@ abstract class Testcase extends \PHPixie\Test\Testcase
     
     protected function assertNames($names, $entities)
     {
-        $data = array();
-        foreach($names as $name) {
-            $data[] = array('name' => $name);
+        $result = array();
+        foreach($entities as $entity) {
+            $result[]= $entity->name;
         }
-        
-        $this->assertEntities($data, $entities);
+
+        sort($names);
+        sort($result);
+
+        $this->assertEquals($names, $result);
     }
     
     protected function idField($modelName)

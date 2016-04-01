@@ -10,6 +10,7 @@ class Config extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side
 
     public $leftKey;
     public $rightKey;
+    public $depthKey;
     public $rootIdKey;
 
     public $onDelete;
@@ -23,6 +24,7 @@ class Config extends \PHPixie\ORM\Relationships\Relationship\Implementation\Side
         
         $this->leftKey  = $configSlice->get('leftKey', 'left');
         $this->rightKey = $configSlice->get('rightKey', 'right');
+        $this->depthKey = $configSlice->get('depthKey', 'depth');
         $this->rootIdKey = $configSlice->get('rootIdKey', 'rootId');
         
         $this->onDelete = $configSlice->get('onParentDelete', 'moveToTop');

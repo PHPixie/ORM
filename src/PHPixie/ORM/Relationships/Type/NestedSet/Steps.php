@@ -4,8 +4,8 @@ namespace PHPixie\ORM\Relationships\Type\NestedSet;
 
 class Steps
 {
-    public function mapQuery($side, $builder, $resultStep, $immediateOnly = false)
+    public function mapQuery($config, $type, $builder, $resultStep, $immediateOnly = false)
     {
-        return new Steps\MapQuery($side, $builder, $resultStep, $immediateOnly);
+        return new Steps\MapQuery($config, $type, $builder, $resultStep, $immediateOnly);
     }
 }

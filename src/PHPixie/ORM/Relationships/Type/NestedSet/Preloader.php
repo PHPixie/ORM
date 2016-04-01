@@ -2,18 +2,78 @@
 
 namespace PHPixie\ORM\Relationships\Type\NestedSet;
 
-abstract class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result
+class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\Preloader\Result
 {
     protected $loaders;
     protected $parentResult;
+    protected $relatedLoader;
 
-    protected $rootIds = array();
+    protected $childMap = array();
+    protected $parentMap = array();
+    protected $relatedIdMap = array();
 
-    public function __construct($loaders, $side, $modelConfig, $result, $loader, $parentResult)
+    public function __construct($loaders, $side, $modelConfig, $result, $loader, $parentResult, $relatedLoader)
     {
         parent::__construct($side, $modelConfig, $result, $loader);
         $this->loaders = $loaders;
         $this->parentResult = $parentResult;
+        $this->relatedLoader = $relatedLoader;
+    }
+
+    public function loadProperty($property)
+    {
+        $this->ensureMapped();
+        $entity = $property->entity();
+        $type = $property->side()->type();
+        $entityId = $entity->id();
+
+        if($this->side->type() === 'children' && $type === 'children') {
+            if(array_key_exists($entityId, $this->childMap)) {
+                $ids = $this->childMap[$entityId];
+            }else{
+                $ids = array();
+            }
+
+            $loader = $this->buildLoader($ids);
+            $value = $this->loaders->editableProxy($loader);
+            $property->setValue($value);
+            return;
+        }
+
+        if($type === 'parent' && array_key_exists($entityId, $this->parentMap)) {
+            $value = $this->parentMap[$entityId];
+            if($value !== null) {
+                if(array_key_exists($value, $this->idOffsets)) {
+                    $value = $this->getEntity($value);
+                }else {
+                    $value = $this->relatedLoader->getByOffset($this->relatedIdMap[$value]);
+                }
+            }
+
+            $property->setValue($value);
+        }
+    }
+
+    protected function getMappedFor($entity)
+    {
+
+    }
+
+    protected function pushToMap($parentId, $childId)
+    {
+        if($this->side->type() === 'children' && $parentId !== null) {
+            if(!array_key_exists($parentId, $this->childMap)) {
+                $this->childMap[$parentId] = array();
+            }
+            $this->childMap[$parentId][] = $childId;
+        }
+
+        $this->parentMap[$childId] = $parentId;
+    }
+
+    protected function buildLoader($ids)
+    {
+        return $this->loaders->multiplePreloader($this, $ids);
     }
 
     protected function mapItems()
@@ -25,7 +85,7 @@ abstract class Preloader extends \PHPixie\ORM\Relationships\Relationship\Impleme
         $rightKey = $sideConfig->rightKey;
         $rootIdKey = $sideConfig->rootIdKey;
 
-        $fields = array($idField, $leftKey, $rightKey, $rootIdKey, 'name');
+        $fields = array($idField, $leftKey, $rightKey, $rootIdKey, 'depth');
         $childData = $this->result->getFields($fields);
 
         $data = array_merge(
@@ -58,6 +118,7 @@ abstract class Preloader extends \PHPixie\ORM\Relationships\Relationship\Impleme
         }
 
         $this->mapIdOffsets();
+        $this->relatedIdMap = array_flip($this->parentResult->getField($idField));
     }
 
     protected function mapTree($data)
@@ -88,8 +149,8 @@ abstract class Preloader extends \PHPixie\ORM\Relationships\Relationship\Impleme
 
             if($parentId) {
                 $this->pushToMap($parentId, $lastId);
-            }else{
-                $this->rootIds[]= $lastId;
+            }elseif($itemData['depth'] < 1) {
+                $this->pushToMap(null, $lastId);
             }
 
             if($itemData[$rightKey] - $itemData[$leftKey] > 1) {
@@ -98,6 +159,4 @@ abstract class Preloader extends \PHPixie\ORM\Relationships\Relationship\Impleme
             }
         }
     }
-
-    abstract protected function pushToMap($parentId, $childId);
 }

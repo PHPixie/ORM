@@ -105,7 +105,7 @@ $article->getField('title', 'No Title');
 
 // Getting a required field
 // Will throw an Exception if it is not set
-$article->getRequiredField('title');1
+$article->getRequiredField('title');
 
 // Convert to a simple PHP object
 // Usefull for serializing

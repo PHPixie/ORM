@@ -2,104 +2,126 @@
 
 namespace PHPixie\ORM\Relationships\Type\NestedSet\Steps;
 
-class MoveChild
+class MoveChild extends \PHPixie\ORM\Steps\Step
 {
     protected $repository;
     protected $config;
-    protected $resultStep;
+    protected $result;
     protected $parentId;
     
-    public function __construct($repository, $config, $resultStep, $parentId)
+    public function __construct($repository, $config, $result, $parentId)
     {
         $this->repository = $repository;
         $this->config = $config;
-        $this->resultStep = $resultStep;
+        $this->result = $result;
         $this->parentId = $parentId;
     }
     
     public function execute()
     {
-        $data = $this->resultStep->getFields(['id', 'rootId', 'left', 'right', 'depth']);
+        $modelConfig = $this->repository->config();
+        $config = $this->config;
+
+        $fields = array(
+            $idField = $modelConfig->idField,
+            $rootIdKey = $config->rootIdKey,
+            $leftKey = $config->leftKey,
+            $rightKey = $config->rightKey,
+            $depthKey = $config->depthKey
+        );
+
+        $data = $this->result->getFields($fields);
+
         if(count($data) !== 2) {
-            throw new \Exception("");
+            throw new \PHPixie\ORM\Exception("The result should contain exactly two items");
         }
-        
-        if($data[0]['id'] == $this->parentId) {
+
+        if($data[0][$idField] == $this->parentId) {
             $parent = $data[0];
             $child  = $data[1];
-        }elseif($data[0]['id'] == $this->parentId) {
+        }elseif($data[1][$idField] == $this->parentId) {
             $parent = $data[1];
             $child  = $data[0];
         }else{
-            throw new \Exception("");
+            throw new \PHPixie\ORM\Exception("Parent node not found in result");
         }
         
-        $childIsNew = $child['rootId'] === null;
-        $parentIsNew = $parent['rootId'] === null;
+        $childIsNew = $child[$rootIdKey] === null;
+        $parentIsNew = $parent[$rootIdKey] === null;
 
-        $width = $childIsNew ? 2 : $child['right'] - $child['left'] + 1;
+        if(!$parentIsNew && !$childIsNew && $child[$rootIdKey] == $parent[$rootIdKey]) {
+            if($child[$leftKey] < $parent[$leftKey] && $child[$rightKey] > $parent[$rightKey]) {
+                throw new \PHPixie\ORM\Exception\Relationship("Cannot add parent to its child");
+            }
+
+            if($child[$leftKey] > $parent[$leftKey] && $child[$rightKey] < $parent[$rightKey]
+                && $child[$depthKey] - 1 == $parent[$depthKey]) {
+                return;
+            }
+        }
+
+        $width = $childIsNew ? 2 : $child[$rightKey] - $child[$leftKey] + 1;
 
         if($parentIsNew) {
-            $this->prepareNode($parent['id'], 1, $parent['id'], $width, 0);
-            $rootId = $parent['id'];
-            $parentLeft = 1;
-            $parentRight = 2;
+            $this->prepareNode($parent[$idField], 1, $parent[$idField], $width, 0);
+            $rootId = $parent[$idField];
             $parentDepth = 0;
             $childLeft = 2;
         }else{
-            $rootId = $parent['rootId'];
-            $this->move($width, $parent['right'], $parent['rootId']);
-            $parentLeft = $parent['left'];
-            $parentRight = $parent['right']+$width;
-            $parentDepth = $parent['depth'];
-            $childLeft = $parent['right'];
+            $rootId = $parent[$rootIdKey];
+            $this->move($width, $parent[$rightKey], $parent[$rootIdKey]);
+            $parentDepth = $parent[$depthKey];
+            $childLeft = $parent[$rightKey];
         }
 
         if($childIsNew) {
-            $this->prepareNode($child['id'], $childLeft, $rootId, 0, $parentDepth+1);
+            $this->prepareNode($child[$idField], $childLeft, $rootId, 0, $parentDepth+1);
         }else{
-            if($child['left'] > $parent['right']) {
-                $childOffset = $width;
-            }else{
-                $childOffset = 0;
-            }
+            //If the child was already moved to the right, we need to compensate for it
+            $childOffset = ($rootId == $child[$rootIdKey] && $child[$leftKey] > $parent[$rightKey]) ? $width : 0;
 
-            $distance = $parent['right'] - $child['left'] - $childOffset;
+            $distance = $parent[$rightKey] - $child[$leftKey] - $childOffset;
 
             $this->updateQuery()
-                ->increment('left', $distance)
-                ->increment('right', $distance)
-                ->set('rootId', $parent['rootId'])
-                ->where('left', '>=', $child['left'] + $childOffset)
-                ->where('right', '<=', $child['right'] + $childOffset)
-                ->where('rootId', $child['rootId'])
+                ->increment($leftKey, $distance)
+                ->increment($rightKey, $distance)
+                ->increment($depthKey, $parentDepth+1 - $child[$depthKey])
+                ->set($rootIdKey, $parent[$rootIdKey])
+                ->where($leftKey, '>=', $child[$leftKey] + $childOffset)
+                ->where($rightKey, '<=', $child[$rightKey] + $childOffset)
+                ->where($rootIdKey, $child[$rootIdKey])
                 ->execute();
         }
 
-        if(!$parentIsNew) {
-            $this->move(-$width, $child['right'], $child['rootId']);
+        if(!$childIsNew) {
+            $this->move(-$width, $child[$rightKey] + $childOffset, $child[$rootIdKey]);
         }
     }
     
     public function move($offset, $right, $rootId)
     {
-        foreach(array('left', 'right') as $property) {
+        $config = $this->config;
+
+        foreach(array($config->leftKey, $config->rightKey) as $property) {
             $this->updateQuery()
                 ->increment($property, $offset)
                 ->where($property, '>=', $right)
-                ->where('rootId', $rootId)
+                ->where($config->rootIdKey, $rootId)
                 ->execute();
         }
     }
                                    
     public function prepareNode($id, $left, $rootId, $innerWidth, $depth)
     {
+        $modelConfig = $this->repository->config();
+        $config = $this->config;
+
         $this->updateQuery()
-            ->set('left', $left)
-            ->set('right', $left+$innerWidth+1)
-            ->set('rootId', $rootId)
-            ->set('depth', $depth)
-            ->where('id', $id)
+            ->set($config->leftKey, $left)
+            ->set($config->rightKey, $left+$innerWidth+1)
+            ->set($config->rootIdKey, $rootId)
+            ->set($config->depthKey, $depth)
+            ->where($modelConfig->idField, $id)
             ->execute();
     }
     

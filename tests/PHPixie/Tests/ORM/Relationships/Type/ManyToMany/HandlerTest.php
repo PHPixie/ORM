@@ -285,6 +285,7 @@ class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implemen
     protected function mapPreloadTest($type, $withPivotConnection = false)
     {
         $preloadProperty = $this->preloadPropertyValue();
+        $relatedLoader = $this->getLoader();
 
         $opposing = $type === 'left' ? 'right' :'left';
         $m = $this->getRelationshipMocks($type, $this->configData, $withPivotConnection);
@@ -342,7 +343,8 @@ class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implemen
             $this->configData[$type.'Model'],
             $preloadProperty['preload'],
             $preloadStep,
-            $plan
+            $plan,
+            $cachingProxy
         ), 0);
 
         $sideConfig = $this->prepareRepositoryConfig($m[$type.'Repo'], array(), $sideOffset++);
@@ -355,7 +357,7 @@ class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implemen
             $pivotResult
         ), 0);
 
-        $this->assertEquals($preloader, $this->handler->mapPreload($m['side'], $preloadProperty['property'], $result, $plan));
+        $this->assertEquals($preloader, $this->handler->mapPreload($m['side'], $preloadProperty['property'], $result, $plan, $relatedLoader));
 
     }
 

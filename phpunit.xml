@@ -2,6 +2,10 @@
     <testsuites>
         <testsuite name="unit">
             <directory>./tests</directory>
+            <exclude>./tests/PHPixie/Tests/ORM/Functional</exclude>
+        </testsuite>
+        <testsuite name="functional">
+            <directory>./tests/PHPixie/Tests/ORM/Functional</directory>
         </testsuite>
     </testsuites>
     <filter>

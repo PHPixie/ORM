@@ -80,12 +80,14 @@ class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\P
     {
         $sideConfig = $this->side->config();
 
-        $idField  = $this->modelConfig->idField;
-        $leftKey  = $sideConfig->leftKey;
-        $rightKey = $sideConfig->rightKey;
-        $rootIdKey = $sideConfig->rootIdKey;
+        $fields = array(
+            $idField  = $this->modelConfig->idField,
+            $leftKey  = $sideConfig->leftKey,
+            $rightKey = $sideConfig->rightKey,
+            $rootIdKey = $sideConfig->rootIdKey,
+            $sideConfig->depthKey
+        );
 
-        $fields = array($idField, $leftKey, $rightKey, $rootIdKey, 'depth');
         $childData = $this->result->getFields($fields);
 
         $data = array_merge(
@@ -128,6 +130,7 @@ class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\P
         $idField  = $this->modelConfig->idField;
         $leftKey  = $sideConfig->leftKey;
         $rightKey = $sideConfig->rightKey;
+        $depthKey = $sideConfig->depthKey;
 
         $stack = array();
         $currentRight = false;
@@ -149,7 +152,7 @@ class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\P
 
             if($parentId) {
                 $this->pushToMap($parentId, $lastId);
-            }elseif($itemData['depth'] < 1) {
+            }elseif($itemData[$depthKey] < 1) {
                 $this->pushToMap(null, $lastId);
             }
 

@@ -17,11 +17,12 @@ class Entity extends   \PHPixie\ORM\Relationships\Relationship\Implementation\Pr
         $this->handler->loadProperty($this->side, $this->entity);
     }
 
-    public function add($items)
+    public function add($child)
     {
         $config = $this->side->config();
-        $plan = $this->handler->linkPlan($config, $this->entity, $items);
+        $plan = $this->handler->linkPlan($config, $this->entity, $child);
         $plan->execute();
+        $this->handler->processAdd($config, $this->entity, $child);
         return $this;
     }
 

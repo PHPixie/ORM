@@ -224,7 +224,6 @@ abstract class RepositoryTest extends \PHPixie\Test\Testcase
             $this->prepareInsertEntityData($connection, $data, $dataOffset, $connectionOffset);
 
             $this->method($connection, 'insertId', 4, array(), $connectionOffset);
-            $this->method($entity, 'setField', null, array($this->configData['idField'], 4), 3);
             $this->method($entity, 'setId', null, array(4), 4);
             $this->method($entity, 'setIsNew', null, array(false), 5);
 

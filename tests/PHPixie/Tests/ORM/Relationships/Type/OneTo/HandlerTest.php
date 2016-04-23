@@ -175,6 +175,7 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
             $preloadProperty = $this->preloadPropertyValue();
             $result = $this->getReusableResult();
             $plan = $this->getPlan();
+            $relatedLoader = $this->getLoader();
 
             $normalizedType = $type == 'owner' ? 'owner' : 'item';
             $preloadRepository = $repositories[$normalizedType];
@@ -221,7 +222,8 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
                 $this->configData[$normalizedType.'Model'],
                 $preloadProperty['preload'],
                 $preloadStep,
-                $plan
+                $plan,
+                $cachingProxy
             ), 0);
             
             $config = $this->prepareRepositoryConfig($preloadRepository, array(), $preloadRepoOffset);
@@ -237,7 +239,8 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
                 $side,
                 $preloadProperty['property'],
                 $result,
-                $plan
+                $plan,
+                $relatedLoader
             ));
         }
     }

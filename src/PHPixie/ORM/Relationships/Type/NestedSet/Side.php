@@ -16,11 +16,8 @@ class Side extends    \PHPixie\ORM\Relationships\Relationship\Implementation\Sid
 
     public function propertyName()
     {
-        if ($this->type === 'parent') {
-            return $this->config->parentProperty;
-        }
-
-        return $this->config->childrenProperty;
+        $property = $this->type.'Property';
+        return $this->config->$property;
     }
 
     public function relationshipType()
@@ -35,7 +32,7 @@ class Side extends    \PHPixie\ORM\Relationships\Relationship\Implementation\Sid
     
     public function isDeleteHandled()
     {
-        return true;
+        return $this->type === 'children';
     }
     
  }

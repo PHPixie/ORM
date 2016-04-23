@@ -77,8 +77,7 @@ abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repositor
             throw new \PHPixie\ORM\Exception\Entity("Deleted models cannot be saved.");
         
         $data = $entity->data();
-        $idField = $this->config->idField;
-        
+
         if($entity->isNew()){
             
             $this->insertEntityData($data);

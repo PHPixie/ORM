@@ -48,7 +48,7 @@ class NestedSet extends \PHPixie\ORM\Relationships\Relationship\Implementation
 
     protected function sideTypes($config)
     {
-        return array('children', 'parent');
+        return array('children', 'parent', 'allChildren', 'allParents');
     }
 
     public function steps()

@@ -181,6 +181,11 @@ abstract class HandlerTest extends \PHPixie\Test\Testcase
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Repository\ReusableResult');
     }
 
+    protected function getLoader()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Loaders\Loader');
+    }
+
     protected function getLoaderProxy($type)
     {
         return $this->quickMock('\PHPixie\ORM\Loaders\Loader\Proxy\\'.ucfirst($type));

@@ -44,18 +44,20 @@ class PreloadTest extends \PHPixie\Test\Testcase
         $preload = $this->getPreload();
         $reusableResult = $this->getReusableResult();
         $stepsPlan = $this->getStepsPlan();
+        $loader = $this->getLoader();
         
-        $this->prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan);
+        $this->prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan, $loader);
         $this->preloadMapper->map(
             $preloadingProxy,
             $this->modelName,
             $preload,
             $reusableResult,
-            $stepsPlan
+            $stepsPlan,
+            $loader
         );
     }
 
-    protected function prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan)
+    protected function prepareMapTest($preloadingProxy, $preload, $reusableResult, $stepsPlan, $loader)
     {
         $sets = array(
             array('pixie', 'oneToOne'),
@@ -85,7 +87,8 @@ class PreloadTest extends \PHPixie\Test\Testcase
                 $side,
                 $property,
                 $reusableResult,
-                $stepsPlan
+                $stepsPlan,
+                $loader
             ), 0);
             
             $this->method($relationship, 'handler', $handler, array(), 0);
@@ -98,6 +101,11 @@ class PreloadTest extends \PHPixie\Test\Testcase
     protected function getPreloadable()
     {
         return $this->abstractMock('\PHPixie\ORM\Mappers\Preload\Preloadable');
+    }
+
+    protected function getLoader()
+    {
+        return $this->abstractMock('\PHPixie\ORM\Loaders\Loader');
     }
     
     protected function getPreload()

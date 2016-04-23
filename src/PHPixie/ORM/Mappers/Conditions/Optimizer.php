@@ -26,7 +26,6 @@ class Optimizer extends \PHPixie\Database\Conditions\Logic\Parser
     
     protected function extractCollections($conditions, $parseLogic = false)
     {
-
         $extracted = array();
         $count = count($conditions);
         foreach($conditions as $key => $condition) {

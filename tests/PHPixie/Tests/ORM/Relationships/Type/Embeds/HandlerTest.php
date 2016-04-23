@@ -72,6 +72,7 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
         $preloadProperty = $this->preloadPropertyValue();
         $result = $this->getReusableResult();
         $plan = $this->getPlan();
+        $relatedLoader = $this->getLoader();
         
         $preloadResult = $this->getPreloadResult();
         $this->method($this->relationship, 'preloadResult', $preloadResult, array($result, $this->configData['path']), 0);
@@ -84,10 +85,11 @@ abstract class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Relationship
             $this->configData['itemModel'],
             $preloadProperty['preload'],
             $preloadResult,
-            $plan
+            $plan,
+            $relatedLoader
         ), 0);
         
-        $this->assertSame($preloader, $this->handler->mapPreload($side, $preloadProperty['property'], $result, $plan));
+        $this->assertSame($preloader, $this->handler->mapPreload($side, $preloadProperty['property'], $result, $plan, $relatedLoader));
     }
     
     protected function prepareGetDocument($document, $path, $createMissing = false, $at = 0)

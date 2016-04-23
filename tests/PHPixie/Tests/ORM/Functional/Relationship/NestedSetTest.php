@@ -7,26 +7,26 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
     protected $relationshipName;
     protected $itemKey;
     protected $itemProperty;
-    
+
     public function setUp()
     {
         $this->defaultORMConfig = array(
             'relationships' => array(
                 array(
-                    'type'  => 'nestedSet',
+                    'type' => 'nestedSet',
                     'model' => 'fairy'
                 )
             )
         );
-        
+
         parent::setUp();
     }
-    
+
     public function testPreloadChildren()
     {
         $this->runTests('preloadChildren');
     }
-    
+
 
     protected function preloadChildrenTest()
     {
@@ -105,7 +105,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->assertNames(
             $map['Trixie'],
             $repository->query()
-                ->relatedTo('parent', function($b) {
+                ->relatedTo('parent', function ($b) {
                     $b->and('name', 'Trixie');
                 })
                 ->find()->asArray()
@@ -118,7 +118,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->assertNames(
             array_keys($expect),
             $repository->query()
-                ->notRelatedTo('parent', function($b) {
+                ->notRelatedTo('parent', function ($b) {
                     $b->and('name', 'Trixie');
                 })
                 ->find()->asArray()
@@ -151,7 +151,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
                 ->find()->asArray()
         );
 
-        $trixie = $repository->query()->findOne();
+        $trixie = $repository->query()->where('name', 'Trixie')->findOne();
 
         $relatedToSets = array(
             $trixie,
@@ -159,11 +159,103 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             $repository->query()->in($trixie)
         );
 
-        foreach($relatedToSets as $relatedTo) {
+        foreach ($relatedToSets as $relatedTo) {
             $this->assertNames(
-                $map['Pixie'],
+                $map['Trixie'],
                 $repository->query()
                     ->relatedTo('parent', $relatedTo)
+                    ->find()->asArray()
+            );
+        }
+    }
+
+    public function testAllParentsConditions()
+    {
+        $this->runTests('allParentsConditions');
+    }
+
+    protected function allParentsConditionsTest()
+    {
+        $map = $this->prepareEntities();
+        $all = $this->getAllFromMap($map);
+
+        $repository = $this->orm->repository('fairy');
+
+        $this->assertNames(
+            array_merge(
+                $map['Pixie'],
+                $map['Trixie'],
+                $map['Fairy']
+            ),
+            $repository->query()
+                ->relatedTo('allParents', function ($b) {
+                    $b->and('name', 'Pixie');
+                })
+                ->find()->asArray()
+        );
+
+        $this->assertNames(
+            array_merge(
+                $map['Pinkie'],
+                $map['Rarity'],
+                $map['Apple'],
+                array('Pinkie', 'Fluttershy', 'Pixie')
+            ),
+            $repository->query()
+                ->notRelatedTo('allParents', function ($b) {
+                    $b->and('name', 'Pixie');
+                })
+                ->find()->asArray()
+        );
+
+        $this->assertNames(
+            array_merge(
+                $map['Pixie'],
+                $map['Trixie'],
+                $map['Fairy']
+            ),
+            $repository->query()
+                ->where('allParents.name', 'Pixie')
+                ->find()->asArray()
+        );
+
+
+        $expect = $all;
+        unset($expect['Pixie']);
+        unset($expect['Pinkie']);
+        unset($expect['Fluttershy']);
+
+        $this->assertNames(
+            array_keys($expect),
+            $repository->query()
+                ->relatedTo('allParents')
+                ->find()->asArray()
+        );
+
+        $this->assertNames(
+            array('Pixie', 'Pinkie', 'Fluttershy'),
+            $repository->query()
+                ->notRelatedTo('allParents')
+                ->find()->asArray()
+        );
+
+        $pixie = $repository->query()->where('name', 'Pixie')->findOne();
+
+        $relatedToSets = array(
+            $pixie,
+            $pixie->id(),
+            $repository->query()->in($pixie)
+        );
+
+        foreach ($relatedToSets as $relatedTo) {
+            $this->assertNames(
+                array_merge(
+                    $map['Pixie'],
+                    $map['Trixie'],
+                    $map['Fairy']
+                ),
+                $repository->query()
+                    ->relatedTo('allParents', $relatedTo)
                     ->find()->asArray()
             );
         }
@@ -184,7 +276,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->assertNames(
             array('Trixie'),
             $repository->query()
-                ->relatedTo('children', function($b) {
+                ->relatedTo('children', function ($b) {
                     $b->and('name', 'Blum');
                 })
                 ->find()->asArray()
@@ -196,19 +288,19 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->assertNames(
             array_keys($expect),
             $repository->query()
-                ->notRelatedTo('children', function($b) {
+                ->notRelatedTo('children', function ($b) {
                     $b->and('name', 'Blum');
                 })
                 ->find()->asArray()
         );
 
         $this->assertNames(
-            $map['Trixie'],
+            array('Trixie'),
             $repository->query()
-                ->where('parent.name', 'Trixie')
+                ->where('children.name', 'Blum')
                 ->find()->asArray()
         );
-/*
+
         $this->assertNames(
             array_merge(
                 array('Pixie', 'Pinkie'),
@@ -222,13 +314,18 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
 
 
         $this->assertNames(
-            array('Pixie', 'Pinkie', 'Fluttershy'),
+            array_merge(
+                $map['Trixie'],
+                $map['Fairy'],
+                $map['Rarity'],
+                $map['Apple'],
+                array('Fluttershy')
+            ),
             $repository->query()
-                ->notRelatedTo('parent')
+                ->notRelatedTo('children')
                 ->find()->asArray()
         );
 
-*/
         $blum = $repository->query()->where('name', 'Blum')->findOne();
 
         $relatedToSets = array(
@@ -237,7 +334,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             $repository->query()->in($blum)
         );
 
-        foreach($relatedToSets as $relatedTo) {
+        foreach ($relatedToSets as $relatedTo) {
             $this->assertNames(
                 array('Trixie'),
                 $repository->query()
@@ -245,6 +342,133 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
                     ->find()->asArray()
             );
         }
+    }
+
+    public function testAllChildrenConditions()
+    {
+        $this->runTests('allChildrenConditions');
+    }
+
+    protected function allChildrenConditionsTest()
+    {
+        $map = $this->prepareEntities();
+        $all = $this->getAllFromMap($map);
+
+        $repository = $this->orm->repository('fairy');
+
+        $this->assertNames(
+            array('Pixie', 'Trixie'),
+            $repository->query()
+                ->relatedTo('allChildren', function ($b) {
+                    $b->and('name', 'Blum');
+                })
+                ->find()->asArray()
+        );
+
+        $expect = $all;
+        unset($expect['Trixie']);
+        unset($expect['Pixie']);
+
+        $this->assertNames(
+            array_keys($expect),
+            $repository->query()
+                ->notRelatedTo('allChildren', function ($b) {
+                    $b->and('name', 'Blum');
+                })
+                ->find()->asArray()
+        );
+
+        $this->assertNames(
+            array('Pixie', 'Trixie'),
+            $repository->query()
+                ->where('allChildren.name', 'Blum')
+                ->find()->asArray()
+        );
+
+        $this->assertNames(
+            array_merge(
+                array('Pixie', 'Pinkie'),
+                $map['Pixie'],
+                $map['Pinkie']
+            ),
+            $repository->query()
+                ->relatedTo('allChildren')
+                ->find()->asArray()
+        );
+
+        $this->assertNames(
+            array_merge(
+                $map['Trixie'],
+                $map['Fairy'],
+                $map['Rarity'],
+                $map['Apple'],
+                array('Fluttershy')
+            ),
+            $repository->query()
+                ->notRelatedTo('allChildren')
+                ->find()->asArray()
+        );
+
+        $blum = $repository->query()->where('name', 'Blum')->findOne();
+
+        $relatedToSets = array(
+            $blum,
+            $blum->id(),
+            $repository->query()->in($blum)
+        );
+
+        foreach ($relatedToSets as $relatedTo) {
+            $this->assertNames(
+                array('Trixie', 'Pixie'),
+                $repository->query()
+                    ->relatedTo('allChildren', $relatedTo)
+                    ->find()->asArray()
+            );
+        }
+    }
+
+    public function testQueries()
+    {
+        $this->runTests('queries');
+    }
+
+    protected function queriesTest()
+    {
+        $map = $this->prepareEntities();
+        $repository = $this->orm->repository('fairy');
+
+        $this->assertNames(
+            $map['Pixie'],
+            $repository->query()
+                ->where('name', 'Pixie')->children()
+                ->find()->asArray()
+        );
+
+        $this->assertNames(
+            array('Pixie'),
+            $repository->query()
+                ->where('name', 'Trixie')->parent()
+                ->find()->asArray()
+        );
+
+        $this->assertNames(
+            array_merge(
+                $map['Pixie'],
+                $map['Trixie'],
+                $map['Fairy']
+            ),
+            $repository->query()
+                ->where('name', 'Pixie')->allChildren()
+                ->find()->asArray()
+        );
+
+        $this->assertNames(
+            array('Trixie', 'Pixie'),
+            $repository->query()
+                ->where('name', 'Blum')->allParents()
+                ->find()->asArray()
+        );
+
     }
 
     public function testAddSetParent()
@@ -255,7 +479,249 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
     protected function addSetParentTest()
     {
         $this->prepareEntities();
-        $this->assertTree($this->initialData());
+        $data = $this->initialData();
+        $this->assertTree($data);
+
+        $trixie = $this->getByName('Trixie');
+        $blum = $this->getByName('Blum');
+
+        $trixie->children->add($blum);
+        $this->assertTree($data);
+    }
+
+    public function testMoveWithinTree()
+    {
+        $this->runTests('moveWithinTree');
+    }
+
+    protected function moveWithinTreeTest()
+    {
+        $this->prepareEntities();
+        $data = $this->initialData();
+
+        $trixie = $this->getByName('Trixie');
+        $sprite = $this->getByName('Sprite');
+
+        $trixie->children->add($sprite);
+
+        $data['Trixie'][1]+=2;
+        $data['Sprite'][0] = $data['Trixie'][1]-2;
+        $data['Sprite'][1] = $data['Trixie'][1]-1;
+        $data['Sprite'][3] = $data['Trixie'][3]+1;
+
+        $data['Fairy'][0]+=2;
+
+
+        $this->assertTree($data);
+
+        $pixie = $this->getByName('Pixie');
+        $pixie->children->add($sprite);
+
+        $data['Trixie'][1]-=2;
+        $data['Sprite'][0] = $data['Pixie'][1]-2;
+        $data['Sprite'][1] = $data['Pixie'][1]-1;
+        $data['Sprite'][3] = $data['Pixie'][3]+1;
+
+        foreach(array('Fairy', 'Mermaid') as $name) {
+            $data[$name][0]-=2;
+            $data[$name][1]-=2;
+        }
+
+        $this->assertTree($data);
+
+        $blum = $this->getByName('Blum');
+        $pixie->children->add($blum);
+
+        $data['Blum'][0] = $data['Pixie'][1]-2;
+        $data['Blum'][1] = $data['Pixie'][1]-1;
+        $data['Trixie'][1]-=2;
+
+        foreach(array('Stella', 'Fairy', 'Sprite', 'Mermaid') as $name) {
+            $data[$name][0]-=2;
+            $data[$name][1]-=2;
+        }
+    }
+
+    public function testMoveOtherTree()
+    {
+        $this->runTests('moveOtherTree');
+    }
+
+    protected function moveOtherTreeTest()
+    {
+        $this->prepareEntities();
+        $data = $this->initialData();
+
+        $trixie = $this->getByName('Trixie');
+        $rarity = $this->getByName('Rarity');
+
+        $trixie->children->add($rarity);
+
+        $offset = $data['Trixie'][1] - $data['Rarity'][0];
+        $depthOffset = $data['Trixie'][3]+1 - $data['Rarity'][3];
+
+        foreach(array('Rarity', 'Rainbow', 'Dash') as $name) {
+            $data[$name][0]+=$offset;
+            $data[$name][1]+=$offset;
+            $data[$name][2] = 1;
+            $data[$name][3]+= $depthOffset;
+        }
+
+        $data['Pixie'][1]+=6;
+        $data['Trixie'][1]+=6;
+        foreach(array('Fairy', 'Sprite', 'Mermaid') as $name) {
+            $data[$name][0]+=6;
+            $data[$name][1]+=6;
+        }
+
+        $data['Pinkie'][1]-=6;
+        foreach(array('Apple', 'Jack', 'Twilight') as $name) {
+            $data[$name][0]-=6;
+            $data[$name][1]-=6;
+        }
+
+        $this->assertTree($data);
+    }
+
+    public function testProperties()
+    {
+        $this->runTests('properties');
+    }
+
+    protected function propertiesTest()
+    {
+        $entities = $this->getPreloadedEntitiesMap();
+
+        $trixie = $entities['Trixie'];
+        $rarity = $entities['Rarity'];
+        $pinkie = $entities['Pinkie'];
+
+        $trixie->children->add($rarity);
+
+        $this->assertSame($trixie, $rarity->parent());
+        $this->assertTrue(in_array($rarity, $trixie->children()->asArray(), true));
+        $this->assertFalse(in_array($rarity, $pinkie->children()->asArray(), true));
+
+        $trixie->parent->set($pinkie);
+        $this->assertSame($pinkie, $trixie->parent());
+        $this->assertTrue(in_array($trixie, $pinkie->children()->asArray(), true));
+
+        $rarity->parent->remove();
+        $this->assertSame(null, $rarity->parent());
+        $this->assertFalse(in_array($rarity, $trixie->children()->asArray(), true));
+
+        $this->assertException(function () use($rarity) {
+            $rarity->children->add(5);
+        }, '\PHPixie\ORM\Exception\Relationship');
+    }
+
+    public function testDeleteConstraint()
+    {
+        $this->runTests('deleteConstraint');
+    }
+
+    protected function deleteConstraintTest()
+    {
+        $this->prepareEntities();
+        $data = $this->initialData();
+
+        $delete = array('Sprite', 'Rainbow', 'Fluttershy');
+        $this->query('fairy')->where('name', 'in', $delete)->delete();
+
+        foreach($delete as $name) {
+            unset($data[$name]);
+        }
+
+        foreach(array('Pixie', 'Fairy', 'Pinkie', 'Rarity') as $name) {
+            $data[$name][1]-=2;
+        }
+
+        foreach(array('Mermaid', 'Dash', 'Apple', 'Jack', 'Twilight') as $name) {
+            $data[$name][0]-=2;
+            $data[$name][1]-=2;
+        }
+
+        $this->assertTree($data);
+
+
+        $self = $this;
+
+        $this->assertException(function() use($self) {
+            $self->getByName('Rarity')->delete();
+        }, '\PHPixie\ORM\Exception\Relationship');
+
+        $delete = array('Trixie', 'Blum', 'Stella', 'Rarity', 'Dash');
+        $this->query('fairy')->where('name', 'in', $delete)->delete();
+
+        foreach($delete as $name) {
+            unset($data[$name]);
+        }
+
+        $data['Pixie'][1]-=6;
+        $data['Pinkie'][1]-=4;
+
+        foreach(array('Fairy', 'Mermaid') as $name) {
+            $data[$name][0]-=6;
+            $data[$name][1]-=6;
+        }
+
+        foreach(array('Apple', 'Jack', 'Twilight') as $name) {
+            $data[$name][0]-=4;
+            $data[$name][1]-=4;
+        }
+
+        $this->assertTree($data);
+
+        $this->query('fairy')->delete();
+        $this->assertTree(array());
+    }
+
+    protected function getPreloadedEntitiesMap()
+    {
+        $this->prepareEntities();
+
+        $entities = $this->query('fairy')->find(array('children'));
+        $map = array();
+
+        foreach($entities as $entity) {
+            $map[$entity->name] = $entity;
+        }
+
+        return $map;
+    }
+
+    public function testAsArray() {
+        $this->runTests('asArray');
+    }
+
+    protected function asArrayTest()
+    {
+        $this->prepareEntities();
+
+        //make sure recursion is prevented
+        $this->query('fairy')->find(array('children'))->asArray(true);
+    }
+
+    public function testMoveParentToChild()
+    {
+        $this->runTests('moveParentToChild');
+    }
+
+    protected function moveParentToChildTest()
+    {
+        $this->prepareEntities();
+
+        $pixie = $this->getByName('Pixie');
+        $sprite = $this->getByName('Sprite');
+
+        $this->assertException(function() use($sprite, $pixie) {
+            $sprite->children->add($pixie);
+        }, '\PHPixie\ORM\Exception');
+    }
+
+    protected function getByName($name)
+    {
+        return $this->query('fairy')->where('name', $name)->findOne();
     }
 
     public function testRemoveParent()
@@ -408,9 +874,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
     {
         $this->runTestCases($name, array(
             'sqlite',
-            //'multiSql',
-            //'mysql',
-            //'mongo',
+            'mysql'
         ));
     }
     
@@ -515,12 +979,12 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         
         $connection->execute('
             CREATE TABLE fairies (
-              id INTEGER PRIMARY KEY AUTO_INCREMENT,
-              name VARCHAR(255),
-              left INTEGER,
-              right INTEGER,
-              rootId Integer,
-              depth INTEGER
+              `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
+              `name` VARCHAR(255),
+              `left` INTEGER,
+              `right` INTEGER,
+              `rootId` INTEGER,
+              `depth` INTEGER
             )
         ');
 

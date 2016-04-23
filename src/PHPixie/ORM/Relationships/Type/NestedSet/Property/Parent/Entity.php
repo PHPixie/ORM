@@ -20,6 +20,7 @@ class Entity extends \PHPixie\ORM\Relationships\Relationship\Implementation\Prop
         $config = $this->side->config();
         $plan = $this->handler->linkPlan($config, $parent, $this->entity);
         $plan->execute();
+        $this->handler->processAdd($config, $parent, $this->entity);
     }
 
     public function remove()
@@ -27,6 +28,20 @@ class Entity extends \PHPixie\ORM\Relationships\Relationship\Implementation\Prop
         $config = $this->side->config();
         $plan = $this->handler->unlinkPlan($config, $this->entity);
         $plan->execute();
+        $this->handler->processRemove($config, $this->entity);
         return $this;
+    }
+
+    public function asData($recursive = false)
+    {
+        if($recursive) {
+            $config = $this->side->config();
+            $childrenProperty = $this->entity->getRelationshipProperty($config->childrenProperty, false);
+            if($childrenProperty->isLoaded()) {
+                return null;
+            }
+        }
+
+        return parent::asData($recursive);
     }
 }

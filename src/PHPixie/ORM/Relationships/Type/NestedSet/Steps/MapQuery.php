@@ -2,50 +2,56 @@
 
 namespace PHPixie\ORM\Relationships\Type\NestedSet\Steps;
 
-class MapQuery
+class MapQuery extends \PHPixie\ORM\Steps\Step
 {
     protected $config;
     protected $type;
     protected $builder;
-    protected $resultStep;
+    protected $result;
     protected $immediateOnly;
 
-    public function __construct($config, $type, $builder, $resultStep, $immediateOnly = false)
+    public function __construct($config, $type, $builder, $result, $immediateOnly = false)
     {
-        var_dump($immediateOnly);
         $this->config = $config;
         $this->type = $type;
         $this->builder = $builder;
-        $this->resultStep = $resultStep;
+        $this->result = $result;
         $this->immediateOnly = $immediateOnly;
     }
 
     public function execute()
     {
-        $fields = ['rootId', 'left', 'right'];
+        $fields = array(
+            $rootIdKey = $this->config->rootIdKey,
+            $leftKey = $this->config->leftKey,
+            $rightKey = $this->config->rightKey
+        );
+
+        $depthKey = $this->config->depthKey;
+
         if($this->immediateOnly) {
-            $fields[]= 'depth';
+            $fields[]= $depthKey;
         }
 
-        $data = $this->resultStep->getFields($fields);
+        $data = $this->result->getFields($fields);
         foreach($data as $row) {
             $this->builder->startOrGroup();
-            $this->builder->_and('rootId', $row['rootId']);
+            $this->builder->_and($rootIdKey, $row[$rootIdKey]);
 
             if ($this->type == 'parent') {
-                $depthModifier = 1;
-                $this->builder
-                    ->_and('left', '<', $row['left'])
-                    ->_and('right', '>', $row['right']);
-            } else {
                 $depthModifier = -1;
                 $this->builder
-                    ->_and('left', '>', $row['left'])
-                    ->_and('right', '<', $row['right']);
+                    ->_and($leftKey, '<', $row[$leftKey])
+                    ->_and($rightKey, '>', $row[$rightKey]);
+            } else {
+                $depthModifier = 1;
+                $this->builder
+                    ->_and($leftKey, '>', $row[$leftKey])
+                    ->_and($rightKey, '<', $row[$rightKey]);
             }
 
             if($this->immediateOnly) {
-                $this->builder->_and('depth', $row['depth'] + $depthModifier);
+                $this->builder->_and($depthKey, $row[$depthKey] + $depthModifier);
             }
 
             $this->builder->endGroup();

@@ -170,7 +170,8 @@ class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Type\OneTo\HandlerTes
         $result = $this->getReusableResult();
         $plan = $this->getPlan();
         $preloadProperty = $this->getOwnerPreloadValue();
-        
+        $relatedLoader = $this->getLoader();
+
         $owner = $this->getDatabaseEntity();
         $this->method($preloadProperty, 'owner', $owner, array(), 0);
         
@@ -181,7 +182,8 @@ class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Type\OneTo\HandlerTes
             $side,
             $preloadProperty,
             $result,
-            $plan
+            $plan,
+            $relatedLoader
         ));
     }
     

@@ -26,6 +26,14 @@ class Entity extends   \PHPixie\ORM\Relationships\Relationship\Implementation\Pr
         return $this;
     }
 
+    public function remove()
+    {
+        $plan = $this->handler->unlinkPlan($this->side, array($this->entity));
+        $plan->execute();
+        $this->handler->processRemove($this->side, $this->entity);
+        return $this;
+    }
+
     public function asData($recursive = false)
     {
         $data = array();

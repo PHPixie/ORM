@@ -11,14 +11,21 @@ abstract class Loader implements \IteratorAggregate
         $this->loaders = $loaders;
     }
 
-    public function asArray($entitiesAsObjects = false)
+    public function asArray($entitiesAsObjects = false, $keyField = null)
     {
         $array = array();
+        $withKey = $keyField === null;
+
         foreach ($this as $entity) {
             if ($entitiesAsObjects) {
                 $entity = $entity->asObject(true);
             }
-            $array[] = $entity;
+            if($withKey) {
+                $array[] = $entity;
+            }else{
+                $field = $entity->getField($field);
+                $array[$field] = $entity;
+            }
         }
 
         return $array;

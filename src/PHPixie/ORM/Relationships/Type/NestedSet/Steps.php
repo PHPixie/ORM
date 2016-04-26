@@ -19,8 +19,8 @@ class Steps
         return new Steps\MoveChild($repository, $config, $childResult, $parentId);
     }
 
-    public function removeChild($repository, $config, $nodeResult)
+    public function removeNodes($repository, $config, $nodeResult)
     {
-        return new Steps\RemoveChild($repository, $config, $nodeResult);
+        return new Steps\RemoveNodes($repository, $config, $nodeResult);
     }
 }

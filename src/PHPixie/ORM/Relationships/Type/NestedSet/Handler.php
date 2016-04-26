@@ -20,7 +20,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
 
         $plan = $this->plans->steps();
         $repository = $this->repository($config);
-        
+
         $childQuery = $repository->databaseSelectQuery();
         $this->planners->in()->items(
             $childQuery,
@@ -28,7 +28,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             array($parent, $child),
             $plan
         );
-        
+
         $childStep = $this->steps->iteratorResult($childQuery);
         $plan->add($childStep);
 
@@ -37,25 +37,40 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         return $plan;
     }
 
-    public function unlinkPlan($config, $entity)
+    public function unlinkPlan($side, $items)
     {
-        $this->assertEntity($config, $entity);
-
-        $plan = $this->plans->steps();
+        $config = $side->config();
         $repository = $this->repository($config);
 
-        $nodeQuery = $repository->databaseSelectQuery();
+        $plan = $this->plans->steps();
+
+        $query = $repository->databaseSelectQuery();
         $this->planners->in()->items(
-            $nodeQuery,
+            $query,
             $config->model,
-            array($entity),
+            $items,
             $plan
         );
 
-        $nodeStep = $this->steps->iteratorResult($nodeQuery);
+        if($side->type() === 'children') {
+            $parentStep = $this->steps->iteratorResult($query);
+            $plan->add($parentStep);
+
+            $query = $repository->databaseSelectQuery();
+            $mapStep = $this->relationship->steps()->mapQuery(
+                $config,
+                'children',
+                $query,
+                $parentStep,
+                true
+            );
+            $plan->add($mapStep);
+        }
+
+        $nodeStep = $this->steps->iteratorResult($query);
         $plan->add($nodeStep);
 
-        $removeStep = $this->relationship->steps()->removeChild($repository, $config, $nodeStep);
+        $removeStep = $this->relationship->steps()->removeNodes($repository, $config, $nodeStep);
         $plan->add($removeStep);
         return $plan;
     }
@@ -152,11 +167,11 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
 
         $preloadStep = $this->steps->reusableResult($query);
         $plan->add($preloadStep);
-        
+
         $loader = $this->loaders->reusableResult($repository, $preloadStep);
         $preloadingProxy = $this->loaders->preloadingProxy($loader);
         $cachingProxy = $this->loaders->cachingProxy($preloadingProxy);
-        
+
         $this->mappers->preload()->map(
             $preloadingProxy,
             $repository->modelName(),
@@ -165,7 +180,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             $plan,
             $cachingProxy
         );
-        
+
         $preloader = $this->relationship->preloader(
             $side,
             $repository->config(),
@@ -205,10 +220,19 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $parentProperty->setValue($parent);
     }
 
-    public function processRemove($config, $node)
+    public function processRemove($side, $node)
     {
-        $parentProperty = $this->removeFromCurrentParent($config, $node);
-        $parentProperty->setValue(null);
+        $config = $side->config();
+        if($side->type() === 'parent') {
+            $this->removeFromCurrentParent($config, $node);
+        }
+
+        $property = $this->getLoadedProperty($node, $config->childrenProperty);
+        if($property !== null) {
+            foreach($property->value()->asArray() as $child) {
+                $this->removeFromCurrentParent($config, $child);
+            }
+        }
     }
 
     protected function removeFromCurrentParent($config, $node)
@@ -223,6 +247,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             }
         }
 
+        $property->setValue(null);
         return $property;
     }
 

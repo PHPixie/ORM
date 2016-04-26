@@ -609,6 +609,12 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $rarity->parent->remove();
         $this->assertSame(null, $rarity->parent());
         $this->assertFalse(in_array($rarity, $trixie->children()->asArray(), true));
+        
+        $fairy = $entities['Fairy'];
+        $fairy->children->remove();
+        $this->assertSame(null, $entities['Sprite']->parent());
+        $this->assertSame(null, $entities['Mermaid']->parent());
+        $this->assertSame(array(), $fairy->children()->asArray(true));
 
         $this->assertException(function () use($rarity) {
             $rarity->children->add(5);
@@ -680,11 +686,14 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
     {
         $this->prepareEntities();
 
-        $entities = $this->query('fairy')->find(array('children'));
+        $entities = $this->query('fairy')->where('depth' ,0)->find(array('children'))->asArray();
         $map = array();
 
-        foreach($entities as $entity) {
-            $map[$entity->name] = $entity;
+        for($i=0; $i<count($entities); $i++) {
+            $map[$entities[$i]->name] = $entities[$i];
+            foreach ($entities[$i]->children() as $child) {
+                $entities[]= $child;
+            }
         }
 
         return $map;
@@ -771,6 +780,36 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
 
         $fluttershy = $this->query('fairy')->where('name', 'Fluttershy')->findOne();
         $fluttershy->parent->remove();
+
+        $this->assertTree($data);
+    }
+
+    public function testRemoveChildren()
+    {
+        $this->runTests('removeChildren');
+    }
+
+    protected function removeChildrenTest()
+    {
+        $this->prepareEntities();
+
+        $data = $this->initialData();
+
+        $pixie = $this->getByName('Pixie');
+        $pixie->children->remove();
+
+        $data['Pixie'][1] = 2;
+
+        $data = array_merge($data, array(
+            'Trixie' => array(1, 6, 4, 0),
+            'Fairy' => array(1, 6, 5, 0),
+
+            'Blum' => array(2, 3, 4, 1),
+            'Stella' => array(4, 5, 4, 1),
+
+            'Sprite' => array(2, 3, 5, 1),
+            'Mermaid' => array(4, 5, 5, 1),
+        ));
 
         $this->assertTree($data);
     }
@@ -874,10 +913,10 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
     {
         $this->runTestCases($name, array(
             'sqlite',
-            'mysql'
+            //'mysql'
         ));
     }
-    
+
     protected function prepareEntities($addWithoutOwner = true)
     {
         $map = array(
@@ -891,7 +930,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
 
             'Fluttershy' => array()
         );
-        
+
         $entities = array(
             'Pixie' => $this->createEntity('fairy', array('name' => 'Pixie')),
             'Pinkie' => $this->createEntity('fairy', array('name' => 'Pinkie')),
@@ -902,7 +941,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
 
         foreach($map as $parent => $children) {
             $parent = $entities[$parent];
-            
+
             foreach($children as $name) {
                 if(!array_key_exists($name, $entities)) {
                     $entities[$name] = $this->createEntity('fairy', array('name' => $name));
@@ -945,19 +984,19 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             'Twilight' => array(11, 12, 2, 2)
         );
     }
-    
+
     protected function prepareSqlite()
     {
         $this->prepareSqliteDatabase();
         $this->prepareSqliteTables();
         $this->prepareOrm();
     }
-    
+
     protected function prepareMultiSql()
     {
         $this->prepareSqliteDatabase(true);
         $this->prepareSqliteTables(true);
-        
+
         $this->prepareOrm(array(
             'models' => array(
                 'flower' => array(
@@ -966,17 +1005,17 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             )
         ));
     }
-    
+
     protected function prepareMysql()
     {
         $this->prepareMysqlDatabase();
-        
+
         $connection = $this->database->get('default');
-        
+
         $connection->execute('
             DROP TABLE IF EXISTS fairies
         ');
-        
+
         $connection->execute('
             CREATE TABLE fairies (
               `id` INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -994,11 +1033,11 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
     protected function prepareSqliteTables($multipleConnections = false)
     {
         $connection = $this->database->get('default');
-        
+
         $connection->execute('
             DROP TABLE IF EXISTS fairies
         ');
-        
+
         $connection->execute('
             CREATE TABLE fairies (
               id INTEGER PRIMARY KEY,
@@ -1009,15 +1048,15 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
               depth INTEGER
             )
         ');
-        
+
         if($multipleConnections) {
             $connection = $this->database->get('second');
         }
-        
+
         $connection->execute('
             DROP TABLE IF EXISTS flowers
         ');
-        
+
         $connection->execute('
             CREATE TABLE flowers (
               id INTEGER PRIMARY KEY,

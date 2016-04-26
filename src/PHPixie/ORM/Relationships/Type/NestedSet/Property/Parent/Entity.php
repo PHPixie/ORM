@@ -25,10 +25,9 @@ class Entity extends \PHPixie\ORM\Relationships\Relationship\Implementation\Prop
 
     public function remove()
     {
-        $config = $this->side->config();
-        $plan = $this->handler->unlinkPlan($config, $this->entity);
+        $plan = $this->handler->unlinkPlan($this->side, array($this->entity));
         $plan->execute();
-        $this->handler->processRemove($config, $this->entity);
+        $this->handler->processRemove($this->side, $this->entity);
         return $this;
     }
 

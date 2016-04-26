@@ -42,6 +42,7 @@ class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\P
 
         if($type === 'parent' && array_key_exists($entityId, $this->parentMap)) {
             $value = $this->parentMap[$entityId];
+
             if($value !== null) {
                 if(array_key_exists($value, $this->idOffsets)) {
                     $value = $this->getEntity($value);
@@ -49,7 +50,6 @@ class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\P
                     $value = $this->relatedLoader->getByOffset($this->relatedIdMap[$value]);
                 }
             }
-
             $property->setValue($value);
         }
     }

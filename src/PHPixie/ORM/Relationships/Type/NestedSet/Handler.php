@@ -65,6 +65,8 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
                 true
             );
             $plan->add($mapStep);
+        } else {
+            $query->where('depth', '>', 0);
         }
 
         $nodeStep = $this->steps->iteratorResult($query);

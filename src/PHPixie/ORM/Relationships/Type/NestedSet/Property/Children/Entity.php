@@ -17,6 +17,11 @@ class Entity extends   \PHPixie\ORM\Relationships\Relationship\Implementation\Pr
         $this->handler->loadProperty($this->side, $this->entity);
     }
 
+    public function allQuery()
+    {
+        return $this->handler->query($this->side, $this->entity, true);
+    }
+                           
     public function add($child)
     {
         $config = $this->side->config();
@@ -26,7 +31,7 @@ class Entity extends   \PHPixie\ORM\Relationships\Relationship\Implementation\Pr
         return $this;
     }
 
-    public function remove()
+    public function removeAll()
     {
         $plan = $this->handler->unlinkPlan($this->side, array($this->entity));
         $plan->execute();

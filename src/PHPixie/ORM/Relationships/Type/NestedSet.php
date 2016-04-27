@@ -43,7 +43,21 @@ class NestedSet extends \PHPixie\ORM\Relationships\Relationship\Implementation
 
     protected function side($type, $config)
     {
+        if(in_array($type, array('children', 'parent'))) {
+            return $this->buildEntitySide($type, $config);
+        }
+        
+        return $this->buildSide($type, $config);
+    }
+    
+    protected function buildSide($type, $config)
+    {
         return new NestedSet\Side($type, $config);
+    }
+    
+    protected function buildEntitySide($type, $config)
+    {
+        return new NestedSet\Side\Entity($type, $config);
     }
 
     protected function sideTypes($config)

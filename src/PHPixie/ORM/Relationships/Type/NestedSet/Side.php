@@ -5,7 +5,6 @@ namespace PHPixie\ORM\Relationships\Type\NestedSet;
 class Side extends    \PHPixie\ORM\Relationships\Relationship\Implementation\Side
            implements \PHPixie\ORM\Relationships\Relationship\Side\Relationship,
                       \PHPixie\ORM\Relationships\Relationship\Side\Preload,
-                      \PHPixie\ORM\Relationships\Relationship\Side\Property\Entity,
                       \PHPixie\ORM\Relationships\Relationship\Side\Property\Query,
                       \PHPixie\ORM\Relationships\Relationship\Side\Cascade\Delete
 {

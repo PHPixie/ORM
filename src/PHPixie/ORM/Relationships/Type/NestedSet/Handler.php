@@ -13,6 +13,11 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         'allChildren' => 'allParents'
     );
 
+    protected $allMap = array(
+        'children' => 'allChildren',
+        'parent'   => 'allParents'
+    );
+
     public function linkPlan($config, $parent, $child)
     {
         $this->assertEntity($config, $parent);
@@ -66,7 +71,9 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
             );
             $plan->add($mapStep);
         } else {
-            $query->where('depth', '>', 0);
+            $query
+                ->where('depth', '>', 0)
+                ->whereNot('depth', null);
         }
 
         $nodeStep = $this->steps->iteratorResult($query);
@@ -77,16 +84,23 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         return $plan;
     }
 
-    public function query($side, $related)
+    public function query($side, $related, $all = false)
     {
         $config = $side->config();
-        $property = $this->opposingMap[$side->type()].'Property';
+        $type = $side->type();
+        
+        $property = $this->opposingMap[$type];
+        if($all) {
+            $property = $this->allMap[$property];
+        }
+        
+        $property.='Property';
         $property = $config->$property;
 
         $repository = $this->repository($config);
         return $repository->query()->relatedTo($property, $related);
     }
-
+    
     public function loadProperty($side, $entity)
     {
         $query = $this->query($side, $entity);

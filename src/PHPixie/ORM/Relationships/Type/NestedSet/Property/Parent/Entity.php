@@ -9,6 +9,11 @@ class Entity extends \PHPixie\ORM\Relationships\Relationship\Implementation\Prop
     {
         return $this->handler->query($this->side, $this->entity);
     }
+    
+    public function allQuery()
+    {
+        return $this->handler->query($this->side, $this->entity, true);
+    }
 
     protected function load()
     {

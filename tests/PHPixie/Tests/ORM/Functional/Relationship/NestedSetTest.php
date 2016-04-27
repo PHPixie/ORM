@@ -611,7 +611,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->assertFalse(in_array($rarity, $trixie->children()->asArray(), true));
         
         $fairy = $entities['Fairy'];
-        $fairy->children->remove();
+        $fairy->children->removeAll();
         $this->assertSame(null, $entities['Sprite']->parent());
         $this->assertSame(null, $entities['Mermaid']->parent());
         $this->assertSame(array(), $fairy->children()->asArray(true));
@@ -796,7 +796,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $data = $this->initialData();
 
         $pixie = $this->getByName('Pixie');
-        $pixie->children->remove();
+        $pixie->children->removeAll();
 
         $data['Pixie'][1] = 2;
 
@@ -812,6 +812,28 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         ));
 
         $this->assertTree($data);
+    }
+
+    public function testAllQuery()
+    {
+        $this->runTests('allQuery');
+    }
+
+    protected function allQueryTest()
+    {
+        $this->prepareEntities();
+
+        $pixie = $this->getByName('Trixie');
+        $this->assertNames(
+            array('Blum', 'Stella'),
+            $pixie->children->allQuery()->find()
+        );
+        
+        $blum = $this->getByName('Blum');
+        $this->assertNames(
+            array('Pixie', 'Trixie'),
+            $blum->parent->allQuery()->find()
+        );
     }
 
     protected function assertTree($data)

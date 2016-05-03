@@ -27,6 +27,7 @@ PHPixie ORM library
     - [Embedded Models in MongoDB](#embedded-models-in-mongodb)
         - [Embeds One](#embeds-one)
         - [Embeds Many](#embeds-many)
+    - [Nested Set](#nested-set)
 
 
 ## Initializing

@@ -9,7 +9,7 @@ class GG extends \PHPixie\ORM\Steps\Step
 
     public function __construct($result, $placeholderField, $resultStep, $resultField)
     {
-        $this->resu;t = $result;
+        $this->result = $result;
         $this->placeholderField = $placeholderField;
         $this->resultStep   = $resultStep;
         $this->resultField  = $resultField;

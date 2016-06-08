@@ -74,7 +74,7 @@ $articleQuery = $orm->query('article');
 
 ### Configuration
 
-By default ORM assumes that thte table name is the plural of the name of the model, and that the name of the primary key is 'id'.
+By default ORM assumes that the table name is the plural of the name of the model, and that the name of the primary key is 'id'.
 For MongoDB database the default id field '_id' is assumed. You can ovveride these settings for a particular model in your
 configuration file:
 
@@ -457,7 +457,7 @@ $categoryQuery->relatedTo('articles.author', function($query) {
 
 ### One To Many
 
-This is the most common relationship. A category can own many articles, a topic has manty replies, etc.
+This is the most common relationship. A category can own many articles, a topic has many replies, etc.
 
 ```php
 // Configuration
@@ -511,7 +511,7 @@ return array(
 );
 ```
 
-Now that we ave relationship properties defined we may start using them:
+Now that we have relationship properties defined we may start using them:
 
 ```php
 // Using with entities
@@ -555,8 +555,8 @@ $articleQuery
 $category->articles->add($articleQuery);
 ```
 
-Queries also have properties, just like Entities do. This allows yout to perform more operations with
-less calls tot he database.
+Queries also have properties, just like Entities do. This allows you to perform more operations with
+less calls to the database.
 
 ```php
 // Assign articles to a category
@@ -602,7 +602,7 @@ $categoryQuery = $orm->query('category')
 
 ### One to One
 
-One to One relationships are very similar to One To Many. The main difference isthat as soon as you attach
+One to One relationships are very similar to One To Many. The main difference is that as soon as you attach
 a new item to an owner, the previous item gets detached. A good example of this would be a relationship between
 an auction lot and the highest bidder. As soon as we set a new person as the highest bidder the old one is unset.
 Another example wold be tasks and workers. Where each task can be performed by a single worker.

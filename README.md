@@ -5,7 +5,7 @@ PHPixie ORM library
 [![Build Status](https://travis-ci.org/PHPixie/ORM.svg?branch=master)](https://travis-ci.org/PHPixie/ORM)
 [![Test Coverage](https://codeclimate.com/github/PHPixie/ORM/badges/coverage.svg)](https://codeclimate.com/github/PHPixie/ORM)
 [![Code Climate](https://codeclimate.com/github/PHPixie/ORM/badges/gpa.svg)](https://codeclimate.com/github/PHPixie/ORM)
-[![HHVM Status](https://img.shields.io/hhvm/phpixie/orm.svg?style=flat-square)](http://hhvm.h4cc.de/package/phpixie/orm)
+[![HHVM Status](https://img.shields.io/hhvm/phpixie/orm.svg?style=flat-sшquare)](http://hhvm.h4cc.de/package/phpixie/orm)
 
 [![Author](http://img.shields.io/badge/author-@dracony-blue.svg?style=flat-square)](https://twitter.com/dracony)
 [![Source Code](http://img.shields.io/badge/source-phpixie/orm-blue.svg?style=flat-square)](https://github.com/phpixie/orm)
@@ -84,7 +84,7 @@ return array(
         'article' => array(
             'type'       => 'database',
             'connection' => 'default',
-            'idField'    => 'id'
+            'id'         => 'id'
         ),
 
         // you can also define embedded models
@@ -784,7 +784,7 @@ MongoDB supports nested documents, which allows using embedded models. E.g. the 
     //...
 
     "author" : {
-        "name" : "Dracony,
+        "name" : "Dracony",
         //...
     }
 }

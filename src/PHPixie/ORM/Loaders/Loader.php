@@ -17,14 +17,16 @@ abstract class Loader implements \IteratorAggregate
         $withKey = $keyField === null;
 
         foreach ($this as $entity) {
+            $value = $entity;
             if ($entitiesAsObjects) {
-                $entity = $entity->asObject(true);
+                $value = $entity->asObject(true);
             }
+            
             if($withKey) {
-                $array[] = $entity;
+                $array[] = $value;
             }else{
-                $field = $entity->getField($keyField);
-                $array[$field] = $entity;
+                $field = $entity->getField($field);
+                $array[$field] = $value;
             }
         }
 

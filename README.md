@@ -204,6 +204,9 @@ $articles = $articles->asArray();
 // Convert it into plain objects,
 // useful for serializing
 $data = $articles->asArray(true);
+
+// Convert it into associative array
+$data = $articles->asArray(true, 'id');
 ```
 
 If you are going to access a particular relationship for multiple items that you are selecting
@@ -483,7 +486,7 @@ return array(
                 // e.g. $category->articles();
                 //
                 // defaults to the plural of the item model
-                'property' => 'articles'
+                'itemsProperty' => 'articles'
             ),
 
             'itemsOptions' => array(
@@ -492,7 +495,7 @@ return array(
                 // e.g. $article->category()
                 //
                 // defaults to the owner model
-                'property' => 'category',
+                'ownerProperty' => 'category',
 
                 // the field that is used to link items
                 // defaults to '<property>Id'
@@ -620,7 +623,7 @@ return array(
             // mandatory options
             'type'  => 'oneToOne',
             'owner' => 'worker',
-            'items' => 'task',
+            'item' => 'task',
 
             // The following keys are optional
             // and will fallback to the defaults
@@ -632,7 +635,7 @@ return array(
                 //
                 // Unlike manyToMany this uses
                 // a singular case by default
-                'property' => 'task'
+                'itemProperty' => 'task'
             ),
 
             // note it's 'itemOptions' here
@@ -641,7 +644,7 @@ return array(
 
                 // the name of the property added to items
                 // e.g. $task->worker()
-                'property' => 'worker',
+                'ownerProperty' => 'worker',
 
                 // the field that is used to link items
                 // defaults to '<property>Id'
@@ -706,11 +709,11 @@ return array(
             // based on model names
 
             'leftOptions' => array(
-                'property' => 'tags'
+                'rightProperty' => 'tags'
             ),
 
             'rightOptions' => array(
-                'property' => 'articles'
+                'leftProperty' => 'articles'
             ),
 
             // depends on property names
@@ -1059,7 +1062,7 @@ return array(
             // All of them are INTEGER
             // These are their default names
             'leftKey'   => 'left',
-            'leftKey'   => 'right',
+            'rightKey'   => 'right',
             'depthKey'  => 'depth',
             'rootIdKey' => 'rootId',
 

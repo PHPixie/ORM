@@ -42,6 +42,12 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
         return $this;
     }
     
+    public function relationshipPropertyNames()
+    {
+        $this->requirePropertyNames();
+        return $this->relationshipProperties;
+    }
+    
     public function getRelationshipProperty($name, $createMissing = true)
     {
         $this->requirePropertyNames();

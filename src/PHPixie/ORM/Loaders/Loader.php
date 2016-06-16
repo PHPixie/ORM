@@ -25,7 +25,7 @@ abstract class Loader implements \IteratorAggregate
             if($withKey) {
                 $array[] = $value;
             }else{
-                $field = $entity->getField($field);
+                $field = $entity->getField($keyField);
                 $array[$field] = $value;
             }
         }

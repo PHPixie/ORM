@@ -6,6 +6,7 @@ interface Entity extends \PHPixie\ORM\Conditions\Condition\In\Item
 {
     public function modelName();
     public function asObject($recursive = false);
+    public function relationshipPropertyNames();
     public function getRelationshipProperty($relationship, $createMissing = true);
     public function data();
     public function getRequiredField($name);

@@ -24,6 +24,11 @@ abstract class Entity implements \PHPixie\ORM\Models\Model\Entity
         return $this->entity->asObject($recursive);
     }
     
+    public function relationshipPropertyNames()
+    {
+        return $this->entity->relationshipPropertyNames();
+    }
+    
     public function getRelationshipProperty($relationship, $createMissing = true)
     {
         return $this->entity->getRelationshipProperty($relationship, $createMissing);

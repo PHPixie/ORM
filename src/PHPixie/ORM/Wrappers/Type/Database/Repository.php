@@ -13,7 +13,12 @@ class Repository implements \PHPixie\ORM\Models\Type\Database\Repository
     {
         $this->repository = $repository;
     }
-    
+
+    public function databaseModel()
+    {
+        return $this->repository->databaseModel();
+    }
+
     public function config()
     {
         return $this->repository->config();

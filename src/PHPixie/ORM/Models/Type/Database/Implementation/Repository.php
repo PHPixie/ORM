@@ -31,7 +31,12 @@ abstract class Repository implements \PHPixie\ORM\Models\Type\Database\Repositor
     {
         return $this->config->model;
     }
-    
+
+    public function databaseModel()
+    {
+        return $this->databaseModel;
+    }
+
     public function query()
     {
         return $this->databaseModel->query($this->modelName());

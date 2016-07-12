@@ -10,6 +10,7 @@ interface Repository
     public function delete($entity);
     public function load($data);
     public function create();
+    public function databaseModel();
 
     /**
      * @return Query

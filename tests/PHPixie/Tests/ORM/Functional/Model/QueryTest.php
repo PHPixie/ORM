@@ -84,7 +84,7 @@ class QueryTest extends \PHPixie\Tests\ORM\Functional\ModelTest
             $this->query()
                 ->orderDescendingBy('name')
                 ->offset(1)
-                ->find()->asArray()
+                ->find(array(), array('name'))->asArray()
         );
     }
 

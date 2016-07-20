@@ -84,19 +84,19 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
         return $this->query->getConditions();
     }
     
-    public function planFind($preload = array())
+    public function planFind($preload = array(), $fields = null)
     {
-        return $this->query->planFind($preload);
+        return $this->query->planFind($preload, $fields);
     }
     
-    public function find($preload = array())
+    public function find($preload = array(), $fields = null)
     {
-        return $this->query->find($preload);
+        return $this->query->find($preload, $fields);
     }
     
-    public function findOne($preload = array())
+    public function findOne($preload = array(), $fields = null)
     {
-        return $this->query->findOne($preload);
+        return $this->query->findOne($preload, $fields);
     }
     
     public function planDelete()

@@ -114,9 +114,9 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
         return $this->container->getConditions();
     }
 
-    public function find($preload = array())
+    public function find($preload = array(), $fields = null)
     {
-        return $this->planFind($preload)->execute();
+        return $this->planFind($preload, $fields)->execute();
     }
 
     /**
@@ -124,12 +124,12 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
      * @return null|Entity
      * @throws \PHPixie\ORM\Exception\Query
      */
-    public function findOne($preload = array())
+    public function findOne($preload = array(), $fields = null)
     {
         $oldLimit = $this->getLimit();
         $this->limit(1);
         
-        $loader = $this->find($preload);
+        $loader = $this->find($preload, $fields);
         
         if($oldLimit !== null)
         {
@@ -144,7 +144,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
         return $loader->getByOffset(0);
     }
     
-    public function planFind($preload = array())
+    public function planFind($preload = array(), $fields = null)
     {
         $preloads = $this->values->preload();
         
@@ -152,7 +152,7 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
             $preloads->add($item);
         }
         
-        return $this->queryMapper->mapFind($this, $preloads);
+        return $this->queryMapper->mapFind($this, $preloads, $fields);
     }
 
 

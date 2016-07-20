@@ -64,19 +64,19 @@ interface Query extends \PHPixie\ORM\Conditions\Condition\In\Item,
      * @param array $preload
      * @return Plan
      */
-    public function planFind($preload = array());
+    public function planFind($preload = array(), $fields = null);
 
     /**
      * @param array $preload
      * @return Loader
      */
-    public function find($preload = array());
+    public function find($preload = array(), $fields = null);
 
     /**
      * @param array $preload
      * @return \PHPixie\ORM\Models\Type\Database\Implementation\Entity
      */
-    public function findOne($preload = array());
+    public function findOne($preload = array(), $fields = null);
 
     /**
      * @return Plan

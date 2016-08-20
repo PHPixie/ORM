@@ -317,7 +317,7 @@ class ORMWrappers extends \PHPixie\ORM\Wrappers\Implementation
     );
 
     // Model names of repositories to wrap
-    protected $databaseQueries = array(
+    protected $databaseRepositories = array(
         'user'
     );
 

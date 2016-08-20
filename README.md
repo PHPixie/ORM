@@ -47,12 +47,12 @@ $orm = new \PHPixie\ORM($database, $slice->arrayData(array(
 ```
 
 > If you are using the PHPixie Framework the ORM component is already set up for you.
-> It is accessable via `$frameworkBuilder->components()->orm()` and can be confgigured
+> It is accessable via `$frameworkBuilder->components()->orm()` and can be configured
 > in the `config/orm.php` file of your bundle.
 
 ## Models
 
-A Model consists of a Repository, Queries and Entities and will usuaully map to a table in a relational database
+A Model consists of a Repository, Queries and Entities and will usually map to a table in a relational database
 or a document collection in MongoDB.
 
 * Entity - a single item, stored in the database, e.g. an article
@@ -75,7 +75,7 @@ $articleQuery = $orm->query('article');
 ### Configuration
 
 By default ORM assumes that the table name is the plural of the name of the model, and that the name of the primary key is 'id'.
-For MongoDB database the default id field '_id' is assumed. You can ovveride these settings for a particular model in your
+For MongoDB database the default id field '_id' is assumed. You can override these settings for a particular model in your
 configuration file:
 
 ```php
@@ -440,7 +440,7 @@ $categoryQuery->relatedTo('articles', function($query) {
 });
 
 // Or a shorthand
-// Yo'll be using this a lot
+// You'll be using this a lot
 $categoryQuery->where('articles.title', 'Welcome');
 
 // You can use the '.'

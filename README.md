@@ -68,7 +68,7 @@ $newArticle   = $repository->createEntity();
 $articleQuery = $repository->query();
 
 // shorthands
-$newArtcile   = $orm->createEntity('article');
+$newArticle   = $orm->createEntity('article');
 $articleQuery = $orm->query('article');
 ```
 
@@ -139,7 +139,7 @@ $articles = $orm->query('article')
 // Actually the in() method can be used
 // to also include subqueries and entities.
 //
-// This will select artciles with id '1',
+// This will select articles with id '1',
 // or the id same as $someArticle, and
 // anything matched by $subQuery
 $articles = $orm->query('article')
@@ -405,7 +405,7 @@ Before looking at actual relationship types, let's see how can you define condit
 // in your config file, more on them later
 $categoryQuery->relatedTo('articles');
 
-// or all artciles with a category
+// or all articles with a category
 $articleQuery->relatedTo('category');
 
 // Use logic operators
@@ -527,7 +527,7 @@ $category = $article->category();
 // Get category articles
 $articles = $category->articles();
 
-// Add artcle to category
+// Add article to category
 $category->articles->add($article);
 
 // Remove article from category

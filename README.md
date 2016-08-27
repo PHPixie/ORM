@@ -345,6 +345,7 @@ class ORMWrappers extends \PHPixie\ORM\Wrappers\Implementation
     }
 
     public function postEntity($entity)
+    {
         return new PostEntity($entity);
     }
 }

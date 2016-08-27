@@ -68,7 +68,7 @@ $newArticle   = $repository->createEntity();
 $articleQuery = $repository->query();
 
 // shorthands
-$newArtcile   = $orm->createEntity('article');
+$newArticle   = $orm->createEntity('article');
 $articleQuery = $orm->query('article');
 ```
 

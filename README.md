@@ -52,7 +52,7 @@ $orm = new \PHPixie\ORM($database, $slice->arrayData(array(
 
 ## Models
 
-A Model consists of a Repository, Queries and Entities and will usuaully map to a table in a relational database
+A Model consists of a Repository, Queries and Entities and will usually map to a table in a relational database
 or a document collection in MongoDB.
 
 * Entity - a single item, stored in the database, e.g. an article

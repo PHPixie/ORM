@@ -52,7 +52,7 @@ $orm = new \PHPixie\ORM($database, $slice->arrayData(array(
 
 ## Models
 
-A Model consists of a Repository, Queries and Entities and will usuaully map to a table in a relational database
+A Model consists of a Repository, Queries and Entities and will usually map to a table in a relational database
 or a document collection in MongoDB.
 
 * Entity - a single item, stored in the database, e.g. an article
@@ -68,14 +68,14 @@ $newArticle   = $repository->createEntity();
 $articleQuery = $repository->query();
 
 // shorthands
-$newArtcile   = $orm->createEntity('article');
+$newArticle   = $orm->createEntity('article');
 $articleQuery = $orm->query('article');
 ```
 
 ### Configuration
 
 By default ORM assumes that the table name is the plural of the name of the model, and that the name of the primary key is 'id'.
-For MongoDB database the default id field '_id' is assumed. You can ovveride these settings for a particular model in your
+For MongoDB database the default id field '_id' is assumed. You can override these settings for a particular model in your
 configuration file:
 
 ```php
@@ -317,7 +317,7 @@ class ORMWrappers extends \PHPixie\ORM\Wrappers\Implementation
     );
 
     // Model names of repositories to wrap
-    protected $databaseQueries = array(
+    protected $databaseRepositories = array(
         'user'
     );
 
@@ -345,6 +345,7 @@ class ORMWrappers extends \PHPixie\ORM\Wrappers\Implementation
     }
 
     public function postEntity($entity)
+    {
         return new PostEntity($entity);
     }
 }

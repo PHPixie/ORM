@@ -272,7 +272,16 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $all = $this->getAllFromMap($map);
 
         $repository = $this->orm->repository('fairy');
-
+        
+        $this->assertNames(
+            array(),
+            $repository->query()
+                ->relatedTo('children', function($q) {
+                    $q->where('id', 100);
+                })
+            ->find()->asArray()
+        );
+        
         $this->assertNames(
             array('Trixie'),
             $repository->query()
@@ -343,7 +352,7 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
             );
         }
     }
-
+    
     public function testAllChildrenConditions()
     {
         $this->runTests('allChildrenConditions');

@@ -34,6 +34,11 @@ class MapQuery extends \PHPixie\ORM\Steps\Step
         }
 
         $data = $this->result->getFields($fields);
+        if(empty($data)) {
+            $this->builder->_and($leftKey, '>*', $rightKey);
+            return;
+        }
+        
         foreach($data as $row) {
             $this->builder->startOrGroup();
             $this->builder->_and($rootIdKey, $row[$rootIdKey]);

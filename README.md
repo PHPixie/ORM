@@ -47,7 +47,7 @@ $orm = new \PHPixie\ORM($database, $slice->arrayData(array(
 ```
 
 > If you are using the PHPixie Framework the ORM component is already set up for you.
-> It is accessable via `$frameworkBuilder->components()->orm()` and can be confgigured
+> It is accessable via `$frameworkBuilder->components()->orm()` and can be configured
 > in the `config/orm.php` file of your bundle.
 
 ## Models
@@ -441,7 +441,7 @@ $categoryQuery->relatedTo('articles', function($query) {
 });
 
 // Or a shorthand
-// Yo'll be using this a lot
+// You'll be using this a lot
 $categoryQuery->where('articles.title', 'Welcome');
 
 // You can use the '.'

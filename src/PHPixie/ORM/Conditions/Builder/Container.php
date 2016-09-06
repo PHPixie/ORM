@@ -21,10 +21,11 @@ class Container extends \PHPixie\Database\Conditions\Builder\Container
     public function addOperatorCondition($logic, $negate, $field, $operator, $values)
     {
         $relationship = null;
-        
-        if (($pos = strpos($field, '>')) !== false || ($pos = strrpos($field, '.')) !== false) {
-            $relationship = substr($field, 0, $pos);
-            $field = substr($field, $pos + 1);
+        if(is_string($field)) {
+            if(($pos = strpos($field, '>')) !== false || ($pos = strrpos($field, '.')) !== false) {
+                $relationship = substr($field, 0, $pos);
+                $field        = substr($field, $pos + 1);
+            }
         }
 
         $condition = $this->buildOperatorCondition($field, $operator, $values);

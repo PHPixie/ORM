@@ -62,7 +62,7 @@ class Database extends \PHPixie\ORM\Models\Model
     }
 
     /**
-     * @param $modelName
+     * @param string $modelName
      * @return Database\Repository
      */
     public function repository($modelName)

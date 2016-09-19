@@ -2,19 +2,33 @@
 
 namespace PHPixie\ORM;
 
+/**
+ * Class Drivers
+ * @package PHPixie\ORM
+ */
 class Drivers
 {
     /**
      * @type \PHPixie\ORM\Builder
      */
     protected $ormBuilder;
+    /**
+     * @var array
+     */
     protected $drivers = array();
-    
+
+    /**
+     * @var array
+     */
     protected $classMap = array(
         'pdo'   => '\PHPixie\ORM\Drivers\Driver\PDO',
         'mongo' => '\PHPixie\ORM\Drivers\Driver\Mongo',
     );
-    
+
+    /**
+     * Drivers constructor.
+     * @param Builder $ormBuilder
+     */
     public function __construct($ormBuilder)
     {
         $this->ormBuilder = $ormBuilder;
@@ -34,7 +48,11 @@ class Drivers
         
         return $this->drivers[$name];
     }
-    
+
+    /**
+     * @param string $name
+     * @return \PHPixie\Database\Driver
+     */
     protected function buildDriver($name) {
         
         $class = $this->classMap[$name];

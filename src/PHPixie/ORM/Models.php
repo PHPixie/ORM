@@ -9,6 +9,9 @@ class Models
      */
     protected $ormBuilder;
     protected $configSlice;
+    /**
+     * @var array|null
+     */
     protected $wrappers;
 
     /**
@@ -20,19 +23,32 @@ class Models
      * @type \PHPixie\ORM\Models\Type\Embedded
      */
     protected $embeddedModel;
-    
+
+    /**
+     * Models constructor.
+     * @param $ormBuilder \PHPixie\ORM\Builder
+     * @param $configSlice
+     * @param null|array $wrappers
+     */
     public function __construct($ormBuilder, $configSlice, $wrappers = null)
     {
         $this->ormBuilder   = $ormBuilder;
         $this->configSlice  = $configSlice;
         $this->wrappers     = $wrappers;
     }
-    
+
+    /**
+     * @param $modelName string
+     * @return mixed
+     */
     public function modelConfigSlice($modelName)
     {
         return $this->configSlice->slice($modelName);
     }
-    
+
+    /**
+     * @return null|array
+     */
     public function wrappers()
     {
         return $this->wrappers;
@@ -63,7 +79,10 @@ class Models
         
         return $this->embeddedModel;
     }
-    
+
+    /**
+     * @return Models\Type\Database
+     */
     protected function buildDatabaseModel()
     {
         return new \PHPixie\ORM\Models\Type\Database(
@@ -73,7 +92,10 @@ class Models
             $this->ormBuilder->drivers()
         );
     }
-    
+
+    /**
+     * @return Models\Type\Embedded
+     */
     protected function buildEmbeddedModel()
     {
         return new \PHPixie\ORM\Models\Type\Embedded(

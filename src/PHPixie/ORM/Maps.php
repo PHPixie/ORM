@@ -9,7 +9,10 @@ class Maps
      */
     protected $ormBuilder;
     protected $configSlice;
-    
+
+    /**
+     * @var array
+     */
     protected $maps = array(
         'relationship',
         'queryProperty',
@@ -17,14 +20,24 @@ class Maps
         'preload',
         'cascadeDelete'
     );
-    
+
+    /**
+     * @var null|array
+     */
     protected $mapInstances = null;
-    
+
+    /**
+     * @var
+     */
     protected $relationshipMap;
     protected $entityPropertyMap;
     protected $queryPropertyMap;
-    
 
+    /**
+     * Maps constructor.
+     * @param $ormBuilder \PHPixie\ORM\Builder
+     * @param $configSlice
+     */
     public function __construct($ormBuilder, $configSlice)
     {
         $this->ormBuilder  = $ormBuilder;
@@ -97,7 +110,10 @@ class Maps
             }
         }
     }
-    
+
+    /**
+     * @param $side \PHPixie\ORM\Relationships\Relationship\Side
+     */
     protected function addSide($side)
     {
         if($side instanceof \PHPixie\ORM\Relationships\Relationship\Side\Relationship) {
@@ -120,7 +136,11 @@ class Maps
             $this->mapInstances['cascadeDelete']->add($side);
         }
     }
-    
+
+    /**
+     * @param $name string
+     * @return mixed
+     */
     protected function getMap($name)
     {
         if($this->mapInstances === null) {
@@ -130,30 +150,45 @@ class Maps
         return $this->mapInstances[$name];
     }
 
+    /**
+     * @return Maps\Map\Relationship
+     */
     protected function buildRelationshipMap()
     {
         return new Maps\Map\Relationship();
     }
-    
+
+    /**
+     * @return Maps\Map\Property\Entity
+     */
     protected function buildEntityPropertyMap()
     {
         return new Maps\Map\Property\Entity(
             $this->ormBuilder->relationships()
         );
     }
-    
+
+    /**
+     * @return Maps\Map\Property\Query
+     */
     protected function buildQueryPropertyMap()
     {
         return new Maps\Map\Property\Query(
             $this->ormBuilder->relationships()
         );
     }
-    
+
+    /**
+     * @return Maps\Map\Preload
+     */
     protected function buildPreloadMap()
     {
         return new Maps\Map\Preload();
     }
-    
+
+    /**
+     * @return Maps\Map\Cascade\Delete
+     */
     protected function buildCascadeDeleteMap()
     {
         return new Maps\Map\Cascade\Delete();

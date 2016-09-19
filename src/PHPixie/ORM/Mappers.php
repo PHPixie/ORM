@@ -2,14 +2,25 @@
 
 namespace PHPixie\ORM;
 
+/**
+ * Class Mappers
+ * @package PHPixie\ORM
+ */
 class Mappers
 {
     /**
      * @type \PHPixie\ORM\Builder
      */
     protected $ormBuilder;
+    /**
+     * @var array
+     */
     protected $instances = array();
-    
+
+    /**
+     * Mappers constructor.
+     * @param $ormBuilder \PHPixie\ORM\Builder
+     */
     public function __construct($ormBuilder)
     {
         $this->ormBuilder = $ormBuilder;
@@ -78,7 +89,11 @@ class Mappers
     {
         return new \PHPixie\ORM\Mappers\Cascade\Path($this);
     }
-    
+
+    /**
+     * @param $name string
+     * @return mixed
+     */
     protected function instance($name)
     {
         if(!array_key_exists($name, $this->instances)) {
@@ -88,7 +103,10 @@ class Mappers
         
         return $this->instances[$name];
     }
-    
+
+    /**
+     * @return Mappers\Query
+     */
     protected function buildQuery()
     {
         return new \PHPixie\ORM\Mappers\Query(
@@ -99,7 +117,10 @@ class Mappers
             $this->ormBuilder->steps()
         );
     }
-    
+
+    /**
+     * @return Mappers\Conditions
+     */
     protected function buildConditions()
     {
         return new \PHPixie\ORM\Mappers\Conditions(
@@ -109,7 +130,10 @@ class Mappers
             $this->ormBuilder->maps()->relationship()
         );
     }
-    
+
+    /**
+     * @return Mappers\Conditions\Optimizer
+     */
     protected function buildConditionsOptimizer()
     {
         return new \PHPixie\ORM\Mappers\Conditions\Optimizer(
@@ -117,7 +141,10 @@ class Mappers
             $this->ormBuilder->conditions()
         );
     }
-    
+
+    /**
+     * @return Mappers\Conditions\Normalizer
+     */
     protected function buildConditionsNormalizer()
     {
         return new \PHPixie\ORM\Mappers\Conditions\Normalizer(
@@ -125,7 +152,10 @@ class Mappers
             $this->ormBuilder->models()
         );
     }
-    
+
+    /**
+     * @return Mappers\Preload
+     */
     protected function buildPreload()
     {
         return new \PHPixie\ORM\Mappers\Preload(
@@ -133,12 +163,18 @@ class Mappers
             $this->ormBuilder->maps()->preload()
         );
     }
-    
+
+    /**
+     * @return Mappers\Update
+     */
     protected function buildUpdate()
     {
         return new \PHPixie\ORM\Mappers\Update();
     }
-    
+
+    /**
+     * @return Mappers\Cascade\Mapper\Delete
+     */
     protected function buildCascadeDelete()
     {
         return new \PHPixie\ORM\Mappers\Cascade\Mapper\Delete(

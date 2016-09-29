@@ -179,7 +179,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $this->mappers->preload()->map(
             $preloadingProxy,
             $sideRepository->modelName(),
-            $preload(),
+            $preload,
             $preloadStep,
             $plan,
             $cachingProxy

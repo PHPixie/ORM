@@ -39,8 +39,10 @@ class PreloaderTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implem
         $itemKey = $this->configData[$type.'PivotKey'];
         
         $fields = array();
+        $allIds = [];
         foreach($this->map as $ownerId => $ids) {
             foreach($ids as $id) {
+                $allIds[$id] = true;
                 $fields[] = array(
                                 $ownerKey => $ownerId,
                                 $itemKey  => $id,
@@ -49,7 +51,8 @@ class PreloaderTest extends \PHPixie\Tests\ORM\Relationships\Relationship\Implem
         }
         
         $this->method($this->pivotResult, 'getFields', $fields, array(array($ownerKey, $itemKey)), 0);
-        $this->prepareMapIdOffsets();
+        $this->method($this->result, 'getField', array_keys($allIds), array('id'), 0);
+        $this->prepareMapIdOffsets(1);
         
     }
 

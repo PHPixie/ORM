@@ -7,7 +7,7 @@ class Property
     protected $options;
     protected $parameters;
      
-    public function __construct($propertyName, $options)
+    public function __construct($propertyName, $options = array())
     {
         $this->propertyName = $propertyName;
         $this->options = $options;

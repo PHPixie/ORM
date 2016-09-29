@@ -37,7 +37,7 @@ class Preload
         return $this->addExplodedPath($path, $options);
     }
     
-    public function addExplodedPath($explodedPath, $options)
+    public function addExplodedPath($explodedPath, $options = array())
     {
         $propertyName = array_shift($explodedPath);
         $property = $this->getProperty($propertyName);

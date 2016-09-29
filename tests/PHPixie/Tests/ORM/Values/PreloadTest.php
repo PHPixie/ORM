@@ -93,11 +93,11 @@ class PreloadTest extends \PHPixie\Test\Testcase
         
         if($property === null) {
             $property = $this->getCascadingProperty($name);
-            $this->method($this->values, 'cascadingPreloadProperty', $property, array($name), 0);
+            $this->method($this->values, 'cascadingPreloadProperty', $property, array($name, array()), 0);
         }
         
         if(!empty($path)) {
-            $this->method($property->preload(), 'addExplodedPath', null, array($path), 0);
+            $this->method($property->preload(), 'addExplodedPath', null, array($path, array()), 0);
         }
         
         return $property;

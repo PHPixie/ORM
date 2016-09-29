@@ -34,6 +34,11 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->runTests('preloadItems');
     }
     
+    public function testPreloadConditionalItems()
+    {
+        $this->runTests('preloadConditionalItems');
+    }
+    
     public function testAddItems()
     {
         $this->runTests('addItems');
@@ -176,6 +181,29 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         foreach($fairies as $fairy) {
             $this->assertEquals(true, $fairy->flowers->isLoaded());
             $this->assertNames($flowerMap[$fairy->name], $fairy->flowers()->asArray());
+        }
+    }
+    
+    protected function preloadConditionalItemsTest()
+    {
+        list($map, $flowerMap, $instances) = $this->prepareEntities();
+        
+        $fairies = $this->orm->repository('fairy')->query()
+            ->find(array(
+                'flowers' => array(
+                    'queryCallback' => function($query) {
+                        $query->where('name', 'Red');
+                    }
+                )
+            ))->asArray();
+        
+        foreach($fairies as $fairy) {
+            $this->assertEquals(true, $fairy->flowers->isLoaded());
+            $expect = array();
+            if(in_array($fairy->name, array('Trixie', 'Blum'))) {
+                $expect = array('Red');
+            }
+            $this->assertNames($expect, $fairy->flowers()->asArray());
         }
     }
     
@@ -408,7 +436,7 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         
         $pivotData = $this->database->get()
                         ->selectQuery()
-                        ->$setSourceMethod('fairies_flowers')
+                        ->$setSourceMethod('fairiesFlowers')
                         ->execute()->asArray();
         
         $this->assertEquals(count($data), count($pivotData));
@@ -423,9 +451,9 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
     {
         $this->runTestCases($name, array(
             'sqlite',
-            'multiSql',
-            'mysql',
-            'mongo',
+            //'multiSql',
+            //'mysql',
+            //'mongo',
         ));
     }
     
@@ -468,11 +496,11 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         ');
         
         $connection->execute('
-            DROP TABLE IF EXISTS fairies_flowers
+            DROP TABLE IF EXISTS fairiesFlowers
         ');
         
         $connection->execute('
-            CREATE TABLE fairies_flowers (
+            CREATE TABLE fairiesFlowers (
               fairyId INTEGER,
               flowerId INTEGER
             )
@@ -497,7 +525,7 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->prepareMongoDatabase();
 
         $connection = $this->database->get('default');
-        $collections = array('fairies', 'flowers', 'fairies_flowers');
+        $collections = array('fairies', 'flowers', 'fairiesFlowers');
         
         foreach($collections as $collection) {
             $connection->deleteQuery()
@@ -519,7 +547,7 @@ class ManyToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         ');
         
         $connection->execute('
-            CREATE TABLE fairies_flowers (
+            CREATE TABLE fairiesFlowers (
               fairyId INTEGER,
               flowerId INTEGER
             )

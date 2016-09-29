@@ -31,18 +31,18 @@ class Preload
         return $this->properties[$name];
     }
     
-    public function addPath($path)
+    public function addPath($path, $options = array())
     {
         $path = explode('.', $path);
-        return $this->addExplodedPath($path);
+        return $this->addExplodedPath($path, $options);
     }
     
-    public function addExplodedPath($explodedPath)
+    public function addExplodedPath($explodedPath, $options)
     {
         $propertyName = array_shift($explodedPath);
         $property = $this->getProperty($propertyName);
         if($property === null) {
-            $property = $this->values->cascadingPreloadProperty($propertyName);
+            $property = $this->values->cascadingPreloadProperty($propertyName, $options);
             $this->addProperty($property);
         }
         
@@ -52,10 +52,10 @@ class Preload
         return $this;
     }
     
-    public function add($item)
+    public function add($item, $options = array())
     {
         if(is_string($item))
-            return $this->addPath($item);
+            return $this->addPath($item, $options);
             
         if($item instanceof \PHPixie\ORM\Values\Preload\Property)
             return $this->addProperty($item);

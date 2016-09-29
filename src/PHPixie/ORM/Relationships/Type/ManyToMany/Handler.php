@@ -161,7 +161,14 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
                             $config->get($dependencies['type'].'PivotKey'),
                             $plan
                         );
-
+        
+        $options = $preloadProperty->options();
+        
+        if(isset($options['queryCallback'])) {
+            $callback = $options['queryCallback'];
+            $callback($sideQuery);
+        }
+        
         $preloadStep = $this->steps->reusableResult($sideQuery);
         $plan->add($preloadStep);
         $loader = $this->loaders->reusableResult($sideRepository, $preloadStep);

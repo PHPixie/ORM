@@ -6,9 +6,9 @@ class Cascading extends \PHPixie\ORM\Values\Preload\Property
 {
     protected $preload;
     
-    public function __construct($propertyName, $preload)
+    public function __construct($propertyName, $preload, $options)
     {
-        parent::__construct($propertyName);
+        parent::__construct($propertyName, $options);
         $this->preload = $preload;
     }
     

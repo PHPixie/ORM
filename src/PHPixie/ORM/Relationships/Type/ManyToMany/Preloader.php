@@ -23,11 +23,15 @@ class Preloader extends \PHPixie\ORM\Relationships\Relationship\Implementation\P
         $itemIdField = $config->get($type.'PivotKey');
         
         $fields = $this->pivotResult->getFields(array($ownerIdField, $itemIdField));
-
+        $itemIds = $this->result->getField($this->modelConfig->idField);
+        $itemIds = array_fill_keys($itemIds, true);
+        
         foreach ($fields as $pivotData) {
             $id = $pivotData[$itemIdField];
             $ownerId = $pivotData[$ownerIdField];
-            $this->pushToMap($ownerId, $id);
+            if(isset($itemIds[$id])) {
+                $this->pushToMap($ownerId, $id);
+            }
         }
 
         $this->mapIdOffsets();

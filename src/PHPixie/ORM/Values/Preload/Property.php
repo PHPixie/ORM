@@ -4,11 +4,13 @@ namespace PHPixie\ORM\Values\Preload;
 
 class Property
 {
-    protected $propertyName;
+    protected $options;
+    protected $parameters;
      
-    public function __construct($propertyName)
+    public function __construct($propertyName, $options)
     {
         $this->propertyName = $propertyName;
+        $this->options = $options;
     }
     
     public function propertyName()
@@ -16,4 +18,8 @@ class Property
         return $this->propertyName;
     }
     
+    public function options()
+    {
+        return $this->options;
+    }
 }

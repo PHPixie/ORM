@@ -148,8 +148,13 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
     {
         $preloads = $this->values->preload();
         
-        foreach($preload as $item) {
-            $preloads->add($item);
+        foreach($preload as $item => $options) {
+            if(is_numeric($item)) {
+                $item = $options;
+                $options = array();
+            }
+            
+            $preloads->add($item, $options);
         }
         
         return $this->queryMapper->mapFind($this, $preloads, $fields);

@@ -12,20 +12,22 @@ class Values
         );
     }
     
-    public function preloadProperty($propertyName)
+    public function preloadProperty($propertyName, $options = array())
     {
         return new \PHPixie\ORM\Values\Preload\Property(
-            $propertyName
+            $propertyName,
+            $options
         );
     }
     
-    public function cascadingPreloadProperty($propertyName)
+    public function cascadingPreloadProperty($propertyName, $options = array())
     {
         $preload = $this->preload();
         
         return new \PHPixie\ORM\Values\Preload\Property\Cascading(
             $propertyName,
-            $preload
+            $preload,
+            $options
         );
     }
     

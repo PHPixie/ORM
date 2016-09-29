@@ -161,7 +161,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
                             $config->get($dependencies['type'].'PivotKey'),
                             $plan
                         );
-        
+        $preload = $preloadProperty->preload();
         $options = $preloadProperty->options();
         
         if(isset($options['queryCallback'])) {
@@ -179,7 +179,7 @@ class Handler extends \PHPixie\ORM\Relationships\Relationship\Implementation\Han
         $this->mappers->preload()->map(
             $preloadingProxy,
             $sideRepository->modelName(),
-            $preloadProperty->preload(),
+            $preload(),
             $preloadStep,
             $plan,
             $cachingProxy

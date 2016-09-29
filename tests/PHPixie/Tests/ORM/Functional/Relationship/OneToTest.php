@@ -340,9 +340,9 @@ abstract class OneToTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
     {
         $this->runTestCases($name, array(
             'sqlite',
-            'multiSql',
-            'mysql',
-            'mongo',
+            //'multiSql',
+            //'mysql',
+            //'mongo',
         ));
     }
     

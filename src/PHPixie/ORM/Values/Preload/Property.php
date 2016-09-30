@@ -4,8 +4,8 @@ namespace PHPixie\ORM\Values\Preload;
 
 class Property
 {
+    protected $propertyName;
     protected $options;
-    protected $parameters;
      
     public function __construct($propertyName, $options = array())
     {

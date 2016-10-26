@@ -592,6 +592,43 @@ class NestedSetTest extends \PHPixie\Tests\ORM\Functional\RelationshipTest
         $this->assertTree($data);
     }
 
+    public function testMoveWithoutReload()
+    {
+        $this->runTests('moveWithoutReload');
+    }
+
+
+    protected function moveWithoutReloadTest()
+    {
+        $pixie = $this->createEntity('fairy', array('name' => 'Pixie'));
+        $trixie = $this->createEntity('fairy', array('name' => 'Trixie'));
+        $blum = $this->createEntity('fairy', array('name' => 'Blum'));
+        $stella = $this->createEntity('fairy', array('name' => 'Stella'));
+        $pinky = $this->createEntity('fairy', array('name' => 'Pinky'));
+        
+        $pinky->parent->set($stella);
+        $stella->parent->set($blum);
+        
+        $pixie->children->add($trixie);
+        $pixie->children->add($blum);
+        
+        $columns = array('id', 'name', 'left', 'right', 'depth', 'rootId');
+        
+        $expect = array(
+            array('1', 'Pixie', '1', '10', '0', '1'),
+            array('2', 'Trixie', '2', '3', '1', '1'),
+            array('3', 'Blum', '4', '9', '1', '1'),
+            array('4', 'Stella', '5', '8', '2', '1'),
+            array('5', 'Pinky', '6', '7', '3', '1'),
+        );
+        
+        foreach($expect as $key => $value) {
+            $expect[$key] = array_combine($columns, $value);
+        }
+        
+        $this->assertData('fairy', $expect);
+    }
+
     public function testProperties()
     {
         $this->runTests('properties');

@@ -78,15 +78,15 @@ class MoveChild extends \PHPixie\ORM\Steps\Step
             $this->prepareNode($child[$idField], $childLeft, $rootId, 0, $parentDepth+1);
         }else{
             //If the child was already moved to the right, we need to compensate for it
-            $childOffset = ($rootId == $child[$rootIdKey] && $child[$leftKey] > $parent[$rightKey]) ? $width : 0;
+            $childOffset = ($rootId == $child[$rootIdKey] && $child[$leftKey] > $childLeft) ? $width : 0;
 
-            $distance = $parent[$rightKey] - $child[$leftKey] - $childOffset;
-
+            $distance = $childLeft - $child[$leftKey] - $childOffset;
+            
             $this->updateQuery()
                 ->increment($leftKey, $distance)
                 ->increment($rightKey, $distance)
                 ->increment($depthKey, $parentDepth+1 - $child[$depthKey])
-                ->set($rootIdKey, $parent[$rootIdKey])
+                ->set($rootIdKey, $rootId)
                 ->where($leftKey, '>=', $child[$leftKey] + $childOffset)
                 ->where($rightKey, '<=', $child[$rightKey] + $childOffset)
                 ->where($rootIdKey, $child[$rootIdKey])

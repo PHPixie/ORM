@@ -21,8 +21,9 @@ class Drivers
      * @var array
      */
     protected $classMap = array(
-        'pdo'   => '\PHPixie\ORM\Drivers\Driver\PDO',
-        'mongo' => '\PHPixie\ORM\Drivers\Driver\Mongo',
+        'pdo'       => '\PHPixie\ORM\Drivers\Driver\PDO',
+        'mongo'     => '\PHPixie\ORM\Drivers\Driver\Mongo',
+        'interbase' => '\PHPixie\ORM\Drivers\Driver\InterBase',
     );
 
     /**

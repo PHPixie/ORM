@@ -55,7 +55,13 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
         $this->query->clearOffset();
         return $this;
     }
-    
+
+    public function orderBy($field, $direction)
+    {
+        $this->query->orderBy($field, $direction);
+        return $this;
+    }
+
     public function orderAscendingBy($field)
     {
         $this->query->orderAscendingBy($field);

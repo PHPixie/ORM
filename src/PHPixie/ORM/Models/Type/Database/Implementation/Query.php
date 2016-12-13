@@ -86,6 +86,12 @@ class Query extends \PHPixie\ORM\Conditions\Builder\Proxy
         return $this;
     }
 
+    public function orderBy($field, $direction)
+    {
+        $this->orderBy[] = $this->values->orderBy($field, $direction);
+        return $this;
+    }
+
     public function orderAscendingBy($field)
     {
         $this->orderBy[] = $this->values->orderBy($field, 'asc');

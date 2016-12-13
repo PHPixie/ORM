@@ -41,6 +41,14 @@ interface Query extends \PHPixie\ORM\Conditions\Condition\In\Item,
     public function clearOffset();
 
     /**
+     * @param $field
+     * @param $direction
+     *
+     * @return static
+     */
+    public function orderBy($field, $direction);
+
+    /**
      * @return static
      */
     public function orderAscendingBy($field);

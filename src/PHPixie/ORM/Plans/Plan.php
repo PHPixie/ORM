@@ -13,19 +13,20 @@ abstract class Plan
 
     public function execute()
     {
-        $transaction = $this->plans->transaction();
         $steps = $this->steps();
         $connections = $this->usedConnections();
-        $transaction->begin($connections);
+        
+        $transaction = $this->plans->transaction($connections);
+        $transaction->begin();
 
         try {
             foreach($steps as $step) {
                 $step->execute();
             }
-            $transaction->commit($connections);
+            $transaction->commit();
 
         } catch (\Exception $exception) {
-            $transaction->rollback($connections);
+            $transaction->rollback();
             throw $exception;
         }
     }

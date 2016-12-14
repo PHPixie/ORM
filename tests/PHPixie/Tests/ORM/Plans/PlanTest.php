@@ -8,16 +8,12 @@ namespace PHPixie\Tests\ORM\Plans;
 abstract class PlanTest extends \PHPixie\Test\Testcase
 {
     protected $plans;
-    protected $transaction;
     protected $connections;
     protected $plan;
     
     public function setUp()
     {
         $this->plans = $this->quickMock('\PHPixie\ORM\Plans');
-        
-        $this->transaction = $this->quickMock('\PHPixie\ORM\Plans\Transaction');
-        $this->method($this->plans, 'transaction', $this->transaction, array());
         
         $this->connections = array(
             $this->getConnection(),
@@ -82,8 +78,12 @@ abstract class PlanTest extends \PHPixie\Test\Testcase
     public function testExecuteRollback()
     {
         $this->addSteps(true);
-        $this->method($this->transaction, 'begin', null, array($this->connections), 0);
-        $this->method($this->transaction, 'rollback', null, array($this->connections), 1);
+        
+        $transaction = $this->quickMock('\PHPixie\ORM\Plans\Transaction');
+        $this->method($this->plans, 'transaction', $transaction, array($this->connections));
+        
+        $this->method($transaction, 'begin', null, array(), 0);
+        $this->method($transaction, 'rollback', null, array(), 1);
         foreach($this->steps as $step)
             $this->method($step, 'execute', function() {
                 throw new \Exception("test");
@@ -103,8 +103,12 @@ abstract class PlanTest extends \PHPixie\Test\Testcase
     protected function prepareExecute()
     {
         $this->addSteps(true);
-        $this->method($this->transaction, 'begin', null, array($this->connections), 0);
-        $this->method($this->transaction, 'commit', null, array($this->connections), 1);
+        
+        $transaction = $this->quickMock('\PHPixie\ORM\Plans\Transaction');
+        $this->method($this->plans, 'transaction', $transaction, array($this->connections));
+        
+        $this->method($transaction, 'begin', null, array(), 0);
+        $this->method($transaction, 'commit', null, array(), 1);
         foreach($this->steps as $step) {
             $step
                 ->expects($this->once())

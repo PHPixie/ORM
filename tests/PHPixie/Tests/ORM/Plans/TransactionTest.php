@@ -17,35 +17,33 @@ class TransactionTest extends \PHPixie\Test\Testcase
             $this->connection(),
             $this->connection(true),
         );
-        $this->transaction = new \PHPixie\ORM\Plans\Transaction;
+        $this->transaction = new \PHPixie\ORM\Plans\Transaction($this->connections);
     }
     
     protected function connection($transactable = false)
     {
-        $class = $transactable ? '\PHPixie\Database\Connection\Transactable' : '\PHPixie\Database\Connection';
-        return $this->abstractMock($class, array(
-            'beginTransaction',
-            'commitTransaction',
-            'rollbackTransaction',
-        ));
+        $class = $transactable ? '\PHPixie\Database\Driver\PDO\Connection' : '\PHPixie\Database\Connection';
+        return $this->quickMock($class);
     }
     
     /**
      * @covers ::begin
-     * @covers ::<protected>
-     */
-    public function testBeginTransaction()
-    {
-        $this->transactionTest('begin');
-    }
-    
-    /**
      * @covers ::commit
      * @covers ::<protected>
      */
-    public function testCommitTransaction()
+    public function testTransaction()
     {
-        $this->transactionTest('commit');
+        $this->method($this->connections[0], 'inTransaction', false, array(), 0);
+        $this->method($this->connections[2], 'inTransaction', false, array(), 0);
+        
+        $this->method($this->connections[0], 'beginTransaction', null, array(), 1);
+        $this->method($this->connections[2], 'beginTransaction', null, array(), 1);
+        
+        $this->method($this->connections[0], 'commitTransaction', null, array(), 2);
+        $this->method($this->connections[2], 'commitTransaction', null, array(), 2);
+        
+        $this->transaction->begin();
+        $this->transaction->commit();
     }
     
     /**
@@ -54,17 +52,16 @@ class TransactionTest extends \PHPixie\Test\Testcase
      */
     public function testRollbackTransaction()
     {
-        $this->transactionTest('rollback');
-    }
-    
-    protected function transactionTest($method)
-    {
-        $connectionMethod = $method.'Transaction';
-        $this->method($this->connections[0], $connectionMethod, null, array(), 0);
-        $this->connections[1]
-                ->expects($this->never())
-                ->method($connectionMethod);
-        $this->method($this->connections[2], $connectionMethod, null, array(), 0);
-        $this->transaction->$method($this->connections);
+        $this->method($this->connections[0], 'inTransaction', false, array(), 0);
+        $this->method($this->connections[2], 'inTransaction', false, array(), 0);
+        
+        $this->method($this->connections[0], 'beginTransaction', null, array(), 1);
+        $this->method($this->connections[2], 'beginTransaction', null, array(), 1);
+        
+        $this->method($this->connections[0], 'rollbackTransaction', null, array(), 2);
+        $this->method($this->connections[2], 'rollbackTransaction', null, array(), 2);
+        
+        $this->transaction->begin();
+        $this->transaction->rollback();
     }
 }

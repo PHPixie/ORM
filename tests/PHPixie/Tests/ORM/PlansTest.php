@@ -76,9 +76,11 @@ class PlansTest extends \PHPixie\Test\Testcase
      */
     public function testTransaction()
     {
-        $transaction = $this->plans->transaction();
-        $this->assertInstanceOf('\PHPixie\ORM\Plans\Transaction', $transaction);
-        $this->assertSame($transaction, $this->plans->transaction());
+        $connections = array(5);
+        $transaction = $this->plans->transaction($connections);
+        $this->assertInstance($transaction, '\PHPixie\ORM\Plans\Transaction', array(
+            'connections' => $connections
+        ));
     }
 
 }

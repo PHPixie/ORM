@@ -108,13 +108,16 @@ abstract class HandlerTest extends \PHPixie\Test\Testcase
     protected function config($map, $methodMap = array())
     {
         $config = $this->getConfig();
-        $config
-            ->expects($this->any())
-            ->method('get')
-            ->will($this->returnCallback(function($key) use($map){
-                return $map[$key];
-            }));
-
+        
+        if(method_exists($config, 'get')) {
+            $config
+                ->expects($this->any())
+                ->method('get')
+                ->will($this->returnCallback(function($key) use($map){
+                    return $map[$key];
+                }));
+        }
+        
         foreach($map as $key => $value)
             $config->$key = $value;
 

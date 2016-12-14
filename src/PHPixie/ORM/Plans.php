@@ -5,11 +5,6 @@ namespace PHPixie\ORM;
 class Plans
 {
     /**
-     * @type Plans\Transaction
-     */
-    protected $transaction;
-
-    /**
      * @return Plans\Plan\Steps
      */
     public function steps()
@@ -48,16 +43,8 @@ class Plans
     /**
      * @return Plans\Transaction
      */
-    public function transaction()
+    public function transaction($connections)
     {
-        if ($this->transaction === null)
-            $this->transaction = $this->buildTransaction();
-
-        return $this->transaction;
-    }
-
-    protected function buildTransaction()
-    {
-        return new Plans\Transaction();
+        return new Plans\Transaction($connections);
     }
 }

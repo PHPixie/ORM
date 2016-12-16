@@ -238,7 +238,14 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
                                         $resultField,
                                         $plan
                                     );
-
+        $preload = $preloadProperty->preload();
+        $options = $preloadProperty->options();
+        
+        if(isset($options['queryCallback'])) {
+            $callback = $options['queryCallback'];
+            $callback($query);
+        }
+        
         $preloadStep = $this->steps->reusableResult($query);
         $plan->add($preloadStep);
         $loader = $this->loaders->reusableResult($preloadRepository, $preloadStep);
@@ -248,7 +255,7 @@ abstract class Handler extends \PHPixie\ORM\Relationships\Relationship\Implement
         $this->mappers->preload()->map(
             $preloadingProxy,
             $preloadRepository->modelName(),
-            $preloadProperty->preload(),
+            $preload,
             $preloadStep,
             $plan,
             $cachingProxy

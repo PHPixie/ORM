@@ -710,11 +710,11 @@ return array(
             // based on model names
 
             'leftOptions' => array(
-                'rightProperty' => 'tags'
+                'property' => 'tags'
             ),
 
             'rightOptions' => array(
-                'leftProperty' => 'articles'
+                'property' => 'articles'
             ),
 
             // depends on property names

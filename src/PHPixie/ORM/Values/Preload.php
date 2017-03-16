@@ -47,7 +47,7 @@ class Preload
         }
         
         if(!empty($explodedPath))
-            $property->preload()->addExplodedPath($explodedPath);
+            $property->preload()->addExplodedPath($explodedPath, $options);
         
         return $this;
     }

@@ -4,7 +4,7 @@
     "keywords": ["orm", "database"],
     "homepage": "http://phpixie.com",
     "type": "library",
-    "license": "BSD",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Roman Tsiupa",

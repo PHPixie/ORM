@@ -351,7 +351,7 @@ class ContainerTest extends \PHPixie\Tests\Database\Conditions\Builder\Container
     
     protected function getInItem($modelName)
     {
-        $item = $this->getMock('\PHPixie\ORM\Conditions\Condition\In\Item', array());
+        $item = $this->quickMock('\PHPixie\ORM\Conditions\Condition\In\Item');
         $item
             ->expects($this->any())
             ->method('modelName')

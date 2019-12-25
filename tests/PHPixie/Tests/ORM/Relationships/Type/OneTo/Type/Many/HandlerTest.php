@@ -389,8 +389,9 @@ class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Type\OneTo\HandlerTes
     }
 
     protected function getItem($expectCreateMissing = true, $hasProperty = true, $ownerLoaded = false, $owner = null) {
+        $ownerEntity = $owner !== null ? $owner['entity'] : null;
         $entity = $this->getDatabaseEntity();
-        return $this->addSingleProperty($entity, 'owner', $hasProperty, $ownerLoaded, $owner['entity'], $expectCreateMissing);
+        return $this->addSingleProperty($entity, 'owner', $hasProperty, $ownerLoaded, $ownerEntity, $expectCreateMissing);
     }
 
     protected function getOwner($hasProperty = true, $loaded = true, $expectCreateMissing = false, $id = 1)

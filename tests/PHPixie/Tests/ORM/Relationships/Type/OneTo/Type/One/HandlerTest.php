@@ -211,8 +211,9 @@ class HandlerTest extends \PHPixie\Tests\ORM\Relationships\Type\OneTo\HandlerTes
     }
     
     protected function getSideEntity($type, $expectCreateMissing = true, $hasProperty = true, $valueLoaded = false, $value = null) {
+        $valueEntity = $value !== null ? $value['entity'] : null;
         $entity = $this->getDatabaseEntity();
-        return $this->addSingleProperty($entity, $this->opposing($type), $hasProperty, $valueLoaded, $value['entity'], $expectCreateMissing);
+        return $this->addSingleProperty($entity, $this->opposing($type), $hasProperty, $valueLoaded, $valueEntity, $expectCreateMissing);
     }
     
     protected function opposing($type)

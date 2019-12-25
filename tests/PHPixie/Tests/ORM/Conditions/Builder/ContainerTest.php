@@ -40,7 +40,7 @@ class ContainerTest extends \PHPixie\Tests\Database\Conditions\Builder\Container
                     'fairy' => 'pixie'
                 );
                 
-                $side = $self->getMock('\PHPixie\ORM\Relationships\Relationship\Side\Relationship', array());
+                $side = $self->quickMock('\PHPixie\ORM\Relationships\Relationship\Side\Relationship');
                 $side
                     ->expects($this->any())
                     ->method('relatedModelName')

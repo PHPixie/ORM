@@ -15,10 +15,10 @@ class ContainerTest extends \PHPixie\Tests\Database\Conditions\Builder\Container
     
     public function setUp()
     {
-        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder', array(), array(), '', false);
+        $this->ormBuilder = $this->quickMock('\PHPixie\ORM\Builder', array());
         $this->conditions = new \PHPixie\ORM\Conditions($this->ormBuilder);
-        $this->maps = $this->getMock('\PHPixie\ORM\Maps', array(), array(), '', false);
-        $this->relationshipMap = $this->getMock('\PHPixie\ORM\Maps\Map\Relationship', array(), array(), '', false);
+        $this->maps = $this->quickMock('\PHPixie\ORM\Maps');
+        $this->relationshipMap = $this->quickMock('\PHPixie\ORM\Maps\Map\Relationship', array());
 
         $this->ormBuilder
             ->expects($this->any())
